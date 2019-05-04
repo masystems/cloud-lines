@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Database Export</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Impex</li>
+                <li class="breadcrumb-item active">Export</li>
+            </ol>
+        </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <h4 class="card-title">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} Export Settings</h4>
+                <h6 class="card-subtitle"></h6>
+                <div class="skin skin-square">
+                    <form action="{% url 'export' %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row pt-3">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Select infomation to export</label>
+                                    <div class="input-group text-right">
+                                        <ul class="icheck-list">
+                                            {% for field in fields %}
+                                                {% if 'mother' != field.name and 'father' != field.name %}
+                                                    <li>
+                                                        <input type="checkbox" checked class="check" data-checkbox="icheckbox_line-green" name="fields" value='{{ field.name }}' data-label="{{ field.name }}"> </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Download</label>
+<!--                                    <button type="submit" class="btn btn-block btn-outline-info mt-2" name="submit" value='xlsx'>Download .XLSX</button>-->
+                                    <button type="submit" class="btn btn-block btn-outline-success" name="submit" value='csv'>Download .CSV</button>
+<!--                                    <button type="submit" class="btn btn-block btn-outline-primary" name="submit" value='pdf'>Download .PDF</button>-->
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

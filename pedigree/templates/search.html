@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} Search</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{{ animal_type|title }}</a></li>
+                <li class="breadcrumb-item active">Search</li>
+            </ol>
+        </div>
+
+        <div class="col-md-6 col-4 align-self-center">
+
+        {% if editor %}
+            <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Add {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+            </a>
+
+        {% else %}
+            {% include 'login_modal.html' %}
+            <!-- /.modal -->
+            <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Add {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+        {% endif %}
+
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+
+    <div class="container-fluid">
+        <div class="col-12">
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form class="form-control-line" method="POST" action="{% url 'results' %}"
+                        enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="form-group has-success">
+                            <div class="form-group has-success">
+                                <label class="form-control-label" for="search"> Search</label>
+                                <input class="form-control form-control-success" name="search" id="search" required type="text">
+                            </div>
+
+                            {% if error %}
+                            <br>
+                                <div class="alert alert-warning" role="alert">
+                                    {{ error }}<strong>{{ search_string }}</strong>.
+                                </div>
+                            {% endif %}
+<!--                            <button type="submit" class="btn btn-outline-success">Search</button>-->
+                        </div>
+                    </form>
+                    <table id="table" class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">Reg No.</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">DOB</th>
+                        <th scope="col">DOD</th>
+                        <th scope="col">Breed</th>
+                        <th scope="col">Sex</th>
+                        <th scope="col">Notes</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for pedigree in pedigrees.all %}
+                    <tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
+                        style="cursor: pointer;">
+                        <th scope="row">{{ pedigree.reg_no }}</th>
+                        <td>{{ pedigree.name }}</td>
+                        <td>{{ pedigree.dob }}</td>
+                        <td>{% if pedigree.dod %}{{ pedigree.dod }}{% endif %}</td>
+                        <td>{{ pedigree.attribute.breed.breed_name }}</td>
+                        <td><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
+                        <td>{{ pedigree.note }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

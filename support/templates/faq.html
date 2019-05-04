@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Support</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">FAQs</li>
+            </ol>
+        </div>
+        <div class="col-md-6 col-4 align-self-center">
+            <button type="button" class="btn float-right hidden-sm-down btn-success ml-1" data-toggle="modal" data-target="#add-contact">New Support Ticket</button>
+            <!-- Add Contact Popup Model -->
+            <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h4 class="modal-title" id="myModalLabel">Close</h4> </div>
+                        <div class="modal-body">
+                            <form class="form-control-line">
+                                <div class="form-group">
+
+                                        <label>Subject</label>
+                                        <input type="text" class="form-control">
+
+                                        <label>Priority</label>
+                                        <select type="text" class="form-control">
+                                            <option>low</option>
+                                            <option>medium</option>
+                                            <option>high</option>
+                                        </select>
+
+                                        <label>Problem description</label>
+                                        <textarea class="form-control" rows="5"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info waves-effect" data-dismiss="modal">Save</button>
+                            <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">FAQs</h4>
+                <h6 class="card-subtitle"></h6>
+                <div id="accordion1" role="tablist" aria-multiselectable="true">
+                    <div class="card mb-0">
+                        <div class="card-header" role="tab" id="headingOne1">
+                            <h5 class="mb-0">
+                            <a data-toggle="collapse" data-parent="#accordion1" href="#collapseOne1" aria-expanded="true" aria-controls="collapseOne">
+                              Q1. How do I become admin ?
+                            </a>
+                          </h5>
+                        </div>
+                        <div id="collapseOne1" class="collapse show" role="tabpanel" aria-labelledby="headingOne1">
+                            <div class="card-body">
+                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-0">
+                        <div class="card-header" role="tab" id="headingTwo2">
+                            <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" data-parent="#accordion1" href="#collapseTwo2" aria-expanded="false" aria-controls="collapseTwo2">
+                              Q2. How to modify Navigation?
+                            </a>
+                          </h5>
+                        </div>
+                        <div id="collapseTwo2" class="collapse" role="tabpanel" aria-labelledby="headingTwo2">
+                            <div class="card-body">
+                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" role="tab" id="headingThree3">
+                            <h5 class="mb-0">
+                            <a class="collapsed" data-toggle="collapse" data-parent="#accordion1" href="#collapseThree3" aria-expanded="false" aria-controls="collapseThree3">
+                              Q3. How to get yearly Support?
+                            </a>
+                          </h5>
+                        </div>
+                        <div id="collapseThree3" class="collapse" role="tabpanel" aria-labelledby="headingThree3">
+                            <div class="card-body">
+                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

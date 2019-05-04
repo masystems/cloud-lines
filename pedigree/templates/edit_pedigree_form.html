@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<style>
+    ul {
+  list-style-type: none;
+}
+
+li {
+  display: inline-block;
+}
+
+.removeImageCheck {
+  display: none;
+}
+
+.removeImages {
+  border: 1px solid #fff;
+  padding: 10px;
+  position: relative;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.removeImages:before {
+  background-color: white;
+  color: white;
+  content: " ";
+  border-radius: 50%;
+  border: 1px solid #f009;
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  transition-duration: 0.4s;
+  transform: scale(0);
+
+}
+
+.removeImages img {
+  height: 200px;
+  transition-duration: 0.2s;
+  transform-origin: 50% 50%;
+}
+
+:checked + .removeImages {
+  border-color: #ddd;
+}
+
+:checked + .removeImages:before {
+  content: "x";
+  background-color: #f009;
+  transform: scale(1);
+}
+
+:checked + .removeImages img {
+  transform: scale(0.9);
+  box-shadow: 0 0 5px #f009;
+}
+</style>
+
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Edit {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Form</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} Search</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree' pedigree.id %}">{{ pedigree.reg_no }}</a></li>
+                <li class="breadcrumb-item active">Edit {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</li>
+            </ol>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="container pt-5">
+        <div class="card ">
+            <div class="card-header">
+                <h4 class="mb-0 ">Edit {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}: {{ pedigree.reg_no }}</h4>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'edit_pedigree_form' pedigree.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-body">
+                        <h3 class="box-title">{% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Info</h3>
+                        <hr class="mt-0 mb-5">
+                        {% if pedigree_form.errors %}
+                            {% for field in pedigree_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in pedigree_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in pedigree_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {% for field in pedigree_form.visible_fields %}
+                            <div class="col-lg-6 col-md-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                    <div class="col-md-9">
+                                        {% if field.label == 'Breeder' %}
+                                            <div id="breeders">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.breeder != None %}{{ pedigree.breeder }}{% endif %}">
+                                            </div>
+                                        {% elif field.label == 'Current owner'%}
+                                            <div id="breeders">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.current_owner != None %}{{ pedigree.current_owner }}{% endif %}">
+                                            </div>
+                                        {% elif field.label == 'Mother' %}
+                                            <div id="mothers">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
+                                            </div>
+                                        {% elif field.label == 'Breed group' %}
+                                            <div id="breed_groups">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.breed_group != None %}{{ pedigree.breed_group }}{% endif %}">
+                                            </div>
+                                        {% elif field.label == 'Father' %}
+                                            <div id="fathers">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_father != None %}{{ pedigree.parent_father }}{% endif %}">
+                                            </div>
+
+                                        {% elif field.label == 'Registration Number' %}
+                                            {% render_field field class="form-control" value=pedigree.reg_no %}
+                                        {% elif field.label == 'Name' %}
+                                            {% render_field field class="form-control" value=pedigree.name %}
+                                        {% elif field.label == 'Date of registration' %}
+                                             {% render_field field class="form-control" type="date" value=pedigree.date_of_registration %}
+                                        {% elif field.label == 'Date of birth' %}
+                                            {% render_field field class="form-control" type="date" value=pedigree.dob %}
+                                        {% elif field.label == 'Dod' %}
+                                            {% render_field field class="form-control" type="date" value=pedigree.dod%}
+                                        {% elif field.label == 'Sex' %}
+                                            <div class="radio radio-info pt-2">
+                                                {% for option in field %}
+                                                    <input type="radio" name="sex" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if pedigree.sex == option.choice_label|lower %}checked{% endif %}>
+                                                        <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }} </label>
+                                                {% endfor %}
+                                        </div>
+                                        {% elif field.label == 'Description' %}
+                                            <textarea name="description" id="id_description" class="form-control" cols="40" rows="10">{{ pedigree.description }}</textarea>
+                                        {% elif field.label == 'Note' %}
+                                            {% render_field field class="form-control" value=pedigree.note %}
+                                        {% else %}
+                                            {% render_field field class="form-control" %}
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                          <span class="help-block text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <h3 class="box-title">Attributes</h3>
+                        <hr class="mt-0 mb-5">
+                        <!--/row-->
+                        {% if attributes_form.errors %}
+                            {% for field in attributes_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in attributes_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in attributes_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {% for field in attributes_form.visible_fields %}
+                                {% if field.name != 'reg_no'%}
+                                    <div class="col-lg-6 col-md-12">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 text-right col-form-label">{{ field.label }}</label>
+                                            <div class="col-md-9">
+                                                {% if field.label == 'Breed' %}
+                                                    <div id="breeds">
+                                                        <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ pedigree.attribute.breed.breed_name }}" value="{{ pedigree.attribute.breed.breed_name }}">
+                                                    </div>
+                                                {% elif field.label == 'Eggs per week' %}
+                                                    {% render_field field class="form-control" value=pedigree.attribute.eggs_per_week %}
+                                                {% elif field.label == 'Prize winning' %}
+                                                    {% for option in field %}
+                                                        <div class="checkbox checkbox-success pt-2">
+                                                            <input id="{{ field.label }}" name='{{ field.name }}' value="1" type="checkbox" {% if pedigree.attribute.prize_winning %}checked{% endif %}>
+                                                            <label for="{{ field.label }}"></label>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    {{ field }}
+                                                {% endif %}
+                                                {% for error in field.errors %}
+                                                  <span class="help-block text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <!--/row-->
+                        <h3 class="box-title">Images</h3>
+                        <hr class="mt-0 mb-5">
+                        <!--/row-->
+                        {% if image_form.errors %}
+                            {% for field in image_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in image_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in image_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            {% for field in image_form.visible_fields %}
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 text-right col-form-label">{{ field.label }}</label>
+                                        <div class="col-md-9">
+                                            {{ field }}
+                                            {% for error in field.errors %}
+                                              <span class="help-block text-danger">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <hr>
+                            {% if pedigree.images.first %}
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="form-group row">
+                                        <h4 class="text-muted">Select images to be removed</h4>
+                                        <div class="pt-2">
+                                            {% for image in pedigree.images.all %}
+                                                <input type="checkbox" name='{{ pedigree.id }}-{{ image.id }}' class="removeImageCheck" id="{{ image.id }}" />
+                                                <label class="removeImages" for="{{ image.id }}"><img src="{{ image.image.url }}" /></label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        </div>
+                        <!--/row-->
+                    </div>
+                    <hr>
+                    <div class="form-actions">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-success">Submit</button>
+                                        <a href="{% url 'pedigree' pedigree.id %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
+                                        <button type="button" data-toggle="modal" data-target="#delete" class="model_img img-fluid btn btn-danger float-right">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% include 'delete.html' with name=pedigree.name %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </form>
+    </div>
+
+    </div>
+
+
+
+{% endblock %}

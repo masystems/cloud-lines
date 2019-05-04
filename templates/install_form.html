@@ -1,0 +1,94 @@
+{% load widget_tweaks %}
+<div class="row" id="validation">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <div class="card wizard-content">
+            <div class="card-body">
+                <h4 class="card-title">Site Install</h4>
+                <h6 class="card-subtitle">We need to capture a few bits of information before creating your site.</h6>
+                <form id="installForm" action="{% url 'install' %}" method="POST" enctype="multipart/form-data" class="validation-wizard wizard-circle">
+                    {% csrf_token %}
+                    <!-- Step 1 -->
+                    <h6>Site Details</h6>
+                    <section>
+                        <div class="row">
+                            <!--loop start-->
+                            {% for field in install_form.visible_fields %}
+                            {% if field.label != 'Install available' %}
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                    <div class="col-md-9">
+                                        {{ field|attr:"class:form-control" }}
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                    <!-- Step 2 -->
+                    <h6>Accounts</h6>
+                    <section>
+                        <p>Please enter your account detials. You will be able to add other accounts from within the application.</p>
+                        <div class="form-row">
+                            <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ti-user"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="First Name" name="firstname" aria-label="Firstname" required>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ti-user"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Last Name" name="lastname" aria-label="Lastname" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ti-user"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Username" name="username" aria-label="Username" required>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ti-email"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Email" name="email" aria-label="Email" required>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ti-lock"></i></span>
+                                    </div>
+                                    <input type="password" class="form-control" placeholder="Password" name="password" aria-label="Password" required>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="ti-lock"></i></span>
+                                    </div>
+                                    <input type="password" class="form-control" placeholder="Confirm Password" name="password2" aria-label="Password" required>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

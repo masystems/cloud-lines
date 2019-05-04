@@ -1,0 +1,255 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>CloudLines</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="{% static 'css/colors/green.css' %}" id="theme" rel="stylesheet">
+
+    <title>CloudLines</title>
+    <style>
+        td:nth-child(1) {
+            vertical-align: middle;
+        }
+        td:nth-child(2) {
+            vertical-align: middle;
+        }
+
+        .feeds li span {
+            font-size: 14px;
+        }
+        table {
+            width:100% !important;
+            border-style: solid;
+            border-width: thin;
+        }
+    </style>
+</head>
+
+<body class="fix-header fix-sidebar card-no-border">
+<!-- ============================================================== -->
+<!-- Main wrapper - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<div id="main-wrapper">
+    <!-- ============================================================== -->
+    <!-- Topbar header - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <header class="topbar">
+        <nav class="navbar top-navbar navbar-expand-md navbar-light">
+            <!-- ============================================================== -->
+            <!-- Logo -->
+            <!-- ============================================================== -->
+            <div class="navbar-header">
+                <h2 style="color:white"> CloudLines</h2>
+            </div>
+        </nav>
+    </header>
+
+    <div class="page-wrapper">
+        <div class="container-fluid">
+            <table class="table responsive" style="width:100%">
+                <tbody>
+                    <tr>
+                        <!--## col1 ##-->
+                        <td>
+                            {% if lvl1.images.first %}
+                                <img src="{% for image in lvl1.images.all %}
+                                            {% if forloop.first %}
+                                                {{ image.image.url }}
+                                            {% endif %}
+                                        {% endfor %}"
+                                   class="img-responsive thumbnail mr-3">
+                            {% endif %}
+                        </td>
+                        <!--## col2 ##-->
+                        <td>
+                            <ul style="list-style-type:none;">
+                              <li><strong>Breeder:</strong> {{ lvl1.breeder.prefix }}</li>
+                              <li><strong>Owner:</strong> {{ lvl1.current_owner.prefix }}</li>
+                            </ul>
+                            <p></p>
+                            <p></p>
+                        </td>
+                        <!--## col3 ##-->
+                        <td>
+                            <ul style="list-style-type:none;">
+                                <li><strong>Reg No.</strong>: {{ lvl1.reg_no }}</li>
+                                <li><strong>Name:</strong> {{ lvl1.name }}</li>
+                                {% if lvl1.dob %}
+                                    <li><strong>DOB:</strong> {{ lvl1.dob }}</li>
+                                {% endif %}
+                                {% if lvl1.dod %}
+                                    <li><strong>DOD:</strong> {{ lvl1.dod }}</li>
+                                {% endif %}
+                                {% if lvl1.date_of_registration %}
+                                    <li><strong>DOR:</strong> {{ lvl1.date_of_registration }}</li>
+                                {% endif %}
+                                {% if lvl1.sex %}
+                                    <li><strong>Sex:</strong> {{ lvl1.sex }}</li>
+                                {% endif %}
+                                {% if lvl1.note %}
+                                    <li><strong>Note:</strong> {{ lvl1.note }}</li>
+                                {% endif %}
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table responsive" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Parents</th>
+                        <th>Grandparents</th>
+                        <th>Great Grandparents</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <!--## col1 ##-->
+                        <td rowspan="4">
+                            <!--cell text-->
+                            {% if lvl2_1 %}
+                                {{ lvl2_1.reg_no }}
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                        <!--## col2 ##-->
+                        <td rowspan="2">
+                            {% if lvl3_1 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                        <!--## col3 ##-->
+                        <td>
+                            {% if lvl4_1 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--## col3 ##-->
+                        <td>
+                            {% if lvl4_2 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--## col2 ##-->
+                        <td rowspan="2">
+                            {% if lvl3_2 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                        <!--## col3 ##-->
+                        <td>
+                            {% if lvl4_3 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--## col3 ##-->
+                        <td>
+                            {% if lvl4_4 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--## col1 ##-->
+                        <td rowspan="4">
+                            <!--cell text-->
+                            {% if lvl2_2 %}
+                                {{ lvl2_2.reg_no }}
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                        <!--## col2 ##-->
+                        <td rowspan="2">
+                            {% if lvl3_3 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                        <!--## col3 ##-->
+                        <td>
+                            {% if lvl4_5 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--## col3 ##-->
+                        <td>
+                            {% if lvl4_6 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--## col2 ##-->
+                        <td rowspan="2">
+                            {% if lvl3_4 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                        <!--## col3 ##-->
+                        <td>
+                            {% if lvl4_7 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <!--## col3 ##-->
+                        <td>
+                            {% if lvl4_8 %}
+
+                            {% else %}
+                                ~~~
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <footer class="footer">
+            © 2019 MA Systems Ltd | V2.0
+        </footer>
+    </div>
+</div>
+
+</body>
+
+</html>

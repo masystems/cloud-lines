@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} Search</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} Search</a></li>
+                <li class="breadcrumb-item active">Search results</li>
+            </ol>
+        </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+        {% if editor %}
+            <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Create
+            </a>
+
+        {% else %}
+            {% include 'login_modal.html' %}
+            <!-- /.modal -->
+            <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Create</button>
+        {% endif %}
+
+    </div>
+</div>
+
+<h2 class="featurette-heading">Search Results: {{ search_string }}</h2>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="table" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Reg No.</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">DOB</th>
+                    <th scope="col">DOD</th>
+                    <th scope="col">Breed</th>
+                    <th scope="col">Sex</th>
+                    <th scope="col">Notes</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for result in results.all %}
+                <tr onclick="window.location='{% url 'pedigree' result.id %}';"
+                    style="cursor: pointer;">
+                    <th scope="row">{{ result.reg_no }}</th>
+                    <td>{{ result.name }}</td>
+                    <td>{{ result.dob }}</td>
+                    <td>{{ result.dod }}</td>
+                    <td>{{ result.attribute.breed.breed_name }}</td>
+                    <td><span class="label {% if result.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ result.sex }} </span></td>
+                    <td>{{ result.notes }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

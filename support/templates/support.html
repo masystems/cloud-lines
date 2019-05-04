@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Support</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Support</li>
+            </ol>
+        </div>
+        <div class="col-md-6 col-4 align-self-center">
+            <button type="button" class="btn float-right hidden-sm-down btn-success ml-1" data-toggle="modal" data-target="#add-contact">New Support Ticket</button>
+            <a href="{% url 'faq' %}"><button type="button" class="btn float-right hidden-sm-down btn-info">FAQs</button></a>
+            <!-- Add Contact Popup Model -->
+            <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h4 class="modal-title" id="myModalLabel">Close</h4> </div>
+                        <div class="modal-body">
+                            <form action="{% url 'support' %}" method="POST" class="form-control-line">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    {% if support_form.errors %}
+                                        {% for field in support_form %}
+                                            {% for error in field.errors %}
+                                                <div class="alert alert-danger">
+                                                    <strong>{{ field.label }}: {{ error }}</strong>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        {% for error in support_form.non_field_errors %}
+                                            <div class="alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% for hidden in support_form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                    {% for field in support_form.visible_fields %}
+                                        {% render_field field class+="form-control" placeholder=field.label|title %}
+                                    {% endfor %}
+                                </div>
+
+
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-success waves-effect">Submit</button>
+                                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Tickets</h4>
+                    <div class="table-responsive m-t-40">
+                        <table id="supportTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Subject</th>
+                                    <th>Priority</th>
+                                    <th>Problem</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for ticket in tickets.all %}
+                                <tr>
+                                    <td>{{ ticket.id }}</td>
+                                    <td>{{ ticket.subject }}</td>
+                                    <td><span class="label {% if ticket.priority == 'low' %} label-info{% elif ticket.priority == 'medium' %} label-warning{% else %} label-danger{% endif %}">{{ ticket.priority|title }}</span></td>
+                                    <td>{{ ticket.description }}</td>
+                                    <td><span class="label {% if ticket.status == 'open' %} label-info{% elif ticket.status == 'waiting_on_customer' %} label-warning{% else %} label-danger{% endif %}">{{ ticket.status|title|cut:"_" }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+{% endblock %}

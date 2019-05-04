@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">New {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Form</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} search</a></li>
+                <li class="breadcrumb-item active">New {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Form</li>
+            </ol>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="container pt-5">
+        <div class="card ">
+            <div class="card-header">
+                <h4 class="mb-0 ">Choose existing {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Form</h4>
+            </div>
+            <div class="card-body">
+
+            </div>
+        </div>
+
+        <div class="card ">
+            <div class="card-header">
+                <h4 class="mb-0 ">Add New {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Form</h4>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'new_pedigree_form' %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-body">
+                        <h3 class="box-title">{% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Info</h3>
+                        <hr class="mt-0 mb-5">
+                        {% if pedigree_form.errors %}
+                            {% for field in pedigree_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in pedigree_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in pedigree_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {% for field in pedigree_form.visible_fields %}
+                            <div class="col-lg-6 col-md-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right col-form-label">{% if site_mode == 'breed_groups' %}
+                                                                                        <!--make sure you don't show mother and father fields!-->
+                                                                                        {% if field.label|title != 'Mother' and field.label|title != 'Father' %}
+                                                                                            {{ field.label|title }}
+                                                                                        {% else %}
+                                                                                        {% endif %}
+                                                                                      {% else %}
+                                                                                        {{ field.label|title }}
+                                                                                      {% endif %}</label>
+                                    <div class="col-md-9">
+                                        {% if field.label == 'Breeder' or field.label == 'Current owner' %}
+                                            <div id="breeders">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                            </div>
+                                        {% elif field.label == 'Mother' %}
+                                            <div id="mothers">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                            </div>
+                                        {% elif field.label == 'Father'  %}
+                                            <div id="fathers">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                            </div>
+                                        {% elif field.label == 'Breed group'  %}
+                                            <div id="breed_groups">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                            </div>
+                                        {% elif field.label == 'Sex' %}
+                                            <div class="radio radio-info pt-2">
+                                                {% for option in field %}
+                                                    <input type="radio" name="sex" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}">
+                                                        <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }} </label>
+                                                {% endfor %}
+                                        </div>
+                                        {% else %}
+                                            {{ field }}
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                          <span class="help-block text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                        <h3 class="box-title">Attributes</h3>
+                        <hr class="mt-0 mb-5">
+                        <!--/row-->
+                        {% if attributes_form.errors %}
+                            {% for field in attributes_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in attributes_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in attributes_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {% for field in attributes_form.visible_fields %}
+                                {% if field.name != 'reg_no'%}
+                                    <div class="col-lg-6 col-md-12">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 text-right col-form-label">{{ field.label }}</label>
+                                            <div class="col-md-9">
+                                                {% if field.label == 'Breed' %}
+                                                    <div id="breeds">
+                                                        <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                                    </div>
+                                                {% elif field.label == 'Prize winning' %}
+                                                    {% for option in field %}
+                                                        <div class="checkbox checkbox-success pt-2">
+                                                            <input id="{{ field.label }}" name='{{ field.name }}' value="1" type="checkbox">
+                                                            <label for="{{ field.label }}"></label>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    {{ field }}
+                                                {% endif %}
+                                                {% for error in field.errors %}
+                                                  <span class="help-block text-danger">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <!--/row-->
+                        <h3 class="box-title">Images</h3>
+                        <hr class="mt-0 mb-5">
+                        <!--/row-->
+                        {% if image_form.errors %}
+                            {% for field in image_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in image_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in image_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            {% for field in image_form.visible_fields %}
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 text-right col-form-label">{{ field.label }}</label>
+                                        <div class="col-md-9">
+                                            {{ field }}
+                                            {% for error in field.errors %}
+                                              <span class="help-block text-danger">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <!--/row-->
+                    </div>
+                    <hr>
+                    <div class="form-actions">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <button type="submit" class="btn btn-success">Submit</button>
+                                        <a href="{% url 'pedigree_search' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6"> </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </form>
+    </div>
+
+    </div>
+
+
+
+{% endblock %}

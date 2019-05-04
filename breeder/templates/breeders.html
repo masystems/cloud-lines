@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} Breeders</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Breeders</li>
+            </ol>
+        </div>
+        <div class="col-md-6 col-4 align-self-center">
+
+            {% if editor %}
+            <a href="{% url 'new_breeder_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Add Breeder
+            </a>
+            {% else %}
+                {% include 'login_modal.html' %}
+            <!-- /.modal -->
+            <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Add Breeder</button>
+        {% endif %}
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="row">
+        <div class="col-12">
+            <h2 class="featurette-heading">Breeders</h2>
+            <div class="card">
+                <div class="card-body">
+                    <table id="table" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Prefix</th>
+                            <th scope="col">Address</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Phone</th>
+                        </tr>
+                        </thead>
+                        <tbody id="bredTable">
+                        {% for breeder in breeders.all %}
+                            {% if breeder.active %}
+                                <tr onclick="window.location='{% url 'breeder' breeder.prefix %}';"
+                                                    style="cursor: pointer;">
+                                    <th scope="row">{{ breeder.contact_name }}</th>
+                                    <td>{{ breeder.prefix }}</td>
+                                    <td>{{ breeder.address }}</td>
+                                    <td>{{ breeder.email }}</td>
+                                    <td>{{ breeder.phone_number1 }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

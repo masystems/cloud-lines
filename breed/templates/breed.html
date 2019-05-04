@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">{{ breed.breed_name }}</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'breeds' %}">Breeds</a></li>
+                <li class="breadcrumb-item active">{{ breed.breed_name }}</li>
+            </ol>
+        </div>
+        <div class="col-md-6 col-4 align-self-center">
+
+            {% if editor %}
+                <a href="{% url 'edit_breed_form' breed.id %}" class="btn btn-outline-info float-right"><i class="fas fa-pencil-alt"></i> Edit
+                </a>
+            {% else %}
+                {% include 'login_modal.html' %}
+                <button class="btn btn-outline-info float-right" data-toggle="modal" data-target="#login"><i class="fas fa-pencil-alt"></i> Edit</button>
+            {% endif %}
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="row">
+        <div class="col-12 mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">{{ breed.breed_name|title }} Details</h4>
+                    <h6 class="card-subtitle mb-2 text-muted"></h6>
+                    {% if breed.image %}
+                        <img src="{{ breed.image.url }}" style="max-width:350px" class="float-left pr-2">
+                    {% endif %}
+                    <p class="card-text">{{ breed.description|linebreaks }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

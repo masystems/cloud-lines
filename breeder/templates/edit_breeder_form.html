@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Edit Breeder Form</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'breeders' %}">Breeders</a></li>
+                <li class="breadcrumb-item active">Edit Breeder Form</li>
+            </ol>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="container pt-5">
+        <div class="card ">
+            <div class="card-header">
+                <h4 class="mb-0 ">Edit Breeder: {{ breeder.prefix }}</h4>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'edit_breeder_form' breeder.id%}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-body">
+                        <h3 class="box-title">Breeder Info</h3>
+                        <hr class="mt-0 mb-5">
+                        {% if breeder_form.errors %}
+                            {% for field in breeder_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in breeder_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in breeder_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {% for field in breeder_form.visible_fields %}
+                            <div class="col-lg-6 col-md-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                    <div class="col-md-9">
+                                        {% if field.label == 'Prefix' %}
+                                            {% render_field field class="form-control" value=breeder.prefix %}
+                                        {% elif field.label == 'Contact name' %}
+                                            {% render_field field class="form-control" value=breeder.contact_name %}
+                                        {% elif field.label == 'Address' %}
+                                            {% render_field field class="form-control" value=breeder.address %}
+                                        {% elif field.label == 'Phone number1' %}
+                                            {% render_field field class="form-control" value=breeder.phone_number1 %}
+                                        {% elif field.label == 'Phone number2' %}
+                                            {% render_field field class="form-control" value=breeder.phone_number2 %}
+                                        {% elif field.label == 'Email' %}
+                                            {% render_field field class="form-control" value=breeder.email %}
+                                        {% elif field.label == 'Active' %}
+                                            {% if breeder.active %}
+                                                {{ field|attr:"class:form-control"|attr:"checked: " }}
+                                            {% else %}
+                                                {% render_field field class="form-control" %}
+                                            {% endif %}
+                                        {% else %}
+                                            {% render_field field class="form-control" %}
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-success">Submit</button>
+                                            <a href="{% url 'breeder' breeder.prefix %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
+                                                <button type="button" data-toggle="modal" data-target="#delete" class="model_img img-fluid btn btn-danger float-right">Delete</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% include 'delete.html' with name=breeder.prefix %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </form>
+    </div>
+
+    </div>
+
+
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">New Breed Form</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'breeds' %}">Breeds</a></li>
+                <li class="breadcrumb-item active">New Breed Form</li>
+            </ol>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="container pt-5">
+        <div class="card ">
+            <div class="card-header">
+                <h4 class="mb-0 ">Add New Breed Form</h4>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'new_breed_form' %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-body">
+                        <h3 class="box-title">Breed Info</h3>
+                        <hr class="mt-0 mb-5">
+                        {% if breed_form.errors %}
+                            {% for field in breed_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in breed_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in breed_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {% for field in breed_form.visible_fields %}
+                            <div class="col-lg-6 col-md-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                    <div class="col-md-9">
+                                        {{ field|attr:"class:form-control" }}
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    <hr>
+                    <div class="form-actions">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-offset-3 col-md-9">
+                                        <button type="submit" class="btn btn-success">Submit</button>
+                                        <a href="{% url 'breeds' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6"> </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </form>
+    </div>
+
+    </div>
+
+
+
+{% endblock %}

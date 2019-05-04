@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">New Breed Group Form</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'breed_groups' %}">Breed Groups</a></li>
+                <li class="breadcrumb-item active">New Breed Group Form</li>
+            </ol>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="container pt-5">
+        <div class="card ">
+            <div class="card-header">
+                <h4 class="mb-0 ">Add New Breed Group Form</h4>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'new_breed_group_form' %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-body">
+                        <h3 class="box-title">Breed Info</h3>
+                        <hr class="mt-0 mb-5">
+                        {% if breed_group_form.errors %}
+                            {% for field in breed_group_form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>{{ field.label }}: {{ error }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in breed_group_form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="row">
+                            {% for hidden in breed_group_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            {% for field in breed_group_form.visible_fields %}
+                            <div class="col-lg-6 col-md-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                    <div class="col-md-9">
+                                        {% if field.label == 'Breeder' %}
+                                            <div id="breeders">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                            </div>
+                                        {% elif field.label == 'Breed' %}
+                                                    <div id="breeds">
+                                                        <input class="typeahead form-control" id="breed" onchange="updateMembers()" onkeyup='updateMembers()' onclick="updateMembers()" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}" required>
+                                                        <small>Typing in the field will refresh the available birds in the group members field below.</small>
+                                                    </div>
+                                        {% elif field.label == 'Group members' %}
+                                            <div id="members">
+                                                <select class="form-control" id='mem' name='{{ field.name }}' multiple='multiple' size="10" style="height: 100%;">
+                                                    {% for pedigree in pedigree.all %}
+                                                        <option value="{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}">{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                                <small>Hold down CTRL to select multiple birds.</small>
+                                            </div>
+
+                                        <script>
+                                            function updateMembers() {
+                                                var breed = document.getElementById('breed').value;
+                                                var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.attribute.breed.breed_name }}', {% endfor %} };
+
+                                                $('#mem').empty();
+
+                                                $.each(options, function(key, value) {
+                                                    if (value.includes(breed)) {
+                                                        var option = document.createElement('option')
+                                                            option.setAttribute("value", key);
+                                                        var val = document.createTextNode(key);
+                                                            option.appendChild(val);
+                                                        document.getElementById("mem").appendChild(option);
+                                                    }
+                                                });
+                                            }
+                                        </script>
+                                        {% else %}
+                                            {{ field|attr:"class:form-control" }}
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-9">
+                                            <button type="submit" class="btn btn-success">Submit</button>
+                                            <a href="{% url 'breed_groups' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6"> </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </form>
+    </div>
+
+    </div>
+
+
+
+{% endblock %}

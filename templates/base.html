@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load staticfiles %}
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/images/favicon.png' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+    <title>CloudLines</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/plugins/datatables/media/css/dataTables.bootstrap4.css' %}">
+    <link href="{% static 'assets/plugins/icheck/skins/all.css' %}" rel="stylesheet">
+    <!-- Popup CSS -->
+    <link href="{% static 'assets/plugins/Magnific-Popup-master/dist/magnific-popup.css' %}" rel="stylesheet">
+    <!--form css-->
+    <link href="{% static 'assets/plugins/bootstrap-select/bootstrap-select.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/plugins/multiselect/css/multi-select.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/plugins/dropzone-master/dist/dropzone.css' %}" rel="stylesheet" type="text/css" />
+    <!-- chart-->
+    <link href="{% static 'assets/plugins/morrisjs/morris.css' %}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="{% static 'css/colors/green.css' %}" id="theme" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
+    <!--Download as pdf-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
+</head>
+
+<body class="fix-header fix-sidebar card-no-border">
+<!-- ============================================================== -->
+<!-- Preloader - style you can find in spinners.css -->
+<!-- ============================================================== -->
+<div class="preloader">
+    <svg class="circular" viewBox="25 25 50 50">
+        <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+    </svg>
+</div>
+<!-- ============================================================== -->
+<!-- Main wrapper - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<div id="main-wrapper">
+    <!-- ============================================================== -->
+    <!-- Topbar header - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <header class="topbar">
+        <nav class="navbar top-navbar navbar-expand-md navbar-light">
+            <!-- ============================================================== -->
+            <!-- Logo -->
+            <!-- ============================================================== -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <!-- Logo icon -->
+                    <b>
+                        <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+                        <!-- Dark Logo icon -->
+                        <i class="fas fa-cloud fa-lg" style="color:white"></i>
+                    </b>
+                    <!--End Logo icon -->
+                    <!-- Logo text -->
+                    <span>
+                        <!-- Light Logo text -->
+                         <img src="{% static 'assets/images/logo-light-text.png' %}" class="light-logo" alt="CloudLines"/></span>
+                </a>
+            </div>
+            <!-- ============================================================== -->
+            <!-- End Logo -->
+            <!-- ============================================================== -->
+            <div class="navbar-collapse">
+                <!-- ============================================================== -->
+                <!-- toggle and nav items -->
+                <!-- ============================================================== -->
+                <ul class="navbar-nav mr-auto mt-md-0 ">
+                    <!-- This is  -->
+                    <li class="nav-item"><a class="nav-link nav-toggler hidden-md-up text-muted waves-effect waves-dark"
+                                            href="javascript:void(0)"><i class="ti-menu"></i></a></li>
+                    <li class="nav-item"><a
+                            class="nav-link sidebartoggler hidden-sm-down text-muted waves-effect waves-dark"
+                            href="javascript:void(0)"><i class="far fa-arrow-alt-circle-left"></i></a></li>
+                </ul>
+                <!-- ============================================================== -->
+                <!-- User profile and search -->
+                <!-- ============================================================== -->
+                <ul class="navbar-nav my-lg-0">
+                    <li class="nav-item hidden-sm-down">
+                        {% if user.is_authenticated %}
+                        <form class="app-search" method="POST" action="{% url 'results' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="text" name="search" id="search" class="form-control" placeholder="{% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}search"> <a class="srh-btn"><i
+                                class="ti-search"></i></a></form>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img
+                                src="{% static 'assets/images/users/u1.gif' %}" alt="user" class="profile-pic"/></a>
+                        {% if user.is_authenticated %}
+                        <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                            <ul class="dropdown-user">
+                                <li>
+                                    <div class="dw-user-box">
+                                        <div class="u-img"><img src="{% static 'assets/images/users/1.jpg' %}"
+                                                                alt="user"></div>
+                                        <div class="u-text">
+                                            <h4>{{ request.user.get_full_name }} {{ request.user.last }}</h4>
+                                            <p class="text-muted">{{ request.user.email }}</p></div>
+                                    </div>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#"><i class="ti-settings"></i> Account Setting</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{% url 'logout' %}"><i class="fa fa-power-off"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                        {% else %}
+                        <div class="dropdown-menu dropdown-menu-right animated flipInY">
+                            <ul class="dropdown-user">
+                                <li><a href="{% url 'login' %}"><i class="fa fa-power-off"></i> Login</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <!-- ============================================================== -->
+    <!-- End Topbar header -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- Left Sidebar - style you can find in sidebar.scss  -->
+    <!-- ============================================================== -->
+    <aside class="left-sidebar">
+        <!-- Sidebar scroll-->
+        <div class="scroll-sidebar">
+            <!-- Sidebar navigation-->
+            <nav class="sidebar-nav">
+                <ul id="sidebarnav">
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a class="" href="{% url 'dashboard' %}" aria-expanded="false"><i class="fas fa-home"></i><span
+                                class="hide-menu"> Dashboard</span></a>
+                    </li>
+                    <li>
+                        <a href="{% url 'pedigree_search' %}"><i class="{% if site_mode == 'mammal' %}fas fa-paw{% else %}fas fa-egg{% endif %}"></i><span
+                                class="hide-menu"> {{ animal_type|title }}</span></a>
+                    </li>
+                    <li><a href="{% url 'breeders' %}"><i class="fas fa-users"></i><span
+                                class="hide-menu"> Breeders</span></a></li>
+                    {% if site_mode == 'poultry' %}
+                        <li><a href="{% url 'breed_groups' %}"><i class="far fa-object-ungroup"></i><span
+                                    class="hide-menu"> Breed Groups</span></a></li>
+                    {% endif %}
+                    <li><a href="{% url 'breeds' %}"><i class="fas fa-random"></i><span
+                                class="hide-menu"> Breeds</span></a></li>
+                    <li class="nav-devider"></li>
+                    <li class="nav-small-cap"> Database Management</li>
+                    <li>
+                        <a class="has-arrow " href="#" aria-expanded="false"><i class="fas fa-arrow-alt-circle-down"></i><span
+                                class="hide-menu"> Impex Database</span></a>
+                        <ul aria-expanded="false" class="collapse">
+                            <li><a href="#">Import</a></li>
+                            <li><a href="{% url 'export' %}">Export</a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="{% url 'support' %}"><i class="fas fa-hands-helping"></i><span
+                                class="hide-menu"> Support</span></a></li>
+                    <li><a href="{% url 'faq' %}"><i class="fas fa-question"></i><span
+                                class="hide-menu"> FAQs</span></a></li>
+                    {% else %}
+                    <li>
+                        <a class="" href="{% url 'home' %}" aria-expanded="false"><i class="fas fa-home"></i><span
+                                class="hide-menu"> Home</span></a>
+                    </li>
+                    <li>
+                        <a class="" href="#about" aria-expanded="false"><i class="fas fa-info-circle"></i><span
+                                class="hide-menu"> About</span></a>
+                    </li>
+                    <li>
+                        <a class="" href="#pricing" aria-expanded="false"><i class="fas fa-pound-sign"></i><span
+                                class="hide-menu"> Pricing</span></a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <!-- End Sidebar navigation -->
+        </div>
+        <!-- End Sidebar scroll-->
+    </aside>
+    <!-- ============================================================== -->
+    <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- Page wrapper  -->
+    <!-- ============================================================== -->
+    <div class="page-wrapper">
+        <!-- ============================================================== -->
+        <!-- Container fluid  -->
+        <!-- ============================================================== -->
+        <div class="container-fluid">
+
+
+            {% block content %}
+
+
+            {% endblock %}
+
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Container fluid  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- footer -->
+        <!-- ============================================================== -->
+        <footer class="footer">
+            © 2019 MA Systems Ltd | V2.0
+        </footer>
+        <!-- ============================================================== -->
+        <!-- End footer -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Page wrapper  -->
+    <!-- ============================================================== -->
+</div>
+<!-- ============================================================== -->
+<!-- End Wrapper -->
+<!-- ============================================================== -->
+<!-- ============================================================== -->
+<!-- All Jquery -->
+<!-- ============================================================== -->
+<!-- Bootstrap tether Core JavaScript -->
+<script src="{% static 'assets/plugins/bootstrap/js/popper.min.js' %}"></script>
+<script src="{% static 'assets/plugins/bootstrap/js/bootstrap.js' %}"></script>
+<!-- slimscrollbar scrollbar JavaScript -->
+<script src="{% static 'js/jquery.slimscroll.js' %}"></script>
+<!--Wave Effects -->
+<script src="{% static 'js/waves.js' %}"></script>
+<!--Menu sidebar -->
+<script src="{% static 'js/sidebarmenu.js' %}"></script>
+<!--stickey kit -->
+<script src="{% static 'assets/plugins/sticky-kit-master/dist/sticky-kit.min.js' %}"></script>
+<!--Custom JavaScript -->
+<script src="{% static 'js/custom.min.js' %}"></script>
+<!--form js-->
+<script src="{% static 'assets/plugins/bootstrap-select/bootstrap-select.min.js' %}" type="text/javascript"></script>
+
+<!-- Typehead Plugin JavaScript -->
+<script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
+
+<!-- Magnific popup JavaScript -->
+<script src="{% static 'assets/plugins/Magnific-Popup-master/dist/jquery.magnific-popup.min.js' %}"></script>
+<script src="{% static 'assets/plugins/Magnific-Popup-master/dist/jquery.magnific-popup-init.js' %}"></script>
+
+<!-- Data table -->
+<script src="{% static 'assets/plugins/datatables/datatables.min.js' %}"></script>
+
+<script src="{% static 'assets/plugins/select2/dist/js/select2.full.min.js' %}" type="text/javascript"></script>
+<script src="{% static 'assets/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.js' %}" type="text/javascript"></script>
+<script type="text/javascript" src="{% static 'assets/plugins/multiselect/js/jquery.multi-select.js' %}"></script>
+
+<!--Morris JavaScript -->
+<script src="{% static 'assets/plugins/raphael/raphael-min.js' %}"></script>
+<script src="{% static 'assets/plugins/morrisjs/morris.js' %}"></script>
+
+<!-- icheck -->
+<script src="{% static 'assets/plugins/icheck/icheck.min.js' %}"></script>
+<script src="{% static 'assets/plugins/icheck/icheck.init.js' %}"></script>
+
+<script>
+    $(function() {
+        $('#table').DataTable();
+    });
+</script>
+<script>
+    jQuery(document).ready(function() {
+        // Switchery
+        var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+        $('.js-switch').each(function() {
+            new Switchery($(this)[0], $(this).data());
+        });
+        // For select 2
+        $(".select2").select2();
+        $('.selectpicker').selectpicker();
+       //Bootstrap-TouchSpin
+        $(".vertical-spin").TouchSpin({
+            verticalbuttons: true
+        });
+        var vspinTrue = $(".vertical-spin").TouchSpin({
+            verticalbuttons: true
+        });
+        if (vspinTrue) {
+            $('.vertical-spin').prev('.bootstrap-touchspin-prefix').remove();
+        }
+        $("input[name='tch1']").TouchSpin({
+            min: 0,
+            max: 100,
+            step: 0.1,
+            decimals: 2,
+            boostat: 5,
+            maxboostedstep: 10,
+            postfix: '%'
+        });
+        $("input[name='tch2']").TouchSpin({
+            min: -1000000000,
+            max: 1000000000,
+            stepinterval: 50,
+            maxboostedstep: 10000000,
+            prefix: '$'
+        });
+        $("input[name='tch3']").TouchSpin();
+        $("input[name='tch3_22']").TouchSpin({
+            initval: 40
+        });
+        $("input[name='tch5']").TouchSpin({
+            prefix: "pre",
+            postfix: "post"
+        });
+        // For multiselect
+        $('#pre-selected-options').multiSelect();
+        $('#optgroup').multiSelect({
+            selectableOptgroup: true
+        });
+        $('#public-methods').multiSelect();
+        $('#select-all').click(function() {
+            $('#public-methods').multiSelect('select_all');
+            return false;
+        });
+        $('#deselect-all').click(function() {
+            $('#public-methods').multiSelect('deselect_all');
+            return false;
+        });
+        $('#refresh').on('click', function() {
+            $('#public-methods').multiSelect('refresh');
+            return false;
+        });
+        $('#add-option').on('click', function() {
+            $('#public-methods').multiSelect('addOption', {
+                value: 42,
+                text: 'test 42',
+                index: 0
+            });
+            return false;
+        });
+        $(".ajax").select2({
+            ajax: {
+                url: "https://api.github.com/search/repositories",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function(data, params) {
+                    // parse the results into the format expected by Select2
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data, except to indicate that infinite
+                    // scrolling can be used
+                    params.page = params.page || 1;
+                    return {
+                        results: data.items,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count
+                        }
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function(markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 1,
+            //templateResult: formatRepo, // omitted for brevity, see the source of this page
+            //templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+    });
+    </script>
+
+<script>
+$(document).ready(function() {
+  var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
+
+    // an array that will be populated with substring matches
+    matches = [];
+
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        matches.push(str);
+      }
+    });
+
+    cb(matches);
+      };
+    };
+
+    var reg_numbers = [{% for pedigree in pedigrees.all %}'{{ pedigree.reg_no }}', {% endfor %}];
+    var mothers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
+    var fathers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'male' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
+    var breeders = [{% for breeder in breeders.all %}'{{ breeder.prefix }}', {% endfor %}];
+    var breeds = [{% for breed in breeds.all %}'{{ breed.breed_name }}', {% endfor %}];
+    var breed_groups = [{% for group in breed_groups.all %}'{{ group.group_name }}', {% endfor %}];
+
+    $('#reg_numbers .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'reg_numbers',
+      source: substringMatcher(reg_numbers)
+    });
+
+    $('#mothers .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'mothers',
+      source: substringMatcher(mothers)
+    });
+
+    $('#fathers .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'fathers',
+      source: substringMatcher(fathers)
+    });
+
+    $('#breeders .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'breeders',
+      source: substringMatcher(breeders)
+    });
+
+    $('#breeds .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'breeds',
+      source: substringMatcher(breeds)
+    });
+
+    $('#breed_groups .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'breed_groups',
+      source: substringMatcher(breed_groups)
+    });
+});
+</script>
+
+</body>
+
+</html>

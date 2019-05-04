@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<style>
+td:nth-child(1) {
+vertical-align: middle;
+}
+td:nth-child(2) {
+vertical-align: middle;
+}
+.left-sidebar {
+    z-index: 10 !important;
+}
+
+.feeds li span {
+    font-size: 14px;
+
+</style>
+
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">{% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Details</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} search</a></li>
+                <li class="breadcrumb-item active">{{ lvl1.reg_no }}</li>
+            </ol>
+        </div>
+        <div class="col-md-6 col-4 align-self-center">
+
+            {% if editor %}
+                <a href="{% url 'edit_pedigree_form' lvl1.id %}" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fas fa-pencil-alt"></i> Edit {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                </a>
+                <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Add {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                </a>
+            {% else %}
+                {% include 'login_modal.html' %}
+            <!-- /.modal -->
+                <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fas fa-pencil-alt"></i> Edit</button>
+                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Create</button>
+            {% endif %}
+
+        </div>
+    </div>
+    <!-- ============================================================== -->
+
+<div class="row">
+    <div class="col-md-8 col-lg-8 col-xlg-8">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{ lvl1.name }}</h4>
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs customtab" role="tablist">
+                    <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#profile" role="tab"><span class="hidden-sm-up"><i class="ti-info"></i></span> <span class="hidden-xs-down">Profile</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#stats" role="tab"><span class="hidden-sm-up"><i class="ti-dashboard"></i></span> <span class="hidden-xs-down">Stats</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#images" role="tab"><span class="hidden-sm-up"><i class="ti-image"></i></span> <span class="hidden-xs-down">Images</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#children" role="tab"><span class="hidden-sm-up"><i class="mdi mdi-human-child"></i></span> <span class="hidden-xs-down">Children</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#cert" role="tab"><span class="hidden-sm-up"><i class="mdi mdi-human-child"></i></span> <span class="hidden-xs-down">Certificate</span></a> </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane p-3 active" id="profile" role="tabpanel">
+                        <div class="row">
+                            {% if lvl1.images.first %}
+                                <div class="col-md-4"><img src="{% for image in lvl1.images.all %}
+                                                                    {% if forloop.first %}
+                                                                        {{ image.image.url }}
+                                                                    {% endif %}
+                                                                {% endfor %}"
+                                                           class="img-responsive thumbnail mr-3">
+                                </div>
+                            {% endif %}
+                            <div class="col-md-8">
+                                {{ lvl1.description|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane p-3" id="stats" role="tabpanel">
+                        <!-- Row -->
+                    <div class="row">
+                        <!-- Column -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Row -->
+                                    <div class="row">
+                                        <div class="col-8"><span class="display-6">{{ lvl1.attribute.eggs_per_week }}</span>
+                                            <h6>Eggs Laid Per Week</h6></div>
+                                        <div class="col-4 align-self-center text-right  pl-0">
+                                            <div id="sparklinedash3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Row -->
+                                    <div class="row">
+                                        <div class="col-8"><span class="display-6">370 <i class="ti-angle-up font-14 text-success"></i></span>
+                                            <h6>Offspring</h6></div>
+                                        <div class="col-4 align-self-center text-right pl-0">
+                                            <div id="sparklinedash"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Row -->
+                                    <div class="row">
+                                        <div class="col-8"><span class="display-7">{{ lvl1.dob }} </span>
+                                            <h6>Date Of Birth</h6></div>
+                                        <div class="col-4 align-self-center text-right pl-0">
+                                            <div id="sparklinedash2"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Column -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Row -->
+                                    <div class="row">
+                                        {% if lvl1.dod %}
+                                        <div class="col-8"><span class="display-7">{{ lvl1.dod }}</span>
+                                            <h6>Date Of Death</h6></div>
+                                        <div class="col-4 align-self-center text-right pl-0">
+                                            <div id="sparklinedash4"></div>
+                                        </div>
+                                        {% else %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Row -->
+
+                    </div>
+                    <div class="tab-pane p-3" id="images" role="tabpanel">
+                        <div class="card-columns el-element-overlay">
+                            {% for image in lvl1.images.all %}
+                            <div class="card">
+                                <div class="el-card-item">
+                                    <div class="el-card-avatar el-overlay-1">
+                                        <a class="image-popup-vertical-fit" href="{{ image.image.url }}"> <img src="{{ image.image.url }}" alt="user" /> </a>
+                                    </div>
+                                    <div class="el-card-content">
+                                        <h3 class="box-title">{{ image.title }}</h3> <small>{{ image.description }}</small>
+                                        <br/>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="tab-pane p-3" id="children" role="tabpanel">
+                        {% if children %}
+                            {% for child in children.all %}
+                                <div class="card" style="width: 20rem;">
+                                  <img class="card-img-top" src="{% for image in child.images.all %}
+                                                                    {% if forloop.first %}
+                                                                        {{ image.image.url }}
+                                                                    {% endif %}
+                                                                {% endfor %}" alt="Card image cap">
+                                  <div class="card-body">
+                                    <h4 class="card-title">{{ child.name }}</h4>
+                                    <p class="card-text">{{ child.description|truncatewords:"50" }}</p>
+                                    <a href="{% url 'pedigree' child.id %}"
+                                       class="btn btn-outline-info waves-effect waves-light" role="button">
+                                    <span class="btn-label"><i class="{% if child.sex == 'female' %}icon-symble-female{% else %}icon-symbol-male{% endif %}"></i></span> <strong>{{ child.reg_no }}</strong></a>
+                                  </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                        <h4>No children for this {% if site_mode == 'mammal' %}pedigree{% else %}bird{% endif %}, add one?</h4>
+                        {% endif %}
+
+                        <div id="existing" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="existing" aria-hidden="true" style="display: none;">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title float-left">Choose existing {% if site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %}</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{% url 'add_existing' lvl1.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <div class="form-body">
+                                                <div class="form-group row">
+                                                    <div class="col-8">
+                                                        <div id="reg_numbers">
+                                                            <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter registration number">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <button type="submit" class="btn btn-success">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if editor %}
+                            {% include 'add_new_pedigree.html' %}
+                            <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
+                        {% else %}
+                            {% include 'add_new_pedigree.html' %}
+                            <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#login">Add existing</button>
+                        {% endif %}
+                    </div>
+
+                    <div class="tab-pane p-3" id="cert" role="tabpanel">
+                        <div id="certificate">
+                            <table class="table responsive">
+                                <thead>
+                                    <tr>
+                                        <th>Parents</th>
+                                        <th>Grandparents</th>
+                                        <th>Great Grandparents</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <!--## col1 ##-->
+                                        <td rowspan="4">
+                                            <!--cell text-->
+                                            {% if lvl2_1 %}
+                                                {% include 'relative.html' with pedigree=lvl2_1 %}
+                                            {% else %}
+                                            <p>{{ no_pedigree_text }}</p>
+                                                {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
+                                            {% endif %}
+                                        </td>
+                                        <!--## col2 ##-->
+                                        <td rowspan="2">
+                                            {% if lvl3_1 %}
+                                                {% include 'relative.html' with pedigree=lvl3_1 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl3_1 %}
+                                            {% endif %}
+                                        </td>
+                                        <!--## col3 ##-->
+                                        <td>
+                                            {% if lvl4_1 %}
+                                                {% include 'relative.html' with pedigree=lvl4_1 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl4_1 %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!--## col3 ##-->
+                                        <td>
+                                            {% if lvl4_2 %}
+                                                {% include 'relative.html' with pedigree=lvl4_2 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl4_2 %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!--## col2 ##-->
+                                        <td rowspan="2">
+                                            {% if lvl3_2 %}
+                                                {% include 'relative.html' with pedigree=lvl3_2 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl3_2 %}
+                                            {% endif %}
+                                        </td>
+                                        <!--## col3 ##-->
+                                        <td>
+                                            {% if lvl4_3 %}
+                                                {% include 'relative.html' with pedigree=lvl4_3 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl4_3 %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!--## col3 ##-->
+                                        <td>{% if lvl4_4 %}
+                                                {% include 'relative.html' with pedigree=lvl4_4 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl4_4 %}
+                                            {% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <!--## col1 ##-->
+                                        <td rowspan="4">
+                                            <!--cell text-->
+                                            {% if lvl2_2 %}
+                                                {% include 'relative.html' with pedigree=lvl2_2 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl2_2 %}
+                                            {% endif %}
+                                        </td>
+                                        <!--## col2 ##-->
+                                        <td rowspan="2">
+                                            {% if lvl3_3 %}
+                                                {% include 'relative.html' with pedigree=lvl3_3 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl3_3 %}
+                                            {% endif %}
+                                        </td>
+                                        <!--## col3 ##-->
+                                        <td>
+                                            {% if lvl4_5 %}
+                                                {% include 'relative.html' with pedigree=lvl4_5 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl4_5 %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!--## col3 ##-->
+                                        <td>
+                                            {% if lvl4_6 %}
+                                                {% include 'relative.html' with pedigree=lvl4_6 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl4_6 %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!--## col2 ##-->
+                                        <td rowspan="2">
+                                            {% if lvl3_4 %}
+                                                {% include 'relative.html' with pedigree=lvl3_4 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl3_4 %}
+                                            {% endif %}
+                                        </td>
+                                        <!--## col3 ##-->
+                                        <td>
+                                            {% if lvl4_7 %}
+                                                {% include 'relative.html' with pedigree=lvl4_7 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl4_7 %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <!--## col3 ##-->
+                                        <td>
+                                            {% if lvl4_8 %}
+                                                {% include 'relative.html' with pedigree=lvl4_8 %}
+                                            {% else %}
+                                            {% include 'add_new_pedigree.html' with pedigree=lvl4_8 %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <a href="{% url 'cert' lvl1.id %}"><button class="btn float-right hidden-sm-down btn-outline-info">generate PDF</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-4 col-xlg-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Details</h4>
+                <ul class="feeds">
+                    {% if lvl1.breeder.prefix %}
+                    <li>
+                        <div class="bg-light-info"><i class="fas fa-user-plus"></i></div> Breeder <span class=""><a href="{% url 'breeder' lvl1.breeder.prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.breeder.prefix }}</button></a></span></li>
+                    {% endif %}
+                    {% if lvl1.current_owner.prefix %}
+                    <li>
+                        <div class="bg-light-success"><i class="fas fa-user"></i></div> Owner <span class=""><a href="{% url 'breeder' lvl1.breeder.prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.current_owner.prefix }}</button></a></span></li>
+                    {% endif %}
+                    {% if lvl1.reg_no %}
+                    <li>
+                        <div class="bg-light-warning"><i class="far fa-id-card"></i></div> Registration Numbers.<span class="font-weight-normal">{{ lvl1.reg_no }}</span></li>
+                    {% endif %}
+                    {% if lvl1.name %}
+                    <li>
+                        <div class="bg-light-danger"><i class="fas fa-smile"></i></div> Name<span class="font-weight-normal">{{ lvl1.name }}</span></li>
+                    {% endif %}
+                    {% if lvl1.date_of_registration %}
+                    <li>
+                        <div class="bg-light-inverse"><i class="far fa-clipboard"></i></div> Date of Registration <span class="font-weight-normal">{{ lvl1.date_of_registration }}</span></li>
+                    {% endif %}
+                    {% if lvl1.dob %}
+                    <li>
+                        <div class="bg-light-info"><i class="fas fa-birthday-cake"></i></div> Date of Birth <span class="font-weight-normal">{{ lvl1.dob }}</span></li>
+                    {% endif %}
+                    {% if lvl1.dod %}
+                    <li>
+                        <div class="bg-light-danger"><i class="far fa-calendar-times"></i></div> Date of Death<span class="font-weight-normal">{{ lvl1.dod }}</span></li>
+                    {% endif %}
+                    {% if lvl1.sex %}
+                    <li>
+                        <div class="bg-light-inverse"><i class="fas fa-venus-mars"></i></div> Sex <span class="font-weight-normal">{{ lvl1.sex|title }}</span></li>
+                    {% endif %}
+                    {% if lvl1.attribute.breed.breed_name %}
+                    <li>
+                        <div class="bg-light-warning"><i class="fas fa-dna"></i></div> Breed <span class="font-weight-normal">{{ lvl1.attribute.breed.breed_name }}</span></li>
+                    {% endif %}
+                    {% if lvl1.breed_group %}
+                    <li>
+                        <div class="bg-light-warning"><i class="far fa-object-ungroup"></i></div> Group born from <span class="font-weight-normal">{{ lvl1.breed_group }}</span></li>
+                    {% endif %}
+                    {% if groups %}
+                    <li>
+                        <div class="bg-light-warning"><i class="far fa-object-ungroup"></i></div> Member of <span class="font-weight-normal">{% for group in groups %}{{ group.group_name }}, {% endfor %}</span></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <hr>
+</div>
+{% endblock %}
