@@ -41,7 +41,7 @@ def site_login(request):
         user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
         if user is not None:
             auth.login(request, user)
-            return redirect('home')
+            return redirect('dashboard')
         else:
             return render(request, 'login.html', {'error': 'Username or Password does not exist.'})
     else:
@@ -53,7 +53,7 @@ def logout(request):
     # TO DO neet to go to homepage and logout
     # if request.method == 'POST':
     auth.logout(request)
-    return redirect('login')
+    return redirect('home')
 
 
 @login_required(login_url="/account/login")
