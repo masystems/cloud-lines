@@ -3,7 +3,8 @@
 *.pot
 *.pyc
 __pycache__/
-pedigreedb/local_settings.py
+cloudlines/local_settings.py
+cloudlines/static
 media
 db.sqlite3
 /static
