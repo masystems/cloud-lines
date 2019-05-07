@@ -8,3 +8,8 @@ cloudlines/static
 media
 db.sqlite3
 /static
+/template/
+libpangoft2-1.0.so.0
+pango-1.0
+pangocairo-1.0
+zappa_settings.json
