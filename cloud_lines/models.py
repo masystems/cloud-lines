@@ -21,3 +21,7 @@ class Service(models.Model):
 
     class Meta:
         ordering = ['ordering']
+
+
+class Page(models.Model):
+    title = models.CharField(max_length=50)

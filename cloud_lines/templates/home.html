@@ -1,264 +1,151 @@
-{% load staticfiles %}
-<!DOCTYPE html>
-<html dir="ltr" lang="en-GB">
-<head>
 
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-	<meta name="MASystems" content="SemiColonWeb" />
+{% extends 'home_base.html' %}
+{% load static %}
+{% block content %}
 
-	<!-- Stylesheets
+
+<section id="slider" class="slider-element bg-angle">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+
+	<!-- Slider Titiles
 	============================================= -->
-	<link href="http://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Istok+Web:400,700" rel="stylesheet" type="text/css" />
-	<link rel="stylesheet" href="{% static 'cloud-lines/css/bootstrap.css' %}" type="text/css" />
-	<link rel="stylesheet" href="{% static 'cloud-lines/css/style.css' %}" type="text/css" />
+	<div class="vertical-middle ignore-header dark">
+		<div class="container">
+			<div class="row justify-content-between align-items-center">
+				<div class="col-md-5">
+					<div class="slider-title">
+						<h2 class="text-white text-rotater mb-3" data-separator="," data-rotate="fadeIn" data-speed="3500"><i class="icon-project-diagram"></i> Track your own<br> <span class="t-rotate text-white">poultry,pet,agricultural</span> online.</h2>
+						<p>Store your pedigree breed society register. Print your own pedigree certificates. Give read-only access to club members. Integrate with your club or society website.</p>
+					</div>
+					<a href="#" class="button bg-white text-dark button-light button-rounded button-large color ml-0">Try free! <i class="icon-line-arrow-right t600"></i></a>
+				</div>
+				<div class="col-md-7 d-none d-md-block pt-2">
+<!--							<img src="{% static 'cloud-lines/demos/hosting/images/cat_dog.jpg' %}" alt="">-->
+					<div class="col_full portfolio-single-image">
+						<div class="fslider" data-arrows="false" data-animation="slide">
+							<div class="flexslider">
+								<div class="slider-wrap">
+									<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/cat_dog.jpg' %}" alt=""></a></div>
+									<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/chick.jpg' %}" alt=""></a></div>
+									<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/cow.jpg' %}" alt=""></a></div>
+									<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/goat.jpg' %}" alt=""></a></div>
+									<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/llama.jpg' %}" alt=""></a></div>
+									<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/rabbit.jpg' %}" alt=""></a></div>
+									<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/sheep.jpg' %}" alt=""></a></div>
+								</div>
+							</div>
+						</div>
+					</div><!-- .portfolio-single-image end -->
+				</div>
 
-	<link rel="stylesheet" href="{% static 'cloud-lines/css/dark.css' %}" type="text/css" />
-	<link rel="stylesheet" href="{% static 'cloud-lines/css/font-icons.css' %}" type="text/css" />
-	<link rel="stylesheet" href="{% static 'cloud-lines/css/animate.css' %}" type="text/css" />
-	<link rel="stylesheet" href="{% static 'cloud-lines/css/magnific-popup.css' %}" type="text/css" />
+			</div>
+		</div>
+	</div>
 
-	<link rel="stylesheet" href="{% static 'cloud-lines/css/components/ion.rangeslider.css' %}" type="text/css" />
+</section><!-- #slider end -->
 
-	<link rel="stylesheet" href="{% static 'cloud-lines/css/responsive.css' %}" type="text/css" />
-	<meta name='viewport' content='initial-scale=1, viewport-fit=cover'>
+<!-- Content
+============================================= -->
+<section id="content">
 
-	<!-- Hosting Demo Specific Stylesheet -->
-<!--	<link rel="stylesheet" href="{% static 'cloud-lines/css/colors.php?color=44aaac' %}" type="text/css" /> &lt;!&ndash; Theme Color &ndash;&gt;-->
-	<link rel="stylesheet" href="{% static 'cloud-lines/demos/hosting/css/fonts.css' %}" type="text/css" />
-	<link rel="stylesheet" href="{% static 'cloud-lines/demos/hosting/hosting.css' %}" type="text/css" />
-	<!-- / -->
-	<script src="{% static 'cloud-lines/js/jquery.js' %}"></script>
-	<!-- Document Title
-	============================================= -->
-	<title>CloudLines</title>
+	<div class="content-wrap nopadding">
 
-</head>
+		<div class="container clearfix">
 
-<body class="stretched">
+			<!-- Slider negetive Box
+			============================================= -->
+			<div class="row justify-content-center slider-box-wrap clearfix">
+				<div class="col-10">
+					<div class="slider-bottom-box">
+						<div class="row align-items-center clearfix">
+							<div class="col-lg-4 mb-3 mb-lg-0">
+								<h2 class="mb-3 h1 t300">Features</h2>
+								<p class="t400 text-muted mb-0">May vary depending on selected service.</p>
+							</div>
+							<div class="col-lg-4 col-sm-6">
+								<ul class="iconlist m-0">
+									<li><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">4 generations</li>
+									<li class="pt-3"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Generate certificates</li>
+									<li class="pt-3"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Get real-time data analysis</li>
+								</ul>
+							</div>
+							<div class="col-lg-4 col-sm-6">
+								<ul class="iconlist m-0">
+									<li class="pt-3 pt-lg-0"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Track breeders</li>
+									<li class="pt-3"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Import/Export data</li>
+									<li class="pt-3"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Online support</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-	<!-- Document Wrapper
-	============================================= -->
-	<div id="wrapper" class="clearfix">
+			<!-- Features Section
+			============================================= -->
+			<div class="heading-block center topmargin-lg divcenter nobottomborder clearfix" style="max-width: 700px">
+				<h2>All you’ll ever need to track your pedigree breeding programme</h2>
+				<p>Cloud Lines is an innovative new product from <a href="#">MA Systems Ltd</a>,
+					which enables our valued customers to keep accurate fully-featured records of their breeding programmes.</p>
 
-		<!-- Top Bar
-		============================================= -->
-		<div id="top-bar" class="center dark" style="background-color: #15888a">
-			<p class="mb-0 text-white" style="font-size: 14px;">GDPR Notice<a href="#" class="ml-2 font-primary t700 text-white"><u>Learn More</u> &#8250;</a></p>
+				<p>Cloud Lines was developed in 2018 due to a growing need to support customers using bespoke or legacy database applications.
+					Cloud Lines is built on the most modern IT architecture, and aims to deliver superior service at reduced cost.
+					The cloud-based platform which hosts Cloud Lines can boast of 99.9% uptime and 99.9999% data durability.
+					All user data is regularly backup up as standard and customers have the option to export data as often as needed.</p>
+
+				<p>Cloud Lines is designed to be both user friendly and as fully featured as possible.
+					All Levels of customer have access to the same breed-specific functionality, including automatically generated pedigree
+					certificates which can be exported as PDFs.</p>
+
+				<p>For more information, or to discuss your transition to Cloud Lines, please contact us via the <a href="#">contact form</a></p>
+			</div>
+			<div class="clear"></div>
+			<div class="row mt-4 clearfix">
+				{% for service in services.all %}
+				<div class="col-lg-4 col-md-6 mb-5">
+					<div class="feature-box not-dark fbox-small">
+						<div class="fbox-icon">
+							<img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="height: 52px;">
+						</div>
+						<h3 class="t500 text-dark">{{ service.service_name }}</h3>
+						<p class="t300">{{ service.service_description|truncatechars:200 }}</p>
+						<a href="#" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+
 		</div>
 
-		<!-- Header
+		<!-- Domain Section
 		============================================= -->
-		<header id="header" class="full-header transparent-header dark" data-sticky-class="not-dark">
-
-			<div id="header-wrap">
-
-				<div class="container clearfix">
-
-					<div id="primary-menu-trigger"><i class="icon-reorder"></i></div>
-
-					<!-- Logo
-					============================================= -->
-					<div id="logo">
-
-						<span><a href="{% url 'home' %}" class="standard-logo" data-dark-logo="{% static 'cloud-lines/images/logo-dark.png' %}"><img src="{% static 'cloud-lines/images/logo.png' %}" alt="Canvas Logo"></a></span>
-						<a href="{% url 'home' %}" class="retina-logo" data-dark-logo="{% static 'cloud-lines/images/logo-dark@2x.png' %}"><img src="{% static 'cloud-lines/images/logo@2x.png' %}" alt="Canvas Logo"></a>
-					</div><!-- #logo end -->
-
-					<!-- Primary Navigation
-					============================================= -->
-					<nav id="primary-menu" class="not-dark with-arrows">
-
-						<ul class="not-dark">
-							<li class="current"><a href="{% url 'home' %}"><div>Home</div></a></li>
-							<li class="mega-menu"><a href="#"><div>Services</div></a>
-								<!-- Mega Menu Content
-								============================================= -->
-								<div class="mega-menu-content style-2 border-top-0 clearfix">
-									{% for service in services.all %}
-									<ul class="mega-menu-column col-lg-2">
-										<li>
-											<div class="feature-box not-dark fbox-small fbox-center nobottommargin">
-												<div class="fbox-icon">
-													<img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 52px;">
-												</div>
-												<h3 class="t500"><a href="#">{{ service.service_name }}</a></h3>
-												<p class="d-none d-lg-block mb-0 t300">{{ service.service_description|truncatechars:150 }}</p>
-												<a href="#" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
-											</div>
-										</li>
-									</ul>
-									{% endfor %}
-								</div>
-							</li>
-							<li><a href="#"><div>About</div></a></li>
-							<li><a href="#"><div>Extras</div></a></li>
-							<li><a href="#"><div>FAQs</div></a></li>
-							<li><a href="#"><div>Contact</div></a></li>
-						</ul>
-
-						<!-- Top Search
-						============================================= -->
-						<a href="{% url 'dashboard' %}" class="button bg-white text-dark button-light button-rounded color">Login to Cloud Lines</a>
-
-					</nav><!-- #primary-menu end -->
-
-				</div>
-
-			</div>
-
-		</header><!-- #header end -->
-
-		<!-- Slider
-		============================================= -->
-		<section id="slider" class="slider-element bg-angle">
-
-			<!-- Slider Background Map
-			============================================= -->
-<!--			<img class="img-map parallax" src="{% static 'cloud-lines/demos/hosting/images/svg/map-light.svg' %}" alt="" data-0="opacity: 0.05;margin-top:0px" data-800="opacity: 0.5;margin-top:150px">-->
-
-			<!-- Slider Background Cloud
-			============================================= -->
-			<div class="cloud-wrap">
-				<div class="c1"><div class="cloud"></div></div>
-				<div class="c2"><div class="cloud"></div></div>
-				<div class="c3"><div class="cloud"></div></div>
-				<div class="c4"><div class="cloud"></div></div>
-				<div class="c5"><div class="cloud"></div></div>
-			</div>
-
-			<!-- Slider Titiles
-			============================================= -->
-			<div class="vertical-middle ignore-header dark">
-				<div class="container">
-					<div class="row justify-content-between align-items-center">
-						<div class="col-md-5">
-							<div class="slider-title">
-								<h2 class="text-white text-rotater mb-3" data-separator="," data-rotate="fadeIn" data-speed="3500"><i class="icon-project-diagram"></i> Track your own<br> <span class="t-rotate text-white">poultry,pet,agricultural</span> online.</h2>
-								<p>Store your pedigree breed society register. Print your own pedigree certificates. Give read-only access to club members. Integrate with your club or society website.</p>
-							</div>
-							<a href="#" class="button bg-white text-dark button-light button-rounded button-large color ml-0">Try free! <i class="icon-line-arrow-right t600"></i></a>
+		<div class="section section-domain mt-4 mb-3" style="background: #F5F5F5 url('{% static 'cloud-lines/demos/hosting/images/pattern-dark.png' %}') repeat center center;">
+			<div class="container">
+				<div class="row justify-content-between align-items-center">
+					<div class="col-md-5">
+						<div class="heading-block mb-0 nobottomborder clearfix">
+							<h3 class="ls0 nott">Want to know more?</h3>
+							<p class="mb-0">Send us your email address and/or phone number and we'll be in contact to talk to you about your needs.</p>
 						</div>
-						<div class="col-md-7 d-none d-md-block pt-2">
-<!--							<img src="{% static 'cloud-lines/demos/hosting/images/cat_dog.jpg' %}" alt="">-->
-							<div class="col_full portfolio-single-image">
-								<div class="fslider" data-arrows="false" data-animation="slide">
-									<div class="flexslider">
-										<div class="slider-wrap">
-											<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/cat_dog.jpg' %}" alt=""></a></div>
-											<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/chick.jpg' %}" alt=""></a></div>
-											<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/cow.jpg' %}" alt=""></a></div>
-											<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/goat.jpg' %}" alt=""></a></div>
-											<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/llama.jpg' %}" alt=""></a></div>
-											<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/rabbit.jpg' %}" alt=""></a></div>
-											<div class="slide"><a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/sheep.jpg' %}" alt=""></a></div>
-										</div>
-									</div>
-								</div>
-							</div><!-- .portfolio-single-image end -->
+					</div>
+					<div class="col-md-6 mt-4 mt-lg-0">
+						<div class="input-group input-group-lg">
+							<input type="text" class="form-control" placeholder="Email and/or phone number" aria-label="Email and/or phone number">
+							<div class="input-group-append">
+								<button class="btn bgcolor text-white dark">Send</button>
+							</div>
 						</div>
 
 					</div>
 				</div>
 			</div>
-
-		</section><!-- #slider end -->
-
-		<!-- Content
-		============================================= -->
-		<section id="content">
-
-			<div class="content-wrap nopadding">
-
-				<div class="container clearfix">
-
-					<!-- Slider negetive Box
-					============================================= -->
-					<div class="row justify-content-center slider-box-wrap clearfix">
-						<div class="col-10">
-							<div class="slider-bottom-box">
-								<div class="row align-items-center clearfix">
-									<div class="col-lg-4 mb-3 mb-lg-0">
-										<h2 class="mb-3 h1 t300">Features</h2>
-										<p class="t400 text-muted mb-0">May vary depending on selected service.</p>
-									</div>
-									<div class="col-lg-4 col-sm-6">
-										<ul class="iconlist m-0">
-											<li><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">4 generations</li>
-											<li class="pt-3"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Generate certificates</li>
-											<li class="pt-3"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Get real-time data analysis</li>
-										</ul>
-									</div>
-									<div class="col-lg-4 col-sm-6">
-										<ul class="iconlist m-0">
-											<li class="pt-3 pt-lg-0"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Track breeders</li>
-											<li class="pt-3"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Import/Export data</li>
-											<li class="pt-3"><img src="{% static 'cloud-lines/demos/hosting/images/svg/checked.svg' %}" width="20" height="20" alt="" class="mr-2">Online support</li>
-										</ul>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Features Section
-					============================================= -->
-					<div class="heading-block center topmargin-lg divcenter nobottomborder clearfix" style="max-width: 700px">
-						<h2>All you’ll ever need to track your pedigree breeding programme</h2>
-						<p>Cloud Lines is an innovative new product from <a href="#">MA Systems Ltd</a>,
-							which enables our valued customers to keep accurate fully-featured records of their breeding programmes.</p>
-
-						<p>Cloud Lines was developed in 2018 due to a growing need to support customers using bespoke or legacy database applications.
-							Cloud Lines is built on the most modern IT architecture, and aims to deliver superior service at reduced cost.
-							The cloud-based platform which hosts Cloud Lines can boast of 99.9% uptime and 99.9999% data durability.
-							All user data is regularly backup up as standard and customers have the option to export data as often as needed.</p>
-
-						<p>Cloud Lines is designed to be both user friendly and as fully featured as possible.
-							All Levels of customer have access to the same breed-specific functionality, including automatically generated pedigree
-							certificates which can be exported as PDFs.</p>
-
-						<p>For more information, or to discuss your transition to Cloud Lines, please contact us via the <a href="#">contact form</a></p>
-					</div>
-					<div class="clear"></div>
-					<div class="row mt-4 clearfix">
-						{% for service in services.all %}
-						<div class="col-lg-4 col-md-6 mb-5">
-							<div class="feature-box not-dark fbox-small">
-								<div class="fbox-icon">
-									<img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="height: 52px;">
-								</div>
-								<h3 class="t500 text-dark">{{ service.service_name }}</h3>
-								<p class="t300">{{ service.service_description|truncatechars:200 }}</p>
-								<a href="#" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
-							</div>
-						</div>
-						{% endfor %}
-					</div>
-
-				</div>
-
-				<!-- Domain Section
-				============================================= -->
-				<div class="section section-domain mt-4 mb-3" style="background: #F5F5F5 url('{% static 'cloud-lines/demos/hosting/images/pattern-dark.png' %}') repeat center center;">
-					<div class="container">
-						<div class="row justify-content-between align-items-center">
-							<div class="col-md-5">
-								<div class="heading-block mb-0 nobottomborder clearfix">
-									<h3 class="ls0 nott">Want to know more?</h3>
-									<p class="mb-0">Send us your email address and/or phone number and we'll be in contact to talk to you about your needs.</p>
-								</div>
-							</div>
-							<div class="col-md-6 mt-4 mt-lg-0">
-								<div class="input-group input-group-lg">
-									<input type="text" class="form-control" placeholder="Email and/or phone number" aria-label="Email and/or phone number">
-									<div class="input-group-append">
-										<button class="btn bgcolor text-white dark">Send</button>
-									</div>
-								</div>
-
-							</div>
-						</div>
-					</div>
-				</div>
+		</div>
 
 <!--				&lt;!&ndash; Loaction Section-->
 <!--				============================================= &ndash;&gt;-->
@@ -525,259 +412,259 @@
 <!--					</div>-->
 <!--				</div>-->
 
-				<!-- Addition Service Section
-				============================================= -->
-				<div class="container clearfix">
-					<div class="row clearfix">
-						<div class="col-md-12">
-							<div class="before-heading">Other Additional Services</div>
-							<h3>Highly Available Services</h3>
-							<div class="row">
-								<div class="col-md-6">
-									<div class="feature-box p-4 media-box" style="border-radius: 6px; box-shadow: 0 2px 4px rgba(3,27,78,.1); border: 1px solid #e5e8ed;">
-										<div class="fbox-media">
-											<img src="{% static 'cloud-lines/demos/hosting/images/svg/balancing.svg' %}" style="width: 42px;" alt="">
-										</div>
-										<div class="fbox-desc">
-											<h3 class="ls0">Load Balancing</h3>
-											<p class="mt-2">Our cloud hosting platform is prepared to cope with any amount of load on the frontend or the database. You can rest assured that the site will keep going.</p>
-										</div>
-									</div>
-
-									<div class="feature-box p-4 topmargin-sm media-box" style="border-radius: 6px; box-shadow: 0 2px 4px rgba(3,27,78,.1); border: 1px solid #e5e8ed;">
-										<div class="fbox-media">
-											<img src="{% static 'cloud-lines/demos/hosting/images/svg/location.svg' %}" style="width: 42px;" alt="">
-										</div>
-										<div class="fbox-desc">
-											<h3 class="ls0">Location Zone</h3>
-											<p class="mt-2">It doesn't matter where you are in the world. You will be able to access you data with zero interruption.</p>
-										</div>
-									</div>
+		<!-- Addition Service Section
+		============================================= -->
+		<div class="container clearfix">
+			<div class="row clearfix">
+				<div class="col-md-12">
+					<div class="before-heading">Other Additional Services</div>
+					<h3>Highly Available Services</h3>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="feature-box p-4 media-box" style="border-radius: 6px; box-shadow: 0 2px 4px rgba(3,27,78,.1); border: 1px solid #e5e8ed;">
+								<div class="fbox-media">
+									<img src="{% static 'cloud-lines/demos/hosting/images/svg/balancing.svg' %}" style="width: 42px;" alt="">
 								</div>
+								<div class="fbox-desc">
+									<h3 class="ls0">Load Balancing</h3>
+									<p class="mt-2">Our cloud hosting platform is prepared to cope with any amount of load on the frontend or the database. You can rest assured that the site will keep going.</p>
+								</div>
+							</div>
 
-								<div class="col-md-6">
-									<div class="feature-box p-4 mt-4 mt-sm-0 media-box" style="border-radius: 6px; box-shadow: 0 2px 4px rgba(3,27,78,.1); border: 1px solid #e5e8ed;">
-										<div class="fbox-media">
-											<img src="{% static 'cloud-lines/demos/hosting/images/svg/ssl.svg' %}" style="width: 42px;" alt="">
-										</div>
-										<div class="fbox-desc">
-											<h3 class="ls0">Dedicated SSL Certificate</h3>
-											<p class="mt-2">We take security and your data very seriously! That's why we have dedicated SSL certificates on all our domains.</p>
-										</div>
-									</div>
+							<div class="feature-box p-4 topmargin-sm media-box" style="border-radius: 6px; box-shadow: 0 2px 4px rgba(3,27,78,.1); border: 1px solid #e5e8ed;">
+								<div class="fbox-media">
+									<img src="{% static 'cloud-lines/demos/hosting/images/svg/location.svg' %}" style="width: 42px;" alt="">
+								</div>
+								<div class="fbox-desc">
+									<h3 class="ls0">Location Zone</h3>
+									<p class="mt-2">It doesn't matter where you are in the world. You will be able to access you data with zero interruption.</p>
+								</div>
+							</div>
+						</div>
 
-									<div class="feature-box p-4 topmargin-sm media-box" style="border-radius: 6px; box-shadow: 0 2px 4px rgba(3,27,78,.1); border: 1px solid #e5e8ed;">
-										<div class="fbox-media">
-											<img src="{% static 'cloud-lines/demos/hosting/images/svg/team.svg' %}" style="width: 42px;" alt="">
-										</div>
-										<div class="fbox-desc">
-											<h3 class="ls0">Team Accounts</h3>
-											<p class="mt-2">You have access to your own accounts and access levels. Add and removes users how you see fit.</p>
-										</div>
-									</div>
+						<div class="col-md-6">
+							<div class="feature-box p-4 mt-4 mt-sm-0 media-box" style="border-radius: 6px; box-shadow: 0 2px 4px rgba(3,27,78,.1); border: 1px solid #e5e8ed;">
+								<div class="fbox-media">
+									<img src="{% static 'cloud-lines/demos/hosting/images/svg/ssl.svg' %}" style="width: 42px;" alt="">
+								</div>
+								<div class="fbox-desc">
+									<h3 class="ls0">Dedicated SSL Certificate</h3>
+									<p class="mt-2">We take security and your data very seriously! That's why we have dedicated SSL certificates on all our domains.</p>
+								</div>
+							</div>
+
+							<div class="feature-box p-4 topmargin-sm media-box" style="border-radius: 6px; box-shadow: 0 2px 4px rgba(3,27,78,.1); border: 1px solid #e5e8ed;">
+								<div class="fbox-media">
+									<img src="{% static 'cloud-lines/demos/hosting/images/svg/team.svg' %}" style="width: 42px;" alt="">
+								</div>
+								<div class="fbox-desc">
+									<h3 class="ls0">Team Accounts</h3>
+									<p class="mt-2">You have access to your own accounts and access levels. Add and removes users how you see fit.</p>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				<div class="clear"></div>
+			</div>
+		</div>
+		<div class="clear"></div>
 
-				<!-- Testimonials Section
-				============================================= -->
-				<div class="section">
-					<div class="container">
+		<!-- Testimonials Section
+		============================================= -->
+		<div class="section">
+			<div class="container">
 
-						<div class="heading-block center mt-2 mb-3 divcenter nobottomborder clearfix" style="max-width: 700px">
-							<div class="before-heading">See what Our Customers say</div>
-							<h2>Many Happy Users</h2>
-						</div>
-
-						<!-- Owl Carousel
-						============================================= -->
-						<div id="oc-testimonials" class="owl-carousel center testimonials-carousel testimonial-full carousel-widget mt-5" data-margin="0" data-items-xs="1" data-items-sm="1" data-items-md="1" data-items-lg="2" data-items-xl="3" data-center="true" data-loop="true" data-autoplay="4000" data-speed="500">
-
-							<!-- Item 1 -->
-							<div class="oc-item">
-								<div class="testimonial p-4 noborder noshadow">
-									<div class="testi-image">
-										<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/1.jpg' %}" alt="Customer Testimonails"></a>
-									</div>
-									<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-half-full"></i></li></ul>
-									<div class="testi-content">
-										<p class="font-body font-normal">Incidunt deleniti blanditiis quas aperiam recusandae consequatur ullam quibusdam cum libero illo rerum repellendus!</p>
-										<div class="testi-meta">
-											John Doe
-											<span>XYZ Inc.</span>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Item 2 -->
-							<div class="oc-item">
-								<div class="testimonial p-4 noborder noshadow">
-									<div class="testi-image">
-										<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/2.jpg' %}" alt="Customer Testimonails"></a>
-									</div>
-									<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-empty"></i></li></ul>
-									<div class="testi-content">
-										<p class="font-body font-normal">Natus voluptatum enim quod necessitatibus quis expedita harum provident eos obcaecati id culpa corporis molestias.</p>
-										<div class="testi-meta">
-											Collis Ta'eed
-											<span>Envato Inc.</span>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Item 3 -->
-							<div class="oc-item">
-								<div class="testimonial p-4 noborder noshadow">
-									<div class="testi-image">
-										<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/5.jpg' %}" alt="Customer Testimonails"></a>
-									</div>
-									<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i></li></ul>
-									<div class="testi-content">
-										<p class="font-normal font-body">Fugit officia dolor sed harum excepturi ex iusto magnam asperiores molestiae qui natus obcaecati facere sint amet.</p>
-										<div class="testi-meta">
-											Mary Jane
-											<span>Google Inc.</span>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Item 4 -->
-							<div class="oc-item">
-								<div class="testimonial p-4 noborder noshadow">
-									<div class="testi-image">
-										<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/4.jpg' %}" alt="Customer Testimonails"></a>
-									</div>
-									<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i></li></ul>
-									<div class="testi-content">
-										<p class="font-normal font-body">Similique fugit repellendus expedita excepturi iure perferendis provident quia eaque. Repellendus, vero numquam?</p>
-										<div class="testi-meta">
-											Steve Jobs
-											<span>Apple Inc.</span>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Item 5 -->
-							<div class="oc-item">
-								<div class="testimonial p-4 noborder noshadow">
-									<div class="testi-image">
-										<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/3.jpg' %}" alt="Customer Testimonails"></a>
-									</div>
-									<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-empty"></i></li></ul>
-									<div class="testi-content">
-										<p class="font-normal font-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, perspiciatis illum totam dolore deleniti labore.</p>
-										<div class="testi-meta">
-											Jamie Morrison
-											<span>Adobe Inc.</span>
-										</div>
-									</div>
-								</div>
-							</div>
-
-						</div>
-					</div>
+				<div class="heading-block center mt-2 mb-3 divcenter nobottomborder clearfix" style="max-width: 700px">
+					<div class="before-heading">See what Our Customers say</div>
+					<h2>Many Happy Users</h2>
 				</div>
 
-				<div class="container clearfix">
-					<div class="row clearfix">
-						<div class="col-md-12">
-							<div class="row">
-								<div class="fancy-title title-dotted-border title-center">
-									<h3>Comparison Table</h3>
+				<!-- Owl Carousel
+				============================================= -->
+				<div id="oc-testimonials" class="owl-carousel center testimonials-carousel testimonial-full carousel-widget mt-5" data-margin="0" data-items-xs="1" data-items-sm="1" data-items-md="1" data-items-lg="2" data-items-xl="3" data-center="true" data-loop="true" data-autoplay="4000" data-speed="500">
+
+					<!-- Item 1 -->
+					<div class="oc-item">
+						<div class="testimonial p-4 noborder noshadow">
+							<div class="testi-image">
+								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/1.jpg' %}" alt="Customer Testimonails"></a>
+							</div>
+							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-half-full"></i></li></ul>
+							<div class="testi-content">
+								<p class="font-body font-normal">Incidunt deleniti blanditiis quas aperiam recusandae consequatur ullam quibusdam cum libero illo rerum repellendus!</p>
+								<div class="testi-meta">
+									John Doe
+									<span>XYZ Inc.</span>
 								</div>
-
-								<table class="table table-hover table-comparison nobottommargin">
-								  	<thead>
-										<tr>
-											<th>&nbsp;</th>
-											{% for service in services.all %}
-												<th>{{ service }}</th>
-											{% endfor %}
-										</tr>
-								  	</thead>
-								  	<tbody>
-										<tr>
-											<td>Admin Users</td>
-											{% for service in services.all %}
-												<td>{{ service.admin_users }}</td>
-											{% endfor %}
-										</tr>
-										<tr>
-											<td>Read-only Users</td>
-											{% for service in services.all %}
-												{% if service.read_only_users == 99 %}
-													<td>Unlimited</td>
-												{% else %}
-													<td>{{ service.read_only_users }}</td>
-												{% endif %}
-											{% endfor %}
-										</tr>
-										<tr>
-											<td>Number of Animals</td>
-											{% for service in services.all %}
-												{% if service.number_of_animals == 99 %}
-													<td>Unlimited</td>
-												{% else %}
-													<td>{{ service.number_of_animals }}</td>
-												{% endif %}
-											{% endfor %}
-										</tr>
-										<tr>
-											<td>Multi Breed</td>
-											{% for service in services.all %}
-												{% if service.multi_breed %}
-													<td><i class="icon-ok"></i></td>
-												{% else %}
-													<td><i class="icon-remove"></i></td>
-												{% endif %}
-											{% endfor %}
-										</tr>
-										<tr>
-											<td>Premium support available</td>
-											{% for service in services.all %}
-												{% if service.support %}
-													<td><i class="icon-ok"></i></td>
-												{% else %}
-													<td><i class="icon-remove"></i></td>
-												{% endif %}
-											{% endfor %}
-										</tr>
-										<tr>
-											<td>Price Per Month</td>
-											{% for service in services.all %}
-												{% if service.price_per_month == 0 %}
-													<td>Free</td>
-												{% else %}
-													<td>£{{ service.price_per_month }}</td>
-												{% endif %}
-											{% endfor %}
-										</tr>
-
-										<tr>
-									  		<td>&nbsp;</td>
-									  		<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									  		<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									  		<td><a href="#" class="btn btn-info">Sign Up</a></td>
-											<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									  		<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									  		<td><a href="#" class="btn btn-info">Sign Up</a></td>
-										</tr>
-								  	</tbody>
-								</table>
 							</div>
 						</div>
 					</div>
-				</div>
 
-				<!-- Trusted Client Section
-				============================================= -->
+					<!-- Item 2 -->
+					<div class="oc-item">
+						<div class="testimonial p-4 noborder noshadow">
+							<div class="testi-image">
+								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/2.jpg' %}" alt="Customer Testimonails"></a>
+							</div>
+							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-empty"></i></li></ul>
+							<div class="testi-content">
+								<p class="font-body font-normal">Natus voluptatum enim quod necessitatibus quis expedita harum provident eos obcaecati id culpa corporis molestias.</p>
+								<div class="testi-meta">
+									Collis Ta'eed
+									<span>Envato Inc.</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Item 3 -->
+					<div class="oc-item">
+						<div class="testimonial p-4 noborder noshadow">
+							<div class="testi-image">
+								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/5.jpg' %}" alt="Customer Testimonails"></a>
+							</div>
+							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i></li></ul>
+							<div class="testi-content">
+								<p class="font-normal font-body">Fugit officia dolor sed harum excepturi ex iusto magnam asperiores molestiae qui natus obcaecati facere sint amet.</p>
+								<div class="testi-meta">
+									Mary Jane
+									<span>Google Inc.</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Item 4 -->
+					<div class="oc-item">
+						<div class="testimonial p-4 noborder noshadow">
+							<div class="testi-image">
+								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/4.jpg' %}" alt="Customer Testimonails"></a>
+							</div>
+							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i></li></ul>
+							<div class="testi-content">
+								<p class="font-normal font-body">Similique fugit repellendus expedita excepturi iure perferendis provident quia eaque. Repellendus, vero numquam?</p>
+								<div class="testi-meta">
+									Steve Jobs
+									<span>Apple Inc.</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Item 5 -->
+					<div class="oc-item">
+						<div class="testimonial p-4 noborder noshadow">
+							<div class="testi-image">
+								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/3.jpg' %}" alt="Customer Testimonails"></a>
+							</div>
+							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-empty"></i></li></ul>
+							<div class="testi-content">
+								<p class="font-normal font-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, perspiciatis illum totam dolore deleniti labore.</p>
+								<div class="testi-meta">
+									Jamie Morrison
+									<span>Adobe Inc.</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="container clearfix">
+			<div class="row clearfix">
+				<div class="col-md-12">
+					<div class="row">
+						<div class="fancy-title title-dotted-border title-center">
+							<h3>Comparison Table</h3>
+						</div>
+
+						<table class="table table-hover table-comparison nobottommargin">
+							<thead>
+								<tr>
+									<th>&nbsp;</th>
+									{% for service in services.all %}
+										<th>{{ service }}</th>
+									{% endfor %}
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Admin Users</td>
+									{% for service in services.all %}
+										<td>{{ service.admin_users }}</td>
+									{% endfor %}
+								</tr>
+								<tr>
+									<td>Read-only Users</td>
+									{% for service in services.all %}
+										{% if service.read_only_users == 99 %}
+											<td>Unlimited</td>
+										{% else %}
+											<td>{{ service.read_only_users }}</td>
+										{% endif %}
+									{% endfor %}
+								</tr>
+								<tr>
+									<td>Number of Animals</td>
+									{% for service in services.all %}
+										{% if service.number_of_animals == 99 %}
+											<td>Unlimited</td>
+										{% else %}
+											<td>{{ service.number_of_animals }}</td>
+										{% endif %}
+									{% endfor %}
+								</tr>
+								<tr>
+									<td>Multi Breed</td>
+									{% for service in services.all %}
+										{% if service.multi_breed %}
+											<td><i class="icon-ok"></i></td>
+										{% else %}
+											<td><i class="icon-remove"></i></td>
+										{% endif %}
+									{% endfor %}
+								</tr>
+								<tr>
+									<td>Premium support available</td>
+									{% for service in services.all %}
+										{% if service.support %}
+											<td><i class="icon-ok"></i></td>
+										{% else %}
+											<td><i class="icon-remove"></i></td>
+										{% endif %}
+									{% endfor %}
+								</tr>
+								<tr>
+									<td>Price Per Month</td>
+									{% for service in services.all %}
+										{% if service.price_per_month == 0 %}
+											<td>Free</td>
+										{% else %}
+											<td>£{{ service.price_per_month }}</td>
+										{% endif %}
+									{% endfor %}
+								</tr>
+
+								<tr>
+									<td>&nbsp;</td>
+									<td><a href="#" class="btn btn-info">Sign Up</a></td>
+									<td><a href="#" class="btn btn-info">Sign Up</a></td>
+									<td><a href="#" class="btn btn-info">Sign Up</a></td>
+									<td><a href="#" class="btn btn-info">Sign Up</a></td>
+									<td><a href="#" class="btn btn-info">Sign Up</a></td>
+									<td><a href="#" class="btn btn-info">Sign Up</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Trusted Client Section
+		============================================= -->
 <!--				<div class="section mt-3 mb-4 pt-0 nobg">-->
 <!--					<div class="container clearfix">-->
 <!--						<div class="divcenter" style="max-width: 1000px">-->
@@ -805,236 +692,4 @@
 <!--					</div>-->
 <!--				</div>-->
 
-				<!-- Bottom Section
-				============================================= -->
-				<div class="section bgcolor dark m-0">
-					<div class="container">
-						<div class="row center justify-content-center">
-							<div class="col-md-8">
-								<h2 class="t700 text-white mb-3">Start your free instance now!</h2>
-							</div>
-							<div class="col-md-8">
-								<a href="#" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-
-		</section><!-- #content end -->
-
-		<!-- Footer
-		============================================= -->
-		<footer id="footer" class="dark">
-
-			<div class="container">
-
-				<!-- Footer Widgets
-				============================================= -->
-				<div class="footer-widgets-wrap pb-4 clearfix">
-
-					<div class="row">
-
-						<div class="col-md-4 col-sm-6 mb-0 mb-sm-4 mb-md-0">
-
-							<div class="widget clearfix">
-
-								<h4>About Cloud-Lines</h4>
-
-								<p>A pedigee tracking solution created and owned my MA Systems..</p>
-
-								<div style="background: url('{% static 'cloud-lines/images/world-map.png' %}') no-repeat left center; background-size: auto 100%;">
-<!--									<address>-->
-<!--										<strong>Headquarters:</strong><br>-->
-<!--										7 Cherwell Close, Maidenhead<br>-->
-<!--										Berkshire, SL68AY<br>-->
-<!--									</address>-->
-<!--									<abbr title="Phone Number"><strong>Phone:</strong></abbr> +44 7500776311<br>-->
-									<abbr title="Email Address"><strong>Email:</strong></abbr> info@masys.co.uk
-								</div>
-
-							</div>
-
-						</div>
-
-						<div class="col-md-3 col-6 mt-5 mt-sm-0">
-
-							<div class="widget clearfix">
-
-								<h4>Features</h4>
-
-								<ul class="list-unstyled iconlist ml-0">
-									<li><a href="http://codex.wordpress.org/">Documentation</a></li>
-									<li><a href="http://wordpress.org/support/forum/requests-and-feedback">Feedback</a></li>
-									<li><a href="http://wordpress.org/extend/plugins/">Plugins</a></li>
-									<li><a href="http://wordpress.org/support/">Support Forums</a></li>
-								</ul>
-
-							</div>
-
-						</div>
-
-						<div class="col-md-3 col-6 mt-5 mt-sm-0">
-
-							<div class="widget clearfix">
-
-								<h4>Social</h4>
-
-								<ul class="list-unstyled iconlist">
-									<li><i class="icon-facebook"></i><a href="http://facebook.com/semicolonweb" target="_blank"> Facebook</a></li>
-									<li><i class="icon-twitter"></i><a href="http://twitter.com/__semicolon" target="_blank"> Twitter</a></li>
-									<li><i class="icon-instagram"></i><a href="http://instagram.com/semicolonweb" target="_blank"> Instagram</a></li>
-									<li><i class="icon-youtube"></i><a href="https://www.youtube.com/user/shank20121/videos" target="_blank"> YouTube</a></li>
-									<li><i class="icon-github"></i><a href="https://github.com/masystems/" target="_blank"> Github</a></li>
-								</ul>
-
-							</div>
-
-						</div>
-
-						<div class="col-md-2 col-sm-6 mt-4 mt-sm-0">
-
-							<div class="widget clearfix">
-
-								<h4>Support</h4>
-
-								<ul class="list-unstyled iconlist ml-0">
-									<li><a href="#">Help Center</a></li>
-									<li><a href="#">Status</a></li>
-									<li><a href="#">Changelog</a></li>
-									<li><a href="#">Contact Support</a></li>
-								</ul>
-
-							</div>
-
-						</div>
-
-					</div>
-
-				</div><!-- .footer-widgets-wrap end -->
-
-				<div class="line line-sm m-0"></div>
-
-			</div>
-
-
-			<!-- Copyrights
-			============================================= -->
-			<div id="copyrights" class="nobg">
-
-				<div class="container clearfix">
-
-					<div class="col_half">
-						Copyrights &copy; 2019 All Rights Reserved by MASystems.<br>
-						<div class="copyright-links"><a href="#">Terms of Use</a> / <a href="#">Privacy Policy</a></div>
-					</div>
-
-					<div class="col_half col_last tright">
-						<div class="copyrights-menu copyright-links clearfix">
-							<a href="#">Home</a>/<a href="#">About Us</a>/<a href="#">Team</a>/<a href="#">Clients</a>/<a href="#">FAQs</a>/<a href="#">Contact</a>
-						</div>
-					</div>
-
-				</div>
-
-			</div><!-- #copyrights end -->
-
-		</footer><!-- #footer end -->
-
-	</div><!-- #wrapper end -->
-
-	<!-- Go To Top
-	============================================= -->
-	<div id="gotoTop" class="icon-angle-up"></div>
-
-	<!-- External JavaScripts
-	============================================= -->
-
-	<script src="{% static 'cloud-lines/js/plugins.js' %}"></script>
-
-	<script src="{% static 'cloud-lines/js/jquery.hotspot.js' %}"></script>
-	<script src="{% static 'cloud-lines/js/components/rangeslider.min.js' %}"></script>
-
-	<!-- Footer Scripts
-	============================================= -->
-	<script src="{% static 'cloud-lines/js/functions.js' %}"></script>
-
-	<script>
-		jQuery(document).ready( function() {
-			var pricingCPU = 1,
-				pricingRAM = 1,
-				pricingStorage = 10,
-				elementCPU = $(".range-slider-cpu"),
-				elementRAM = $(".range-slider-ram"),
-				elementStorage = $(".range-slider-storage");
-
-			elementCPU.ionRangeSlider({
-				grid: false,
-				values: [1,2,4,6,8],
-				postfix: ' Core',
-				onStart: function(data){
-					pricingCPU = data.from_value;
-				}
-			});
-
-			elementCPU.on( 'change', function(){
-				pricingCPU = $(this).prop('value');
-				calculatePrice( pricingCPU, pricingRAM, pricingStorage );
-			});
-
-			elementRAM.ionRangeSlider({
-				grid: false,
-				step: 1,
-				min: 1,
-				from:1,
-				max: 32,
-				postfix: ' GB',
-				onStart: function(data){
-					pricingRAM = data.from;
-					console.log(data);
-				}
-			});
-
-			elementRAM.on( 'onStart change', function(){
-				pricingRAM = $(this).prop('value');
-				calculatePrice( pricingCPU, pricingRAM, pricingStorage );
-			});
-
-			elementStorage.ionRangeSlider({
-				grid: false,
-				step: 10,
-				min: 10,
-				max: 100,
-				postfix: ' GB',
-				onStart: function(data){
-					pricingStorage = data.from;
-				}
-			});
-
-			elementStorage.on( 'change', function(){
-				pricingStorage = $(this).prop('value');
-				calculatePrice( pricingCPU, pricingRAM, pricingStorage );
-			});
-
-			calculatePrice( pricingCPU, pricingRAM, pricingStorage );
-
-			function calculatePrice( cpu, ram, storage ) {
-				var pricingValue = ( Number(cpu) * 10 ) + ( Number(ram) * 8 ) + ( Number(storage) * 0.5 );
-				jQuery('.cpu-value').html(pricingCPU);
-				jQuery('.ram-value').html(pricingRAM);
-				jQuery('.storage-value').html(pricingStorage);
-				jQuery('.cpu-price').html('$'+pricingCPU * 10);
-				jQuery('.ram-price').html('$'+pricingRAM * 8);
-				jQuery('.storage-price').html('$'+pricingStorage * 0.5);
-				jQuery('.pricing-price').html( '$'+pricingValue );
-			}
-		});
-
-		jQuery(window).on( 'load', function(){
-			$('#hotspot-img').hotSpot();
-		});
-	</script>
-
-</body>
-</html>
+{% endblock %}

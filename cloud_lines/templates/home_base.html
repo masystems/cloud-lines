@@ -1,0 +1,273 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html dir="ltr" lang="en-GB">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="MASystems" content="SemiColonWeb" />
+
+	<!-- Stylesheets
+	============================================= -->
+	<link href="http://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Istok+Web:400,700" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="{% static 'cloud-lines/css/bootstrap.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'cloud-lines/css/style.css' %}" type="text/css" />
+
+	<link rel="stylesheet" href="{% static 'cloud-lines/css/dark.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'cloud-lines/css/font-icons.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'cloud-lines/css/animate.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'cloud-lines/css/magnific-popup.css' %}" type="text/css" />
+
+	<link rel="stylesheet" href="{% static 'cloud-lines/css/components/ion.rangeslider.css' %}" type="text/css" />
+
+	<link rel="stylesheet" href="{% static 'cloud-lines/css/responsive.css' %}" type="text/css" />
+	<meta name='viewport' content='initial-scale=1, viewport-fit=cover'>
+
+	<!-- Hosting Demo Specific Stylesheet -->
+<!--	<link rel="stylesheet" href="{% static 'cloud-lines/css/colors.php?color=44aaac' %}" type="text/css" /> &lt;!&ndash; Theme Color &ndash;&gt;-->
+	<link rel="stylesheet" href="{% static 'cloud-lines/demos/hosting/css/fonts.css' %}" type="text/css" />
+	<link rel="stylesheet" href="{% static 'cloud-lines/demos/hosting/hosting.css' %}" type="text/css" />
+	<!-- / -->
+	<script src="{% static 'cloud-lines/js/jquery.js' %}"></script>
+	<!-- Document Title
+	============================================= -->
+	<title>CloudLines</title>
+
+</head>
+
+<body class="stretched">
+
+	<!-- Document Wrapper
+	============================================= -->
+	<div id="wrapper" class="clearfix">
+
+		<!-- Top Bar
+		============================================= -->
+		<div id="top-bar" class="center dark" style="background-color: #15888a">
+			<p class="mb-0 text-white" style="font-size: 14px;">GDPR Notice<a href="#" class="ml-2 font-primary t700 text-white"><u>Learn More</u> &#8250;</a></p>
+		</div>
+
+		<!-- Header
+		============================================= -->
+		<header id="header" class="full-header transparent-header dark" data-sticky-class="not-dark">
+
+			<div id="header-wrap">
+
+				<div class="container clearfix">
+
+					<div id="primary-menu-trigger"><i class="icon-reorder"></i></div>
+
+					<!-- Logo
+					============================================= -->
+					<div id="logo">
+
+						<span><a href="{% url 'home' %}" class="standard-logo" data-dark-logo="{% static 'cloud-lines/images/logo-dark.png' %}"><img src="{% static 'cloud-lines/images/logo.png' %}" alt="Canvas Logo"></a></span>
+						<a href="{% url 'home' %}" class="retina-logo" data-dark-logo="{% static 'cloud-lines/images/logo-dark@2x.png' %}"><img src="{% static 'cloud-lines/images/logo@2x.png' %}" alt="Canvas Logo"></a>
+					</div><!-- #logo end -->
+
+					<!-- Primary Navigation
+					============================================= -->
+					<nav id="primary-menu" class="not-dark with-arrows">
+
+						<ul class="not-dark">
+							<li class="current"><a href="{% url 'home' %}"><div>Home</div></a></li>
+							<li class="mega-menu"><a href="#"><div>Services</div></a>
+								<!-- Mega Menu Content
+								============================================= -->
+								<div class="mega-menu-content style-2 border-top-0 clearfix">
+									{% for service in services.all %}
+									<ul class="mega-menu-column col-lg-2">
+										<li>
+											<div class="feature-box not-dark fbox-small fbox-center nobottommargin">
+												<div class="fbox-icon">
+													<img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 52px;">
+												</div>
+												<h3 class="t500"><a href="#">{{ service.service_name }}</a></h3>
+												<p class="d-none d-lg-block mb-0 t300">{{ service.service_description|truncatechars:150 }}</p>
+												<a href="#" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
+											</div>
+										</li>
+									</ul>
+									{% endfor %}
+								</div>
+							</li>
+							<li><a href="{% url 'about' %}"><div>About</div></a></li>
+							<li><a href="#"><div>Extras</div></a></li>
+							<li><a href="#"><div>FAQs</div></a></li>
+							<li><a href="#"><div>Contact</div></a></li>
+						</ul>
+
+						<!-- Top Search
+						============================================= -->
+
+						<a href="{% url 'dashboard' %}" class="button bg-white text-dark button-light button-rounded color"><span class="d-none d-lg-block">Login to Cloud Lines</span><span class="d-lg-none d-sm-block d-md-block"><i class="icon-dashboard"></i></span></a>
+
+					</nav><!-- #primary-menu end -->
+
+				</div>
+
+			</div>
+
+		</header><!-- #header end -->
+
+		    {% block content %}
+
+
+            {% endblock %}
+
+				<!-- Bottom Section
+				============================================= -->
+				<div class="section bgcolor dark m-0">
+					<div class="container">
+						<div class="row center justify-content-center">
+							<div class="col-md-8">
+								<h2 class="t700 text-white mb-3">Start your free instance now!</h2>
+							</div>
+							<div class="col-md-8">
+								<a href="#" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</section>
+
+		<!-- Footer
+		============================================= -->
+		<footer id="footer" class="dark">
+
+			<div class="container">
+
+				<!-- Footer Widgets
+				============================================= -->
+				<div class="footer-widgets-wrap pb-4 clearfix">
+
+					<div class="row">
+
+						<div class="col-md-4 col-sm-6 mb-0 mb-sm-4 mb-md-0">
+
+							<div class="widget clearfix">
+
+								<h4>About Cloud-Lines</h4>
+
+								<p>A pedigee tracking solution created and owned my MA Systems..</p>
+
+								<div style="background: url('{% static 'cloud-lines/images/world-map.png' %}') no-repeat left center; background-size: auto 100%;">
+<!--									<address>-->
+<!--										<strong>Headquarters:</strong><br>-->
+<!--										7 Cherwell Close, Maidenhead<br>-->
+<!--										Berkshire, SL68AY<br>-->
+<!--									</address>-->
+<!--									<abbr title="Phone Number"><strong>Phone:</strong></abbr> +44 7500776311<br>-->
+									<abbr title="Email Address"><strong>Email:</strong></abbr> info@masys.co.uk
+								</div>
+
+							</div>
+
+						</div>
+
+						<div class="col-md-3 col-6 mt-5 mt-sm-0">
+
+							<div class="widget clearfix">
+
+								<h4>Features</h4>
+
+								<ul class="list-unstyled iconlist ml-0">
+									<li><a href="http://codex.wordpress.org/">Documentation</a></li>
+									<li><a href="http://wordpress.org/support/forum/requests-and-feedback">Feedback</a></li>
+									<li><a href="http://wordpress.org/extend/plugins/">Plugins</a></li>
+									<li><a href="http://wordpress.org/support/">Support Forums</a></li>
+								</ul>
+
+							</div>
+
+						</div>
+
+						<div class="col-md-3 col-6 mt-5 mt-sm-0">
+
+							<div class="widget clearfix">
+
+								<h4>Social</h4>
+
+								<ul class="list-unstyled iconlist">
+									<li><i class="icon-facebook"></i><a href="http://facebook.com/semicolonweb" target="_blank"> Facebook</a></li>
+									<li><i class="icon-twitter"></i><a href="http://twitter.com/__semicolon" target="_blank"> Twitter</a></li>
+									<li><i class="icon-instagram"></i><a href="http://instagram.com/semicolonweb" target="_blank"> Instagram</a></li>
+									<li><i class="icon-youtube"></i><a href="https://www.youtube.com/user/shank20121/videos" target="_blank"> YouTube</a></li>
+									<li><i class="icon-github"></i><a href="https://github.com/masystems/" target="_blank"> Github</a></li>
+								</ul>
+
+							</div>
+
+						</div>
+
+						<div class="col-md-2 col-sm-6 mt-4 mt-sm-0">
+
+							<div class="widget clearfix">
+
+								<h4>Support</h4>
+
+								<ul class="list-unstyled iconlist ml-0">
+									<li><a href="#">Help Center</a></li>
+									<li><a href="#">Status</a></li>
+									<li><a href="#">Changelog</a></li>
+									<li><a href="#">Contact Support</a></li>
+								</ul>
+
+							</div>
+
+						</div>
+
+					</div>
+
+				</div><!-- .footer-widgets-wrap end -->
+
+				<div class="line line-sm m-0"></div>
+
+			</div>
+
+
+			<!-- Copyrights
+			============================================= -->
+			<div id="copyrights" class="nobg">
+
+				<div class="container clearfix">
+
+					<div class="col_half">
+						Copyrights &copy; 2019 All Rights Reserved by MASystems.<br>
+						<div class="copyright-links"><a href="#">Terms of Use</a> / <a href="#">Privacy Policy</a></div>
+					</div>
+
+					<div class="col_half col_last tright">
+						<div class="copyrights-menu copyright-links clearfix">
+							<a href="#">Home</a>/<a href="#">About Us</a>/<a href="#">Team</a>/<a href="#">Clients</a>/<a href="#">FAQs</a>/<a href="#">Contact</a>
+						</div>
+					</div>
+
+				</div>
+
+			</div><!-- #copyrights end -->
+
+		</footer><!-- #footer end -->
+
+	</div><!-- #wrapper end -->
+
+	<!-- Go To Top
+	============================================= -->
+	<div id="gotoTop" class="icon-angle-up"></div>
+
+	<!-- External JavaScripts
+	============================================= -->
+
+	<script src="{% static 'cloud-lines/js/plugins.js' %}"></script>
+
+	<script src="{% static 'cloud-lines/js/jquery.hotspot.js' %}"></script>
+	<script src="{% static 'cloud-lines/js/components/rangeslider.min.js' %}"></script>
+
+	<!-- Footer Scripts
+	============================================= -->
+	<script src="{% static 'cloud-lines/js/functions.js' %}"></script>
+
+</body>
+</html>
