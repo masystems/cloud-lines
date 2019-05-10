@@ -24,10 +24,6 @@ def is_editor(user):
     return user.groups.filter(name='editor').exists() or user.is_superuser
 
 
-def home(request):
-    return render(request, 'home.html')
-
-
 @login_required(login_url="/account/login")
 def dashboard(request):
 

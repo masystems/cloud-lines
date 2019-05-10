@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from pedigree import views
+from cloud_lines import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
-    path('dashboard', views.dashboard, name='dashboard'),
     path('pedigree/', include('pedigree.urls')),
     path('breeders/', include('breeder.urls')),
     path('breeds/', include('breed.urls')),
