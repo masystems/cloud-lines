@@ -25,8 +25,9 @@ class Service(models.Model):
 
 class Page(models.Model):
     title = models.CharField(max_length=50)
-    sub_title = models.CharField(max_length=150)
+    sub_title = models.CharField(max_length=150, blank=True)
     body = models.TextField()
+    image = models.ImageField(blank=True)
 
     def __str__(self):
         return self.title

@@ -3,17 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="ca65e522-4d0f-409c-bde2-2d82bd0bafaa" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloud_lines/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cloud_lines/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloud_lines/templates/about.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloud_lines/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/templates/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloud_lines/templates/home_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/templates/home_base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloud_lines/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudlines/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudlines/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/support/templates/faq.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/support/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/support/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/support/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/support/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,7 +13,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cloud_lines/templates/home_base.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="465">
@@ -52,11 +42,11 @@
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cloud_lines/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="495">
-              <caret line="33" selection-start-line="33" selection-end-line="33" />
+            <state relative-caret-position="405">
+              <caret line="27" column="59" selection-start-line="27" selection-start-column="59" selection-end-line="27" selection-end-column="59" />
             </state>
           </provider>
         </entry>
@@ -73,8 +63,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cloud_lines/templates/faqs.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="40" column="28" selection-start-line="40" selection-start-column="28" selection-end-line="40" selection-end-column="28" />
+            <state relative-caret-position="576">
+              <caret line="56" lean-forward="true" selection-start-line="56" selection-end-line="56" />
             </state>
           </provider>
         </entry>
@@ -132,16 +122,16 @@
         <option value="$PROJECT_DIR$/cloud_lines/templates/extras.html" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/faqs.py" />
         <option value="$PROJECT_DIR$/cloudlines/urls.py" />
-        <option value="$PROJECT_DIR$/cloud_lines/models.py" />
         <option value="$PROJECT_DIR$/cloud_lines/admin.py" />
         <option value="$PROJECT_DIR$/support/urls.py" />
         <option value="$PROJECT_DIR$/support/views.py" />
         <option value="$PROJECT_DIR$/templates/base.html" />
         <option value="$PROJECT_DIR$/cloud_lines/views.py" />
         <option value="$PROJECT_DIR$/template/faqs.html" />
-        <option value="$PROJECT_DIR$/cloud_lines/templates/std_page.html" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/faqs.html" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/home_base.html" />
+        <option value="$PROJECT_DIR$/cloud_lines/templates/std_page.html" />
+        <option value="$PROJECT_DIR$/cloud_lines/models.py" />
       </list>
     </option>
   </component>
@@ -508,31 +498,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cloud_lines/templates/std_page.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="411">
-          <caret line="41" column="38" selection-start-line="41" selection-start-column="29" selection-end-line="41" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cloud_lines/templates/faqs.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="40" column="28" selection-start-line="40" selection-start-column="28" selection-end-line="40" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/base.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="331">
           <caret line="182" column="74" selection-start-line="182" selection-start-column="74" selection-end-line="182" selection-end-column="74" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cloud_lines/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="33" selection-start-line="33" selection-end-line="33" />
         </state>
       </provider>
     </entry>
@@ -543,6 +512,27 @@
           <folding>
             <element signature="n#style#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cloud_lines/templates/faqs.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="56" lean-forward="true" selection-start-line="56" selection-end-line="56" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cloud_lines/templates/std_page.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="411">
+          <caret line="41" column="38" selection-start-line="41" selection-start-column="29" selection-end-line="41" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cloud_lines/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="27" column="59" selection-start-line="27" selection-start-column="59" selection-end-line="27" selection-end-column="59" />
         </state>
       </provider>
     </entry>
