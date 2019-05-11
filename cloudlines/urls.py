@@ -9,6 +9,7 @@ urlpatterns = [
     path('about', views.about, name='about'),
     path('extras', views.extras, name='extras'),
     path('faqs', views.faqs, name='faqs'),
+    path('contact', views.contact, name='contact'),
     path('pedigree/', include('pedigree.urls')),
     path('breeders/', include('breeder.urls')),
     path('breeds/', include('breed.urls')),

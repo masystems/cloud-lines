@@ -1,0 +1,119 @@
+{% extends 'home_base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .slider-element {
+    top: -100px;
+    bottom: -100px;
+    height: 100px !important;
+    margin-bottom: -100px;
+}
+</style>
+
+<section id="slider" class="slider-element">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+</section><!-- #slider end -->
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+	<div class="container clearfix">
+		<h1>Contact</h1>
+		<span>{{ content.sub_title }}</span>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Contact</li>
+		</ol>
+	</div>
+
+		</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<!-- Contact Form & Map Overlay Section
+		============================================= -->
+<section id="content">
+
+    <div class="container clearfix content-wrap">
+
+        <!-- Contact Form Overlay
+        ============================================= -->
+        <div id="contact-form-overlay">
+
+            <div class="fancy-title title-dotted-border">
+                <h3>Send us an Email</h3>
+            </div>
+
+            <div class="form-widget">
+
+                <div class="form-result"></div>
+
+                <!-- Contact Form
+                ============================================= -->
+                <form class="nobottommargin" id="template-contactform" name="template-contactform" action="{% url 'contact' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="col_half">
+                        <label for="name">Name <small>*</small></label>
+                        <input type="text" id="name" name="name" value="" class="sm-form-control required" />
+                    </div>
+
+                    <div class="col_half col_last">
+                        <label for="email">Email <small>*</small></label>
+                        <input type="email" id="email" name="email" value="" class="required email sm-form-control" />
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="col_half">
+                        <label for="phone">Phone</label>
+                        <input type="text" id="phone" name="phone" value="" class="sm-form-control" />
+                    </div>
+
+                    <div class="col_half col_last">
+                        <label for="service">Services</label>
+                        <select id="service" name="service" class="sm-form-control">
+                            <option value="">-- Select One --</option>
+                            {% for service in services %}
+                                <option value="{{ service }}">{{ service }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="col_full">
+                        <label for="subject">Subject <small>*</small></label>
+                        <input type="text" id="subject" name="subject" value="" class="required sm-form-control" />
+                    </div>
+
+                    <div class="col_full">
+                        <label for="message">Message <small>*</small></label>
+                        <textarea class="required sm-form-control" id="message" name="message" rows="6" cols="30"></textarea>
+                    </div>
+
+                    <div class="col_full hidden">
+                        <input type="text" id="botcheck" name="botcheck" value="" class="sm-form-control" />
+                    </div>
+
+                    <div class="col_full">
+                        <button class="button button-3d nomargin" type="submit" id="submit" name="submit" value="submit">Send Message</button>
+                    </div>
+
+                    <input type="hidden" name="prefix" value="contactform">
+
+                </form>
+            </div>
+
+        </div><!-- Contact Form Overlay End -->
+
+    </div>
+
+
+{% endblock %}
