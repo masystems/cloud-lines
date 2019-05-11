@@ -25,3 +25,16 @@ class Service(models.Model):
 
 class Page(models.Model):
     title = models.CharField(max_length=50)
+    sub_title = models.CharField(max_length=150)
+    body = models.TextField()
+
+    def __str__(self):
+        return self.title
+
+
+class Faq(models.Model):
+    question = models.CharField(max_length=250)
+    answer = models.TextField()
+
+    def __str__(self):
+        return self.question

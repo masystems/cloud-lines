@@ -1,0 +1,59 @@
+{% extends 'home_base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .slider-element {
+    top: -100px;
+    bottom: -100px;
+    height: 100px !important;
+    margin-bottom: -100px;
+}
+</style>
+
+<section id="slider" class="slider-element">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+</section><!-- #slider end -->
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+	<div class="container clearfix">
+		<h1>FAQs</h1>
+		<span>{{ content.sub_title }}</span>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">FAQs</li>
+		</ol>
+	</div>
+
+		</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<!-- Post Content
+			============================================= -->
+			<div class="postcontent nobottommargin clearfix">
+				<div class="clear"></div>
+				<div id="faqs" class="faqs">
+					{% for faq in faqs.all %}
+						<div class="toggle faq faq-marketplace faq-authors">
+							<div class="togglet"><i class="toggle-closed icon-question-sign"></i><i class="toggle-open icon-question-sign"></i>{{ faq.question }}</div>
+							<div class="togglec">{{ faq.answer }}</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div><!-- .postcontent end -->
+		</div>
+
+
+{% endblock %}
