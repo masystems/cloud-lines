@@ -51,69 +51,62 @@
                 <h3>Send us an Email</h3>
             </div>
 
-            <div class="form-widget">
+            <!-- Contact Form
+            ============================================= -->
+            <form name="contact" action="{% url 'contact' %}" method="POST">
+                {% csrf_token %}
+                <div class="col_half">
+                    <label for="name">Name <small>*</small></label>
+                    <input type="text" id="name" name="name" value="" class="sm-form-control required" />
+                </div>
 
-                <div class="form-result"></div>
+                <div class="col_half col_last">
+                    <label for="email">Email <small>*</small></label>
+                    <input type="email" id="email" name="email" value="" class="required email sm-form-control" />
+                </div>
 
-                <!-- Contact Form
-                ============================================= -->
-                <form class="nobottommargin" id="template-contactform" name="template-contactform" action="{% url 'contact' %}" method="POST">
-                    {% csrf_token %}
-                    <div class="col_half">
-                        <label for="name">Name <small>*</small></label>
-                        <input type="text" id="name" name="name" value="" class="sm-form-control required" />
-                    </div>
+                <div class="clear"></div>
 
-                    <div class="col_half col_last">
-                        <label for="email">Email <small>*</small></label>
-                        <input type="email" id="email" name="email" value="" class="required email sm-form-control" />
-                    </div>
+                <div class="col_half">
+                    <label for="phone">Phone</label>
+                    <input type="text" id="phone" name="phone" value="" class="sm-form-control" />
+                </div>
 
-                    <div class="clear"></div>
+                <div class="col_half col_last">
+                    <label for="service">Services</label>
+                    <select id="service" name="service" class="sm-form-control">
+                        <option value="">-- Select One --</option>
+                        {% for service in services %}
+                            <option value="{{ service }}">{{ service }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-                    <div class="col_half">
-                        <label for="phone">Phone</label>
-                        <input type="text" id="phone" name="phone" value="" class="sm-form-control" />
-                    </div>
+                <div class="clear"></div>
 
-                    <div class="col_half col_last">
-                        <label for="service">Services</label>
-                        <select id="service" name="service" class="sm-form-control">
-                            <option value="">-- Select One --</option>
-                            {% for service in services %}
-                                <option value="{{ service }}">{{ service }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                <div class="col_full">
+                    <label for="subject">Subject <small>*</small></label>
+                    <input type="text" id="subject" name="subject" value="" class="required sm-form-control" />
+                </div>
 
-                    <div class="clear"></div>
+                <div class="col_full">
+                    <label for="message">Message <small>*</small></label>
+                    <textarea class="required sm-form-control" id="message" name="message" rows="6" cols="30"></textarea>
+                </div>
 
-                    <div class="col_full">
-                        <label for="subject">Subject <small>*</small></label>
-                        <input type="text" id="subject" name="subject" value="" class="required sm-form-control" />
-                    </div>
+                <div class="col_full hidden">
+                    <input type="text" id="botcheck" name="botcheck" value="" class="sm-form-control" />
+                </div>
 
-                    <div class="col_full">
-                        <label for="message">Message <small>*</small></label>
-                        <textarea class="required sm-form-control" id="message" name="message" rows="6" cols="30"></textarea>
-                    </div>
+                <div class="col_full">
+                    <button class="button button-3d" type="submit">Send Message</button>
+                </div>
 
-                    <div class="col_full hidden">
-                        <input type="text" id="botcheck" name="botcheck" value="" class="sm-form-control" />
-                    </div>
 
-                    <div class="col_full">
-                        <button class="button button-3d nomargin" type="submit" id="submit" name="submit" value="submit">Send Message</button>
-                    </div>
-
-                    <input type="hidden" name="prefix" value="contactform">
-
-                </form>
-            </div>
+            </form>
 
         </div><!-- Contact Form Overlay End -->
 
     </div>
-
 
 {% endblock %}

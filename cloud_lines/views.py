@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
 from .models import Service, Page, Faq
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import EmailMessage, BadHeaderError
 from .forms import ContactForm
 
 def home(request):
@@ -35,11 +35,21 @@ def contact(request):
             service = form.cleaned_data['service']
             message = form.cleaned_data['message']
             try:
-                send_mail(subject, message, email, ['marco@masys.co.uk'])
+                EmailMessage(subject,
+                             name + '' + phone + '' + service + '' + message,
+                             email,
+                             ['marco@masys.co.uk'],
+                             reply_to=[email])
             except BadHeaderError:
-                return HttpResponse('Invalid header found.')
+                return redirect('fail')
             return redirect('success')
+
     return render(request, 'contact.html', {'services': Service.objects.all()})
 
-def successView(request):
+
+def success(request):
     return HttpResponse('Success! Thank you for your message.')
+
+
+def fail(request):
+    return HttpResponse('Oops, something went wrong!')
