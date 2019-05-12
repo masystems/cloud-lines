@@ -19,7 +19,7 @@ def extras(request):
 
 def faqs(request):
     return render(request, 'faqs.html', {'faqs': Faq.objects.all(),
-                                        'services': Service.objects.all()})
+                                         'services': Service.objects.all()})
 
 
 def contact(request):
@@ -33,26 +33,26 @@ def contact(request):
         email = EmailMessage(
             subject,
             "From: {},\nPhone: {},\nService: {},\nMessage: {}".format(name,
-                                    phone,
-                                    service,
-                                    message_body),
+                                                                      phone,
+                                                                      service,
+                                                                      message_body),
             'contact@cmdlb.com',
-            ['marco@masys.co.uk',
-             'adam@masys.co.uk'],
+            ['marco@masys.co.uk', 'adam@masys.co.uk'],
             reply_to=[email_address],
         )
         try:
             email.send(fail_silently=False)
             message = {'message': "Thank you for your email, we'll be in touch soon!"}
-            email = Contact.objects.create(name=name,
+        except:
+            message = {'message': "Something went wrong, but we're working on it!"}
+
+        email_obj = Contact.objects.create(name=name,
                                            email=email_address,
                                            phone=phone,
                                            service=service,
                                            subject=subject,
                                            message=message_body)
-            email.save()
-        except:
-            message = {'message': "Something went wrong, but we're working on it!"}
+        email_obj.save()
 
         return HttpResponse(json.dumps(message), content_type='application/json')
     else:
