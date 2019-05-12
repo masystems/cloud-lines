@@ -69,7 +69,7 @@
 					<nav id="primary-menu" class="not-dark with-arrows">
 
 						<ul class="not-dark">
-							<li class="current"><a href="{% url 'home' %}"><div>Home</div></a></li>
+							<li class=""><a href="{% url 'home' %}"><div>Home</div></a></li>
 							<li class="mega-menu"><a href="#"><div>Services</div></a>
 								<!-- Mega Menu Content
 								============================================= -->
@@ -90,10 +90,10 @@
 									{% endfor %}
 								</div>
 							</li>
-							<li><a href="{% url 'about' %}"><div>About</div></a></li>
-							<li><a href="{% url 'extras' %}"><div>Extras</div></a></li>
-							<li><a href="{% url 'faqs' %}"><div>FAQs</div></a></li>
-							<li><a href="{% url 'contact' %}"><div>Contact</div></a></li>
+							<li class="{% if 'about' in request.path %}current{% endif %}"><a href="{% url 'about' %}"><div>About</div></a></li>
+							<li class="{% if 'extras' in request.path %}current{% endif %}"><a href="{% url 'extras' %}"><div>Extras</div></a></li>
+							<li class="{% if 'faqs' in request.path %}current{% endif %}"><a href="{% url 'faqs' %}"><div>FAQs</div></a></li>
+							<li class="{% if 'contact' in request.path %}current{% endif %}"><a href="{% url 'contact' %}"><div>Contact</div></a></li>
 						</ul>
 
 						<!-- Top Search
@@ -108,7 +108,6 @@
 			</div>
 
 		</header><!-- #header end -->
-
 		    {% block content %}
 
 
