@@ -10,8 +10,6 @@ urlpatterns = [
     path('extras', views.extras, name='extras'),
     path('faqs', views.faqs, name='faqs'),
     path('contact', views.contact, name='contact'),
-    path('success', views.success, name='success'),
-    path('fail', views.fail, name='fail'),
     path('pedigree/', include('pedigree.urls')),
     path('breeders/', include('breeder.urls')),
     path('breeds/', include('breed.urls')),

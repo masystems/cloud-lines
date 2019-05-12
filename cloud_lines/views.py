@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
-from .models import Service, Page, Faq
+from .models import Service, Page, Faq, Contact
 from django.core.mail import EmailMessage, BadHeaderError
-from .forms import ContactForm
+import json
 
 def home(request):
     return render(request, 'home.html', {'services': Service.objects.all()})
@@ -23,33 +23,36 @@ def faqs(request):
 
 
 def contact(request):
-    if request.method == 'GET':
-        form = ContactForm()
+    if request.POST:
+        name = request.POST.get('name')
+        email_address = request.POST.get('email')
+        phone = request.POST.get('phone')
+        service = request.POST.get('service')
+        subject = request.POST.get('subject')
+        message_body = request.POST.get('message')
+        email = EmailMessage(
+            subject,
+            "{}, {}, {}, {}".format(name,
+                                    phone,
+                                    service,
+                                    message_body),
+            'contact@cmdlb.com',
+            ['marco.baldanza@cmdlb.com'],
+            reply_to=[email_address],
+        )
+        try:
+            email.send(fail_silently=False)
+            message = {'message': "Thank you for your email, we'll be in touch soon!"}
+            email = Contact.objects.create(name=name,
+                                           email=email_address,
+                                           phone=phone,
+                                           service=service,
+                                           subject=subject,
+                                           message=message_body)
+            email.save()
+        except:
+            message = {'message': "Something went wrong, but we're working on it!"}
+
+        return HttpResponse(json.dumps(message), content_type='application/json')
     else:
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            email = form.cleaned_data['email']
-            phone = form.cleaned_data['phone']
-            subject = form.cleaned_data['subject']
-            service = form.cleaned_data['service']
-            message = form.cleaned_data['message']
-            try:
-                EmailMessage(subject,
-                             name + '' + phone + '' + service + '' + message,
-                             email,
-                             ['marco@masys.co.uk'],
-                             reply_to=[email])
-            except BadHeaderError:
-                return redirect('fail')
-            return redirect('success')
-
-    return render(request, 'contact.html', {'services': Service.objects.all()})
-
-
-def success(request):
-    return HttpResponse('Success! Thank you for your message.')
-
-
-def fail(request):
-    return HttpResponse('Oops, something went wrong!')
+        return render(request, 'contact.html', {'services': Service.objects.all()})

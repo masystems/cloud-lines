@@ -39,3 +39,15 @@ class Faq(models.Model):
 
     def __str__(self):
         return self.question
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=250)
+    email = models.CharField(max_length=250)
+    phone = models.CharField(max_length=50, blank=True)
+    service = models.CharField(max_length=50, blank=True)
+    subject = models.CharField(max_length=250)
+    message = models.TextField()
+
+    def __str__(self):
+        return self.email
