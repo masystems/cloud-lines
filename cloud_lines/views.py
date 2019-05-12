@@ -32,12 +32,13 @@ def contact(request):
         message_body = request.POST.get('message')
         email = EmailMessage(
             subject,
-            "{}, {}, {}, {}".format(name,
+            "From: {},\nPhone: {},\nService: {},\nMessage: {}".format(name,
                                     phone,
                                     service,
                                     message_body),
             'contact@cmdlb.com',
-            ['marco.baldanza@cmdlb.com'],
+            ['marco@masys.co.uk',
+             'adam@masys.co.uk'],
             reply_to=[email_address],
         )
         try:
