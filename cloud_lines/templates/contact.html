@@ -47,12 +47,14 @@
         ============================================= -->
         <div id="contact-form-overlay">
 
+            <div class="fancy-title title-dotted-border">
+                <h3>Send us an Email</h3>
+            </div>
+
             <!-- Contact Form
             ============================================= -->
-            <div id="contactForm">
-                <div class="fancy-title title-dotted-border">
-                    <h3>Send us an Email</h3>
-                </div>
+            <form name="contact" id="contactForm" action="{% url 'contact' %}" method="POST">
+                {% csrf_token %}
                 <div class="col_half">
                     <label for="name">Name <small>*</small></label>
                     <input type="text" id="name" name="name" value="" class="sm-form-control required" />
@@ -100,58 +102,10 @@
                     <button class="button button-3d" id="contactMessage" type="submit">Send Message</button>
                 </div>
 
-            </div>
+
+            </form>
 
         </div><!-- Contact Form Overlay End -->
-    <script>
-            $('#contactMessage').click(function () {
-            $.ajax({
-                type: "POST",
-                url: "{% url 'contact' %}",
-                dataType: "json",
-                data: {
-                    "name": $('#name').val(),
-                    "email": $('#email').val(),
-                    "phone": $('#phone').val(),
-                    "service": $('#service').val(),
-                    "subject": $('#subject').val(),
-                    "message": $('#message').val(),
-                },
-                success: function (data) {
-                    $('#contactForm').html('<h4 class="text-center">' + data.message + '</h5>').fadeIn(3000);
-                }
-            });
-        });
-        function getCookie(name) {
-            var cookieValue = null;
-            var i = 0;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (i; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        var csrftoken = getCookie('csrftoken');
-        function csrfSafeMethod(method) {
-            // these HTTP methods do not require CSRF protection
-            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-        }
-        $.ajaxSetup({
-            crossDomain: false, // obviates need for sameOrigin test
-            beforeSend: function (xhr, settings) {
-                if (!csrfSafeMethod(settings.type)) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                }
-            }
-        });
-    </script>
     </div>
 
 {% endblock %}

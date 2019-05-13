@@ -42,18 +42,37 @@ def contact(request):
         )
         try:
             email.send(fail_silently=False)
-            message = {'message': "Thank you for your email, we'll be in touch soon!"}
+            email_obj = Contact.objects.create(name=name,
+                                               email=email_address,
+                                               phone=phone,
+                                               service=service,
+                                               subject=subject,
+                                               message=message_body)
+            email_obj.save()
         except:
-            message = {'message': "Something went wrong, but we're working on it!"}
+            redirect('result', 'fail')
 
-        email_obj = Contact.objects.create(name=name,
-                                           email=email_address,
-                                           phone=phone,
-                                           service=service,
-                                           subject=subject,
-                                           message=message_body)
-        email_obj.save()
-
-        return HttpResponse(json.dumps(message), content_type='application/json')
+        return redirect('result', 'success')
     else:
         return render(request, 'contact.html', {'services': Service.objects.all()})
+
+
+def result(request, result):
+    content = {}
+    if result == 'success':
+        content['title'] = 'Success'
+        content['sub_title'] = 'Message received!'
+        content['body'] = """<h4>Got it!</h4>
+                                <div class="style-msg successmsg">
+                                <div class="sb-msg"><i class="icon-thumbs-up"></i><strong>Received!</strong> You successfully sent us a message and we'll get back to you ASAP.</div>
+                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            </div>"""
+    elif result == 'fail':
+        content['title'] = 'Oops'
+        content['sub_title'] = 'Something went wrong!'
+        content['body'] = """<h4>Oh no!</h4>
+                                <div class="style-msg errormsg">
+                                <div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> We're working on it!</div>
+                            </div>"""
+    return render(request, 'std_page.html', {'content': content,
+                                             'services': Service.objects.all()})
