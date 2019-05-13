@@ -53,7 +53,7 @@
 
             <!-- Contact Form
             ============================================= -->
-            <form name="contact" id="contactForm" action="{% url 'contact' %}" method="POST">
+            <form name="contact" action="{% url 'contact' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="col_half">
                     <label for="name">Name <small>*</small></label>
@@ -99,7 +99,7 @@
                 </div>
 
                 <div class="col_full">
-                    <button class="button button-3d" id="contactMessage" type="submit">Send Message</button>
+                    <button class="button button-3d" type="submit">Send Message</button>
                 </div>
 
 
