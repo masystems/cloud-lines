@@ -23,7 +23,7 @@ def faqs(request):
 
 
 def contact(request):
-    if request.POST:
+    if request.method == 'POST':
         name = request.POST.get('name')
         email_address = request.POST.get('email')
         phone = request.POST.get('phone')

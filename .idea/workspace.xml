@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ca65e522-4d0f-409c-bde2-2d82bd0bafaa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/cloud_lines/templates/contact.html" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/templates/contact.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloud_lines/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudlines/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudlines/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -59,8 +57,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cloud_lines/templates/contact.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="772">
-              <caret line="107" column="47" selection-start-line="107" selection-start-column="47" selection-end-line="107" selection-end-column="47" />
+            <state relative-caret-position="457">
+              <caret line="101" column="53" selection-start-line="101" selection-start-column="53" selection-end-line="101" selection-end-column="53" />
             </state>
           </provider>
         </entry>
@@ -68,7 +66,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cloud_lines/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="613">
+            <state relative-caret-position="740">
               <caret line="72" column="44" lean-forward="true" selection-start-line="72" selection-start-column="44" selection-end-line="72" selection-end-column="44" />
               <folding>
                 <element signature="e#0#59#0" expanded="true" />
@@ -78,13 +76,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/cloud_lines/templates/success_contact.html">
+        <entry file="file://$PROJECT_DIR$/breeder/templates/new_breeder_form.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret selection-end-line="3" selection-end-column="6" />
-              <folding>
-                <element signature="e#275#282#1" expanded="true" />
-              </folding>
+            <state relative-caret-position="-270">
+              <caret line="27" column="127" selection-start-line="27" selection-start-column="98" selection-end-line="27" selection-end-column="127" />
             </state>
           </provider>
         </entry>
@@ -168,10 +163,10 @@
         <option value="$PROJECT_DIR$/cloud_lines/models.py" />
         <option value="$PROJECT_DIR$/cloudlines/settings.py" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/home_base.html" />
-        <option value="$PROJECT_DIR$/cloud_lines/templates/contact.html" />
         <option value="$PROJECT_DIR$/cloudlines/urls.py" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/result.html" />
         <option value="$PROJECT_DIR$/cloud_lines/views.py" />
+        <option value="$PROJECT_DIR$/cloud_lines/templates/contact.html" />
       </list>
     </option>
   </component>
@@ -193,6 +188,17 @@
             <path>
               <item name="cloud-lines" type="b2602c69:ProjectViewProjectNode" />
               <item name="cloud-lines" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cloud-lines" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cloud-lines" type="462c0819:PsiDirectoryNode" />
+              <item name="breeder" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cloud-lines" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cloud-lines" type="462c0819:PsiDirectoryNode" />
+              <item name="breeder" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="cloud-lines" type="b2602c69:ProjectViewProjectNode" />
@@ -257,9 +263,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1920" y="0" width="1920" height="1080" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24472573" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24472573" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -272,7 +277,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.15254237" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.25635594" />
       <window_info anchor="bottom" id="Python Console" order="11" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -280,9 +285,6 @@
     </layout>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cloudlines/static/cloud-lines/css/fonts/font-icons-snapchat.svg">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/cloudlines/static/cloud-lines/css/fonts/lined-icons.svg">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -588,14 +590,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cloud_lines/templates/contact.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="772">
-          <caret line="107" column="47" selection-start-line="107" selection-start-column="47" selection-end-line="107" selection-end-column="47" />
+        <state relative-caret-position="457">
+          <caret line="101" column="53" selection-start-line="101" selection-start-column="53" selection-end-line="101" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/breeder/templates/new_breeder_form.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-270">
+          <caret line="27" column="127" selection-start-line="27" selection-start-column="98" selection-end-line="27" selection-end-column="127" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cloud_lines/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="613">
+        <state relative-caret-position="740">
           <caret line="72" column="44" lean-forward="true" selection-start-line="72" selection-start-column="44" selection-end-line="72" selection-end-column="44" />
           <folding>
             <element signature="e#0#59#0" expanded="true" />
