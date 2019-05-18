@@ -1,7 +1,7 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, redirect
 from .models import Service, Page, Faq, Contact
-from django.core.mail import EmailMessage, BadHeaderError
-import json
+from django.core.mail import EmailMessage
+
 
 def home(request):
     return render(request, 'home.html', {'services': Service.objects.all()})
