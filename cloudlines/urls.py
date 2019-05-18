@@ -10,7 +10,6 @@ urlpatterns = [
     path('extras', views.extras, name='extras'),
     path('faqs', views.faqs, name='faqs'),
     path('contact', views.contact, name='contact'),
-    path('result/<str:result>', views.result, name='result'),
     path('pedigree/', include('pedigree.urls')),
     path('breeders/', include('breeder.urls')),
     path('breeds/', include('breed.urls')),

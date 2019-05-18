@@ -53,8 +53,7 @@
 
             <!-- Contact Form
             ============================================= -->
-            <form action="{% url 'contact' %}" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+            <div id="contactForm" data-wow-duration="1s">
                 <div class="col_half">
                     <label for="name">Name <small>*</small></label>
                     <input type="text" id="name" name="name" value="" class="sm-form-control required" />
@@ -99,9 +98,9 @@
                 </div>
 
                 <div class="col_full">
-                    <button class="button button-3d" type="submit">Send Message</button>
+                    <button class="button button-3d" id="contactMessage" type="submit">Send Message</button>
                 </div>
-            </form>
+            </div>
         </div><!-- Contact Form Overlay End -->
     </div>
 
