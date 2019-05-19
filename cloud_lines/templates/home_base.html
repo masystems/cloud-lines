@@ -70,7 +70,7 @@
 
 						<ul class="not-dark">
 							<li class=""><a href="{% url 'home' %}"><div>Home</div></a></li>
-							<li class="mega-menu"><a href="#"><div>Services</div></a>
+							<li class="mega-menu"><a href="{% url 'services' %}"><div>Services</div></a>
 								<!-- Mega Menu Content
 								============================================= -->
 								<div class="mega-menu-content style-2 border-top-0 clearfix">
@@ -79,11 +79,11 @@
 										<li>
 											<div class="feature-box not-dark fbox-small fbox-center nobottommargin">
 												<div class="fbox-icon">
-													<img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 52px;">
+													<a href="{% url 'services' %}#{{ service.service_name }}"><img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 52px;"></a>
 												</div>
-												<h3 class="t500"><a href="#">{{ service.service_name }}</a></h3>
+												<h3 class="t500"><a href="{% url 'services' %}#{{ service.service_name }}">{{ service.service_name }}</a></h3>
 												<p class="d-none d-lg-block mb-0 t300">{{ service.service_description|truncatechars:150 }}</p>
-												<a href="#" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
+												<a href="{% url 'services' %}#{{ service.service_name }}" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
 											</div>
 										</li>
 									</ul>

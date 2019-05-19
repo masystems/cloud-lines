@@ -2,7 +2,8 @@
 {% extends 'home_base.html' %}
 {% load static %}
 {% block content %}
-
+<!-- Load Stripe.js on your website. -->
+<script src="https://js.stripe.com/v3"></script>
 <style>
     .slider-element {
     top: -100px;
@@ -50,20 +51,27 @@
                     <div class="col_three_fifth nobottommargin col_last">
 
                         <div class="heading-block">
-                            <h3>{{ service.service_name }}</h3>
-                            <span><i class="icon-user-cog"></i> <strong>{{ service.admin_users }}</strong> |
-                                <i class="icon-user-friends"></i> <strong>{{ service.read_only_users }}</strong> |
-                                <i class="icon-paw"></i> <strong>{{ service.number_of_animals }}</strong> |
-                                <i class="icon-list-ol"></i> <strong>{{ service.multi_breed }}</strong> |
-                                <i class="icon-hands-helping"></i> <strong>{{ service.support }}</strong> |
-                                <i class="icon-pound-sign"></i> <strong>{{ service.price_per_month }}Per Month</strong> |
-                                <i class="icon-pound-sign"></i> <strong>{{ service.price_per_year }}Per Year</strong>
+                            <h3 id="{{ service.service_name }}" style="padding-top: 60px; margin-top: -60px;">{{ service.service_name }}</h3>
+                            <span><i class="icon-user-cog"></i> {{ service.admin_users }} |
+                                <i class="icon-user-friends"></i> {{ service.read_only_users }} |
+                                <i class="icon-paw"></i> {{ service.number_of_animals }} |
+                                <i class="icon-list-ol"></i> {{ service.multi_breed }} |
+                                <i class="icon-hands-helping"></i> {{ service.support }} |
+                                <i class="icon-pound-sign"></i> {{ service.price_per_month }}p/month |
+                                <i class="icon-pound-sign"></i> {{ service.price_per_year }}p/year
                             </span>
                         </div>
                         {% autoescape off %}
                             {{ service.service_description }}
                         {% endautoescape %}
-                        <a href="#">Learn more &rarr;</a>
+                        <br>
+                        <br>
+                        <div class="btn-group" role="group" aria-label="service_buttons">
+                            {% autoescape off %}
+                                {{ service.button_monthly }}
+                                {{ service.button_yearly }}
+                            {% endautoescape %}
+                        </div>
 
                     </div>
 
@@ -72,22 +80,28 @@
                 {% if forloop.counter|divisibleby:2 %}
                     <div class="col_three_fifth">
                         <div class="heading-block">
-                            <h3>{{ service.service_name }}</h3>
-                            <span><i class="icon-user-cog"></i> <strong>{{ service.admin_users }}</strong> |
-                                <i class="icon-user-friends"></i> <strong>{{ service.read_only_users }}</strong> |
-                                <i class="icon-paw"></i> <strong>{{ service.number_of_animals }}</strong> |
-                                <i class="icon-list-ol"></i> <strong>{{ service.multi_breed }}</strong> |
-                                <i class="icon-hands-helping"></i> <strong>{{ service.support }}</strong> |
-                                <i class="icon-pound-sign"></i> <strong>{{ service.price_per_month }}Per Month</strong> |
-                                <i class="icon-pound-sign"></i> <strong>{{ service.price_per_year }}Per Year</strong>
+                            <h3 id="{{ service.service_name }}" style="padding-top: 60px; margin-top: -60px;">{{ service.service_name }}</h3>
+                            <span><i class="icon-user-cog"></i> {{ service.admin_users }} |
+                                <i class="icon-user-friends"></i> {{ service.read_only_users }} |
+                                <i class="icon-paw"></i> {{ service.number_of_animals }} |
+                                <i class="icon-list-ol"></i> {{ service.multi_breed }} |
+                                <i class="icon-hands-helping"></i> {{ service.support }} |
+                                <i class="icon-pound-sign"></i> {{ service.price_per_month }}p/month |
+                                <i class="icon-pound-sign"></i> {{ service.price_per_year }}p/year
                             </span>
                         </div>
 
                         {% autoescape off %}
                             {{ service.service_description }}
                         {% endautoescape %}
-
-                        <a href="#">Learn more &rarr;</a>
+                        <br>
+                        <br>
+                        <div class="btn-group" role="group" aria-label="service_buttons">
+                            {% autoescape off %}
+                                {{ service.button_monthly }}
+                                {{ service.button_yearly }}
+                            {% endautoescape %}
+                        </div>
 
                         </div>
 
