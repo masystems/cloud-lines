@@ -1,0 +1,101 @@
+
+{% extends 'home_base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .slider-element {
+    top: -100px;
+    bottom: -100px;
+    height: 100px !important;
+    margin-bottom: -100px;
+}
+</style>
+
+<section id="slider" class="slider-element">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+</section><!-- #slider end -->
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+	<div class="container clearfix">
+		<h1>{{ content.title }}</h1>
+		<span>{{ content.sub_title }}</span>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Services</li>
+		</ol>
+	</div>
+
+		</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+	<div class="content-wrap nopadding">
+		<div class="container clearfix">
+            {% for service in services %}
+                {% if not forloop.counter|divisibleby:2 %}
+                    <div class="col_two_fifth topmargin nobottommargin" style="min-height: 350px;">
+                        <img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 252px;">
+                    </div>
+
+                    <div class="col_three_fifth nobottommargin col_last">
+
+                        <div class="heading-block">
+                            <h3>{{ service.service_name }}</h3>
+                            <span><i class="icon-user-cog"></i> <strong>{{ service.admin_users }}</strong> |
+                                <i class="icon-user-friends"></i> <strong>{{ service.read_only_users }}</strong> |
+                                <i class="icon-paw"></i> <strong>{{ service.number_of_animals }}</strong> |
+                                <i class="icon-list-ol"></i> <strong>{{ service.multi_breed }}</strong> |
+                                <i class="icon-hands-helping"></i> <strong>{{ service.support }}</strong> |
+                                <i class="icon-pound-sign"></i> <strong>{{ service.price_per_month }}Per Month</strong> |
+                                <i class="icon-pound-sign"></i> <strong>{{ service.price_per_year }}Per Year</strong>
+                            </span>
+                        </div>
+                        {% autoescape off %}
+                            {{ service.service_description }}
+                        {% endautoescape %}
+                        <a href="#">Learn more &rarr;</a>
+
+                    </div>
+
+                    <div class="clear"></div><div class="line"></div>
+                {% endif %}
+                {% if forloop.counter|divisibleby:2 %}
+                    <div class="col_three_fifth">
+                        <div class="heading-block">
+                            <h3>{{ service.service_name }}</h3>
+                            <span><i class="icon-user-cog"></i> <strong>{{ service.admin_users }}</strong> |
+                                <i class="icon-user-friends"></i> <strong>{{ service.read_only_users }}</strong> |
+                                <i class="icon-paw"></i> <strong>{{ service.number_of_animals }}</strong> |
+                                <i class="icon-list-ol"></i> <strong>{{ service.multi_breed }}</strong> |
+                                <i class="icon-hands-helping"></i> <strong>{{ service.support }}</strong> |
+                                <i class="icon-pound-sign"></i> <strong>{{ service.price_per_month }}Per Month</strong> |
+                                <i class="icon-pound-sign"></i> <strong>{{ service.price_per_year }}Per Year</strong>
+                            </span>
+                        </div>
+
+                        {% autoescape off %}
+                            {{ service.service_description }}
+                        {% endautoescape %}
+
+                        <a href="#">Learn more &rarr;</a>
+
+                        </div>
+
+                        <div class="col_two_fifth topmargin col_last" style="min-height: 350px">
+                            <img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 252px;">
+                        </div>
+                        <div class="clear"></div><div class="line"></div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+{% endblock %}

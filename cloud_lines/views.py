@@ -22,6 +22,10 @@ def faqs(request):
                                          'services': Service.objects.all()})
 
 
+def services(request):
+    return render(request, 'services.html', {'services': Service.objects.all()})
+
+
 # def contact(request):
 #     if request.method == 'POST':
 #         name = request.POST.get('name')

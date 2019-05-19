@@ -9,11 +9,13 @@ urlpatterns = [
     path('about', views.about, name='about'),
     path('extras', views.extras, name='extras'),
     path('faqs', views.faqs, name='faqs'),
+    path('services', views.services, name='services'),
     path('contact', views.contact, name='contact'),
     path('pedigree/', include('pedigree.urls')),
     path('breeders/', include('breeder.urls')),
     path('breeds/', include('breed.urls')),
     path('breed_groups/', include('breed_group.urls')),
     path('account/', include('account.urls')),
-    path('support/', include('support.urls'))
+    path('support/', include('support.urls')),
+    path('stripe/', include("djstripe.urls", namespace="djstripe")),
 ]
