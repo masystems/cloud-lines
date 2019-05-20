@@ -88,12 +88,21 @@
                         {% endautoescape %}
                         <br>
                         <br>
-                        <div class="btn-group" role="group" aria-label="service_buttons">
-                            {% autoescape off %}
-                                {{ service.button_monthly }}
-                                {{ service.button_yearly }}
-                            {% endautoescape %}
-                        </div>
+                        {% if user.is_authenticated %}
+                            {% if service.service_name == 'Free' %}
+                                <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-teal">Start now!</a>
+                            {% else %}
+                                <div class="btn-group" role="group" aria-label="service_buttons">
+                                    {% autoescape off %}
+                                        {{ service.button_monthly }}
+                                        {{ service.button_yearly }}
+                                    {% endautoescape %}
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-teal">Start now!</a>
+                        {% endif %}
+
 
                     </div>
 
@@ -140,12 +149,20 @@
                         {% endautoescape %}
                         <br>
                         <br>
-                        <div class="btn-group" role="group" aria-label="service_buttons">
-                            {% autoescape off %}
-                                {{ service.button_monthly }}
-                                {{ service.button_yearly }}
-                            {% endautoescape %}
-                        </div>
+                        {% if user.is_authenticated %}
+                            {% if service.service_name == 'Free' %}
+                                <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-teal">Start now!</a>
+                            {% else %}
+                                <div class="btn-group" role="group" aria-label="service_buttons">
+                                    {% autoescape off %}
+                                        {{ service.button_monthly }}
+                                        {{ service.button_yearly }}
+                                    {% endautoescape %}
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-teal">Start now!</a>
+                        {% endif %}
 
                         </div>
 

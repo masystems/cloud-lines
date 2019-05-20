@@ -103,11 +103,11 @@
 				<div class="col-lg-4 col-md-6 mb-5">
 					<div class="feature-box not-dark fbox-small">
 						<div class="fbox-icon">
-							<img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="height: 52px;">
+							<a href="{% url 'services' %}#{{ service.service_name }}"><img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="height: 52px;"></a>
 						</div>
 						<h3 class="t500 text-dark">{{ service.service_name }}</h3>
 						<p class="t300">{{ service.service_description|truncatechars:200 }}</p>
-						<a href="#" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
+						<a href="{% url 'services' %}#{{ service.service_name }}" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
 					</div>
 				</div>
 				{% endfor %}
@@ -641,12 +641,9 @@
 
 								<tr>
 									<td>&nbsp;</td>
-									<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									<td><a href="#" class="btn btn-info">Sign Up</a></td>
-									<td><a href="#" class="btn btn-info">Sign Up</a></td>
+									{% for service in services.all %}
+										<td><a href="{% url 'services' %}#{{ service.service_name }}" class="btn btn-info">Sign Up</a></td>
+									{% endfor %}
 								</tr>
 							</tbody>
 						</table>
