@@ -94,6 +94,14 @@
 							<li class="{% if 'extras' in request.path %}current{% endif %}"><a href="{% url 'extras' %}"><div>Extras</div></a></li>
 							<li class="{% if 'faqs' in request.path %}current{% endif %}"><a href="{% url 'faqs' %}"><div>FAQs</div></a></li>
 							<li class="{% if 'contact' in request.path %}current{% endif %}"><a href="{% url 'contact' %}"><div>Contact</div></a></li>
+							{% if user.is_superuser %}
+							<li><a href="#"><div>Admin</div></a>
+								<ul>
+									<li><a href="/admin"><div>Backend</div></a></li>
+									<li><a href="{% url 'logout' %}"><div>Logout</div></a></li>
+								</ul>
+							</li>
+							{% endif %}
 						</ul>
 
 						<!-- Top Search

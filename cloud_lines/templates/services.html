@@ -45,7 +45,9 @@
             {% for service in services %}
                 {% if not forloop.counter|divisibleby:2 %}
                     <div class="col_two_fifth topmargin nobottommargin" style="min-height: 350px;">
-                        <img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 252px;">
+                        {% if service.image %}
+                            <img src="{% static service.image.url %}" class="img-fluid" alt="{{ service.service_name }}">
+                        {% endif %}
                     </div>
 
                     <div class="col_three_fifth nobottommargin col_last">
@@ -106,39 +108,41 @@
 
                     </div>
 
-                    <div class="clear"></div><div class="line"></div>
+                    {% if not forloop.last %}
+                        <div class="line"></div>
+                    {% endif %}
                 {% endif %}
                 {% if forloop.counter|divisibleby:2 %}
                     <div class="col_three_fifth">
                         <div class="heading-block">
                             <h3 id="{{ service.service_name }}" style="padding-top: 60px; margin-top: -60px;">{{ service.service_name }}</h3>
                             <span>
-                                <button class="button button-mini button-circle button-aqua" data-container="body"
+                                <button class="button button-mini button-circle button-yellow" data-container="body"
                                    data-toggle="popover" data-placement="top" data-content="Number of admin accounts."
                                    data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
 
-                                <button class="button button-mini button-circle button-aqua" data-container="body"
+                                <button class="button button-mini button-circle button-yellow" data-container="body"
                                    data-toggle="popover" data-placement="top" data-content="Number of read only accounts."
                                    data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-friends"></i>{{ service.read_only_users }}</button>
 
-                                <button class="button button-mini button-circle button-aqua" data-container="body"
+                                <button class="button button-mini button-circle button-yellow" data-container="body"
                                    data-toggle="popover" data-placement="top" data-content="Number of animals."
                                    data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-paw"></i>{{ service.number_of_animals }}</button>
 
-                                <button class="button button-mini button-circle button-aqua" data-container="body"
+                                <button class="button button-mini button-circle button-yellow" data-container="body"
                                    data-toggle="popover" data-placement="top" data-content="Multi breed available."
                                    data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-list-ol"></i>{% if service.multi_breed %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
 
-                                <button class="button button-mini button-circle button-aqua" data-container="body"
+                                <button class="button button-mini button-circle button-yellow" data-container="body"
                                    data-toggle="popover" data-placement="top" data-content="Support available."
                                    data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-hands-helping"></i>{% if service.support %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
 
 
-                                <button class="button button-mini button-circle button-aqua" data-container="body"
+                                <button class="button button-mini button-circle button-yellow" data-container="body"
                                    data-toggle="popover" data-placement="top" data-content="Price per month."
                                    data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
 
-                                <button class="button button-mini button-circle button-aqua" data-container="body"
+                                <button class="button button-mini button-circle button-yellow" data-container="body"
                                    data-toggle="popover" data-placement="top" data-content="Price per year."
                                    data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_year }} p/year</button>
                             </span>
@@ -151,7 +155,7 @@
                         <br>
                         {% if user.is_authenticated %}
                             {% if service.service_name == 'Free' %}
-                                <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-teal">Start now!</a>
+                                <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-yellow">Start now!</a>
                             {% else %}
                                 <div class="btn-group" role="group" aria-label="service_buttons">
                                     {% autoescape off %}
@@ -161,15 +165,19 @@
                                 </div>
                             {% endif %}
                         {% else %}
-                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-teal">Start now!</a>
+                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-yellow">Start now!</a>
                         {% endif %}
 
                         </div>
 
                         <div class="col_two_fifth topmargin col_last" style="min-height: 350px">
-                            <img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 252px;">
+                            {% if service.image %}
+                                <img src="{% static service.image.url %}" class="img-fluid" alt="{{ service.service_name }}">
+                            {% endif %}
                         </div>
-                        <div class="clear"></div><div class="line"></div>
+                        {% if not forloop.last %}
+                            <div class="line"></div>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             </div>

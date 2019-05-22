@@ -4,6 +4,7 @@ from django.db import models
 class Service(models.Model):
     ordering = models.IntegerField()
     icon = models.CharField(max_length=500, blank=True)
+    image = models.FileField(blank=True)
     service_name = models.CharField(max_length=50)
     admin_users = models.IntegerField()
     read_only_users = models.IntegerField()

@@ -17,5 +17,4 @@ urlpatterns = [
     path('breed_groups/', include('breed_group.urls')),
     path('account/', include('account.urls')),
     path('support/', include('support.urls')),
-    path('stripe/', include("djstripe.urls", namespace="djstripe")),
 ]

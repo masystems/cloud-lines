@@ -24,7 +24,6 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_s3_storage',
     'storages',
-    'djstripe',
     'zappa_django_utils',
     'django.contrib.admin',
     'django.contrib.auth',
