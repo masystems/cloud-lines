@@ -56,33 +56,33 @@
                             <h3 id="{{ service.service_name }}" style="padding-top: 60px; margin-top: -60px;">{{ service.service_name }}</h3>
                             <span>
                                 <button class="button button-mini button-circle button-aqua" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Number of admin accounts."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
+                                   data-toggle="tooltip" data-placement="top" title="Max number of admin accounts"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
 
                                 <button class="button button-mini button-circle button-aqua" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Number of read only accounts."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-friends"></i>{{ service.read_only_users }}</button>
+                                   data-toggle="tooltip" data-placement="top" title="Max number of read only accounts"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-friends"></i>{{ service.read_only_users }}</button>
 
                                 <button class="button button-mini button-circle button-aqua" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Number of animals."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-paw"></i>{{ service.number_of_animals }}</button>
+                                   data-toggle="tooltip" data-placement="top" title="Max number of animals."
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-paw"></i>{{ service.number_of_animals }}</button>
 
                                 <button class="button button-mini button-circle button-aqua" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Multi breed available."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-list-ol"></i>{% if service.multi_breed %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
+                                   data-toggle="tooltip" data-placement="top" title="{% if service.multi_breed %}Multi breed available{% else %}No multi breed available{% endif %}"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-list-ol"></i>{% if service.multi_breed %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
 
                                 <button class="button button-mini button-circle button-aqua" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Support available."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-hands-helping"></i>{% if service.support %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
+                                   data-toggle="tooltip" data-placement="top" title="{% if service.support %}Support available{% else %}No support available{% endif %}"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-hands-helping"></i>{% if service.support %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
 
 
                                 <button class="button button-mini button-circle button-aqua" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Price per month."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
+                                   data-toggle="tooltip" data-placement="top" title="Price per month"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
 
                                 <button class="button button-mini button-circle button-aqua" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Price per year."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_year }} p/year</button>
+                                   data-toggle="tooltip" data-placement="top" title="Price per year"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_year }} p/year</button>
                             </span>
                         </div>
                         {% autoescape off %}
@@ -118,33 +118,33 @@
                             <h3 id="{{ service.service_name }}" style="padding-top: 60px; margin-top: -60px;">{{ service.service_name }}</h3>
                             <span>
                                 <button class="button button-mini button-circle button-yellow" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Number of admin accounts."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
+                                   data-toggle="tooltip" data-placement="top" title="Max number of admin accounts"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
 
                                 <button class="button button-mini button-circle button-yellow" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Number of read only accounts."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-friends"></i>{{ service.read_only_users }}</button>
+                                   data-toggle="tooltip" data-placement="top" title="Max number of read only accounts"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-friends"></i>{{ service.read_only_users }}</button>
 
                                 <button class="button button-mini button-circle button-yellow" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Number of animals."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-paw"></i>{{ service.number_of_animals }}</button>
+                                   data-toggle="tooltip" data-placement="top" title="Max number of animals."
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-paw"></i>{{ service.number_of_animals }}</button>
 
                                 <button class="button button-mini button-circle button-yellow" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Multi breed available."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-list-ol"></i>{% if service.multi_breed %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
+                                   data-toggle="tooltip" data-placement="top" title="{% if service.multi_breed %}Multi breed available{% else %}No multi breed available{% endif %}"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-list-ol"></i>{% if service.multi_breed %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
 
                                 <button class="button button-mini button-circle button-yellow" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Support available."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-hands-helping"></i>{% if service.support %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
+                                   data-toggle="tooltip" data-placement="top" title="{% if service.support %}Support available{% else %}No support available{% endif %}"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-hands-helping"></i>{% if service.support %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
 
 
                                 <button class="button button-mini button-circle button-yellow" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Price per month."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
+                                   data-toggle="tooltip" data-placement="top" title="Price per month"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
 
                                 <button class="button button-mini button-circle button-yellow" data-container="body"
-                                   data-toggle="popover" data-placement="top" data-content="Price per year."
-                                   data-original-title="" title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_year }} p/year</button>
+                                   data-toggle="tooltip" data-placement="top" title="Price per year"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_year }} p/year</button>
                             </span>
                         </div>
 
