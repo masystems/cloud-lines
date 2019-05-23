@@ -1,13 +1,15 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, render_to_response
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
-from .models import SiteDetail, SignUpForm
+from .models import SiteDetail, SignUpForm, UserDetails
 from .forms import InstallForm
+from django.template import RequestContext
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import auth
+
 
 def site_mode(request):
     try:
@@ -18,10 +20,12 @@ def site_mode(request):
         return {'site_mode': None,
                 'animal_type': 'Pedigrees'}
 
+
 def is_editor(user):
     return {'is_editor': user.groups.filter(name='editor').exists() or user.is_superuser}
 
 
+@login_required(login_url="/account/login")
 def new_user(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -35,6 +39,7 @@ def new_user(request):
     else:
         form = UserCreationForm()
         return render(request, 'signup.html', {'form': form})
+
 
 def site_login(request):
     if request.method == 'POST':
@@ -59,6 +64,7 @@ def logout(request):
 @login_required(login_url="/account/login")
 def profile(request):
     return render(request, 'profile.html', {'is_editor': is_editor(request.user)})
+
 
 def install(request):
     try:
@@ -90,3 +96,20 @@ def install(request):
         install_form = InstallForm()
 
     return render(request, 'install.html', {'install_form': install_form})
+
+
+def register(request):
+    if request.method == 'POST':
+        username = request.POST.get('register-form-username')
+        raw_password = request.POST.get('register-form-password')
+        email = request.POST.get('register-form-email')
+        User.objects.create_user(username=username,
+                                 email=email,
+                                 password=raw_password,
+                                 first_name=request.POST.get('register-form-first-name'),
+                                 last_name=request.POST.get('register-form-last-name'))
+        user = authenticate(username=username, password=raw_password)
+        login(request, user)
+        return redirect('dashboard')
+    else:
+        return render(request, 'login.html')

@@ -19,6 +19,7 @@ class SiteDetail(models.Model):
     def __str__(self):
         return self.site_mode
 
+
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
@@ -27,3 +28,9 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', )
+
+
+class UserDetails(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='owner')
+    phone = models.TextField(max_length=15, blank=False)
+

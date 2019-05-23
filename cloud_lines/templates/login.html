@@ -1,0 +1,145 @@
+
+{% extends 'home_base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .slider-element {
+    top: -100px;
+    bottom: -100px;
+    height: 100px !important;
+    margin-bottom: -100px;
+}
+</style>
+
+<section id="slider" class="slider-element">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+</section><!-- #slider end -->
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+	<div class="container clearfix">
+		<h1>Login/Register</h1>
+		<span>{{ content.sub_title }}</span>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Login/Register</li>
+		</ol>
+	</div>
+
+		</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<div class="col_one_third nobottommargin">
+				<div class="well well-lg nobottommargin">
+					<form class="nobottommargin" action="{% url 'login' %}" method="POST" id="loginform">
+						{% csrf_token %}
+						<h3>Login to your Account</h3>
+
+						<div class="col_full">
+							<label for="username">Username:</label>
+							<input type="text" id="username" name="username" value="" class="form-control" />
+						</div>
+
+						<div class="col_full">
+							<label for="password">Password:</label>
+							<input type="password" id="password" name="password" value="" class="form-control" />
+						</div>
+						{% if error %}
+							<div class="style-msg errormsg">
+								<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Username or password not recognised, try again!</div>
+							</div>
+						{% endif %}
+						<div class="col_full nobottommargin">
+							<button class="button button-3d nomargin" id="login-form-submit" name="login-form-submit" type="submit" value="login">Login</button>
+							<a href="#" class="fright">Forgot Password?</a>
+						</div>
+
+					</form>
+				</div>
+
+				</div>
+
+				<div class="col_two_third col_last nobottommargin">
+
+
+					<h3>Don't have an Account? Register Now.</h3>
+
+					<p>Register now to gain access to our products and services.</p>
+
+					<form id="register-form" name="register-form" class="nobottommargin" action="{% url 'register' %}" method="POST" enctype="multipart/form-data">
+						{% csrf_token %}
+						<div class="col_half">
+							<label for="register-form-first-name">First Name:</label>
+							<input type="text" id="register-form-first-name" name="register-form-first-name" value="" class="form-control" required/>
+						</div>
+
+						<div class="col_half col_last">
+							<label for="register-form-last-name">Last Name:</label>
+							<input type="text" id="register-form-last-name" name="register-form-last-name" value="" class="form-control" required/>
+						</div>
+
+						<div class="clear"></div>
+
+						<div class="col_half">
+							<label for="register-form-username">Username:</label>
+							<input type="text" id="register-form-username" name="register-form-username" value="" class="form-control" required/>
+						</div>
+
+						<div class="col_half col_last">
+							<label for="register-form-email">Email Address:</label>
+							<input type="text" id="register-form-email" name="register-form-email" value="" class="form-control" required/>
+						</div>
+
+						<div class="clear"></div>
+
+						<div class="col_half">
+							<label for="register-form-phone">Phone:</label>
+							<input type="text" id="register-form-phone" name="register-form-phone" value="" class="form-control" required/>
+						</div>
+
+						<div class="clear"></div>
+
+						<div class="col_half">
+							<label for="register-form-password">Choose Password:</label>
+							<input type="password" id="register-form-password" name="register-form-password" value="" class="form-control" required/>
+						</div>
+
+						<div class="col_half col_last">
+							<label for="register-form-confirm_password">Re-enter Password:</label>
+							<input type="password" id="register-form-confirm_password" name="register-form-repassword" value="" class="form-control" required/>
+							<span id='password_message'></span>
+						</div>
+
+						<div class="clear"></div>
+
+						<div class="col_full nobottommargin">
+							<button class="button button-3d button-black nomargin" id="register-form-submit" name="register-form-submit" type="submit" value="register">Register Now</button>
+						</div>
+
+					</form>
+
+					<script>
+						$('#password, #register-form-confirm_password').on('keyup', function () {
+						  if ($('#register-form-password').val() == $('#register-form-confirm_password').val()) {
+							$('#password_message').html('<i class="icon-thumbs-up"></i><strong>Well done!</strong> Passwords match!').css('color', 'green');
+						  } else
+							$('#password_message').html('<i class="icon-warning-sign"></i><strong>Warning!</strong> Passwords do not match!').css('color', 'red');
+						});
+					</script>
+
+				</div>
+		</div>
+	</div>
+{% endblock %}
