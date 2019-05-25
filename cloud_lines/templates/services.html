@@ -92,22 +92,16 @@
                         <br>
                         {% if user.is_authenticated %}
                             {% if service.service_name == 'Free' %}
-                                <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-teal">Start now!</a>
+                                <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-aqua">Start now!</a>
                             {% else %}
                                 <div class="btn-group" role="group" aria-label="service_buttons">
-                                    {% autoescape off %}
-                                        {{ service.button_monthly }}
-                                        {{ service.button_yearly }}
-                                    {% endautoescape %}
+                                    <a href="#" class="button button-3d button-rounded button-yellow button-aqua"><i class="icon-trash2"></i>Start now!</a>
                                 </div>
                             {% endif %}
                         {% else %}
-                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-teal">Start now!</a>
+                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-aqua">Start now!</a>
                         {% endif %}
-
-
                     </div>
-
                     {% if not forloop.last %}
                         <div class="line"></div>
                     {% endif %}
@@ -158,27 +152,24 @@
                                 <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-yellow">Start now!</a>
                             {% else %}
                                 <div class="btn-group" role="group" aria-label="service_buttons">
-                                    {% autoescape off %}
-                                        {{ service.button_monthly }}
-                                        {{ service.button_yearly }}
-                                    {% endautoescape %}
+                                    <a href="#" class="button button-3d button-rounded button-yellow button-yellow"><i class="icon-trash2"></i>Start now!</a>
                                 </div>
                             {% endif %}
                         {% else %}
                             <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-yellow">Start now!</a>
                         {% endif %}
+                    </div>
 
-                        </div>
-
-                        <div class="col_two_fifth topmargin col_last" style="min-height: 350px">
-                            {% if service.image %}
-                                <img src="{{ service.image.url }}" class="img-fluid" alt="{{ service.service_name }}">
-                            {% endif %}
-                        </div>
-                        {% if not forloop.last %}
-                            <div class="line"></div>
+                    <div class="col_two_fifth topmargin col_last" style="min-height: 350px">
+                        {% if service.image %}
+                            <img src="{{ service.image.url }}" class="img-fluid" alt="{{ service.service_name }}">
                         {% endif %}
+                    </div>
+                    {% if not forloop.last %}
+                        <div class="line"></div>
                     {% endif %}
-                {% endfor %}
-            </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

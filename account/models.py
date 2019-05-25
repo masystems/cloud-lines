@@ -30,7 +30,10 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', )
 
 
-class UserDetails(models.Model):
+class UserDetail(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='owner')
-    phone = models.TextField(max_length=15, blank=False)
+    phone = models.CharField(max_length=15, blank=False)
+    stripe_id = models.CharField(max_length=50, blank=True)
 
+    def __str__(self):
+        return str(self.user)

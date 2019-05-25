@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect, HttpResponse
+from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact
-from django.core.mail import EmailMessage
+from account.models import UserDetail
+from django.conf import settings
 import json
+import stripe
 
 def home(request):
     return render(request, 'home.html', {'services': Service.objects.all()})
@@ -96,3 +99,35 @@ def contact(request):
         return HttpResponse(json.dumps(message), content_type='application/json')
     else:
         return render(request, 'contact.html', {'services': Service.objects.all()})
+
+
+@login_required(login_url="/account/login")
+def order(request):
+    if request.POST:
+        stripe.api_key = settings.STRIPE_PUBLIC_KEY
+
+        # create stripe user
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        customer = stripe.Customer.create(
+            name="{} {}".format(request.POST.get('register-form-first-name'),
+                                request.POST.get('register-form-last-name')),
+            email=request.POST.get('register-form-email'),
+            phone=request.POST.get('register-form-phone'),
+            address=request.POST.get('addressline1'),
+        )
+
+        # update user datail
+        UserDetail.objects.filter(user=request.user).update(stripe_id=customer.last_response.request_id)
+
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            subscription_data={
+                'items': [{
+                    'plan': 'plan_123',
+                }],
+            },
+            success_url='https://example.com/success',
+            cancel_url='https://example.com/cancel',
+        )
+    else:
+        return render(request, 'order.html', {'services': Service.objects.all()})

@@ -1,14 +1,14 @@
 from django.shortcuts import render, HttpResponse, render_to_response
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
-from .models import SiteDetail, SignUpForm, UserDetails
+from .models import SiteDetail, SignUpForm, UserDetail
 from .forms import InstallForm
-from django.template import RequestContext
-
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import auth
+import stripe
 
 
 def site_mode(request):
@@ -109,7 +109,13 @@ def register(request):
                                  first_name=request.POST.get('register-form-first-name'),
                                  last_name=request.POST.get('register-form-last-name'))
         user = authenticate(username=username, password=raw_password)
+
+        # update user details
+        details = UserDetail.objects.create(user=user,
+                                            phone=request.POST.get('register-form-phone')
+                                            )
+
         login(request, user)
-        return redirect('dashboard')
+        return redirect('purchase')
     else:
         return render(request, 'login.html')

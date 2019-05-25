@@ -11,6 +11,7 @@ urlpatterns = [
     path('faqs/', views.faqs, name='faqs'),
     path('services/', views.services, name='services'),
     path('contact/', views.contact, name='contact'),
+    path('order', views.order, name='order'),
     path('pedigree/', include('pedigree.urls')),
     path('breeders/', include('breeder.urls')),
     path('breeds/', include('breed.urls')),
