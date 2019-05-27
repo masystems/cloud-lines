@@ -116,6 +116,6 @@ def register(request):
                                             )
 
         login(request, user)
-        return redirect('purchase')
+        return redirect('order')
     else:
         return render(request, 'login.html')

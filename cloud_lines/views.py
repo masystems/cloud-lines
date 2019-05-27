@@ -109,25 +109,51 @@ def order(request):
         # create stripe user
         stripe.api_key = settings.STRIPE_SECRET_KEY
         customer = stripe.Customer.create(
-            name="{} {}".format(request.POST.get('register-form-first-name'),
-                                request.POST.get('register-form-last-name')),
-            email=request.POST.get('register-form-email'),
-            phone=request.POST.get('register-form-phone'),
-            address=request.POST.get('addressline1'),
-        )
+            name=request.POST.get('checkout-form-billing-name'),
+            email=request.POST.get('checkout-form-billing-email'),
 
+            phone=request.POST.get('checkout-form-billing-phone'),
+            address={'line1': request.POST.get('checkout-form-billing-add1'),
+                     'city': request.POST.get('checkout-form-billing-city'),
+                     'country': request.POST.get('checkout-form-billing-country'),
+                     'line2': request.POST.get('checkout-form-billing-add2'),
+                     'postal_code': request.POST.get('checkout-form-billing-post-code')}
+        )
+        customer_id = customer['id']
         # update user datail
-        UserDetail.objects.filter(user=request.user).update(stripe_id=customer.last_response.request_id)
+        UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
 
-        session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            subscription_data={
-                'items': [{
-                    'plan': 'plan_123',
-                }],
-            },
-            success_url='https://example.com/success',
-            cancel_url='https://example.com/cancel',
+        # create card object for user
+        expiry = request.POST.get('checkout-form-expiration').split('/')
+        card = stripe.Customer.create_source(
+            customer_id,
+            source='tok_visa'
+            # source={'object': 'card',
+            #         'name': request.POST.get('checkout-form-card-number'),
+            #         'number': request.POST.get('checkout-form-card-number'),
+            #         'exp_month': expiry[0],
+            #         'exp_year': expiry[1],
+            #         'cvc': request.POST.get('checkout-form-security-code'),
+            #         }
         )
+
+        service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
+        if request.POST.get('checkout-form-payment-inc') == 'Monthly':
+            plan = service.monthly_id
+        elif request.POST.get('checkout-form-payment-inc') == 'Yearly':
+            plan = service.yearly_id
+        # create the charge
+        subscription = stripe.Subscription.create(
+                        customer=customer_id,
+                        items=[
+                            {
+                                "plan": plan,
+                            },
+                        ]
+                    )
+        if subscription:
+            return render(request, 'success.html', {'services': Service.objects.all()})
+        else:
+            return render(request, 'error.html', {'services': Service.objects.all()})
     else:
         return render(request, 'order.html', {'services': Service.objects.all()})

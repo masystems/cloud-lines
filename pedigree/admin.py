@@ -8,7 +8,6 @@ class PedigreeAttributesInline(admin.StackedInline):
 
 class PedigreeImagesInline(admin.TabularInline):
     model = PedigreeImage
-    extra = 3
 
 
 class PedigreeAdmin(admin.ModelAdmin):

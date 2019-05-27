@@ -2,6 +2,7 @@ from django.db import models
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from cloud_lines.models import Service
 
 
 class SiteDetail(models.Model):
@@ -31,9 +32,19 @@ class SignUpForm(UserCreationForm):
 
 
 class UserDetail(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='owner')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='user')
     phone = models.CharField(max_length=15, blank=False)
     stripe_id = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return str(self.user)
+
+
+class Service(models.Model):
+    user = models.ForeignKey(UserDetail, on_delete=models.SET_NULL, null=True, blank=True)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
+    INCREMENTS = (
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+    )
+    increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True)

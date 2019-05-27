@@ -1,0 +1,55 @@
+
+{% extends 'home_base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .slider-element {
+    top: -100px;
+    bottom: -100px;
+    height: 100px !important;
+    margin-bottom: -100px;
+}
+</style>
+
+<section id="slider" class="slider-element">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+</section><!-- #slider end -->
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+	<div class="container clearfix">
+		<h1>Confirmation</h1>
+		<span>Welcome to the Cloudlines team!</span>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Confirmation</li>
+		</ol>
+	</div>
+
+		</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+	<div class="content-wrap nopadding">
+		<div class="container clearfix">
+			<div class="col-md-12">
+				<div class="row">
+					<h3 class="color"></h3>
+					<div>
+						{% autoescape off %}
+							{{ content.body }}
+						{% endautoescape %}
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock %}
