@@ -6,6 +6,7 @@ from django.conf import settings
 import json
 import stripe
 
+
 def home(request):
     return render(request, 'home.html', {'services': Service.objects.all()})
 
@@ -123,11 +124,12 @@ def order(request):
         # update user datail
         UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
 
+
         # create card object for user
-        expiry = request.POST.get('checkout-form-expiration').split('/')
-        card = stripe.Customer.create_source(
-            customer_id,
-            source='tok_visa'
+        # expiry = request.POST.get('checkout-form-expiration').split('/')
+        # card = stripe.Customer.create_source(
+        #     customer_id,
+        #     source='tok_visa'
             # source={'object': 'card',
             #         'name': request.POST.get('checkout-form-card-number'),
             #         'number': request.POST.get('checkout-form-card-number'),
@@ -135,13 +137,21 @@ def order(request):
             #         'exp_year': expiry[1],
             #         'cvc': request.POST.get('checkout-form-security-code'),
             #         }
-        )
+        # )
 
         service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
         if request.POST.get('checkout-form-payment-inc') == 'Monthly':
             plan = service.monthly_id
         elif request.POST.get('checkout-form-payment-inc') == 'Yearly':
             plan = service.yearly_id
+
+        # create payment intent
+        stripe.PaymentIntent.create(
+            amount=1099,
+            currency='gbp',
+            payment_method_types=['card']
+        )
+
         # create the charge
         subscription = stripe.Subscription.create(
                         customer=customer_id,
@@ -156,4 +166,5 @@ def order(request):
         else:
             return render(request, 'error.html', {'services': Service.objects.all()})
     else:
-        return render(request, 'order.html', {'services': Service.objects.all()})
+        return render(request, 'order.html', {'services': Service.objects.all(),
+                                              'user_detail': UserDetail.objects.get(user=request.user)})

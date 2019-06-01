@@ -327,7 +327,7 @@
 						</div>
 						<div class="col-12 form-group">
 							<label>Phone:</label><br>
-							<input type="text" name="checkout-form-billing-phone" id="checkout-form-billing-phone" class="form-control required" value="{{ user.user.phone }}">
+							<input type="text" name="checkout-form-billing-phone" id="checkout-form-billing-phone" class="form-control required" value="{{ user_detail.phone }}">
 						</div>
 					</div>
 				</div>
@@ -355,12 +355,95 @@
 								<option value="Yearly">Yearly</option>
 							</select>
 						</div>
+
+						<div class="col-12 form-group">
+							<label>Name On Card:</label>
+							<input type="text" name="checkout-form-name-on-card" id="checkout-form-name-on-card" class="form-control required" value="{{ user.first_name }} {{ user.last_name }}">
+						</div>
+						<div class="col-12 form-group">
+							<label>Card Number:</label>
+							<div class="input-group mx-auto" style="">
+								<input type="text"
+									   name="checkout-form-card-number"
+									   id="checkout-form-card-number"
+									   class="form-control required visa"
+									   placeholder="1234-1234-1234-1234"
+									   pattern="[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}"
+									   required>
+							</div>
+							<div id="cardWarning" class="style-msg alertmsg mt-1"></div>
+
+
+							<span>
+								<i class="i-rounded i-light icon-cc-visa"></i> <i class="i-rounded i-light icon-cc-mastercard"></i> <i class="i-rounded i-light icon-cc-amex"></i>
+							</span>
+							<small>Must be 16 characters long.</small>
+							<script>
+								$('#checkout-form-card-number').keyup(function() {
+								  var cardNumber = $(this).val().split("-").join(""); // remove hyphens
+								  if (cardNumber.length > 0) {
+									cardNumber = cardNumber.match(new RegExp('.{1,4}', 'g')).join("-");
+								  }
+								  if (cardNumber.length > 19) {
+									$("#cardWarning").html('<div id="cardWarningMessage" class="sb-msg"><i class="icon-warning-sign"></i><strong>Warning!</strong> You have too many numbers!</div>');
+								  }
+								  if (cardNumber.length <= 19) {
+								  	$("#cardWarningMessage").fadeOut();
+								  }
+								  $(this).val(cardNumber);
+								});
+							</script>
+						</div>
+						<div class="col-6 form-group">
+							<label>Expiration:</label><br>
+							<input type="text"
+								   name="checkout-form-expiration"
+								   id="checkout-form-expiration"
+								   class="form-control"
+								   value=""
+								   placeholder="MM/YY"
+								   pattern="[0-9]{2}/[0-9]{2}"
+								   required>
+							<div id="expirationWarning" class="style-msg alertmsg mt-1"></div>
+						</div>
+
+						<script>
+							$('#checkout-form-expiration').keyup(function() {
+							  var expiration = $(this).val().split("/").join(""); // remove hyphens
+							  if (expiration.length > 0) {
+								expiration = expiration.match(new RegExp('.{1,2}', 'g')).join("/");
+							  }
+							  if (expiration.length > 5) {
+									$("#expirationWarning").html('<div id="expirationWarningMessage" class="sb-msg"><i class="icon-warning-sign"></i><strong>Warning!</strong> You have too many numbers!</div>');
+							  }
+							  if (expiration.length <= 5) {
+								$("#expirationWarningMessage").fadeOut();
+							  }
+							  $(this).val(expiration);
+							});
+						</script>
+						<div class="col-6 form-group">
+							<label>Security Code:</label><br>
+							<div class="input-group mx-auto" style="">
+								<input type="text"
+									   name="checkout-form-security-code"
+									   id="checkout-form-security-code"
+									   class="form-control"
+									   value=""
+									   pattern="[0-9]{3}">
+								<div class="input-group-append">
+									<span class="input-group-text">
+										<i class="icon-credit-card1"></i>
+									</span>
+								</div>
+							</div>
+						</div>
 						<div class="table-responsive">
 							  <table class="table table-striped">
 								<thead>
 								  <tr>
-									<th></th>
-									<th></th>
+									<th>Service</th>
+									<th>Increment</th>
 									<th>Total</th>
 								  </tr>
 								</thead>
@@ -414,54 +497,11 @@
 							});
 
 						</script>
-						<div class="col-12 form-group">
-							<label>Name On Card:</label>
-							<input type="text" name="checkout-form-name-on-card" id="checkout-form-name-on-card" class="form-control required" value="{{ user.first_name }} {{ user.last_name }}">
-						</div>
-						<div class="col-12 form-group">
-							<label>Card Number:</label>
-							<div class="input-group mx-auto" style="">
-								<input type="text"
-									   name="checkout-form-card-number"
-									   id="checkout-form-card-number"
-									   class="form-control required visa"
-									   value=""
-									   pattern="[0-9]{16}">
-								<div class="input-group-append">
-									<span class="input-group-text">
-										<i class="icon-cc-visa"></i> <i class="icon-cc-mastercard"></i>
-									</span>
-								</div>
-							</div>
-							<small>Must be 16 characters long.</small>
-						</div>
-						<div class="col-6 form-group">
-							<label>Expiration:</label><br>
-							<input type="text"
-								   name="checkout-form-expiration"
-								   id="checkout-form-expiration"
-								   class="form-control"
-								   value=""
-								   placeholder="MM/YY"
-								   pattern="[0-9]{2}/[0-9]{2}">
-						</div>
-						<div class="col-6 form-group">
-							<label>Security Code:</label><br>
-							<div class="input-group mx-auto" style="">
-								<input type="text"
-									   name="checkout-form-security-code"
-									   id="checkout-form-security-code"
-									   class="form-control"
-									   value=""
-									   pattern="[0-9]{3}">
-								<div class="input-group-append">
-									<span class="input-group-text">
-										<i class="icon-credit-card1"></i>
-									</span>
-								</div>
-							</div>
-						</div>
 
+					</div>
+				</div>
+				<div class="col-12">
+					<div class="form-group center" id="error">
 					</div>
 				</div>
 				<div class="col-12">
@@ -475,6 +515,38 @@
 				  			var txt = $('#submitButton');
 				  			txt.html('<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Processing...');
 				  			$("#submitButton").attr("disabled", true);
+
+				  			var stripe = Stripe('pk_test_7thANq54kGk1twjb4MKf8Nfk00Zepzwpoe');
+
+							<!--The stripe stuff-->
+							var elements = stripe.elements();
+							var cardElement = elements.create('card');
+							cardElement.mount('#card-element');
+
+							var cardholderName = document.getElementById('cardholder-name');
+							var cardButton = document.getElementById('card-button');
+
+
+							stripe.createPaymentMethod('card', cardElement, {
+								billing_details: {name: cardholderName.value}
+									}).then(function(result) {
+									if (result.error) {
+										// Show error in payment form
+										$('#error').text(result.error);
+									} else {
+										// Otherwise send paymentMethod.id to your server (see Step 2)
+										fetch('/ajax/confirm_payment', {
+										method: 'POST',
+										headers: { 'Content-Type': 'application/json' },
+										body: JSON.stringify({ payment_method_id: result.paymentMethod.id })
+								  	}).then(function(result) {
+										// Handle server response (see Step 3)
+										result.json().then(function(json) {
+											handleServerResponse(json);
+									})
+								  });
+								}
+							  });
 				  		});
 					});
 				</script>
