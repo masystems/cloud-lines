@@ -40,11 +40,11 @@ class UserDetail(models.Model):
         return str(self.user)
 
 
-class Service(models.Model):
+class AttachedService(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.SET_NULL, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
     INCREMENTS = (
         ('monthly', 'Monthly'),
         ('yearly', 'Yearly'),
     )
-    increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True)
+    increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True, blank=True)

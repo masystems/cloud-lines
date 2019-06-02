@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import SiteDetail, UserDetail, Service
+from .models import SiteDetail, UserDetail, AttachedService
 
 
 
 class UserServicesInline(admin.TabularInline):
-    model = Service
+    model = AttachedService
     extra = 3
 
 

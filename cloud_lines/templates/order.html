@@ -39,26 +39,170 @@
 <!-- Content
 ============================================= -->
 <section id="content">
-	<div class="content-wrap nopadding">
+
+	<div class="content-wrap">
+
 		<div class="container clearfix">
-			<form class="row" id="orderForm" action="{% url 'order' %}" method="POST" enctype="multipart/form-data">
-				{% csrf_token %}
-				<div class="col-lg-6">
+
+			<div id="processTabs">
+				<ul class="process-steps bottommargin clearfix">
+					<li>
+						<a href="#ptab1" class="i-circled i-bordered i-alt divcenter">1</a>
+						<h5>Select Service</h5>
+					</li>
+					<li>
+						<a href="#ptab2" class="i-circled i-bordered i-alt divcenter">2</a>
+						<h5>Enter Billing Info</h5>
+					</li>
+					<li>
+						<a href="#ptab3" class="i-circled i-bordered i-alt divcenter">3</a>
+						<h5>Complete Payment</h5>
+					</li>
+					<li>
+						<a href="#ptab4" class="i-circled i-bordered i-alt divcenter">4</a>
+						<h5>Order Complete</h5>
+					</li>
+				</ul>
+				<div>
+
+					<div id="ptab1">
+
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore, ipsa, fuga, modi, corporis maiores illum fugit ratione cumque dolores sint obcaecati quod temporibus. Expedita, sapiente, veritatis, impedit iusto labore sed itaque sunt fugiat non quis nihil hic quos necessitatibus officiis mollitia nesciunt neque! Minus, mollitia at iusto unde voluptate repudiandae.</p>
+						<form id="serviceForm" name="serviceForm" class="nobottommargin" method="POST">
+							<div class="form-row">
+								<div class="col-6">
+									<label>Service:</label>
+									<select class="form-control required" name="checkout-form-service" id="checkout-form-service" required>
+										<option value="None">------</option>
+										{% for service in services %}
+											{% if service.service_name != 'Free' %}
+												<option value="{{ service.price_per_month }}" name="{{ service.service_name }}">{{ service.service_name }}</option>
+											{% endif %}
+										{% endfor %}
+									</select>
+
+								</div>
+								<div class="col-6">
+									<label>Payment Increment:</label>
+									<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc" required>
+										<option value="None">------</option>
+										<option value="Monthly">Monthly</option>
+										<option value="Yearly">Yearly</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="table pt-2">
+								<table class="table table-striped">
+									<thead>
+										<tr>
+											<th>Service</th>
+											<th>Increment</th>
+											<th>Total</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td id="service">None selected</td>
+											<td id="increment">None selected</td>
+											<td id="total">£0.00</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<script>
+								$(document).ready(function(){
+									$("#checkout-form-service").add('#checkout-form-payment-inc').change(function(){
+										var service = document.getElementById("checkout-form-service");
+										var service_cost = service.options[service.selectedIndex].value;
+										var service_name = service.options[service.selectedIndex].text;
+										var increment = document.getElementById("checkout-form-payment-inc").value;
+										var fadeout = 100
+										var fadein = 2000
+
+										if (increment == 'Monthly'){
+
+											$("#service").fadeOut(fadeout, function() {
+												$("#service").text(service_name).fadeIn(fadein)
+											});
+
+											$("#increment").fadeOut(fadeout, function() {
+												$("#increment").text(increment).fadeIn(fadein)
+											});
+
+											$("#total").fadeOut(fadeout, function() {
+												$("#total").text('£' + service_cost + 'p/m').fadeIn(fadein)
+											});
+
+										} else if (increment == 'Yearly') {
+
+											$("#service").fadeOut(fadeout, function() {
+												$("#service").text(service_name).fadeIn(fadein)
+											});
+
+											$("#increment").fadeOut(fadeout, function() {
+												$("#increment").text(increment).fadeIn(fadein)
+											});
+
+											$("#total").fadeOut(fadeout, function() {
+												$("#total").text('£' + service_cost*12 + 'p/y').fadeIn(fadein)
+											});
+
+										} else {
+									};
+								  });
+								});
+
+
+							</script>
+
+							<div id='serviceErrors' class="style-msg errormsg">
+
+							</div>
+
+							<a href="#" id="selectService" class="button button-3d nomargin fright tab-linker">Enter Billing Info &rArr;</a>
+							<button id="selectServiceButton" type="button" style="display: none;" class="tab-linker" rel="2"></button>
+						</form>
+						<script>
+							$('#selectService').click( function() {
+								$.ajax({
+									url: '{% url 'order_service' %}',
+									type: 'post',
+									dataType: 'text',
+									data: $('#serviceForm').serialize(),
+									success: function(data) {
+										$('#serviceErrors').html('');
+										$('#selectServiceButton').click();
+									 },
+									error: function(jqXHR, textStatus, errorThrown){
+										$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Change a few things up and try submitting again.</div>');
+										console.log('jqXHR:');
+										console.log(jqXHR);
+										console.log('textStatus:');
+										console.log(textStatus);
+										console.log('errorThrown:');
+										console.log(errorThrown);
+									}
+								});
+							});
+						</script>
+					</div>
+					<div id="ptab2">
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt, deleniti, atque soluta ratione blanditiis maxime at architecto laudantium eius eaque distinctio dolorem voluptatem nam ab molestias velit nemo. Illo, hic.</p>
+
+						<div class="col-lg-12">
 					<div class="row form-billing">
-						<div class="col-12">
-							<h3>Billing Information</h3>
-						</div>
-						<div class="col-12 form-group">
+						<div class="col-6 form-group">
 							<label>Name:</label>
 							<input type="text" name="checkout-form-billing-name" id="checkout-form-billing-name" class="form-control required" value="{{ user.first_name }} {{ user.last_name }}">
 						</div>
-						<div class="col-12 form-group">
+						<div class="col-6 form-group">
 							<label>Email:</label>
 							<input type="email" name="checkout-form-billing-email" id="checkout-form-billing-email" class="form-control required" value="{{ user.email }}">
 						</div>
 						<div class="col-6 form-group">
-							<label>Company Name:</label><br>
-							<input type="text" name="checkout-form-billing-company" id="checkout-form-billing-company" class="form-control" value="" placeholder="Company Inc.">
+							<label>Phone:</label><br>
+							<input type="text" name="checkout-form-billing-phone" id="checkout-form-billing-phone" class="form-control required" value="{{ user_detail.phone }}">
 						</div>
 						<div class="col-6 form-group">
 							<label>Country:</label>
@@ -325,231 +469,45 @@
 							<label>Post Code:</label>
 							<input type="text" name="checkout-form-billing-post-code" id="checkout-form-billing-post-code" class="form-control required" value="">
 						</div>
-						<div class="col-12 form-group">
-							<label>Phone:</label><br>
-							<input type="text" name="checkout-form-billing-phone" id="checkout-form-billing-phone" class="form-control required" value="{{ user_detail.phone }}">
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-6 mt-5 mt-lg-0">
-					<div class="row form-service-card-details">
-						<div class="col-12">
-							<h3>Service & Payment Information</h3>
-						</div>
-						<div class="col-6 form-group">
-							<label>Service:</label>
-							<select class="form-control required" name="checkout-form-service" id="checkout-form-service">
-								<option value="None">------</option>
-								{% for service in services %}
-									{% if service.service_name != 'Free' %}
-										<option value="{{ service.price_per_month }}" name="{{ service.service_name }}">{{ service.service_name }}</option>
-									{% endif %}
-								{% endfor %}
-							</select>
-						</div>
-						<div class="col-6 form-group">
-							<label>Payment Increment:</label>
-							<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc">
-								<option value="None">------</option>
-								<option value="Monthly">Monthly</option>
-								<option value="Yearly">Yearly</option>
-							</select>
-						</div>
-
-						<div class="col-12 form-group">
-							<label>Name On Card:</label>
-							<input type="text" name="checkout-form-name-on-card" id="checkout-form-name-on-card" class="form-control required" value="{{ user.first_name }} {{ user.last_name }}">
-						</div>
-						<div class="col-12 form-group">
-							<label>Card Number:</label>
-							<div class="input-group mx-auto" style="">
-								<input type="text"
-									   name="checkout-form-card-number"
-									   id="checkout-form-card-number"
-									   class="form-control required visa"
-									   placeholder="1234-1234-1234-1234"
-									   pattern="[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}"
-									   required>
-							</div>
-							<div id="cardWarning" class="style-msg alertmsg mt-1"></div>
-
-
-							<span>
-								<i class="i-rounded i-light icon-cc-visa"></i> <i class="i-rounded i-light icon-cc-mastercard"></i> <i class="i-rounded i-light icon-cc-amex"></i>
-							</span>
-							<small>Must be 16 characters long.</small>
-							<script>
-								$('#checkout-form-card-number').keyup(function() {
-								  var cardNumber = $(this).val().split("-").join(""); // remove hyphens
-								  if (cardNumber.length > 0) {
-									cardNumber = cardNumber.match(new RegExp('.{1,4}', 'g')).join("-");
-								  }
-								  if (cardNumber.length > 19) {
-									$("#cardWarning").html('<div id="cardWarningMessage" class="sb-msg"><i class="icon-warning-sign"></i><strong>Warning!</strong> You have too many numbers!</div>');
-								  }
-								  if (cardNumber.length <= 19) {
-								  	$("#cardWarningMessage").fadeOut();
-								  }
-								  $(this).val(cardNumber);
-								});
-							</script>
-						</div>
-						<div class="col-6 form-group">
-							<label>Expiration:</label><br>
-							<input type="text"
-								   name="checkout-form-expiration"
-								   id="checkout-form-expiration"
-								   class="form-control"
-								   value=""
-								   placeholder="MM/YY"
-								   pattern="[0-9]{2}/[0-9]{2}"
-								   required>
-							<div id="expirationWarning" class="style-msg alertmsg mt-1"></div>
-						</div>
-
-						<script>
-							$('#checkout-form-expiration').keyup(function() {
-							  var expiration = $(this).val().split("/").join(""); // remove hyphens
-							  if (expiration.length > 0) {
-								expiration = expiration.match(new RegExp('.{1,2}', 'g')).join("/");
-							  }
-							  if (expiration.length > 5) {
-									$("#expirationWarning").html('<div id="expirationWarningMessage" class="sb-msg"><i class="icon-warning-sign"></i><strong>Warning!</strong> You have too many numbers!</div>');
-							  }
-							  if (expiration.length <= 5) {
-								$("#expirationWarningMessage").fadeOut();
-							  }
-							  $(this).val(expiration);
-							});
-						</script>
-						<div class="col-6 form-group">
-							<label>Security Code:</label><br>
-							<div class="input-group mx-auto" style="">
-								<input type="text"
-									   name="checkout-form-security-code"
-									   id="checkout-form-security-code"
-									   class="form-control"
-									   value=""
-									   pattern="[0-9]{3}">
-								<div class="input-group-append">
-									<span class="input-group-text">
-										<i class="icon-credit-card1"></i>
-									</span>
-								</div>
-							</div>
-						</div>
-						<div class="table-responsive">
-							  <table class="table table-striped">
-								<thead>
-								  <tr>
-									<th>Service</th>
-									<th>Increment</th>
-									<th>Total</th>
-								  </tr>
-								</thead>
-								<tbody>
-								  <tr>
-									<td id="service"></td>
-									<td id="increment"></td>
-									<td id="total"></td>
-								  </tr>
-								</tbody>
-							  </table>
-							</div>
-						<script>
-							$(document).ready(function(){
-							  $("#checkout-form-service").add('#checkout-form-payment-inc').on("click",function(){
-								var service = document.getElementById("checkout-form-service");
-								var service_cost = service.options[service.selectedIndex].value;
-								var service_name = service.options[service.selectedIndex].text;
-								var increment = document.getElementById("checkout-form-payment-inc").value;
-								var fadeout = 1000
-								var fadein = 2000
-
-								if (increment == 'Monthly'){
-
-									$("#service").fadeOut(fadeout, function() {
-										$("#service").text(service_name).fadeIn(fadein)
-									});
-
-									$("#increment").fadeOut(fadeout, function() {
-										$("#increment").text(increment).fadeIn(fadein)
-									});
-
-									$("#total").fadeOut(fadeout, function() {
-										$("#total").text('£' + service_cost).fadeIn(fadein)
-									});
-								} else if (increment == 'Yearly') {
-									$("#service").fadeOut(fadeout, function() {
-										$("#service").text(service_name).fadeIn(fadein)
-									});
-
-									$("#increment").fadeOut(fadeout, function() {
-										$("#increment").text(increment).fadeIn(fadein)
-									});
-
-									$("#total").fadeOut(fadeout, function() {
-										$("#total").text('£' + service_cost*12).fadeIn(fadein)
-									});
-								} else {
-								};
-							  });
-							});
-
-						</script>
 
 					</div>
 				</div>
-				<div class="col-12">
-					<div class="form-group center" id="error">
+
+						<div class="line"></div>
+						<a href="#" class="button button-3d nomargin tab-linker" rel="1">Previous</a>
+						<a href="#" class="button button-3d nomargin fright tab-linker" rel="3">Complete Payment</a>
+					</div>
+					<div id="ptab3">
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis, sit, culpa, placeat, tempora quibusdam molestiae cupiditate atque tempore nemo tenetur facere voluptates autem aliquid provident distinctio beatae odio maxime pariatur eos ratione quae itaque quod. Distinctio, temporibus, cupiditate, eaque vero illo molestiae vel doloremque dolorum repellat ullam possimus modi dicta eum debitis ratione est in sunt et corrupti adipisci quibusdam praesentium optio laborum tempora ipsam aut cum consectetur veritatis dolorem.</p>
+						<div class="line"></div>
+						<a href="#" class="button button-3d nomargin tab-linker" rel="2">Previous</a>
+						<a href="#" class="button button-3d nomargin fright tab-linker" rel="4">Complete Order</a>
+					</div>
+					<div id="ptab4">
+						<div class="alert alert-success">
+							<strong>Thank You.</strong> Your order will be processed once we verify the Payment.
+						</div>
 					</div>
 				</div>
-				<div class="col-12">
-					<div class="form-group center">
-						<button type="submit" id="submitButton" value="Submit" class="button button-3d button-large button-rounded button-aqua">Submit</button>
-					</div>
-				</div>
-				<script>
-					$(document).ready(function(e){
-				  		$("#orderForm").submit(function() {
-				  			var txt = $('#submitButton');
-				  			txt.html('<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Processing...');
-				  			$("#submitButton").attr("disabled", true);
+			</div>
 
-				  			var stripe = Stripe('pk_test_7thANq54kGk1twjb4MKf8Nfk00Zepzwpoe');
+			<div class="clear"></div>
 
-							<!--The stripe stuff-->
-							var elements = stripe.elements();
-							var cardElement = elements.create('card');
-							cardElement.mount('#card-element');
+			<div class="divider divider-center"><i class="icon-circle"></i></div>
 
-							var cardholderName = document.getElementById('cardholder-name');
-							var cardButton = document.getElementById('card-button');
-
-
-							stripe.createPaymentMethod('card', cardElement, {
-								billing_details: {name: cardholderName.value}
-									}).then(function(result) {
-									if (result.error) {
-										// Show error in payment form
-										$('#error').text(result.error);
-									} else {
-										// Otherwise send paymentMethod.id to your server (see Step 2)
-										fetch('/ajax/confirm_payment', {
-										method: 'POST',
-										headers: { 'Content-Type': 'application/json' },
-										body: JSON.stringify({ payment_method_id: result.paymentMethod.id })
-								  	}).then(function(result) {
-										// Handle server response (see Step 3)
-										result.json().then(function(json) {
-											handleServerResponse(json);
-									})
-								  });
-								}
-							  });
-				  		});
-					});
-				</script>
-			</form>
 		</div>
+
+	</div>
+
+
+
+	<script>
+		$(function() {
+			$( "#processTabs" ).tabs({ show: { effect: "fade", duration: 400 } });
+			$( ".tab-linker" ).click(function() {
+				$( "#processTabs" ).tabs("option", "active", $(this).attr('rel') - 1);
+				return false;
+			});
+		});
+	</script>
 {% endblock %}

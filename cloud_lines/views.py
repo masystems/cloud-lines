@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact
-from account.models import UserDetail
+from account.models import UserDetail, AttachedService
 from django.conf import settings
 import json
 import stripe
@@ -168,3 +168,17 @@ def order(request):
     else:
         return render(request, 'order.html', {'services': Service.objects.all(),
                                               'user_detail': UserDetail.objects.get(user=request.user)})
+
+
+@login_required(login_url="/account/login")
+def order_service(request):
+    if request.POST:
+        attach_services = AttachedService.objects.all()
+        attach_services.delete()
+        user_detail = UserDetail.objects.get(user=request.user)
+        service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
+        attach_service = AttachedService.objects.get_or_create(user=user_detail,
+                                                        service=service,
+                                                        increment=request.POST.get('checkout-form-payment-inc').lower())
+
+    return HttpResponse('GOT IT')
