@@ -13,6 +13,7 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('order', views.order, name='order'),
     path('order/service', views.order_service, name='order_service'),
+    path('order/billing', views.order_billing, name='order_billing'),
     path('pedigree/', include('pedigree.urls')),
     path('breeders/', include('breeder.urls')),
     path('breeds/', include('breed.urls')),

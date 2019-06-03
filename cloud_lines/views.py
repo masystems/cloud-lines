@@ -6,6 +6,7 @@ from django.conf import settings
 import json
 import stripe
 
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def home(request):
     return render(request, 'home.html', {'services': Service.objects.all()})
@@ -104,70 +105,9 @@ def contact(request):
 
 @login_required(login_url="/account/login")
 def order(request):
-    if request.POST:
-        stripe.api_key = settings.STRIPE_PUBLIC_KEY
-
-        # create stripe user
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        customer = stripe.Customer.create(
-            name=request.POST.get('checkout-form-billing-name'),
-            email=request.POST.get('checkout-form-billing-email'),
-
-            phone=request.POST.get('checkout-form-billing-phone'),
-            address={'line1': request.POST.get('checkout-form-billing-add1'),
-                     'city': request.POST.get('checkout-form-billing-city'),
-                     'country': request.POST.get('checkout-form-billing-country'),
-                     'line2': request.POST.get('checkout-form-billing-add2'),
-                     'postal_code': request.POST.get('checkout-form-billing-post-code')}
-        )
-        customer_id = customer['id']
-        # update user datail
-        UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
-
-
-        # create card object for user
-        # expiry = request.POST.get('checkout-form-expiration').split('/')
-        # card = stripe.Customer.create_source(
-        #     customer_id,
-        #     source='tok_visa'
-            # source={'object': 'card',
-            #         'name': request.POST.get('checkout-form-card-number'),
-            #         'number': request.POST.get('checkout-form-card-number'),
-            #         'exp_month': expiry[0],
-            #         'exp_year': expiry[1],
-            #         'cvc': request.POST.get('checkout-form-security-code'),
-            #         }
-        # )
-
-        service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
-        if request.POST.get('checkout-form-payment-inc') == 'Monthly':
-            plan = service.monthly_id
-        elif request.POST.get('checkout-form-payment-inc') == 'Yearly':
-            plan = service.yearly_id
-
-        # create payment intent
-        stripe.PaymentIntent.create(
-            amount=1099,
-            currency='gbp',
-            payment_method_types=['card']
-        )
-
-        # create the charge
-        subscription = stripe.Subscription.create(
-                        customer=customer_id,
-                        items=[
-                            {
-                                "plan": plan,
-                            },
-                        ]
-                    )
-        if subscription:
-            return render(request, 'success.html', {'services': Service.objects.all()})
-        else:
-            return render(request, 'error.html', {'services': Service.objects.all()})
-    else:
-        return render(request, 'order.html', {'services': Service.objects.all(),
-                                              'user_detail': UserDetail.objects.get(user=request.user)})
+    return render(request, 'order.html', {'services': Service.objects.all(),
+                                          'user_detail': UserDetail.objects.get(user=request.user),
+                                          'public_api_key': settings.STRIPE_PUBLIC_KEY})
 
 
 @login_required(login_url="/account/login")
@@ -182,3 +122,56 @@ def order_service(request):
                                                         increment=request.POST.get('checkout-form-payment-inc').lower())
 
     return HttpResponse('GOT IT')
+
+
+@login_required(login_url="/account/login")
+def order_billing(request):
+    if request.POST:
+        user_detail = UserDetail.objects.get(user=request.user)
+
+        if not user_detail.stripe_id:
+            # create stripe user
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            customer = stripe.Customer.create(
+                name=request.POST.get('checkout-form-billing-name'),
+                email=request.POST.get('checkout-form-billing-email'),
+
+                phone=request.POST.get('checkout-form-billing-phone'),
+                address={'line1': request.POST.get('checkout-form-billing-add1'),
+                         'city': request.POST.get('checkout-form-billing-city'),
+                         'country': request.POST.get('checkout-form-billing-country'),
+                         'line2': request.POST.get('checkout-form-billing-add2'),
+                         'postal_code': request.POST.get('checkout-form-billing-post-code')}
+            )
+            customer_id = customer['id']
+            # update user datail
+            UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
+        else:
+            stripe.Customer.modify(
+                user_detail.stripe_id,
+                name=request.POST.get('checkout-form-billing-name'),
+                email=request.POST.get('checkout-form-billing-email'),
+
+                phone=request.POST.get('checkout-form-billing-phone'),
+                address={'line1': request.POST.get('checkout-form-billing-add1'),
+                         'city': request.POST.get('checkout-form-billing-city'),
+                         'country': request.POST.get('checkout-form-billing-country'),
+                         'line2': request.POST.get('checkout-form-billing-add2'),
+                         'postal_code': request.POST.get('checkout-form-billing-post-code')}
+            )
+
+        # payment intent
+        att_service = AttachedService.objects.get(user=user_detail)
+        service = Service.objects.get(service_name=att_service.service.service_name)
+        if att_service.increment == 'monthly':
+            amount = service.price_per_month
+        else:
+            amount = service.price_per_year
+
+        intent = stripe.PaymentIntent.create(
+            customer=user_detail.stripe_id,
+            amount=int(amount * 100),
+            currency='gbp',
+            payment_method_types=['card']
+        )
+    return HttpResponse(intent.client_secret)
