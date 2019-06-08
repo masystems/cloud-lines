@@ -161,6 +161,7 @@ def order_billing(request):
             )
 
         # payment intent
+        user_detail = UserDetail.objects.get(user=request.user)
         att_service = AttachedService.objects.get(user=user_detail)
         service = Service.objects.get(service_name=att_service.service.service_name)
         if att_service.increment == 'monthly':
@@ -175,3 +176,26 @@ def order_billing(request):
             payment_method_types=['card']
         )
     return HttpResponse(intent.client_secret)
+
+
+@login_required(login_url="/account/login")
+def order_subscribe(request):
+    user_detail = UserDetail.objects.get(user=request.user)
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    stripe.Customer.modify(
+        user_detail.stripe_id,
+        source=request.POST.get('id')
+    )
+
+    # subscribe user to the selected plan
+    subscription = stripe.Subscription.create(
+        customer=user_detail.stripe_id,
+        items=[
+            {
+                "plan": "plan_F5zq8wz9VNIHUG",
+            },
+        ]
+    )
+
+    return HttpResponse(json.dumps(subscription))
