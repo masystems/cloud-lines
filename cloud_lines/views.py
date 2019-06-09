@@ -117,6 +117,7 @@ def order_service(request):
         attach_services.delete()
         user_detail = UserDetail.objects.get(user=request.user)
         service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
+
         attach_service = AttachedService.objects.get_or_create(user=user_detail,
                                                         service=service,
                                                         increment=request.POST.get('checkout-form-payment-inc').lower())
@@ -160,22 +161,7 @@ def order_billing(request):
                          'postal_code': request.POST.get('checkout-form-billing-post-code')}
             )
 
-        # payment intent
-        user_detail = UserDetail.objects.get(user=request.user)
-        att_service = AttachedService.objects.get(user=user_detail)
-        service = Service.objects.get(service_name=att_service.service.service_name)
-        if att_service.increment == 'monthly':
-            amount = service.price_per_month
-        else:
-            amount = service.price_per_year
-
-        intent = stripe.PaymentIntent.create(
-            customer=user_detail.stripe_id,
-            amount=int(amount * 100),
-            currency='gbp',
-            payment_method_types=['card']
-        )
-    return HttpResponse(intent.client_secret)
+    return HttpResponse('done')
 
 
 @login_required(login_url="/account/login")
@@ -183,17 +169,28 @@ def order_subscribe(request):
     user_detail = UserDetail.objects.get(user=request.user)
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
-    stripe.Customer.modify(
-        user_detail.stripe_id,
-        source=request.POST.get('id')
-    )
+    # add payment token to user
+    try:
+        stripe.Customer.modify(
+            user_detail.stripe_id,
+            source=request.POST.get('id')
+        )
+    except stripe.error.CardError:
+        return HttpResponse('declined')
+
+    attach_service = AttachedService.objects.get(user=user_detail)
+
+    if attach_service.increment == 'yearly':
+        plan = attach_service.service.yearly_id
+    else:
+        plan = attach_service.service.monthly_id
 
     # subscribe user to the selected plan
     subscription = stripe.Subscription.create(
         customer=user_detail.stripe_id,
         items=[
             {
-                "plan": "plan_F5zq8wz9VNIHUG",
+                "plan": plan,
             },
         ]
     )

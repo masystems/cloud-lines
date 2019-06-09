@@ -35,7 +35,7 @@
 		</ol>
 	</div>
 
-		</section><!-- #page-title end -->
+</section><!-- #page-title end -->
 <!-- Content
 ============================================= -->
 <section id="content">
@@ -78,6 +78,8 @@
 
 					<p>Register now to gain access to our products and services.</p>
 
+
+
 					<form id="register-form" name="register-form" class="nobottommargin" action="{% url 'register' %}" method="POST" enctype="multipart/form-data">
 						{% csrf_token %}
 						<div class="col_half">
@@ -95,11 +97,13 @@
 						<div class="col_half">
 							<label for="register-form-username">Username:</label>
 							<input type="text" id="register-form-username" name="register-form-username" value="" class="form-control" required/>
+							<span id='username_message'></span>
 						</div>
 
 						<div class="col_half col_last">
 							<label for="register-form-email">Email Address:</label>
-							<input type="text" id="register-form-email" name="register-form-email" value="" class="form-control" required/>
+							<input type="text" id="register-form-email" name="register-form-email" value="" class="form-control" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required/>
+							<span id='email_message'></span>
 						</div>
 
 						<div class="clear"></div>
@@ -131,11 +135,65 @@
 					</form>
 
 					<script>
+						var fadeout = 100;
+						$('#register-form-username').keyup( function() {
+
+							var username = document.getElementById("register-form-username").value;
+							$.ajax({
+								url: '{% url 'username_check' %}',
+								type: 'post',
+								dataType: 'text',
+								data: $('#register-form-username').serialize(),
+								success: function(data) {
+								if (data == 'False') {
+									$('#username_message').html('');
+									} else {
+									$('#username_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Username is already in use!').css('color', 'red');
+									}
+								 },
+								error: function(jqXHR, textStatus, errorThrown){
+									console.log('jqXHR:');
+									console.log(jqXHR);
+									console.log('textStatus:');
+									console.log(textStatus);
+									console.log('errorThrown:');
+									console.log(errorThrown);
+								}
+							});
+						});
+
+						$('#register-form-email').keyup( function() {
+
+							var username = document.getElementById("register-form-email").value;
+							$.ajax({
+								url: '{% url 'email_check' %}',
+								type: 'post',
+								dataType: 'text',
+								data: $('#register-form-email').serialize(),
+								success: function(data) {
+								if (data == 'False') {
+									$('#email_message').html('');
+									} else {
+									$('#email_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Email address already in use!').css('color', 'red');
+									}
+								 },
+								error: function(jqXHR, textStatus, errorThrown){
+									console.log('jqXHR:');
+									console.log(jqXHR);
+									console.log('textStatus:');
+									console.log(textStatus);
+									console.log('errorThrown:');
+									console.log(errorThrown);
+								}
+							});
+						});
+
 						$('#password, #register-form-confirm_password').on('keyup', function () {
 						  if ($('#register-form-password').val() == $('#register-form-confirm_password').val()) {
 							$('#password_message').html('<i class="icon-thumbs-up"></i><strong>Well done!</strong> Passwords match!').css('color', 'green');
-						  } else
-							$('#password_message').html('<i class="icon-warning-sign"></i><strong>Warning!</strong> Passwords do not match!').css('color', 'red');
+						  } else {
+							$('#password_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Passwords do not match!').css('color', 'red');
+							}
 						});
 					</script>
 

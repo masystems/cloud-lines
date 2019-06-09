@@ -14,34 +14,56 @@
     bottom: -100px;
     height: 100px !important;
     margin-bottom: -100px;
-}
-.StripeElement {
-  box-sizing: border-box;
+	}
 
-  height: 40px;
+	.StripeElement {
+	  box-sizing: border-box;
 
-  padding: 10px 12px;
+	  height: 40px;
 
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background-color: white;
+	  padding: 10px 12px;
 
-  box-shadow: 0 1px 3px 0 #e6ebf1;
-  -webkit-transition: box-shadow 150ms ease;
-  transition: box-shadow 150ms ease;
-}
+	  border: 1px solid transparent;
+	  border-radius: 4px;
+	  background-color: white;
 
-.StripeElement--focus {
-  box-shadow: 0 1px 3px 0 #cfd7df;
-}
+	  box-shadow: 0 1px 3px 0 #e6ebf1;
+	  -webkit-transition: box-shadow 150ms ease;
+	  transition: box-shadow 150ms ease;
+	}
 
-.StripeElement--invalid {
-  border-color: #fa755a;
-}
+	.StripeElement--focus {
+	  box-shadow: 0 1px 3px 0 #cfd7df;
+	}
 
-.StripeElement--webkit-autofill {
-  background-color: #fefde5 !important;
-}
+	.StripeElement--invalid {
+	  border-color: #fa755a;
+	}
+
+	.StripeElement--webkit-autofill {
+	  background-color: #fefde5 !important;
+	}
+
+	.loader {
+	  border: 10px solid #f3f3f3;
+	  border-radius: 50%;
+	  border-top: 10px solid #3498db;
+	  width: 120px;
+	  height: 120px;
+	  -webkit-animation: spin 2s linear infinite; /* Safari */
+	  animation: spin 2s linear infinite;
+	}
+
+	/* Safari */
+	@-webkit-keyframes spin {
+	  0% { -webkit-transform: rotate(0deg); }
+	  100% { -webkit-transform: rotate(360deg); }
+	}
+
+	@keyframes spin {
+	  0% { transform: rotate(0deg); }
+	  100% { transform: rotate(360deg); }
+	}
 
 </style>
 
@@ -145,45 +167,75 @@
 							</div>
 							<script>
 								$(document).ready(function(){
+									updateTables()
+
 									$("#checkout-form-service").add('#checkout-form-payment-inc').change(function(){
-										var service = document.getElementById("checkout-form-service");
+										updateTables()
+								  	});
+
+								  	function updateTables() {
+								  		var service = document.getElementById("checkout-form-service");
 										var service_cost = service.options[service.selectedIndex].value;
 										var service_name = service.options[service.selectedIndex].text;
 										var increment = document.getElementById("checkout-form-payment-inc").value;
-										var fadeout = 100
-										var fadein = 2000
+										var fadeout = 100;
+										var fadein = 2000;
+								  	if (increment == 'Monthly'){
 
-										if (increment == 'Monthly'){
+										$("#service").fadeOut(fadeout, function() {
+											$("#service").text(service_name).fadeIn(fadein)
+										});
 
-											$("#service").fadeOut(fadeout, function() {
-												$("#service").text(service_name).fadeIn(fadein)
-											});
+										$("#increment").fadeOut(fadeout, function() {
+											$("#increment").text(increment).fadeIn(fadein)
+										});
 
-											$("#increment").fadeOut(fadeout, function() {
-												$("#increment").text(increment).fadeIn(fadein)
-											});
+										$("#total").fadeOut(fadeout, function() {
+											$("#total").text('£' + service_cost + 'p/m').fadeIn(fadein)
+										});
 
-											$("#total").fadeOut(fadeout, function() {
-												$("#total").text('£' + service_cost + 'p/m').fadeIn(fadein)
-											});
+										$("#service2").fadeOut(fadeout, function() {
+											$("#service2").text(service_name).fadeIn(fadein)
+										});
 
-										} else if (increment == 'Yearly') {
+										$("#increment2").fadeOut(fadeout, function() {
+											$("#increment2").text(increment).fadeIn(fadein)
+										});
 
-											$("#service").fadeOut(fadeout, function() {
-												$("#service").text(service_name).fadeIn(fadein)
-											});
+										$("#total2").fadeOut(fadeout, function() {
+											$("#total2").text('£' + service_cost + 'p/m').fadeIn(fadein)
+										});
 
-											$("#increment").fadeOut(fadeout, function() {
-												$("#increment").text(increment).fadeIn(fadein)
-											});
+									} else if (increment == 'Yearly') {
 
-											$("#total").fadeOut(fadeout, function() {
-												$("#total").text('£' + service_cost*12 + 'p/y').fadeIn(fadein)
-											});
+										$("#service").fadeOut(fadeout, function() {
+											$("#service").text(service_name).fadeIn(fadein)
+										});
 
-										} else {
+										$("#increment").fadeOut(fadeout, function() {
+											$("#increment").text(increment).fadeIn(fadein)
+										});
+
+										$("#total").fadeOut(fadeout, function() {
+											$("#total").text('£' + service_cost*12 + 'p/y').fadeIn(fadein)
+										});
+
+										$("#service2").fadeOut(fadeout, function() {
+											$("#service2").text(service_name).fadeIn(fadein)
+										});
+
+										$("#increment2").fadeOut(fadeout, function() {
+											$("#increment2").text(increment).fadeIn(fadein)
+										});
+
+										$("#total2").fadeOut(fadeout, function() {
+											$("#total2").text('£' + service_cost*12 + 'p/y').fadeIn(fadein)
+										});
+
+
+									} else {
 									};
-								  });
+								  }
 								});
 
 
@@ -525,7 +577,6 @@
 									data: $('#billingForm').serialize(),
 									success: function(data) {
 										$('#billingErrors').html('');
-										$('#card-button').attr("data-secret", data);
 										$('#selectBillingButton').click();
 									 },
 									error: function(jqXHR, textStatus, errorThrown){
@@ -543,18 +594,40 @@
 					</div>
 					<div id="ptab3">
 						<p>Card: 4000 0582 6000 0005</p>
-						<form id="payment-form">
-							<label>Card Holders Name:</label>
-							<input id="cardholder-name" type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}">
-							<!-- placeholder for Elements -->
-							<div id="card-element"></div>
-							<!-- Used to display Element errors. -->
-							<div id="card-errors" role="alert"></div>
-						</form>
+						<div class="table pt-2">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th>Service</th>
+										<th>Increment</th>
+										<th>Total</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td id="service2">None selected</td>
+										<td id="increment2">None selected</td>
+										<td id="total2">£0.00</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="line"></div>
+						<div class="col-lg-6 offset-lg-3">
+							<form id="payment-form">
+								<label>Card Holders Name:</label>
+								<input id="cardholder-name" type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}">
+								<!-- placeholder for Elements -->
+								<div id="card-element"></div>
+								<!-- Used to display Element errors. -->
+								<div id="card-errors" role="alert"></div>
+							</form>
+						</div>
 
 						<div class="line"></div>
 						<a href="#" class="button button-3d nomargin tab-linker" rel="2">Previous</a>
-						<a href="#" id="card-button" data-secret="{{ client_secret }}" class="button button-3d nomargin fright tab-linker" rel="4">Complete Order</a>
+						<a href="#" id="card-button" class="button button-3d nomargin fright" rel="4">Complete Order</a>
+						<button id="selectCardButton" type="button" style="display: none;" class="tab-linker" rel="4"></button>
 
 						<script>
 							var stripe = Stripe('{{ public_api_key }}');
@@ -575,7 +648,7 @@
 								color: '#fa755a',
 								iconColor: '#fa755a'
 							  }
-};
+							};
 
 							// Create an instance of the card Element.
 							var card = elements.create('card', {style: style});
@@ -597,19 +670,22 @@
 							var form = document.getElementById('payment-form');
 							var cardButton = document.getElementById('card-button');
 							cardButton.addEventListener('click', function(event) {
-							  event.preventDefault();
+							  	event.preventDefault();
 
-							  stripe.createToken(card).then(function(result) {
-								if (result.error) {
-								  // Inform the customer that there was an error.
-								  var errorElement = document.getElementById('card-errors');
-								  errorElement.textContent = result.error.message;
-								  console.log('card token error');
-								} else {
-								  // Send the token to your server.
-								  stripeTokenHandler(result.token);
-								}
-							  });
+							  	stripe.createToken(card).then(function(result) {
+									if (result.error) {
+									  	// Inform the customer that there was an error.
+								  		var errorElement = document.getElementById('card-errors');
+								  		errorElement.textContent = result.error.message;
+								  		console.log('card token error');
+									} else {
+										// switch to next step and start loader
+										$('#selectCardButton').click();
+										$('#loader').removeClass("d-none");
+								  		// Send the token to your server.
+								  		stripeTokenHandler(result.token);
+									}
+							  	});
 							});
 
 							function stripeTokenHandler(token) {
@@ -622,6 +698,12 @@
 									data: token,
 									success: function(data) {
 										console.log(data);
+										$('#loader').addClass('d-none');
+										if (data == 'declined') {
+											$('#paymentFail').removeClass('d-none');
+										} else {
+											$('#paymentSuccess').removeClass('d-none');
+										}
 									 },
 									error: function(jqXHR, textStatus, errorThrown){
 										console.log('jqXHR:');
@@ -635,9 +717,17 @@
 							}
 						</script>
 					</div>
-					<div id="ptab4">
-						<div class="alert alert-success">
-							<strong>Thank You.</strong> Your order will be processed once we verify the Payment.
+					<div id="ptab4" align="center">
+						<div id="loader" class="loader d-none"></div>
+						<div id="paymentSuccess" class="mt-2 d-none" >
+							<h2>Thank You.</h2>
+							<strong>Your order has been processed.</strong>
+							<div>
+								<a href="{% url 'dashboard' %}" class="button button-desc button-3d button-rounded button-teal center mt-5">Dashboard<span>Click here to go to your new dashboard!</span></a>
+							</div>
+						</div>
+						<div id="paymentFail" class="alert alert-danger mt-2 d-none">
+							<strong>Oh No!</strong> Your card seems to have been declined.
 						</div>
 					</div>
 				</div>
@@ -645,7 +735,7 @@
 
 			<div class="clear"></div>
 
-			<div class="divider divider-center"><i class="icon-circle"></i></div>
+			<div class="divider divider-center"><i class="icon-cloud"></i></div>
 
 		</div>
 

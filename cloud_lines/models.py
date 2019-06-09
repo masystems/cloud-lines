@@ -17,10 +17,9 @@ class Service(models.Model):
     total_price_per_year = models.DecimalField(max_digits=6, decimal_places=2)
     service_description = models.TextField()
 
+    service_id = models.CharField(max_length=100, blank=True)
     monthly_id = models.CharField(max_length=100, blank=True)
     yearly_id = models.CharField(max_length=100, blank=True)
-    button_monthly = models.TextField(blank=True)
-    button_yearly = models.TextField(blank=True)
 
     def __str__(self):
         return self.service_name

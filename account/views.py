@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import auth
-import stripe
+import json
 
 
 def site_mode(request):
@@ -119,3 +119,16 @@ def register(request):
         return redirect('order')
     else:
         return render(request, 'login.html')
+
+
+def username_check(request):
+    if request.method == 'POST':
+        username = request.POST.get('register-form-username')
+        return HttpResponse(User.objects.filter(username=username).exists())
+
+
+def email_check(request):
+    if request.method == 'POST':
+        email = request.POST.get('register-form-email')
+        return HttpResponse(User.objects.filter(email=email).exists())
+
