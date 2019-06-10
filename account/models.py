@@ -7,6 +7,8 @@ from cloud_lines.models import Service
 
 class SiteDetail(models.Model):
 
+    admin_users = models.ManyToManyField(User, related_name='admin_users')
+    read_only_users = models.ManyToManyField(User, related_name='read_only_users')
     animal_type = models.CharField(max_length=250)
 
     SITE_MODES = (
@@ -18,7 +20,7 @@ class SiteDetail(models.Model):
     install_available = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.site_mode
+        return self.animal_type
 
 
 class SignUpForm(UserCreationForm):
@@ -43,6 +45,7 @@ class UserDetail(models.Model):
 class AttachedService(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.SET_NULL, null=True, blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
+    site_detail = models.ForeignKey(SiteDetail, on_delete=models.SET_NULL, null=True, blank=True)
     INCREMENTS = (
         ('monthly', 'Monthly'),
         ('yearly', 'Yearly'),

@@ -124,8 +124,8 @@
 
 						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore, ipsa, fuga, modi, corporis maiores illum fugit ratione cumque dolores sint obcaecati quod temporibus. Expedita, sapiente, veritatis, impedit iusto labore sed itaque sunt fugiat non quis nihil hic quos necessitatibus officiis mollitia nesciunt neque! Minus, mollitia at iusto unde voluptate repudiandae.</p>
 						<form id="serviceForm" name="serviceForm" class="nobottommargin" method="POST">
-							<div class="form-row">
-								<div class="col-6">
+							<div class="row form-billing">
+								<div class="col-6 form-group">
 									<label>Service:</label>
 									<select class="form-control required" name="checkout-form-service" id="checkout-form-service" required>
 										<option value="None">------</option>
@@ -137,12 +137,29 @@
 									</select>
 
 								</div>
-								<div class="col-6">
+								<div class="col-6 form-group">
 									<label>Payment Increment:</label>
 									<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc" required>
 										<option value="None">------</option>
 										<option value="Monthly">Monthly</option>
 										<option value="Yearly">Yearly</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="row form-billing">
+								<div class="col-6 form-group">
+									<label>Animal Type:</label>
+									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" placeholder="Cats, Dogs, Goats, Chickens">
+									</select>
+
+								</div>
+								<div class="col-6 form-group">
+									<label>Site Mode:</label>
+									<select class="form-control required" name="checkout-form-site-mode" id="checkout-form-site-mode" required>
+										<option value="None">------</option>
+										<option value="mammal">Mammal</option>
+										<option value="poultry">Poultry</option>
 									</select>
 								</div>
 							</div>

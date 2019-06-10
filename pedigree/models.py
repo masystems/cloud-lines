@@ -2,10 +2,11 @@ from django.contrib.auth.models import User
 from django.db import models
 from breeder.models import Breeder
 from breed.models import Breed
+from account.models import SiteDetail
 
 
 class Pedigree(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    account = models.ForeignKey(SiteDetail, on_delete=models.SET_NULL, blank=True, null=True)
     breeder = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True)
     current_owner = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True, related_name='owner')
     reg_no = models.CharField(max_length=100, blank=True)

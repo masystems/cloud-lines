@@ -9,7 +9,7 @@ from io import BytesIO
 from django.template.loader import get_template
 from django.views.generic import View
 from xhtml2pdf import pisa
-from datetime import datetime, timedelta
+from datetime import datetime
 from .models import Pedigree, PedigreeAttributes, PedigreeImage
 from breed.models import Breed
 from breeder.models import Breeder
@@ -22,47 +22,6 @@ from account.models import SiteDetail
 
 def is_editor(user):
     return user.groups.filter(name='editor').exists() or user.is_superuser
-
-
-@login_required(login_url="/account/login")
-def dashboard(request):
-
-    editor = is_editor(request.user)
-    total_pedigrees = Pedigree.objects.all().count()
-    total_breeders = Breeder.objects.all().count()
-    top_pedigrees = Pedigree.objects.all().order_by('-date_added')[:5]
-    breed_groups = BreedGroup.objects.all().order_by('-date_added')[:5]
-    top_breeders = Breeder.objects.all()
-
-    current_month = datetime.now().month
-    date = datetime.now()
-    pedigree_chart = {}
-    for month in range(0, 12):
-        month_count = Pedigree.objects.filter(date_added__month=current_month-month).count()
-        if month != 0:
-            date = date.replace(day=1)
-            date = date - timedelta(days=1)
-        print(date.strftime("%B"))
-        pedigree_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
-
-    breed_chart = {}
-    for breed in Breed.objects.all():
-        breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed) & Q(sex='male')).count(),
-                               'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed) & Q(sex='female')).count()}
-
-    # breeders_totals = {}
-    # for breeder in top_breeders:
-    #     breeders_totals[breeder]['pedigree_count'] = Pedigree.objects.filter(breeder__prefix__exact=breeder).count()
-    #     breeders_totals[breeder]['owned_count'] = Pedigree.objects.filter(current_owner__prefix__exact=breeder).count()
-
-    return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
-                                              'total_breeders': total_breeders,
-                                              'top_pedigrees': top_pedigrees,
-                                              'top_breeders': top_breeders,
-                                              'breed_groups': breed_groups,
-                                              'editor': editor,
-                                              'breed_chart': breed_chart,
-                                              'pedigree_chart': pedigree_chart})
 
 
 @login_required(login_url="/account/login")
