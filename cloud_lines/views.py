@@ -167,6 +167,7 @@ def order_billing(request):
 @login_required(login_url="/account/login")
 def order_subscribe(request):
     user_detail = UserDetail.objects.get(user=request.user)
+    attach_service = AttachedService.objects.get(user=user_detail)
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
     # add payment token to user
@@ -175,10 +176,46 @@ def order_subscribe(request):
             user_detail.stripe_id,
             source=request.POST.get('id')
         )
-    except stripe.error.CardError:
-        return HttpResponse('declined')
+    except stripe.error.CardError as e:
+        # Since it's a decline, stripe.error.CardError will be caught
+        feedback = send_payment_error(e)
+        return HttpResponse(feedback)
 
-    attach_service = AttachedService.objects.get(user=user_detail)
+    except stripe.error.RateLimitError as e:
+        # Too many requests made to the API too quickly
+        feedback = send_payment_error(e)
+        return HttpResponse(feedback)
+
+    except stripe.error.InvalidRequestError as e:
+        # Invalid parameters were supplied to Stripe's API
+        feedback = send_payment_error(e)
+        return HttpResponse(feedback)
+
+    except stripe.error.AuthenticationError as e:
+        # Authentication with Stripe's API failed
+        # (maybe you changed API keys recently)
+        feedback = send_payment_error(e)
+        return HttpResponse(feedback)
+
+    except stripe.error.APIConnectionError as e:
+        # Network communication with Stripe failed
+        feedback = send_payment_error(e)
+        return HttpResponse(feedback)
+
+    except stripe.error.StripeError as e:
+        # Display a very generic error to the user, and maybe send
+        # yourself an email
+        feedback = send_payment_error(e)
+        return HttpResponse(feedback)
+
+    except Exception as e:
+        # Something else happened, completely unrelated to Stripe
+        feedback = send_payment_error(e)
+        return HttpResponse(feedback)
+
+
+    # update the users attached service to be active
+    AttachedService.objects.filter(user=user_detail).update(active=True)
 
     if attach_service.increment == 'yearly':
         plan = attach_service.service.yearly_id
@@ -195,4 +232,17 @@ def order_subscribe(request):
         ]
     )
 
-    return HttpResponse(json.dumps(subscription))
+    return HttpResponse('success')
+
+
+def send_payment_error(e):
+    body = e.json_body
+    err = body.get('error', {})
+
+    feedback = "Status is: %s" % e.http_status
+    feedback += "<br>Type is: %s" % err.get('type')
+    feedback += "<br>Code is: %s" % err.get('code')
+    feedback += "<br>Param is: %s" % err.get('param')
+    feedback += "<br>Message is: %s" % err.get('message')
+    return feedback
+

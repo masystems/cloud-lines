@@ -83,7 +83,7 @@
 
 	<div class="container clearfix">
 		<h1>Order Service</h1>
-		<span>Full in your details below and select a service</span>
+		<span>Fill in your details below and select a service</span>
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
 			<li class="breadcrumb-item active" aria-current="page">Order</li>
@@ -690,8 +690,8 @@
 
 							function stripeTokenHandler(token) {
 
-							  // Submit the token
-							  $.ajax({
+							  	// Submit the token
+							  	$.ajax({
 									url: '{% url 'order_subscribe' %}',
 									type: 'post',
 									dataType: 'text',
@@ -699,8 +699,9 @@
 									success: function(data) {
 										console.log(data);
 										$('#loader').addClass('d-none');
-										if (data == 'declined') {
+										if (data != 'success') {
 											$('#paymentFail').removeClass('d-none');
+											$('#failedMessage').html(data);
 										} else {
 											$('#paymentSuccess').removeClass('d-none');
 										}
@@ -727,7 +728,10 @@
 							</div>
 						</div>
 						<div id="paymentFail" class="alert alert-danger mt-2 d-none">
-							<strong>Oh No!</strong> Your card seems to have been declined.
+							<h4>Oh No!</h4>
+							<div id="failedMessage">
+
+							</div>
 						</div>
 					</div>
 				</div>

@@ -48,3 +48,4 @@ class AttachedService(models.Model):
         ('yearly', 'Yearly'),
     )
     increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True, blank=True)
+    active = models.BooleanField(default=False)
