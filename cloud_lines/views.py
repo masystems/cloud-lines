@@ -179,39 +179,53 @@ def order_subscribe(request):
     except stripe.error.CardError as e:
         # Since it's a decline, stripe.error.CardError will be caught
         feedback = send_payment_error(e)
-        return HttpResponse(feedback)
+        result = {'result': 'fail',
+                  'feedback': feedback}
+        return HttpResponse(json.dumps(result))
 
     except stripe.error.RateLimitError as e:
         # Too many requests made to the API too quickly
         feedback = send_payment_error(e)
-        return HttpResponse(feedback)
+        result = {'result': 'fail',
+                  'feedback': feedback}
+        return HttpResponse(json.dumps(result))
 
     except stripe.error.InvalidRequestError as e:
         # Invalid parameters were supplied to Stripe's API
         feedback = send_payment_error(e)
-        return HttpResponse(feedback)
+        result = {'result': 'fail',
+                  'feedback': feedback}
+        return HttpResponse(json.dumps(result))
 
     except stripe.error.AuthenticationError as e:
         # Authentication with Stripe's API failed
         # (maybe you changed API keys recently)
         feedback = send_payment_error(e)
-        return HttpResponse(feedback)
+        result = {'result': 'fail',
+                  'feedback': feedback}
+        return HttpResponse(json.dumps(result))
 
     except stripe.error.APIConnectionError as e:
         # Network communication with Stripe failed
         feedback = send_payment_error(e)
-        return HttpResponse(feedback)
+        result = {'result': 'fail',
+                  'feedback': feedback}
+        return HttpResponse(json.dumps(result))
 
     except stripe.error.StripeError as e:
         # Display a very generic error to the user, and maybe send
         # yourself an email
         feedback = send_payment_error(e)
-        return HttpResponse(feedback)
+        result = {'result': 'fail',
+                  'feedback': feedback}
+        return HttpResponse(json.dumps(result))
 
     except Exception as e:
         # Something else happened, completely unrelated to Stripe
         feedback = send_payment_error(e)
-        return HttpResponse(feedback)
+        result = {'result': 'fail',
+                  'feedback': feedback}
+        return HttpResponse(json.dumps(result))
 
 
     # update the users attached service to be active
@@ -232,7 +246,14 @@ def order_subscribe(request):
         ]
     )
 
-    return HttpResponse('success')
+    invoice = stripe.Invoice.list(limit=1)
+    receipt = stripe.Charge.list(customer=user_detail.stripe_id)
+
+    result = {'result': 'success',
+              'invoice': invoice.data[0].invoice_pdf,
+              'receipt': receipt.data[0].receipt_url}
+
+    return HttpResponse(json.dumps(result))
 
 
 def send_payment_error(e):
