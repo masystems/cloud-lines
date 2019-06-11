@@ -21,13 +21,21 @@ from account.models import SiteDetail
 
 
 def is_editor(user):
-    return user.groups.filter(name='editor').exists() or user.is_superuser
+    try:
+        if SiteDetail.objects.get(admin_users=user) or user.is_superuser:
+            return True
+        else:
+            return False
+    except SiteDetail.DoesNotExist:
+        return False
+
 
 
 @login_required(login_url="/account/login")
 def search(request):
     editor = is_editor(request.user)
-    pedigrees = Pedigree.objects.all()
+    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    pedigrees = Pedigree.objects.filter(account=site_detail)
     return render(request, 'search.html', {'pedigrees': pedigrees,
                                            'editor': editor})
 
@@ -44,18 +52,18 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
         except AttributeError:
             pass
 
-        context['site_mode'] = SiteDetail.objects.all().first()
+        context['site_detail'] = SiteDetail.objects.get(Q(admin_users=self.request.user) | Q(read_only_users=self.request.user))
 
-        context['lvl1'] = Pedigree.objects.get(id=self.kwargs['pedigree_id'])
+        context['lvl1'] = Pedigree.objects.get(account=context['site_detail'], id=self.kwargs['pedigree_id'])
 
         # get any children
-        context['children'] = Pedigree.objects.filter(Q(parent_father=context['lvl1']) | Q(parent_mother=context['lvl1']))
+        context['children'] = Pedigree.objects.filter(Q(parent_father=context['lvl1'], account=context['site_detail']) | Q(parent_mother=context['lvl1'], account=context['site_detail']))
 
         # get attached groups
         context['groups'] = BreedGroup.objects.filter(group_members=context['lvl1'].id)
 
         # get all pedigrees for typeahead fields
-        context['pedigrees'] = Pedigree.objects.all()
+        context['pedigrees'] = Pedigree.objects.filter(account=context['site_detail'])
 
         context = generate_hirearchy(context)
 
@@ -84,7 +92,9 @@ def render_to_pdf(template_src, context_dict):
 class GeneratePDF(View):
     def get(self, request, *args, **kwargs):
         context = {}
-        context['lvl1'] = Pedigree.objects.get(id=self.kwargs['pedigree_id'])
+        context['site_detail'] = SiteDetail.objects.get(
+            Q(admin_users=self.request.user) | Q(read_only_users=self.request.user))
+        context['lvl1'] = Pedigree.objects.get(account=context['site_detail'], id=self.kwargs['pedigree_id'])
         context = generate_hirearchy(context)
 
         pdf_filename = "{date}-{name}{pedigree}-certificate".format(
@@ -150,11 +160,12 @@ def generate_hirearchy(context):
 def search_results(request):
     if request.POST:
         editor = is_editor(request.user)
+        site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
         search_string = request.POST['search']
 
         # lvl 1
         try:
-            results = Pedigree.objects.filter(Q(reg_no__icontains=search_string.upper()) | Q(name__icontains=search_string))
+            results = Pedigree.objects.filter(Q(account=site_detail, reg_no__icontains=search_string.upper()) | Q(account=site_detail, name__icontains=search_string))
         except ObjectDoesNotExist:
             breeders = Breeder.objects
             error = "No pedigrees found using: "
@@ -170,7 +181,7 @@ def search_results(request):
                                                        'editor': editor})
         else:
             try:
-                lvl1 = Pedigree.objects.get(Q(reg_no__icontains=search_string.upper()) | Q(name__icontains=search_string))
+                lvl1 = Pedigree.objects.get(Q(account=site_detail, reg_no__icontains=search_string.upper()) | Q(account=site_detail, name__icontains=search_string))
             except ObjectDoesNotExist:
                 breeders = Breeder.objects
                 error = "No pedigrees found using: "
@@ -191,6 +202,7 @@ def new_pedigree_form(request):
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
+    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
 
     if request.method == 'POST':
         # check whether it's valid:
@@ -248,6 +260,7 @@ def new_pedigree_form(request):
                 pass
             new_pedigree.description = pedigree_form['description'].value()
             new_pedigree.note = pedigree_form['note'].value()
+            new_pedigree.account = site_detail
             new_pedigree.save()
 
             new_pedigree_attributes = PedigreeAttributes()
@@ -288,7 +301,8 @@ def new_pedigree_form(request):
 @user_passes_test(is_editor)
 @never_cache
 def edit_pedigree_form(request, id):
-    pedigree = Pedigree.objects.get(id__exact=int(id))
+    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    pedigree = Pedigree.objects.get(account=site_detail, id__exact=int(id))
 
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)
@@ -397,12 +411,14 @@ def edit_pedigree_form(request, id):
                                                        'breeds': Breed.objects.all,
                                                        'breed_groups': BreedGroup.objects.all})
 
+
 def add_existing(request, pedigree_id):
-    pedigree = Pedigree.objects.get(id=pedigree_id)
+    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    pedigree = Pedigree.objects.get(account=site_detail, id=pedigree_id)
 
     if request.method == 'POST':
         child_reg = request.POST.get('reg_no')
-        child = Pedigree.objects.get(reg_no=child_reg)
+        child = Pedigree.objects.get(account=site_detail, reg_no=child_reg)
         if pedigree.sex == 'male':
             child.parent_father = pedigree
         elif pedigree.sex == 'female':
@@ -417,6 +433,7 @@ def add_existing(request, pedigree_id):
 @user_passes_test(is_editor)
 def export(request):
     if request.method == 'POST':
+        site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
         fields = request.POST.getlist('fields')
         date = datetime.now()
         if request.POST['submit'] == 'xlsx':
@@ -429,7 +446,7 @@ def export(request):
             writer = csv.writer(response)
             header = False
 
-            for pedigree in Pedigree.objects.all():
+            for pedigree in Pedigree.objects.filter(account=site_detail):
                 head = ''
                 row = ''
                 for key, val in pedigree.__dict__.items():

@@ -11,6 +11,9 @@ class BreederAdmin(admin.ModelAdmin):
     empty_value_display = '-empty-'
 
     fieldsets = (
+        ('Attached Site', {
+            'fields': ('account',)
+        }),
         ('Breeder details', {
             'fields': ('prefix', 'active')
         }),

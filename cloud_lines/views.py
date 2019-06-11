@@ -17,38 +17,44 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def is_editor(user):
-    return user.groups.filter(name='editor').exists() or user.is_superuser
+    try:
+        if SiteDetail.objects.get(admin_users=user) or user.is_superuser:
+            return True
+        else:
+            return False
+    except SiteDetail.DoesNotExist:
+        return False
 
 
 @login_required(login_url="/account/login")
 def dashboard(request):
-
-    site_detail = SiteDetail.objects.get(admin_users=request.user)
-    attached_service = AttachedService.objects.filter(site_detail=site_detail)
-    user_detail = UserDetail.objects.get(user=request.user)
-
     editor = is_editor(request.user)
+    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+
+    #attached_service = AttachedService.objects.filter(site_detail=site_detail)
+    #user_detail = UserDetail.objects.get(user=request.user)
+
+
     total_pedigrees = Pedigree.objects.filter(account=site_detail).count()
-    total_breeders = Breeder.objects.all().count()
+    total_breeders = Breeder.objects.filter(account=site_detail).count()
     top_pedigrees = Pedigree.objects.all().order_by('-date_added')[:5]
     breed_groups = BreedGroup.objects.all().order_by('-date_added')[:5]
-    top_breeders = Breeder.objects.all()
+    top_breeders = Breeder.objects.filter(account=site_detail)
 
     current_month = datetime.now().month
     date = datetime.now()
     pedigree_chart = {}
     for month in range(0, 12):
-        month_count = Pedigree.objects.filter(date_added__month=current_month-month).count()
+        month_count = Pedigree.objects.filter(account=site_detail, date_added__month=current_month-month).count()
         if month != 0:
             date = date.replace(day=1)
             date = date - timedelta(days=1)
-        print(date.strftime("%B"))
         pedigree_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
 
     breed_chart = {}
     for breed in Breed.objects.all():
-        breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed) & Q(sex='male')).count(),
-                               'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed) & Q(sex='female')).count()}
+        breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=site_detail) & Q(sex='male')).count(),
+                               'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=site_detail) & Q(sex='female')).count()}
 
     # breeders_totals = {}
     # for breeder in top_breeders:
