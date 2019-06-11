@@ -19,3 +19,7 @@ def support(request):
     return render(request, 'support.html', {'support_form': support_form,
                                             'tickets': Ticket.objects.order_by('-date_time')})
 
+
+@login_required(login_url="/account/login")
+def faq(request):
+    return render(request, 'faq.html')

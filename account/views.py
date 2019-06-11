@@ -1,25 +1,54 @@
 from django.shortcuts import render, HttpResponse, render_to_response
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
-from django.db.models import Q
-from .models import SiteDetail, SignUpForm, UserDetail
-from .forms import InstallForm
-from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import auth
-import json
+from django.db.models import Q
+from .models import SiteDetail, SignUpForm, UserDetail, AttachedService
+from .forms import InstallForm
+from cloud_lines.models import Service
+from pedigree.models import Pedigree
 
 
 def site_mode(request):
-    try:
-        site_details = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
-        return {'site_mode': site_details.site_mode,
-                'animal_type': site_details.animal_type}
-    except:
-        return {'site_mode': None,
-                'animal_type': 'Pedigrees'}
+    if request.user.is_authenticated:
+        try:
+            site_details = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+            attached_service = AttachedService.objects.get(site_detail=site_details)
+            service = Service.objects.get(id=attached_service.service.id)
+
+            if Pedigree.objects.filter(account=site_details).count() < service.number_of_animals:
+                pedigrees = True
+            else:
+                pedigrees = False
+
+            if site_details.admin_users.all().count() < service.admin_users:
+                admins = True
+            else:
+                admins = False
+
+            if site_details.read_only_users.all().count() < service.read_only_users:
+                users = True
+            else:
+                users = False
+
+            if site_details.site_mode == 'poultry':
+                multi_breed = service.multi_breed
+            else:
+                multi_breed = False
+
+            return {'site_mode': site_details.site_mode,
+                    'animal_type': site_details.animal_type,
+                    'service_type': attached_service.service,
+                    'pedigrees': pedigrees,
+                    'admins': admins,
+                    'users': users,
+                    'multi_breed': multi_breed}
+        except:
+            return {'site_mode': None,
+                    'animal_type': 'Pedigrees'}
 
 
 def is_editor(user):

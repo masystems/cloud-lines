@@ -44,7 +44,7 @@ class UserDetail(models.Model):
 
 class AttachedService(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.SET_NULL, null=True, blank=True)
-    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='attached_service')
     site_detail = models.ForeignKey(SiteDetail, on_delete=models.SET_NULL, null=True, blank=True)
     INCREMENTS = (
         ('monthly', 'Monthly'),

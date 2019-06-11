@@ -31,10 +31,6 @@ def dashboard(request):
     editor = is_editor(request.user)
     site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
 
-    #attached_service = AttachedService.objects.filter(site_detail=site_detail)
-    #user_detail = UserDetail.objects.get(user=request.user)
-
-
     total_pedigrees = Pedigree.objects.filter(account=site_detail).count()
     total_breeders = Breeder.objects.filter(account=site_detail).count()
     top_pedigrees = Pedigree.objects.filter(account=site_detail).order_by('-date_added')[:5]
