@@ -40,7 +40,6 @@ def search(request):
                                            'editor': editor})
 
 
-
 class PedigreeBase(LoginRequiredMixin, TemplateView):
     login_url = '/account/login'
 

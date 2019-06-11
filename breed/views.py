@@ -1,17 +1,26 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Q
 from .models import Breed
 from .forms import BreedForm
+from account.models import SiteDetail
 
 
 def is_editor(user):
-    return user.groups.filter(name='editor').exists() or user.is_superuser
+    try:
+        if SiteDetail.objects.get(admin_users=user) or user.is_superuser:
+            return True
+        else:
+            return False
+    except SiteDetail.DoesNotExist:
+        return False
 
 
 @login_required(login_url="/account/login")
 def breeds(request):
     editor = is_editor(request.user)
-    breeds = Breed.objects
+    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    breeds = Breed.objects.filter(account=site_detail)
     return render(request, 'breeds.html', {'breeds': breeds,
                                            'editor': editor})
 
@@ -23,6 +32,7 @@ def new_breed_form(request):
 
     if request.method == 'POST':
         if breed_form.is_valid():
+            breed_form.account = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
             breed_form.save()
 
             return redirect('breeds')
@@ -55,8 +65,10 @@ def edit_breed_form(request, breed_id):
     return render(request, 'edit_breed_form.html', {'breed_form': breed_form,
                                                     'breed': breed})
 
+
 @login_required(login_url="/account/login")
 def view_breed(request, breed_id):
-    breed = Breed.objects.get(id=breed_id)
+    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    breed = Breed.objects.get(account=site_detail, id=breed_id)
     return render(request, 'breed.html', {'breed': breed,
                                           'editor': is_editor(request.user)})

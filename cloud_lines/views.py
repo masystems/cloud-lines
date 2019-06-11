@@ -37,8 +37,8 @@ def dashboard(request):
 
     total_pedigrees = Pedigree.objects.filter(account=site_detail).count()
     total_breeders = Breeder.objects.filter(account=site_detail).count()
-    top_pedigrees = Pedigree.objects.all().order_by('-date_added')[:5]
-    breed_groups = BreedGroup.objects.all().order_by('-date_added')[:5]
+    top_pedigrees = Pedigree.objects.filter(account=site_detail).order_by('-date_added')[:5]
+    breed_groups = BreedGroup.objects.filter(account=site_detail).order_by('-date_added')[:5]
     top_breeders = Breeder.objects.filter(account=site_detail)
 
     current_month = datetime.now().month
