@@ -37,8 +37,8 @@ def new_breed_group_form(request):
         new_breed_group.breeder = Breeder.objects.get(prefix=breed_group_form['breeder'].value())
         new_breed_group.breed = Breed.objects.get(breed_name=breed_group_form['breed'].value())
         new_breed_group.group_name = breed_group_form['group_name'].value()
-        new_breed_group.account = site_detail
-        new_breed_group.save()
+        group = new_breed_group.save()
+        BreedGroup.objects.filter(id=group.id).update(account=site_detail)
         # add group members
         for id in breed_group_form['group_members'].value():
             id = id[4:]

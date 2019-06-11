@@ -5,3 +5,4 @@ class BreederForm(ModelForm):
     class Meta:
         model = Breeder
         fields = '__all__'
+        exclude = ('account',)

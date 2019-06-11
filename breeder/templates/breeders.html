@@ -41,20 +41,20 @@
                             <th scope="col">Address</th>
                             <th scope="col">Email</th>
                             <th scope="col">Phone</th>
+                            <th scope="col">Status</th>
                         </tr>
                         </thead>
                         <tbody id="bredTable">
                         {% for breeder in breeders.all %}
-                            {% if breeder.active %}
-                                <tr onclick="window.location='{% url 'breeder' breeder.prefix %}';"
-                                                    style="cursor: pointer;">
-                                    <th scope="row">{{ breeder.contact_name }}</th>
-                                    <td>{{ breeder.prefix }}</td>
-                                    <td>{{ breeder.address }}</td>
-                                    <td>{{ breeder.email }}</td>
-                                    <td>{{ breeder.phone_number1 }}</td>
-                                </tr>
-                            {% endif %}
+                            <tr onclick="window.location='{% url 'breeder' breeder.prefix %}';"
+                                                style="cursor: pointer;">
+                                <th scope="row">{{ breeder.contact_name }}</th>
+                                <td>{{ breeder.prefix }}</td>
+                                <td>{{ breeder.address }}</td>
+                                <td>{{ breeder.email }}</td>
+                                <td>{{ breeder.phone_number1 }}</td>
+                                <td><span class="label {% if breeder.active %}label-light-success{% else %}label-light-danger{% endif %}">{% if breeder.active %}Active{% else %}Inactive{% endif %}</span></td>
+                            </tr>
                         {% endfor %}
                         </tbody>
                     </table>

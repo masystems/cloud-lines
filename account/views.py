@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, render_to_response
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
+from django.db.models import Q
 from .models import SiteDetail, SignUpForm, UserDetail
 from .forms import InstallForm
 from django.conf import settings
@@ -13,7 +14,7 @@ import json
 
 def site_mode(request):
     try:
-        site_details = SiteDetail.objects.all().first()
+        site_details = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
         return {'site_mode': site_details.site_mode,
                 'animal_type': site_details.animal_type}
     except:

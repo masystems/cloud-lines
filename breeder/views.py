@@ -1,12 +1,13 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from .models import Breeder
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Q
 from pedigree.models import Pedigree
 from breed_group.models import BreedGroup
 from account.models import SiteDetail
 from .forms import BreederForm
 import csv
-from django.db.models import Q
+
 
 
 def is_editor(user):
@@ -88,11 +89,11 @@ def new_breeder_form(request):
             new_breeder.phone_number2 = breeder_form['phone_number2'].value()
             new_breeder.email = breeder_form['email'].value()
             new_breeder.active = breeder_form['active'].value()
-            new_breeder.account = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+            new_breeder.account = SiteDetail.objects.get(admin_users=request.user)
             new_breeder.save()
 
-            return redirect('breeder', new_breeder.prefix)
 
+            return redirect('breeder', new_breeder.prefix)
 
     else:
         breeder_form = BreederForm()
@@ -113,7 +114,7 @@ def edit_breeder_form(request, breeder_id):
         if breeder_form.is_valid():
             breeder_form.save()
 
-            return redirect('breeders', breeder.prefix)
+            return redirect('breeder', breeder.prefix)
 
 
     else:
