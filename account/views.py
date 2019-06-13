@@ -16,16 +16,26 @@ from breed.models import Breed
 def site_mode(request):
     if request.user.is_authenticated:
         try:
-            user = UserDetail.objects.get(user=request.user)
-            attached_service = AttachedService.objects.get(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(user=user, active=True))
-            service = Service.objects.get(id=attached_service.service.id)
+            try:
+                user = UserDetail.objects.get(user=request.user)
+                attached_service = AttachedService.objects.get(
+                    Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(
+                        user=user, active=True))
+            except UserDetail.DoesNotExist:
+                user = False
+                attached_service = AttachedService.objects.get(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True))
+            finally:
+                service = Service.objects.get(id=attached_service.service.id)
 
-            if request.user == user.user:
-                editor = True
-            elif request.user in attached_service.admin_users.all():
-                editor = True
-            elif request.user in attached_service.read_only_users.all():
-                editor = False
+            if user:
+                if request.user == user.user:
+                    editor = True
+                elif request.user in attached_service.admin_users.all():
+                    editor = True
+                elif request.user in attached_service.read_only_users.all():
+                    editor = False
+                else:
+                    editor = False
             else:
                 editor = False
 
