@@ -2,11 +2,11 @@ from django.contrib.auth.models import User
 from django.db import models
 from breeder.models import Breeder
 from breed.models import Breed
-from account.models import SiteDetail
+from account.models import AttachedService
 
 
 class Pedigree(models.Model):
-    account = models.ForeignKey(SiteDetail, on_delete=models.SET_NULL, blank=True, null=True)
+    account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
     breeder = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True)
     current_owner = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True, related_name='owner')
     reg_no = models.CharField(max_length=100, blank=True)
@@ -48,7 +48,6 @@ class PedigreeImage(models.Model):
 class PedigreeAttributes(models.Model):
     reg_no = models.OneToOneField(Pedigree, on_delete=models.CASCADE, primary_key=True, related_name='attribute')
     breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed')
-    #breed_groups = models.ForeignKey(BreedGroup, on_delete=models.CASCADE, blank=True, null=True, related_name='breed_group')
     eggs_per_week = models.IntegerField(default=0)
     prize_winning = models.BooleanField(default=False)
 

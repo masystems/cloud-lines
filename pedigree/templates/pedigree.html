@@ -21,25 +21,29 @@ vertical-align: middle;
     <!-- ============================================================== -->
     <div class="row page-titles">
         <div class="col-md-6 col-8 align-self-center">
-            <h3 class="text-themecolor m-b-0 m-t-0">{% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Details</h3>
+            <h3 class="text-themecolor m-b-0 m-t-0">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Details</h3>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} search</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} search</a></li>
                 <li class="breadcrumb-item active">{{ lvl1.reg_no }}</li>
             </ol>
         </div>
         <div class="col-md-6 col-4 align-self-center">
-
             {% if editor %}
-                <a href="{% url 'edit_pedigree_form' lvl1.id %}" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fas fa-pencil-alt"></i> Edit {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                <a href="{% url 'edit_pedigree_form' lvl1.id %}" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fas fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                 </a>
-                <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Add {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
-                </a>
+                {% if add_pedigree %}
+                    <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                    </a>
+                {% else %}
+                    {% include 'upgrade_modal.html' with type='pedigrees' %}
+                    <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fas fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                {% endif %}
             {% else %}
                 {% include 'login_modal.html' %}
-            <!-- /.modal -->
-                <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fas fa-pencil-alt"></i> Edit</button>
-                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Create</button>
+                <!-- /.modal -->
+                <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fas fa-pencil-alt"></i> Edi {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
             {% endif %}
 
         </div>
@@ -82,68 +86,68 @@ vertical-align: middle;
                         <!-- Row -->
                     <div class="row">
                         <!-- Column -->
-                        <div class="col-lg-3 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <!-- Row -->
-                                    <div class="row">
-                                        <div class="col-8"><span class="display-6">{{ lvl1.attribute.eggs_per_week }}</span>
-                                            <h6>Eggs Laid Per Week</h6></div>
-                                        <div class="col-4 align-self-center text-right  pl-0">
-                                            <div id="sparklinedash3"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Column -->
-                        <div class="col-lg-3 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <!-- Row -->
-                                    <div class="row">
-                                        <div class="col-8"><span class="display-6">370 <i class="ti-angle-up font-14 text-success"></i></span>
-                                            <h6>Offspring</h6></div>
-                                        <div class="col-4 align-self-center text-right pl-0">
-                                            <div id="sparklinedash"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Column -->
-                        <div class="col-lg-3 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <!-- Row -->
-                                    <div class="row">
-                                        <div class="col-8"><span class="display-7">{{ lvl1.dob }} </span>
-                                            <h6>Date Of Birth</h6></div>
-                                        <div class="col-4 align-self-center text-right pl-0">
-                                            <div id="sparklinedash2"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Column -->
-                        <div class="col-lg-3 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <!-- Row -->
-                                    <div class="row">
-                                        {% if lvl1.dod %}
-                                        <div class="col-8"><span class="display-7">{{ lvl1.dod }}</span>
-                                            <h6>Date Of Death</h6></div>
-                                        <div class="col-4 align-self-center text-right pl-0">
-                                            <div id="sparklinedash4"></div>
-                                        </div>
-                                        {% else %}
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<!--                        <div class="col-lg-3 col-md-6">-->
+<!--                            <div class="card">-->
+<!--                                <div class="card-body">-->
+<!--                                    &lt;!&ndash; Row &ndash;&gt;-->
+<!--                                    <div class="row">-->
+<!--                                        <div class="col-8"><span class="display-6">{{ lvl1.attribute.eggs_per_week }}</span>-->
+<!--                                            <h6>Eggs Laid Per Week</h6></div>-->
+<!--                                        <div class="col-4 align-self-center text-right  pl-0">-->
+<!--                                            <div id="sparklinedash3"></div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        &lt;!&ndash; Column &ndash;&gt;-->
+<!--                        <div class="col-lg-3 col-md-6">-->
+<!--                            <div class="card">-->
+<!--                                <div class="card-body">-->
+<!--                                    &lt;!&ndash; Row &ndash;&gt;-->
+<!--                                    <div class="row">-->
+<!--                                        <div class="col-8"><span class="display-6">370 <i class="ti-angle-up font-14 text-success"></i></span>-->
+<!--                                            <h6>Offspring</h6></div>-->
+<!--                                        <div class="col-4 align-self-center text-right pl-0">-->
+<!--                                            <div id="sparklinedash"></div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        &lt;!&ndash; Column &ndash;&gt;-->
+<!--                        <div class="col-lg-3 col-md-6">-->
+<!--                            <div class="card">-->
+<!--                                <div class="card-body">-->
+<!--                                    &lt;!&ndash; Row &ndash;&gt;-->
+<!--                                    <div class="row">-->
+<!--                                        <div class="col-8"><span class="display-7">{{ lvl1.dob }} </span>-->
+<!--                                            <h6>Date Of Birth</h6></div>-->
+<!--                                        <div class="col-4 align-self-center text-right pl-0">-->
+<!--                                            <div id="sparklinedash2"></div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        &lt;!&ndash; Column &ndash;&gt;-->
+<!--                        <div class="col-lg-3 col-md-6">-->
+<!--                            <div class="card">-->
+<!--                                <div class="card-body">-->
+<!--                                    &lt;!&ndash; Row &ndash;&gt;-->
+<!--                                    <div class="row">-->
+<!--                                        {% if lvl1.dod %}-->
+<!--                                        <div class="col-8"><span class="display-7">{{ lvl1.dod }}</span>-->
+<!--                                            <h6>Date Of Death</h6></div>-->
+<!--                                        <div class="col-4 align-self-center text-right pl-0">-->
+<!--                                            <div id="sparklinedash4"></div>-->
+<!--                                        </div>-->
+<!--                                        {% else %}-->
+<!--                                        {% endif %}-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
                     </div>
                     <!-- Row -->
 

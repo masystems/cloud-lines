@@ -67,12 +67,12 @@ li {
     <!-- ============================================================== -->
     <div class="row page-titles">
         <div class="col-md-6 col-8 align-self-center">
-            <h3 class="text-themecolor m-b-0 m-t-0">Edit {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Form</h3>
+            <h3 class="text-themecolor m-b-0 m-t-0">Edit {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Form</h3>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} Search</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} Search</a></li>
                 <li class="breadcrumb-item"><a href="{% url 'pedigree' pedigree.id %}">{{ pedigree.reg_no }}</a></li>
-                <li class="breadcrumb-item active">Edit {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</li>
+                <li class="breadcrumb-item active">Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</li>
             </ol>
         </div>
     </div>
@@ -83,13 +83,13 @@ li {
     <div class="container pt-5">
         <div class="card ">
             <div class="card-header">
-                <h4 class="mb-0 ">Edit {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}: {{ pedigree.reg_no }}</h4>
+                <h4 class="mb-0 ">Edit {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}: {{ pedigree.reg_no }}</h4>
             </div>
             <div class="card-body">
                 <form action="{% url 'edit_pedigree_form' pedigree.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-body">
-                        <h3 class="box-title">{% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Info</h3>
+                        <h3 class="box-title">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Info</h3>
                         <hr class="mt-0 mb-5">
                         {% if pedigree_form.errors %}
                             {% for field in pedigree_form %}
@@ -194,14 +194,25 @@ li {
                                 {% if field.name != 'reg_no'%}
                                     <div class="col-lg-6 col-md-12">
                                         <div class="form-group row">
-                                            <label class="col-sm-3 text-right col-form-label">{{ field.label }}</label>
+                                            <label class="col-sm-3 text-right col-form-label">{% if service.site_mode == 'mammal' %}
+                                                                                                {% if field.label != 'Eggs per week' %}
+                                                                                                    {{ field.label }}
+                                                                                                {% endif %}
+                                                                                                {% endif %}</label>
                                             <div class="col-md-9">
                                                 {% if field.label == 'Breed' %}
-                                                    <div id="breeds">
-                                                        <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ pedigree.attribute.breed.breed_name }}" value="{{ pedigree.attribute.breed.breed_name }}">
-                                                    </div>
+                                                    {% if multi_breed %}
+                                                        <div id="breeds">
+                                                            <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ pedigree.attribute.breed.breed_name }}" value="{{ pedigree.attribute.breed.breed_name }}">
+                                                        </div>
+                                                    {% else %}
+                                                        <input name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
+                                                        <input class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
+                                                    {% endif %}
                                                 {% elif field.label == 'Eggs per week' %}
-                                                    {% render_field field class="form-control" value=pedigree.attribute.eggs_per_week %}
+                                                    {% if service.site_mode == 'poultry' %}
+                                                        {% render_field field class="form-control" value=pedigree.attribute.eggs_per_week %}
+                                                    {% endif %}
                                                 {% elif field.label == 'Prize winning' %}
                                                     {% for option in field %}
                                                         <div class="checkbox checkbox-success pt-2">

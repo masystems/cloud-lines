@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+{% if service.site_mode == 'poultry' %}
     <!-- ============================================================== -->
     <!-- Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
@@ -8,7 +10,7 @@
         <div class="col-md-6 col-8 align-self-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Breed Groups</h3>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 <li class="breadcrumb-item active">Breed Groups</li>
             </ol>
         </div>
@@ -75,6 +77,8 @@
             </div>
         </div>
     </div>
-
+{% else %}
+<h1>Oops, you shouldn't be here!</h1>
+{% endif %}
 
 {% endblock %}

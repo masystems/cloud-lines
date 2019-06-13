@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact
-from account.models import UserDetail, AttachedService, SiteDetail
+from account.models import UserDetail, AttachedService
 from django.conf import settings
 import json
 import stripe
@@ -16,32 +16,22 @@ from django.db.models import Q
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-def is_editor(user):
-    try:
-        if SiteDetail.objects.get(admin_users=user) or user.is_superuser:
-            return True
-        else:
-            return False
-    except SiteDetail.DoesNotExist:
-        return False
-
-
 @login_required(login_url="/account/login")
 def dashboard(request):
-    editor = is_editor(request.user)
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(user=user_detail, active=True))
 
-    total_pedigrees = Pedigree.objects.filter(account=site_detail).count()
-    total_breeders = Breeder.objects.filter(account=site_detail).count()
-    top_pedigrees = Pedigree.objects.filter(account=site_detail).order_by('-date_added')[:5]
-    breed_groups = BreedGroup.objects.filter(account=site_detail).order_by('-date_added')[:5]
-    top_breeders = Breeder.objects.filter(account=site_detail)
+    total_pedigrees = Pedigree.objects.filter(account=attached_service).count()
+    total_breeders = Breeder.objects.filter(account=attached_service).count()
+    top_pedigrees = Pedigree.objects.filter(account=attached_service).order_by('-date_added')[:5]
+    breed_groups = BreedGroup.objects.filter(account=attached_service).order_by('-date_added')[:5]
+    top_breeders = Breeder.objects.filter(account=attached_service)
 
     current_month = datetime.now().month
     date = datetime.now()
     pedigree_chart = {}
     for month in range(0, 12):
-        month_count = Pedigree.objects.filter(account=site_detail, date_added__month=current_month-month).count()
+        month_count = Pedigree.objects.filter(account=attached_service, date_added__month=current_month-month).count()
         if month != 0:
             date = date.replace(day=1)
             date = date - timedelta(days=1)
@@ -49,8 +39,8 @@ def dashboard(request):
 
     breed_chart = {}
     for breed in Breed.objects.all():
-        breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=site_detail) & Q(sex='male')).count(),
-                               'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=site_detail) & Q(sex='female')).count()}
+        breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=attached_service) & Q(sex='male')).count(),
+                               'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=attached_service) & Q(sex='female')).count()}
 
     # breeders_totals = {}
     # for breeder in top_breeders:
@@ -62,7 +52,6 @@ def dashboard(request):
                                               'top_pedigrees': top_pedigrees,
                                               'top_breeders': top_breeders,
                                               'breed_groups': breed_groups,
-                                              'editor': editor,
                                               'breed_chart': breed_chart,
                                               'pedigree_chart': pedigree_chart})
 
@@ -177,17 +166,13 @@ def order_service(request):
         user_detail = UserDetail.objects.get(user=request.user)
         service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
 
-        # create site details object
-        site_detail = SiteDetail.objects.create(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                site_mode=request.POST.get('checkout-form-site-mode'),
-                                                install_available=False)
-        site_detail.admin_users.add(request.user)
-
-        attach_service = AttachedService.objects.get_or_create(user=user_detail,
-                                                               service=service,
-                                                               site_detail=site_detail,
-                                                               increment=request.POST.get('checkout-form-payment-inc').lower())
-
+        # create attached service details object
+        attached_service = AttachedService.objects.get_or_create(animal_type=request.POST.get('checkout-form-animal-type'),
+                                                                 site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                 install_available=False,
+                                                                 user=user_detail,
+                                                                 service=service,
+                                                                 increment=request.POST.get('checkout-form-payment-inc').lower())
 
     return HttpResponse('GOT IT')
 

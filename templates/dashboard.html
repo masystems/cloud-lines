@@ -12,8 +12,12 @@
         {% if not editor %}
             {% include 'login_modal.html' %}
         {% endif %}
-        {% if not pedigrees %}
-            {% include 'upgrade_modal.html' %}
+        {% if not add_pedigree %}
+            {% include 'upgrade_modal.html' with type='animals' %}
+        {% endif %}
+
+        {% if not multi_breed %}
+            {% include 'upgrade_modal.html' with type='breeds' %}
         {% endif %}
     </div>
     <!-- ============================================================== -->
@@ -29,19 +33,19 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-info">
-                            {% if pedigrees %}
+                            {% if add_pedigree %}
                                 {% if editor %}
                                     <a href="{% url 'new_pedigree_form' %}">
                                         <div class="box text-center">
                                             <h1 class="font-light text-white"><i class="fas fa-plus"></i> </h1>
-                                            <h6 class="text-white">Add New {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
+                                            <h6 class="text-white">Add New {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
                                         </div>
                                     </a>
                                 {% else %}
                                     <a href="#" data-toggle="modal" data-target="#login">
                                         <div class="box text-center">
                                             <h1 class="font-light text-white"><i class="fas fa-plus"></i> </h1>
-                                            <h6 class="text-white">Add New {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
+                                            <h6 class="text-white">Add New {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
                                         </div>
                                     </a>
                                 {% endif %}
@@ -49,7 +53,7 @@
                                 <a href="#" data-toggle="modal" data-target="#upgrade">
                                     <div class="box text-center">
                                         <h1 class="font-light text-white"><i class="fas fa-plus"></i> </h1>
-                                        <h6 class="text-white">Add New {% if site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
+                                        <h6 class="text-white">Add New {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
                                     </div>
                                 </a>
                             {% endif %}
@@ -78,15 +82,24 @@
                     <!-- Column -->
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-dark">
-                            {% if editor %}
-                                <a href="{% url 'new_breed_form' %}">
-                                    <div class="box text-center">
-                                        <h1 class="font-light text-white"><i class="fas fa-dna"></i></h1>
-                                        <h6 class="text-white">Add New Breed</h6>
-                                    </div>
-                                </a>
+                            {% if multi_breed %}
+                                {% if editor %}
+                                    <a href="{% url 'new_breed_form' %}">
+                                        <div class="box text-center">
+                                            <h1 class="font-light text-white"><i class="fas fa-dna"></i></h1>
+                                            <h6 class="text-white">Add New Breed</h6>
+                                        </div>
+                                    </a>
+                                {% else %}
+                                    <a href="#" data-toggle="modal" data-target="#login">
+                                        <div class="box text-center">
+                                            <h1 class="font-light text-white"><i class="fas fa-dna"></i></h1>
+                                            <h6 class="text-white">Add New Breed</h6>
+                                        </div>
+                                    </a>
+                                {% endif %}
                             {% else %}
-                                <a href="#" data-toggle="modal" data-target="#login">
+                                <a href="#" data-toggle="modal" data-target="#upgrade">
                                     <div class="box text-center">
                                         <h1 class="font-light text-white"><i class="fas fa-dna"></i></h1>
                                         <h6 class="text-white">Add New Breed</h6>

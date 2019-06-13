@@ -17,27 +17,14 @@ from breed_group.models import BreedGroup
 from .forms import PedigreeForm, AttributeForm, ImagesForm
 from django.db.models import Q
 import csv
-from account.models import SiteDetail
-
-
-def is_editor(user):
-    try:
-        if SiteDetail.objects.get(admin_users=user) or user.is_superuser:
-            return True
-        else:
-            return False
-    except SiteDetail.DoesNotExist:
-        return False
-
+from account.views import is_editor, get_service
 
 
 @login_required(login_url="/account/login")
 def search(request):
-    editor = is_editor(request.user)
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
-    pedigrees = Pedigree.objects.filter(account=site_detail)
-    return render(request, 'search.html', {'pedigrees': pedigrees,
-                                           'editor': editor})
+    attached_service = get_service(request)
+    pedigrees = Pedigree.objects.filter(account=attached_service)
+    return render(request, 'search.html', {'pedigrees': pedigrees})
 
 
 class PedigreeBase(LoginRequiredMixin, TemplateView):
@@ -46,28 +33,22 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        try:
-            context['editor'] = is_editor(self.request.user)
-        except AttributeError:
-            pass
+        context['attached_service'] = get_service(self.request)
 
-        context['site_detail'] = SiteDetail.objects.get(Q(admin_users=self.request.user) | Q(read_only_users=self.request.user))
-
-        context['lvl1'] = Pedigree.objects.get(account=context['site_detail'], id=self.kwargs['pedigree_id'])
+        context['lvl1'] = Pedigree.objects.get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
 
         # get any children
-        context['children'] = Pedigree.objects.filter(Q(parent_father=context['lvl1'], account=context['site_detail']) | Q(parent_mother=context['lvl1'], account=context['site_detail']))
+        context['children'] = Pedigree.objects.filter(Q(parent_father=context['lvl1'], account=context['attached_service']) | Q(parent_mother=context['lvl1'], account=context['attached_service']))
 
         # get attached groups
         context['groups'] = BreedGroup.objects.filter(group_members=context['lvl1'].id)
 
         # get all pedigrees for typeahead fields
-        context['pedigrees'] = Pedigree.objects.filter(account=context['site_detail'])
+        context['pedigrees'] = Pedigree.objects.filter(account=context['attached_service'])
 
         context = generate_hirearchy(context)
 
         return context
-
 
 
 class ShowPedigree(PedigreeBase):
@@ -91,9 +72,8 @@ def render_to_pdf(template_src, context_dict):
 class GeneratePDF(View):
     def get(self, request, *args, **kwargs):
         context = {}
-        context['site_detail'] = SiteDetail.objects.get(
-            Q(admin_users=self.request.user) | Q(read_only_users=self.request.user))
-        context['lvl1'] = Pedigree.objects.get(account=context['site_detail'], id=self.kwargs['pedigree_id'])
+        attached_service = get_service(request)
+        context['lvl1'] = Pedigree.objects.get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
         context = generate_hirearchy(context)
 
         pdf_filename = "{date}-{name}{pedigree}-certificate".format(
@@ -155,39 +135,36 @@ def generate_hirearchy(context):
 
     return context
 
+
 @login_required(login_url="/account/login")
 def search_results(request):
     if request.POST:
-        editor = is_editor(request.user)
-        site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+        attached_service = get_service(request)
         search_string = request.POST['search']
 
         # lvl 1
         try:
-            results = Pedigree.objects.filter(Q(account=site_detail, reg_no__icontains=search_string.upper()) | Q(account=site_detail, name__icontains=search_string))
+            results = Pedigree.objects.filter(Q(account=attached_service, reg_no__icontains=search_string.upper()) | Q(account=attached_service, name__icontains=search_string))
         except ObjectDoesNotExist:
             breeders = Breeder.objects
             error = "No pedigrees found using: "
             return render(request, 'search.html', {'breeders': breeders,
-                                                    'error': error,
-                                                    'search_string': search_string,
-                                                       'editor': editor})
+                                                   'error': error,
+                                                   'search_string': search_string})
 
 
         if len(results) > 1:
             return render(request, 'multiple_results.html', {'search_string': search_string,
-                                                        'results': results,
-                                                       'editor': editor})
+                                                             'results': results})
         else:
             try:
-                lvl1 = Pedigree.objects.get(Q(account=site_detail, reg_no__icontains=search_string.upper()) | Q(account=site_detail, name__icontains=search_string))
+                lvl1 = Pedigree.objects.get(Q(account=attached_service, reg_no__icontains=search_string.upper()) | Q(account=attached_service, name__icontains=search_string))
             except ObjectDoesNotExist:
                 breeders = Breeder.objects
                 error = "No pedigrees found using: "
                 return render(request, 'search.html', {'breeders': breeders,
                                                        'error': error,
-                                                       'search_string': search_string,
-                                                       'editor': editor})
+                                                       'search_string': search_string})
 
         return redirect('pedigree', pedigree_id=lvl1.id)
 
@@ -201,7 +178,7 @@ def new_pedigree_form(request):
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    attached_service = get_service(request)
 
     if request.method == 'POST':
         # check whether it's valid:
@@ -259,23 +236,23 @@ def new_pedigree_form(request):
                 pass
             new_pedigree.description = pedigree_form['description'].value()
             new_pedigree.note = pedigree_form['note'].value()
-            new_pedigree.account = site_detail
+            new_pedigree.account = attached_service
             new_pedigree.save()
 
             new_pedigree_attributes = PedigreeAttributes()
             new_pedigree_attributes.reg_no = Pedigree.objects.get(reg_no=new_pedigree.reg_no)
-            try:
-                new_pedigree_attributes.breed = Breed.objects.get(breed_name=attributes_form['breed'].value())
-            except ObjectDoesNotExist:
-                pass
 
-            eggs = attributes_form['eggs_per_week'].value()
-            new_pedigree_attributes.eggs_per_week = int(eggs)
+            new_pedigree_attributes.breed = Breed.objects.get(breed_name=attributes_form['breed'].value())
+
+            try:
+                eggs = attributes_form['eggs_per_week'].value()
+                new_pedigree_attributes.eggs_per_week = int(eggs)
+            except TypeError:
+                pass
             new_pedigree_attributes.prize_winning = attributes_form['prize_winning'].value()
             new_pedigree_attributes.save()
 
             files = request.FILES.getlist('upload_images')
-            #fs = FileSystemStorage()
 
             for file in files:
                 upload = PedigreeImage(image=file, reg_no=new_pedigree)
@@ -286,22 +263,21 @@ def new_pedigree_form(request):
     else:
         pedigree_form = PedigreeForm()
 
-
     return render(request, 'new_pedigree_form.html', {'pedigree_form': pedigree_form,
                                                       'attributes_form': attributes_form,
                                                       'image_form': image_form,
-                                                      'pedigrees': Pedigree.objects.all,
-                                                      'breeders': Breeder.objects.all,
-                                                      'breeds': Breed.objects.all,
-                                                      'breed_groups': BreedGroup.objects.all})
+                                                      'pedigrees': Pedigree.objects.filter(account=attached_service),
+                                                      'breeders': Breeder.objects.filter(account=attached_service),
+                                                      'breeds': Breed.objects.filter(account=attached_service),
+                                                      'breed_groups': BreedGroup.objects.filter(account=attached_service)})
 
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 @never_cache
 def edit_pedigree_form(request, id):
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
-    pedigree = Pedigree.objects.get(account=site_detail, id__exact=int(id))
+    attached_service = get_service(request)
+    pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)
@@ -369,14 +345,15 @@ def edit_pedigree_form(request, id):
             pedigree.note = pedigree_form['note'].value()
             pedigree.save()
 
-            pedigree_attributes = PedigreeAttributes.objects.get(reg_no=pedigree)
-            try:
-                pedigree_attributes.breed = Breed.objects.get(breed_name=attributes_form['breed'].value())
-            except ObjectDoesNotExist:
-                pass
+            pedigree_attributes, created = PedigreeAttributes.objects.get_or_create(reg_no=pedigree)
 
-            eggs = attributes_form['eggs_per_week'].value()
-            pedigree_attributes.eggs_per_week = int(eggs)
+            pedigree_attributes.breed = Breed.objects.get(breed_name=attributes_form['breed'].value())
+
+            try:
+                eggs = attributes_form['eggs_per_week'].value()
+                pedigree_attributes.eggs_per_week = int(eggs)
+            except TypeError:
+                pass
             pedigree_attributes.prize_winning = attributes_form['prize_winning'].value()
 
             files = request.FILES.getlist('upload_images')
@@ -391,8 +368,6 @@ def edit_pedigree_form(request, id):
                 upload = PedigreeImage(image=file, reg_no=pedigree)
                 upload.save()
 
-
-
             pedigree.save()
             pedigree_attributes.save()
 
@@ -400,24 +375,23 @@ def edit_pedigree_form(request, id):
     else:
         pedigree_form = PedigreeForm()
 
-
     return render(request, 'edit_pedigree_form.html', {'pedigree_form': pedigree_form,
                                                        'attributes_form': attributes_form,
                                                        'image_form': image_form,
                                                        'pedigree': pedigree,
-                                                       'pedigrees': Pedigree.objects.all,
-                                                       'breeders': Breeder.objects.all,
-                                                       'breeds': Breed.objects.all,
-                                                       'breed_groups': BreedGroup.objects.all})
+                                                       'pedigrees': Pedigree.objects.filter(account=attached_service),
+                                                       'breeders': Breeder.objects.filter(account=attached_service),
+                                                       'breeds': Breed.objects.filter(account=attached_service),
+                                                       'breed_groups': BreedGroup.objects.filter(account=attached_service)})
 
 
 def add_existing(request, pedigree_id):
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
-    pedigree = Pedigree.objects.get(account=site_detail, id=pedigree_id)
+    attached_service = get_service(request)
+    pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
 
     if request.method == 'POST':
         child_reg = request.POST.get('reg_no')
-        child = Pedigree.objects.get(account=site_detail, reg_no=child_reg)
+        child = Pedigree.objects.get(account=attached_service, reg_no=child_reg)
         if pedigree.sex == 'male':
             child.parent_father = pedigree
         elif pedigree.sex == 'female':
@@ -432,7 +406,7 @@ def add_existing(request, pedigree_id):
 @user_passes_test(is_editor)
 def export(request):
     if request.method == 'POST':
-        site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+        attached_service = get_service(request)
         fields = request.POST.getlist('fields')
         date = datetime.now()
         if request.POST['submit'] == 'xlsx':
@@ -445,7 +419,7 @@ def export(request):
             writer = csv.writer(response)
             header = False
 
-            for pedigree in Pedigree.objects.filter(account=site_detail):
+            for pedigree in Pedigree.objects.filter(account=attached_service):
                 head = ''
                 row = ''
                 for key, val in pedigree.__dict__.items():

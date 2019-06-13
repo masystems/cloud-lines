@@ -43,3 +43,4 @@ weasyprint
 django_weasyprint
 xhtml2pdf
 dj-stripe
+django_extensions

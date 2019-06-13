@@ -9,8 +9,8 @@
         <div class="col-md-6 col-8 align-self-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Edit Breed Form</h3>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'home' %}">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'breeds' %}">Breeds</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'breeds' %}">Breed{% if multi_breed %}s{% endif %}</a></li>
                 <li class="breadcrumb-item active">Edit Breed Form</li>
             </ol>
         </div>

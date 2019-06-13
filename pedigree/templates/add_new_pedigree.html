@@ -1,8 +1,8 @@
 {% if editor %}
     <a href="{% url 'new_pedigree_form' %}" class="btn btn-sm btn-outline-success waves-effect waves-light" type="button">
-    <span class="btn-label"><i class="fas fa-plus-circle"></i></span> Add {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</a>
+    <span class="btn-label"><i class="fas fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</a>
 {% else %}
     <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
-        <span class="btn-label"><i class="fas fa-plus-circle"></i></span> Add {% if site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+        <span class="btn-label"><i class="fas fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
     </button>
 {% endif %}

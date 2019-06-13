@@ -1,9 +1,9 @@
 from django.db import models
-from account.models import SiteDetail
+from account.models import AttachedService
 
 
 class Breeder(models.Model):
-    account = models.ForeignKey(SiteDetail, on_delete=models.SET_NULL, blank=True, null=True)
+    account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
     prefix = models.CharField(max_length=100, blank=False)
     contact_name = models.CharField(max_length=100, blank=True)
 

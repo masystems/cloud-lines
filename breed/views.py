@@ -1,40 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Q
 from .models import Breed
 from .forms import BreedForm
-from account.models import SiteDetail
-
-
-def is_editor(user):
-    try:
-        if SiteDetail.objects.get(admin_users=user) or user.is_superuser:
-            return True
-        else:
-            return False
-    except SiteDetail.DoesNotExist:
-        return False
+from account.views import is_editor, get_service
 
 
 @login_required(login_url="/account/login")
 def breeds(request):
-    editor = is_editor(request.user)
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
-    breeds = Breed.objects.filter(account=site_detail)
-    return render(request, 'breeds.html', {'breeds': breeds,
-                                           'editor': editor})
+    attached_service = get_service(request)
+    breeds = Breed.objects.filter(account=attached_service)
+    if len(breeds) == 1:
+        return redirect('view_breed', breeds[0].id)
+    else:
+        return render(request, 'breeds.html', {'breeds': breeds,})
 
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def new_breed_form(request):
     breed_form = BreedForm(request.POST or None, request.FILES or None)
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    attached_service = get_service(request)
 
     if request.method == 'POST':
         if breed_form.is_valid():
             breed = breed_form.save()
-            Breed.objects.filter(id=breed.id).update(account=site_detail)
+            Breed.objects.filter(id=breed.id).update(account=attached_service)
             return redirect('breeds')
 
     else:
@@ -67,7 +57,7 @@ def edit_breed_form(request, breed_id):
 
 @login_required(login_url="/account/login")
 def view_breed(request, breed_id):
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
-    breed = Breed.objects.get(account=site_detail, id=breed_id)
+    attached_service = get_service(request)
+    breed = Breed.objects.get(account=attached_service, id=breed_id)
     return render(request, 'breed.html', {'breed': breed,
                                           'editor': is_editor(request.user)})

@@ -1,53 +1,37 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from .models import Breeder
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Q
 from pedigree.models import Pedigree
 from breed_group.models import BreedGroup
-from account.models import SiteDetail
+from account.views import is_editor, get_service
 from .forms import BreederForm
 import csv
 
 
-
-def is_editor(user):
-    try:
-        if SiteDetail.objects.get(admin_users=user) or user.is_superuser:
-            return True
-        else:
-            return False
-    except SiteDetail.DoesNotExist:
-        return False
-
-
 @login_required(login_url="/account/login")
 def breeder(request, breeder):
-    editor = is_editor(request.user)
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
-    breeder = Breeder.objects.get(account=site_detail, prefix=breeder)
-    pedigrees = Pedigree.objects.filter(account=site_detail, breeder__prefix__exact=breeder)
-    owned = Pedigree.objects.filter(account=site_detail, current_owner__prefix__exact=breeder)
+    attached_service = get_service(request)
+    breeder = Breeder.objects.get(account=attached_service, prefix=breeder)
+    pedigrees = Pedigree.objects.filter(account=attached_service, breeder__prefix__exact=breeder)
+    owned = Pedigree.objects.filter(account=attached_service, current_owner__prefix__exact=breeder)
     groups = BreedGroup.objects.filter(breeder=breeder)
     return render(request, 'breeder.html', {'breeder': breeder,
                                             'pedigrees': pedigrees,
                                             'owned': owned,
-                                            'editor': editor,
                                             'groups': groups})
 
 
 @login_required(login_url="/account/login")
 def breeders(request):
-    editor = is_editor(request.user)
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
-    breeders = Breeder.objects.filter(account=site_detail)
-    return render(request, 'breeders.html', {'breeders': breeders,
-                                             'editor': editor})
+    attached_service = get_service(request)
+    breeders = Breeder.objects.filter(account=attached_service)
+    return render(request, 'breeders.html', {'breeders': breeders})
 
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def breeder_csv(request):
-    site_detail = SiteDetail.objects.get(Q(admin_users=request.user) | Q(read_only_users=request.user))
+    attached_service = get_service(request)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="breeder_db.csv"'
@@ -60,7 +44,7 @@ def breeder_csv(request):
                      'phone_number2',
                      'email',
                      'active'])
-    breeder = Breeder.objects.filter(account=site_detail)
+    breeder = Breeder.objects.filter(account=attached_service)
     for row in breeder.all():
         writer.writerow([row.prefix,
                          row.contact_name,
@@ -78,6 +62,7 @@ def breeder_csv(request):
 @user_passes_test(is_editor)
 def new_breeder_form(request):
     breeder_form = BreederForm(request.POST or None, request.FILES or None)
+    attached_service = get_service(request)
 
     if request.method == 'POST':
         if breeder_form.is_valid():
@@ -89,7 +74,7 @@ def new_breeder_form(request):
             new_breeder.phone_number2 = breeder_form['phone_number2'].value()
             new_breeder.email = breeder_form['email'].value()
             new_breeder.active = breeder_form['active'].value()
-            new_breeder.account = SiteDetail.objects.get(admin_users=request.user)
+            new_breeder.account = attached_service
             new_breeder.save()
 
 
