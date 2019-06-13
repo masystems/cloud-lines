@@ -161,18 +161,18 @@ def order(request):
 @login_required(login_url="/account/login")
 def order_service(request):
     if request.POST:
-        attach_services = AttachedService.objects.all()
-        attach_services.delete()
+        # attach_services = AttachedService.objects.all()
+        # attach_services.delete()
         user_detail = UserDetail.objects.get(user=request.user)
         service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
 
         # create attached service details object
-        attached_service = AttachedService.objects.get_or_create(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                                 site_mode=request.POST.get('checkout-form-site-mode'),
-                                                                 install_available=False,
-                                                                 user=user_detail,
-                                                                 service=service,
-                                                                 increment=request.POST.get('checkout-form-payment-inc').lower())
+        attached_service = AttachedService.objects.filter(user=user_detail).update(animal_type=request.POST.get('checkout-form-animal-type'),
+                                                                                   site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                                   install_available=False,
+                                                                                   service=service,
+                                                                                   increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                                                   active=False)
 
     return HttpResponse('GOT IT')
 

@@ -2,12 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Breed
 from .forms import BreedForm
-from account.views import is_editor, get_service
+from account.views import is_editor, get_main_account
 
 
 @login_required(login_url="/account/login")
 def breeds(request):
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
     breeds = Breed.objects.filter(account=attached_service)
     if len(breeds) == 1:
         return redirect('view_breed', breeds[0].id)
@@ -19,7 +19,7 @@ def breeds(request):
 @user_passes_test(is_editor)
 def new_breed_form(request):
     breed_form = BreedForm(request.POST or None, request.FILES or None)
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
 
     if request.method == 'POST':
         if breed_form.is_valid():
@@ -57,7 +57,7 @@ def edit_breed_form(request, breed_id):
 
 @login_required(login_url="/account/login")
 def view_breed(request, breed_id):
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
     breed = Breed.objects.get(account=attached_service, id=breed_id)
     return render(request, 'breed.html', {'breed': breed,
                                           'editor': is_editor(request.user)})

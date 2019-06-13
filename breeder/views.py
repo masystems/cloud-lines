@@ -3,14 +3,14 @@ from .models import Breeder
 from django.contrib.auth.decorators import login_required, user_passes_test
 from pedigree.models import Pedigree
 from breed_group.models import BreedGroup
-from account.views import is_editor, get_service
+from account.views import is_editor, get_main_account
 from .forms import BreederForm
 import csv
 
 
 @login_required(login_url="/account/login")
 def breeder(request, breeder):
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
     breeder = Breeder.objects.get(account=attached_service, prefix=breeder)
     pedigrees = Pedigree.objects.filter(account=attached_service, breeder__prefix__exact=breeder)
     owned = Pedigree.objects.filter(account=attached_service, current_owner__prefix__exact=breeder)
@@ -23,7 +23,7 @@ def breeder(request, breeder):
 
 @login_required(login_url="/account/login")
 def breeders(request):
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
     breeders = Breeder.objects.filter(account=attached_service)
     return render(request, 'breeders.html', {'breeders': breeders})
 
@@ -31,7 +31,7 @@ def breeders(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def breeder_csv(request):
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="breeder_db.csv"'
@@ -62,7 +62,7 @@ def breeder_csv(request):
 @user_passes_test(is_editor)
 def new_breeder_form(request):
     breeder_form = BreederForm(request.POST or None, request.FILES or None)
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
 
     if request.method == 'POST':
         if breeder_form.is_valid():

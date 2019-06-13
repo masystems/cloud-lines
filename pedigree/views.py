@@ -17,12 +17,12 @@ from breed_group.models import BreedGroup
 from .forms import PedigreeForm, AttributeForm, ImagesForm
 from django.db.models import Q
 import csv
-from account.views import is_editor, get_service, get_main_account
+from account.views import is_editor, get_main_account
 
 
 @login_required(login_url="/account/login")
 def search(request):
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
     pedigrees = Pedigree.objects.filter(account=attached_service)
     return render(request, 'search.html', {'pedigrees': pedigrees})
 
@@ -33,7 +33,7 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['attached_service'] = get_service(self.request)
+        context['attached_service'] = get_main_account(self.request.user)
 
         context['lvl1'] = Pedigree.objects.get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
 
@@ -72,7 +72,7 @@ def render_to_pdf(template_src, context_dict):
 class GeneratePDF(View):
     def get(self, request, *args, **kwargs):
         context = {}
-        attached_service = get_service(request)
+        context['attached_service'] = get_main_account(request.user)
         context['lvl1'] = Pedigree.objects.get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
         context = generate_hirearchy(context)
 
@@ -139,7 +139,7 @@ def generate_hirearchy(context):
 @login_required(login_url="/account/login")
 def search_results(request):
     if request.POST:
-        attached_service = get_service(request)
+        attached_service = get_main_account(request.user)
         search_string = request.POST['search']
 
         # lvl 1
@@ -178,8 +178,7 @@ def new_pedigree_form(request):
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
-    attached_service = get_service(request)
-    main_account = get_main_account(request.user)
+    attached_service = get_main_account(request.user)
 
     if request.method == 'POST':
         # check whether it's valid:
@@ -237,13 +236,13 @@ def new_pedigree_form(request):
                 pass
             new_pedigree.description = pedigree_form['description'].value()
             new_pedigree.note = pedigree_form['note'].value()
-            new_pedigree.account = main_account
+            new_pedigree.account = attached_service
             new_pedigree.save()
 
             new_pedigree_attributes = PedigreeAttributes()
             new_pedigree_attributes.reg_no = Pedigree.objects.get(reg_no=new_pedigree.reg_no)
 
-            breed = Breed.objects.get(account=main_account, breed_name=attributes_form['breed'].value())
+            breed = Breed.objects.get(account=attached_service, breed_name=attributes_form['breed'].value())
             new_pedigree_attributes.breed = breed
 
             try:
@@ -278,7 +277,7 @@ def new_pedigree_form(request):
 @user_passes_test(is_editor)
 @never_cache
 def edit_pedigree_form(request, id):
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
@@ -388,7 +387,7 @@ def edit_pedigree_form(request, id):
 
 
 def add_existing(request, pedigree_id):
-    attached_service = get_service(request)
+    attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
 
     if request.method == 'POST':
@@ -408,7 +407,7 @@ def add_existing(request, pedigree_id):
 @user_passes_test(is_editor)
 def export(request):
     if request.method == 'POST':
-        attached_service = get_service(request)
+        attached_service = get_main_account(request.user)
         fields = request.POST.getlist('fields')
         date = datetime.now()
         if request.POST['submit'] == 'xlsx':

@@ -155,7 +155,6 @@
             <!-- Sidebar navigation-->
             <nav class="sidebar-nav">
                 <ul id="sidebarnav">
-                    {% if user.is_authenticated %}
                     <li>
                         <a class="" href="{% url 'dashboard' %}" aria-expanded="false"><i class="fas fa-home"></i><span
                                 class="hide-menu"> Dashboard</span></a>
@@ -166,7 +165,7 @@
                     </li>
                     <li><a href="{% url 'breeders' %}"><i class="fas fa-users"></i><span
                                 class="hide-menu"> Breeders</span></a></li>
-                    {% if site_mode == 'poultry' %}
+                    {% if service.site_mode == 'poultry' %}
                         <li><a href="{% url 'breed_groups' %}"><i class="far fa-object-ungroup"></i><span
                                     class="hide-menu"> Breed Groups</span></a></li>
                     {% endif %}
@@ -187,20 +186,6 @@
 
                     <li><a href="{% url 'support' %}"><i class="fas fa-hands-helping"></i><span
                                 class="hide-menu"> Support</span></a></li>
-                    {% else %}
-                    <li>
-                        <a class="" href="{% url 'home' %}" aria-expanded="false"><i class="fas fa-home"></i><span
-                                class="hide-menu"> Home</span></a>
-                    </li>
-                    <li>
-                        <a class="" href="#about" aria-expanded="false"><i class="fas fa-info-circle"></i><span
-                                class="hide-menu"> About</span></a>
-                    </li>
-                    <li>
-                        <a class="" href="#pricing" aria-expanded="false"><i class="fas fa-pound-sign"></i><span
-                                class="hide-menu"> Pricing</span></a>
-                    </li>
-                    {% endif %}
                 </ul>
             </nav>
             <!-- End Sidebar navigation -->

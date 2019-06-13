@@ -78,17 +78,16 @@ def is_editor(user):
 
 def get_main_account(user):
     user_detail = UserDetail.objects.get(user=user)
-    user_service = AttachedService.objects.get(Q(admin_users=user, active=True) | Q(read_only_users=user, active=True) | Q(user=user_detail, active=True))
-    attached_service = AttachedService.objects.get(user=user_service.user)
-    return attached_service
+    try:
+        user_service = AttachedService.objects.get(Q(admin_users=user, active=True) | Q(read_only_users=user, active=True) | Q(user=user_detail, active=True))
+        attached_service = AttachedService.objects.get(user=user_service.user)
+    except AttachedService.DoesNotExist:
+        user_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
+                                                                            site_mode='mammal',
+                                                                            install_available=False,
+                                                                            service=Service.objects.get(service_name='Free'),
+                                                                            active=True)
 
-
-def get_service(request):
-    user_detail = UserDetail.objects.get(user=request.user)
-    attached_service = AttachedService.objects.get(
-        Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(
-            user=user_detail,
-            active=True))
     return attached_service
 
 

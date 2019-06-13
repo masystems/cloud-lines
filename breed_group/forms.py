@@ -5,3 +5,4 @@ class BreedGroupForm(ModelForm):
     class Meta:
         model = BreedGroup
         fields = '__all__'
+        exclude = ('account',)
