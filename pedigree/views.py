@@ -17,7 +17,7 @@ from breed_group.models import BreedGroup
 from .forms import PedigreeForm, AttributeForm, ImagesForm
 from django.db.models import Q
 import csv
-from account.views import is_editor, get_service
+from account.views import is_editor, get_service, get_main_account
 
 
 @login_required(login_url="/account/login")
@@ -179,6 +179,7 @@ def new_pedigree_form(request):
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
     attached_service = get_service(request)
+    main_account = get_main_account(request.user)
 
     if request.method == 'POST':
         # check whether it's valid:
@@ -236,13 +237,14 @@ def new_pedigree_form(request):
                 pass
             new_pedigree.description = pedigree_form['description'].value()
             new_pedigree.note = pedigree_form['note'].value()
-            new_pedigree.account = attached_service
+            new_pedigree.account = main_account
             new_pedigree.save()
 
             new_pedigree_attributes = PedigreeAttributes()
             new_pedigree_attributes.reg_no = Pedigree.objects.get(reg_no=new_pedigree.reg_no)
 
-            new_pedigree_attributes.breed = Breed.objects.get(breed_name=attributes_form['breed'].value())
+            breed = Breed.objects.get(account=main_account, breed_name=attributes_form['breed'].value())
+            new_pedigree_attributes.breed = breed
 
             try:
                 eggs = attributes_form['eggs_per_week'].value()

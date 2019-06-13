@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact
 from account.models import UserDetail, AttachedService
+from account.views import get_main_account
 from django.conf import settings
 import json
 import stripe
@@ -18,29 +19,28 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 @login_required(login_url="/account/login")
 def dashboard(request):
-    user_detail = UserDetail.objects.get(user=request.user)
-    attached_service = AttachedService.objects.get(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(user=user_detail, active=True))
+    main_account = get_main_account(request.user)
 
-    total_pedigrees = Pedigree.objects.filter(account=attached_service).count()
-    total_breeders = Breeder.objects.filter(account=attached_service).count()
-    top_pedigrees = Pedigree.objects.filter(account=attached_service).order_by('-date_added')[:5]
-    breed_groups = BreedGroup.objects.filter(account=attached_service).order_by('-date_added')[:5]
-    top_breeders = Breeder.objects.filter(account=attached_service)
+    total_pedigrees = Pedigree.objects.filter(account=main_account).count()
+    total_breeders = Breeder.objects.filter(account=main_account).count()
+    top_pedigrees = Pedigree.objects.filter(account=main_account).order_by('-date_added')[:5]
+    breed_groups = BreedGroup.objects.filter(account=main_account).order_by('-date_added')[:5]
+    top_breeders = Breeder.objects.filter(account=main_account)
 
     current_month = datetime.now().month
     date = datetime.now()
     pedigree_chart = {}
     for month in range(0, 12):
-        month_count = Pedigree.objects.filter(account=attached_service, date_added__month=current_month-month).count()
+        month_count = Pedigree.objects.filter(account=main_account, date_added__month=current_month-month).count()
         if month != 0:
             date = date.replace(day=1)
             date = date - timedelta(days=1)
         pedigree_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
 
     breed_chart = {}
-    for breed in Breed.objects.all():
-        breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=attached_service) & Q(sex='male')).count(),
-                               'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=attached_service) & Q(sex='female')).count()}
+    for breed in Breed.objects.filter(account=main_account):
+        breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=main_account) & Q(sex='male')).count(),
+                               'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=main_account) & Q(sex='female')).count()}
 
     # breeders_totals = {}
     # for breeder in top_breeders:

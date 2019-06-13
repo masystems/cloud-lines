@@ -14,64 +14,51 @@ from breed.models import Breed
 
 
 def site_mode(request):
+
     if request.user.is_authenticated:
-        try:
-            try:
-                user = UserDetail.objects.get(user=request.user)
-                attached_service = AttachedService.objects.get(
-                    Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(
-                        user=user, active=True))
-            except UserDetail.DoesNotExist:
-                user = False
-                attached_service = AttachedService.objects.get(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True))
-            finally:
-                service = Service.objects.get(id=attached_service.service.id)
+        main_account = get_main_account(request.user)
+        user = UserDetail.objects.get(user=main_account.user.user)
 
-            if user:
-                if request.user == user.user:
-                    editor = True
-                elif request.user in attached_service.admin_users.all():
-                    editor = True
-                elif request.user in attached_service.read_only_users.all():
-                    editor = False
-                else:
-                    editor = False
-            else:
-                editor = False
+        # attached_service = AttachedService.objects.filter(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(
+        #             user=user, active=True)).first()
 
-            if Pedigree.objects.filter(account=attached_service).count() < service.number_of_animals:
-                pedigrees = True
-            else:
-                pedigrees = False
+        service = Service.objects.get(id=main_account.service.id)
 
-            if attached_service.admin_users.all().count() < service.admin_users:
-                admins = True
-            else:
-                admins = False
+        if request.user == user.user:
+            editor = True
+        elif request.user in main_account.admin_users.all():
+            editor = True
+        elif request.user in main_account.read_only_users.all():
+            editor = False
+        else:
+            editor = False
 
-            if attached_service.read_only_users.all().count() < service.read_only_users:
-                users = True
-            else:
-                users = False
+        if Pedigree.objects.filter(account=main_account).count() < service.number_of_animals:
+            pedigrees = True
+        else:
+            pedigrees = False
 
-            if attached_service.site_mode == 'poultry' or Breed.objects.filter(account=attached_service).count() < 1:
-                multi_breed = True
-            else:
-                multi_breed = False
+        if main_account.admin_users.all().count() < service.admin_users:
+            admins = True
+        else:
+            admins = False
 
-            return {'service': attached_service,
-                    'add_pedigree': pedigrees,
-                    'admins': admins,
-                    'users': users,
-                    'multi_breed': multi_breed,
-                    'editor': editor}
+        if main_account.read_only_users.all().count() < service.read_only_users:
+            users = True
+        else:
+            users = False
 
-        except AttachedService.DoesNotExist:
-            return {'site_mode': 'Free',
-                    'animal_type': 'Pedigrees'}
-        except UserDetail.DoesNotExist:
-            return {'site_mode': 'Free',
-                    'animal_type': 'Pedigrees'}
+        if main_account.site_mode == 'poultry' or Breed.objects.filter(account=main_account).count() < 1:
+            multi_breed = True
+        else:
+            multi_breed = False
+
+        return {'service': main_account,
+                'add_pedigree': pedigrees,
+                'admins': admins,
+                'users': users,
+                'multi_breed': multi_breed,
+                'editor': editor}
 
     return {'authenticated': 'no'}
 
@@ -79,12 +66,21 @@ def site_mode(request):
 def is_editor(user):
     try:
         user_detail = UserDetail.objects.get(user=user)
-        if AttachedService.objects.get(Q(admin_users=user, active=True) | Q(read_only_users=user, active=True) | Q(user=user_detail, active=True)):
+        if AttachedService.objects.get(Q(admin_users=user, active=True) | Q(user=user_detail, active=True)):
             return True
         else:
             return False
+    except UserDetail.DoesNotExist:
+        return False
     except AttachedService.DoesNotExist:
         return False
+
+
+def get_main_account(user):
+    user_detail = UserDetail.objects.get(user=user)
+    user_service = AttachedService.objects.get(Q(admin_users=user, active=True) | Q(read_only_users=user, active=True) | Q(user=user_detail, active=True))
+    attached_service = AttachedService.objects.get(user=user_service.user)
+    return attached_service
 
 
 def get_service(request):

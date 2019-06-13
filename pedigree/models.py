@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.db import models
 from breeder.models import Breeder
 from breed.models import Breed
