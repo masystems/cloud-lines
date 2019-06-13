@@ -6,7 +6,7 @@ certifi==2018.11.29
 cfn-flip==1.1.0.post1
 chardet==3.0.4
 Click==7.0
-Django==2.1.7
+Django==2.1.9
 django-s3-storage==0.12.4
 django-storages==1.7.1
 django-widget-tweaks==1.4.3
@@ -15,7 +15,7 @@ durationpy==0.5
 future==0.16.0
 hjson==3.0.1
 idna==2.8
-Jinja2==2.10
+Jinja2==2.10.1
 jmespath==0.9.3
 kappa==0.6.0
 lambda-packages==0.20.0
@@ -26,7 +26,7 @@ psycopg2==2.7.7
 python-dateutil==2.6.1
 python-slugify==1.2.4
 pytz==2018.9
-PyYAML==3.13
+PyYAML==4.2b1
 requests==2.21.0
 s3transfer==0.2.0
 six==1.12.0
@@ -34,7 +34,7 @@ toml==0.10.0
 tqdm==4.19.1
 troposphere==2.4.4
 Unidecode==1.0.23
-urllib3==1.24.1
+urllib3==1.24.2
 Werkzeug==0.14.1
 wsgi-request-logger==0.4.6
 zappa
