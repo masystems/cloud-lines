@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.db.models import Q
@@ -11,6 +12,8 @@ from .forms import InstallForm, SignUpForm
 from cloud_lines.models import Service
 from pedigree.models import Pedigree
 from breed.models import Breed
+import random
+import string
 
 
 def site_mode(request):
@@ -77,34 +80,57 @@ def is_editor(user):
 
 
 def get_main_account(user):
+    # get detail for logged in user
     user_detail = UserDetail.objects.get(user=user)
     try:
-        user_service = AttachedService.objects.get(Q(admin_users=user, active=True) | Q(read_only_users=user, active=True) | Q(user=user_detail, active=True))
+        # get the attached service of the logged in user
+        user_service = AttachedService.objects.get(Q(admin_users=user,
+                                                     active=True) | Q(read_only_users=user,
+                                                                      active=True) | Q(user=user_detail,
+                                                                                       active=True))
+        # get attached service of the primary user
         attached_service = AttachedService.objects.get(user=user_service.user)
     except AttachedService.DoesNotExist:
-        user_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
-                                                                            site_mode='mammal',
-                                                                            install_available=False,
-                                                                            service=Service.objects.get(service_name='Free'),
-                                                                            active=True)
+        # update the attached service to what default
+        attached_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
+                                                                               site_mode='mammal',
+                                                                               install_available=False,
+                                                                               service=Service.objects.get(service_name='Free'),
+                                                                               active=True)
 
     return attached_service
 
 
 @login_required(login_url="/account/login")
-def new_user(request):
+def user_edit(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('home')
-    else:
-        form = UserCreationForm()
-        return render(request, 'signup.html', {'form': form})
+        main_account = get_main_account(request.user)
+
+        # generate password
+        password = ''.join(
+            [random.choice(string.ascii_letters + string.digits + string.punctuation) for n in range(int(10))])
+
+        # create new user
+        user = User.objects.create_user(username=request.POST.get('register-form-username').lower(),
+                                        email=request.POST.get('register-form-email'),
+                                        password=password,
+                                        first_name=request.POST.get('firstName'),
+                                        last_name=request.POST.get('lastName'))
+
+        # update user details
+        user_detail = UserDetail.objects.create(user=user,
+                                                phone=''
+                                                )
+        user_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
+                                                                               install_available=False,
+                                                                               active=False)
+
+        if request.POST.get('status') == 'Editor':
+            main_account.admin_users.add(user)
+        else:
+            main_account.read_only_users.add(user)
+
+        return HttpResponse('Done')
 
 
 def site_login(request):
@@ -198,12 +224,14 @@ def register(request):
         return render(request, 'login.html')
 
 
+@csrf_exempt
 def username_check(request):
     if request.method == 'POST':
         username = request.POST.get('register-form-username')
         return HttpResponse(User.objects.filter(username=username).exists())
 
 
+@csrf_exempt
 def email_check(request):
     if request.method == 'POST':
         email = request.POST.get('register-form-email')

@@ -66,6 +66,7 @@
                                 <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
                                     <div class="modal-dialog" role="document">
                                         <form class="modal-content form-horizontal" id="editor">
+                                            {% csrf_token %}
                                             <div class="modal-header">
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                                                 <h4 class="modal-title" id="editor-title">Add User</h4>
@@ -83,10 +84,18 @@
                                                         <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
                                                     </div>
                                                 </div>
-                                                <div class="form-group">
-                                                    <label for="email" class="col-sm-3 control-label">Email</label>
+                                                <div class="form-group required">
+                                                    <label for="register-form-username" class="col-sm-3 control-label">Username</label>
                                                     <div class="col-sm-9">
-                                                        <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+                                                        <input type="text" class="form-control" id="register-form-username" name="register-form-username" placeholder="Username" required>
+                                                        <span id='username_message'></span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="register-form-email" class="col-sm-3 control-label">Email</label>
+                                                    <div class="col-sm-9">
+                                                        <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email">
+                                                        <span id='email_message'></span>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -120,16 +129,16 @@
                                                   {"name":"id","title":"ID","breakpoints":"xs sm","type":"number","style":{"width":80,"maxWidth":80}},
                                                   {"name":"firstName","title":"First Name"},
                                                   {"name":"lastName","title":"Last Name"},
-                                                  {"name":"something","title":"Never seen but always around","visible":false,"filterable":false},
+                                                  {"name":"username","title":"Username"},
                                                   {"name":"email","title":"Email","breakpoints":"xs sm","style":{"maxWidth":200,"overflow":"hidden","textOverflow":"ellipsis","wordBreak":"keep-all","whiteSpace":"nowrap"}},
                                                   {"name":"status","title":"Status"}
                                                 ],
                                                 rows: [
                                                         {% for user in service.admin_users.all %}
-                                                            {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","email":"{{ user.email }}","status":"Editor"},
+                                                            {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","username":"{{ user.username }}","email":"{{ user.email }}","status":"Editor"},
                                                         {% endfor %}
                                                         {% for user in service.read_only_users.all %}
-                                                            {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","email":"{{ user.email }}","status":"Read Only"},
+                                                            {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","username":"{{ user.username }}","email":"{{ user.email }}","status":"Read Only"},
                                                         {% endfor %}
                                                       ],
                                                 editing: {
@@ -143,7 +152,8 @@
                                                         var values = row.val();
                                                         $editor.find('#firstName').val(values.firstName);
                                                         $editor.find('#lastName').val(values.lastName);
-                                                        $editor.find('#email').val(values.email);
+                                                        $editor.find('#register-form-username').val(values.username);
+                                                        $editor.find('#register-form-email').val(values.email);
                                                         $editor.find('#status').val(values.status);
                                                         $modal.data('row', row);
                                                         $editorTitle.text('Edit user #' + values.id);
@@ -165,7 +175,8 @@
                                                 values = {
                                                     firstName: $editor.find('#firstName').val(),
                                                     lastName: $editor.find('#lastName').val(),
-                                                    email: $editor.find('#email').val(),
+                                                    username: $editor.find('#register-form-username').val(),
+                                                    email: $editor.find('#register-form-email').val(),
                                                     status: $editor.find('#status').val()
                                                 };
 
@@ -175,7 +186,82 @@
                                                 values.id = uid++;
                                                 ft.rows.add(values);
                                             }
+
+                                            $.ajax({
+                                                url: '{% url 'user_edit' %}',
+                                                type: 'post',
+                                                dataType: 'text',
+                                                data: $('#editor').serialize(),
+                                                success: function(data) {
+                                                    console.log(data)
+                                                 },
+                                                error: function(jqXHR, textStatus, errorThrown){
+                                                    console.log('jqXHR:');
+                                                    console.log(jqXHR);
+                                                    console.log('textStatus:');
+                                                    console.log(textStatus);
+                                                    console.log('errorThrown:');
+                                                    console.log(errorThrown);
+                                                }
+                                            });
+
                                             $modal.modal('hide');
+
+
+                                        });
+                                    });
+
+                                    var fadeout = 100;
+                                    $('#register-form-username').keyup( function() {
+
+                                        var username = document.getElementById("register-form-username").value;
+                                        $.ajax({
+                                            url: '{% url 'username_check' %}',
+                                            type: 'post',
+                                            dataType: 'text',
+                                            data: $('#register-form-username').serialize(),
+                                            success: function(data) {
+                                                console.log(data);
+                                                if (data == 'False') {
+                                                    $('#username_message').html('');
+                                                    } else {
+                                                    $('#username_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Username is already in use!').css('color', 'red');
+                                                    }
+                                                },
+                                            error: function(jqXHR, textStatus, errorThrown){
+                                                console.log('jqXHR:');
+                                                console.log(jqXHR);
+                                                console.log('textStatus:');
+                                                console.log(textStatus);
+                                                console.log('errorThrown:');
+                                                console.log(errorThrown);
+                                            }
+                                        });
+                                    });
+
+                                    $('#register-form-email').keyup( function() {
+
+                                        var username = document.getElementById("register-form-email").value;
+                                        $.ajax({
+                                            url: '{% url 'email_check' %}',
+                                            type: 'post',
+                                            dataType: 'text',
+                                            data: $('#register-form-email').serialize(),
+                                            success: function(data) {
+                                            if (data == 'False') {
+                                                $('#email_message').html('');
+                                                } else {
+                                                $('#email_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Email address already in use!').css('color', 'red');
+                                                }
+                                             },
+                                            error: function(jqXHR, textStatus, errorThrown){
+                                                console.log('jqXHR:');
+                                                console.log(jqXHR);
+                                                console.log('textStatus:');
+                                                console.log(textStatus);
+                                                console.log('errorThrown:');
+                                                console.log(errorThrown);
+                                            }
                                         });
                                     });
                                 </script>
