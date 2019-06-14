@@ -109,6 +109,7 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
+                                                <input type="hidden" id="formType" name="formType">
                                                 <button type="submit" class="btn btn-primary">Save changes</button>
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                             </div>
@@ -146,6 +147,7 @@
                                                         $modal.removeData('row');
                                                         $editor[0].reset();
                                                         $editorTitle.text('Add a new user');
+                                                        $('#formType').val('new');
                                                         $modal.modal('show');
                                                     },
                                                     editRow: function(row){
@@ -157,6 +159,7 @@
                                                         $editor.find('#status').val(values.status);
                                                         $modal.data('row', row);
                                                         $editorTitle.text('Edit user #' + values.id);
+                                                        $('#formType').val('new');
                                                         $modal.modal('show');
                                                     },
                                                     deleteRow: function(row){

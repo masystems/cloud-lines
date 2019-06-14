@@ -68,8 +68,10 @@ def site_mode(request):
 
 def is_editor(user):
     try:
-        user_detail = UserDetail.objects.get(user=user)
-        if AttachedService.objects.get(Q(admin_users=user, active=True) | Q(user=user_detail, active=True)):
+        main_account = get_main_account(user)
+        if user in main_account.admin_users.all():
+            return True
+        elif user == main_account.user:
             return True
         else:
             return False
@@ -84,10 +86,17 @@ def get_main_account(user):
     user_detail = UserDetail.objects.get(user=user)
     try:
         # get the attached service of the logged in user
-        user_service = AttachedService.objects.get(Q(admin_users=user,
-                                                     active=True) | Q(read_only_users=user,
-                                                                      active=True) | Q(user=user_detail,
-                                                                                       active=True))
+        try:
+            user_service = AttachedService.objects.get(admin_users=user, active=True)
+        except AttachedService.DoesNotExist:
+            try:
+                user_service = AttachedService.objects.get(read_only_users=user, active=True)
+            except AttachedService.DoesNotExist:
+                try:
+                    user_service = AttachedService.objects.get(user=user_detail, active=True)
+                except AttachedService.DoesNotExist:
+                    pass
+
         # get attached service of the primary user
         attached_service = AttachedService.objects.get(user=user_service.user)
     except AttachedService.DoesNotExist:
@@ -106,31 +115,34 @@ def user_edit(request):
     if request.method == 'POST':
         main_account = get_main_account(request.user)
 
-        # generate password
-        password = ''.join(
-            [random.choice(string.ascii_letters + string.digits + string.punctuation) for n in range(int(10))])
+        if request.POST.get('formType') == 'new':
+            # generate password
+            password = ''.join(
+                [random.choice(string.ascii_letters + string.digits + string.punctuation) for n in range(int(10))])
 
-        # create new user
-        user = User.objects.create_user(username=request.POST.get('register-form-username').lower(),
-                                        email=request.POST.get('register-form-email'),
-                                        password=password,
-                                        first_name=request.POST.get('firstName'),
-                                        last_name=request.POST.get('lastName'))
+            # create new user
+            user = User.objects.create_user(username=request.POST.get('register-form-username').lower(),
+                                            email=request.POST.get('register-form-email'),
+                                            password=password,
+                                            first_name=request.POST.get('firstName'),
+                                            last_name=request.POST.get('lastName'))
 
-        # update user details
-        user_detail = UserDetail.objects.create(user=user,
-                                                phone=''
-                                                )
-        user_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
-                                                                               install_available=False,
-                                                                               active=False)
+            # update user details
+            user_detail = UserDetail.objects.create(user=user,
+                                                    phone=''
+                                                    )
+            user_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
+                                                                                   install_available=False,
+                                                                                   active=False)
 
-        if request.POST.get('status') == 'Editor':
-            main_account.admin_users.add(user)
-        else:
-            main_account.read_only_users.add(user)
+            if request.POST.get('status') == 'Editor':
+                main_account.admin_users.add(user)
+            else:
+                main_account.read_only_users.add(user)
 
-        return HttpResponse('Done')
+            return HttpResponse('Done')
+        elif request.POST.get('formType') == 'edit':
+            pass
 
 
 def site_login(request):

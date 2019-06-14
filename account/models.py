@@ -13,7 +13,7 @@ class UserDetail(models.Model):
 
 
 class AttachedService(models.Model):
-    user = models.OneToOneField(UserDetail, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.OneToOneField(UserDetail, on_delete=models.CASCADE, related_name='attached_service', null=True, blank=True)
     admin_users = models.ManyToManyField(User, related_name='admin_users', blank=True)
     read_only_users = models.ManyToManyField(User, related_name='read_only_users', blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
@@ -33,3 +33,6 @@ class AttachedService(models.Model):
     active = models.BooleanField(default=False)
 
     install_available = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "{}-{}".format(str(self.user), str(self.service))
