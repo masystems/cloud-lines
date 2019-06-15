@@ -110,7 +110,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <input type="hidden" id="formType" name="formType">
-                                                <button type="submit" class="btn btn-primary">Save changes</button>
+                                                <button type="submit" id="userFormBtn" class="btn btn-primary">Save changes</button>
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                             </div>
                                         </form>
@@ -155,21 +155,29 @@
                                                         $editor.find('#firstName').val(values.firstName);
                                                         $editor.find('#lastName').val(values.lastName);
                                                         $editor.find('#register-form-username').val(values.username);
+                                                        $("#register-form-username").prop("readonly", true);
                                                         $editor.find('#register-form-email').val(values.email);
+                                                        $("#register-form-email").prop("readonly", true);
                                                         $editor.find('#status').val(values.status);
                                                         $modal.data('row', row);
                                                         $editorTitle.text('Edit user #' + values.id);
-                                                        $('#formType').val('new');
+                                                        $('#formType').val('edit');
                                                         $modal.modal('show');
                                                     },
                                                     deleteRow: function(row){
-                                                        if (confirm('Are you sure you want to delete the row?')){
-                                                            row.delete();
+                                                        if (confirm('Are you sure you want to delete this user?')){
+                                                            var values = row.val();
+                                                            $editor.find('#register-form-username').val(values.username);
+                                                            $editor.find('#register-form-email').val(values.email);
+                                                            $('#formType').val('delete');
+                                                            $('#userFormBtn').click();
+                                                            //row.delete();
+                                                            location.reload();
                                                         }
                                                     }
                                                 }
                                             }),
-                                            uid = 10001;
+                                            uid = '###';
 
                                         $editor.on('submit', function(e){
                                             if (this.checkValidity && !this.checkValidity()) return;

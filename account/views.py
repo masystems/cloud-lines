@@ -140,9 +140,30 @@ def user_edit(request):
             else:
                 main_account.read_only_users.add(user)
 
-            return HttpResponse('Done')
+            return HttpResponse(True)
         elif request.POST.get('formType') == 'edit':
-            pass
+            # find user and update name fields
+            User.objects.filter(username=request.POST.get('register-form-username'),
+                                email=request.POST.get('register-form-email')).update(first_name=request.POST.get('firstName'),
+                                                                                      last_name=request.POST.get('lastName'))
+            user = User.objects.get(username=request.POST.get('register-form-username'),
+                                    email=request.POST.get('register-form-email'))
+            # remove user from admins and read only users
+            main_account.admin_users.remove(user)
+            main_account.read_only_users.remove(user)
+
+            # add user to the request group
+            if request.POST.get('status') == 'Editor':
+                main_account.admin_users.add(user)
+            else:
+                main_account.read_only_users.add(user)
+
+            return HttpResponse(True)
+        elif request.POST.get('formType') == 'delete':
+            print('deleting user!')
+            User.objects.get(username=request.POST.get('register-form-username'),
+                             email=request.POST.get('register-form-email')).delete()
+            return HttpResponse(True)
 
 
 def site_login(request):
