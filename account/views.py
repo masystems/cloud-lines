@@ -26,8 +26,9 @@ def site_mode(request):
         #             user=user, active=True)).first()
 
         service = Service.objects.get(id=main_account.service.id)
+        print(request.user.username, user.user.username)
+        if str(request.user.username) == str(user.user.username):
 
-        if request.user == user.user:
             editor = True
         elif request.user in main_account.admin_users.all():
             editor = True
@@ -71,7 +72,7 @@ def is_editor(user):
         main_account = get_main_account(user)
         if user in main_account.admin_users.all():
             return True
-        elif user == main_account.user:
+        elif user == main_account.user.user:
             return True
         else:
             return False
@@ -189,8 +190,12 @@ def logout(request):
 @login_required(login_url="/account/login")
 def profile(request):
     user_detail = UserDetail.objects.get(user=request.user)
-    return render(request, 'profile.html', {'is_editor': is_editor(request.user),
-                                            'user_detail': user_detail,})
+    services = Service.objects.all().exclude(service_name='Free')
+
+    recommended = Service.objects.filter(id=user_detail.attached_service.service.id+1)
+    return render(request, 'profile.html', {'user_detail': user_detail,
+                                            'services': services,
+                                            'recommended': recommended})
 
 
 def install(request):

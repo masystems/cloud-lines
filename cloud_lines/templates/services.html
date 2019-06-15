@@ -94,12 +94,10 @@
                             {% if service.service_name == 'Free' %}
                                 <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-aqua">Start now!</a>
                             {% else %}
-                                <div class="btn-group" role="group" aria-label="service_buttons">
-                                    <a href="#" class="button button-3d button-rounded button-yellow button-aqua"><i class="icon-trash2"></i>Start now!</a>
-                                </div>
+                                <a href="{% url 'order' %}" class="button button-3d button-rounded button-yellow button-aqua">Order</a>
                             {% endif %}
                         {% else %}
-                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-aqua">Start now!</a>
+                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-aqua">Login/Register</a>
                         {% endif %}
                     </div>
                     {% if not forloop.last %}
@@ -151,12 +149,10 @@
                             {% if service.service_name == 'Free' %}
                                 <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-yellow">Start now!</a>
                             {% else %}
-                                <div class="btn-group" role="group" aria-label="service_buttons">
-                                    <a href="#" class="button button-3d button-rounded button-yellow button-yellow"><i class="icon-trash2"></i>Start now!</a>
-                                </div>
+                                <a href="{% url 'order' %}" class="button button-3d button-rounded button-yellow button-yellow">Order</a>
                             {% endif %}
                         {% else %}
-                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-yellow">Start now!</a>
+                            <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-yellow">Login/Register</a>
                         {% endif %}
                     </div>
 

@@ -21,8 +21,8 @@
                 <div class="card">
                     <div class="card-body">
                         <center class="mt-4"> <img src="../assets/images/users/5.jpg" class="img-circle" width="150" />
-                            <h4 class="card-title mt-2">{{ request.user.first_name }} {{ request.user.last_name }}</h4>
-                            <h6 class="card-subtitle">{% if is_editor %}Editor{% else %}User{% endif %}</h6>
+                            <h4 class="card-title mt-2">{{ request.user.get_full_name }}</h4>
+                            <h6 class="card-subtitle">{% if editor %}Editor{% else %}User{% endif %}</h6>
                             <div class="row text-center justify-content-md-center">
                                 <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-people"></i> <font class="font-medium">254</font></a></div>
                                 <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i> <font class="font-medium">54</font></a></div>
@@ -51,13 +51,92 @@
                 <div class="card">
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs profile-tab" role="tablist">
-                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#home" role="tab">Timeline</a> </li>
-                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#profile" role="tab">Profile</a> </li>
+                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#account" role="tab">Account</a> </li>
+                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#users" role="tab">Users</a> </li>
                         <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#settings" role="tab">Settings</a> </li>
                     </ul>
                     <!-- Tab panes -->
                     <div class="tab-content">
-                        <div class="tab-pane active" id="home" role="tabpanel">
+                        <div class="tab-pane active" id="account" role="tabpanel">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Full Name</strong>
+                                        <br>
+                                        <p class="text-muted">{{ request.user.get_full_name }}</p>
+                                    </div>
+                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Username</strong>
+                                        <br>
+                                        <p class="text-muted">{{ request.user.username }}</p>
+                                    </div>
+                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Email</strong>
+                                        <br>
+                                        <p class="text-muted">{{ request.user.email }}</p>
+                                    </div>
+                                    <div class="col-md-3 col-xs-6"> <strong>Account Type</strong>
+                                        <br>
+                                        {% if request.user == service.user.user %}
+                                            <p class="text-muted">Service Owner</p>
+                                        {% else %}
+                                        <p class="text-muted"><strong>{% if is_editor %}Editor {% else %}Read only</strong> {% endif %} member of <strong>{{ service.service }}</strong>, owned by <strong>{{ service.user.user.get_full_name }}</strong>(<a href="mailto:{{ service.user.user.email }}">{{ service.user.user.email }}</a>)</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <hr>
+                                {% if is_editor %}
+                                    <p class="mt-4">As an editor you're able to add/delete {{ service.animal_type }}, breeders/owners, breeds and breed groups if it's a poultry service.</p>
+                                {% else %}
+                                    <p class="mt-4">As a read only user you cannot add/delete any {{ service.animal_type }}, however you're free to browse all the data on this site.</p>
+                                {% endif %}
+
+                                {% if request.user == service.user.user %}
+                                    <h4 class="font-medium mt-4">Upgrade Service</h4>
+                                    <div class="row pricing-plan pt-2">
+                                        {% for plan in services %}
+                                            {% if plan.service_name != service.service.service_name %}
+                                                <div class="col-md-3 col-xs-12 col-sm-6 no-padding">
+                                                    <div class="pricing-box {% if plan.id == recommended.first.id %}featured-plan{% endif %}">
+                                                        <div class="pricing-body">
+                                                            <div class="pricing-header">
+                                                                {% if plan.id == recommended.first.id %}
+                                                                    <h4 class="price-lable text-white bg-warning"> Suggested</h4>
+                                                                {% endif %}
+                                                                <h4 class="text-center">{{ plan.service_name }}</h4>
+                                                                <h2 class="text-center"><span class="price-sign">£</span>{{ plan.price_per_month|add:"0" }}</h2>
+                                                                <p class="uppercase">per month</p>
+                                                            </div>
+                                                            <div class="price-table-content">
+                                                                <div class="price-row"><i class="fas fa-pencil-alt"></i> {{ plan.admin_users }} Editors</div>
+                                                                <div class="price-row"><i class="fas fa-book-reader"></i> {{ plan.read_only_users }} Read only Users</div>
+                                                                <div class="price-row"><i class="fas fa-paw"></i> {% if plan.number_of_animals == 99 %}
+                                                                                                                        Unlimited
+                                                                                                                    {% else %}
+                                                                                                                        {{ plan.number_of_animals }}
+                                                                                                                    {% endif %} Animals <i class="fas fa-feather-alt"></i></div>
+                                                                <div class="price-row">{% if plan.multi_breed %}
+                                                                                            <i class="fas fa-check"></i>
+                                                                                        {% else %}
+                                                                                            <i class="fas fa-times"></i>
+                                                                                        {% endif %} Multibreed</div>
+                                                                <div class="price-row">{% if plan.support %}
+                                                                                            <td><i class="fas fa-check"></i></td>
+                                                                                        {% else %}
+                                                                                            <td><i class="fas fa-times"></i></td>
+                                                                                        {% endif %} Support</div>
+                                                                <div class="price-row">
+                                                                    <button class="btn btn-lg btn-info waves-effect waves-light mt-3">Upgrade</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!--second tab-->
+                        <div class="tab-pane" id="users" role="tabpanel">
                             <div class="card-body">
                                 <div class="table-responsive">
                                     <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="true" data-state="true"></table>
@@ -177,7 +256,7 @@
                                                     }
                                                 }
                                             }),
-                                            uid = '###';
+                                            uid = 01;
 
                                         $editor.on('submit', function(e){
                                             if (this.checkValidity && !this.checkValidity()) return;
@@ -276,51 +355,6 @@
                                         });
                                     });
                                 </script>
-                            </div>
-                        </div>
-                        <!--second tab-->
-                        <div class="tab-pane" id="profile" role="tabpanel">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Full Name</strong>
-                                        <br>
-                                        <p class="text-muted">Johnathan Deo</p>
-                                    </div>
-                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Mobile</strong>
-                                        <br>
-                                        <p class="text-muted">(123) 456 7890</p>
-                                    </div>
-                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Email</strong>
-                                        <br>
-                                        <p class="text-muted">johnathan@admin.com</p>
-                                    </div>
-                                    <div class="col-md-3 col-xs-6"> <strong>Location</strong>
-                                        <br>
-                                        <p class="text-muted">London</p>
-                                    </div>
-                                </div>
-                                <hr>
-                                <p class="mt-4">Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt.Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim.</p>
-                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries </p>
-                                <p>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
-                                <h4 class="font-medium mt-4">Skill Set</h4>
-                                <hr>
-                                <h5 class="mt-4">Wordpress <span class="float-right">80%</span></h5>
-                                <div class="progress">
-                                    <div class="progress-bar bg-success" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width:80%; height:6px;"> <span class="sr-only">50% Complete</span> </div>
-                                </div>
-                                <h5 class="mt-4">HTML 5 <span class="float-right">90%</span></h5>
-                                <div class="progress">
-                                    <div class="progress-bar bg-info" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width:90%; height:6px;"> <span class="sr-only">50% Complete</span> </div>
-                                </div>
-                                <h5 class="mt-4">jQuery <span class="float-right">50%</span></h5>
-                                <div class="progress">
-                                    <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width:50%; height:6px;"> <span class="sr-only">50% Complete</span> </div>
-                                </div>
-                                <h5 class="mt-4">Photoshop <span class="float-right">70%</span></h5>
-                                <div class="progress">
-                                    <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:70%; height:6px;"> <span class="sr-only">50% Complete</span> </div>
-                                </div>
                             </div>
                         </div>
                         <div class="tab-pane" id="settings" role="tabpanel">
