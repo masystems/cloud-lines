@@ -77,19 +77,19 @@
                                         {% if request.user == service.user.user %}
                                             <p class="text-muted">Service Owner</p>
                                         {% else %}
-                                        <p class="text-muted"><strong>{% if is_editor %}Editor {% else %}Read only</strong> {% endif %} member of <strong>{{ service.service }}</strong>, owned by <strong>{{ service.user.user.get_full_name }}</strong>(<a href="mailto:{{ service.user.user.email }}">{{ service.user.user.email }}</a>)</p>
+                                        <p class="text-muted"><strong>{% if editor %}Editor {% else %}Read only</strong> {% endif %} member of <strong>{{ service.service }}</strong>, owned by <strong>{{ service.user.user.get_full_name }}</strong>(<a href="mailto:{{ service.user.user.email }}">{{ service.user.user.email }}</a>)</p>
                                         {% endif %}
                                     </div>
                                 </div>
                                 <hr>
-                                {% if is_editor %}
+                                {% if editor %}
                                     <p class="mt-4">As an editor you're able to add/delete {{ service.animal_type }}, breeders/owners, breeds and breed groups if it's a poultry service.</p>
                                 {% else %}
                                     <p class="mt-4">As a read only user you cannot add/delete any {{ service.animal_type }}, however you're free to browse all the data on this site.</p>
                                 {% endif %}
 
                                 {% if request.user == service.user.user %}
-                                    <h4 class="font-medium mt-4">Upgrade Service</h4>
+                                    <h4 class="font-medium mt-4">Available Services</h4>
                                     <div class="row pricing-plan pt-2">
                                         {% for plan in services %}
                                             {% if plan.service_name != service.service.service_name %}
@@ -123,7 +123,7 @@
                                                                                             <td><i class="fas fa-times"></i></td>
                                                                                         {% endif %} Support</div>
                                                                 <div class="price-row">
-                                                                    <button class="btn btn-lg btn-info waves-effect waves-light mt-3">Upgrade</button>
+                                                                    <a href="{% url 'order' %}"><button class="btn btn-lg {% if plan.id < recommended.first.id %}btn-warning{% else %}btn-info{% endif %} waves-effect waves-light mt-3">{% if plan.id < recommended.first.id %}Downgrade{% else %}Upgrade{% endif %}</button></a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -144,6 +144,7 @@
                                 <!-- Start Popup Model -->
                                 <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
                                     <div class="modal-dialog" role="document">
+                                        {% if editor %}
                                         <form class="modal-content form-horizontal" id="editor">
                                             {% csrf_token %}
                                             <div class="modal-header">
@@ -173,7 +174,7 @@
                                                 <div class="form-group">
                                                     <label for="register-form-email" class="col-sm-3 control-label">Email</label>
                                                     <div class="col-sm-9">
-                                                        <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email">
+                                                        <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email" required>
                                                         <span id='email_message'></span>
                                                     </div>
                                                 </div>
@@ -193,9 +194,11 @@
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                             </div>
                                         </form>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <!-- End Popup Model -->
+                                {% if editor %}
                                 <script>
                                     $(window).on('load', function() {
 
@@ -311,10 +314,10 @@
                                             dataType: 'text',
                                             data: $('#register-form-username').serialize(),
                                             success: function(data) {
-                                                console.log(data);
                                                 if (data == 'False') {
                                                     $('#username_message').html('');
                                                     } else {
+                                                    $('#userFormBtn[type="submit"]').prop('disabled', true);
                                                     $('#username_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Username is already in use!').css('color', 'red');
                                                     }
                                                 },
@@ -340,7 +343,9 @@
                                             success: function(data) {
                                             if (data == 'False') {
                                                 $('#email_message').html('');
+                                                $('#userFormBtn').prop('disabled', false);
                                                 } else {
+                                                $('#userFormBtn').prop('disabled', true);
                                                 $('#email_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Email address already in use!').css('color', 'red');
                                                 }
                                              },
@@ -355,6 +360,7 @@
                                         });
                                     });
                                 </script>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="tab-pane" id="settings" role="tabpanel">
@@ -382,24 +388,6 @@
                                         <label class="col-md-12">Phone No</label>
                                         <div class="col-md-12">
                                             <input type="text" placeholder="123 456 7890" class="form-control form-control-line">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-md-12">Message</label>
-                                        <div class="col-md-12">
-                                            <textarea rows="5" class="form-control form-control-line"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-12">Select Country</label>
-                                        <div class="col-sm-12">
-                                            <select class="form-control form-control-line">
-                                                <option>London</option>
-                                                <option>India</option>
-                                                <option>Usa</option>
-                                                <option>Canada</option>
-                                                <option>Thailand</option>
-                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group">

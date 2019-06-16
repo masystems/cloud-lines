@@ -190,9 +190,13 @@ def logout(request):
 @login_required(login_url="/account/login")
 def profile(request):
     user_detail = UserDetail.objects.get(user=request.user)
-    services = Service.objects.all().exclude(service_name='Free')
-
-    recommended = Service.objects.filter(id=user_detail.attached_service.service.id+1)
+    main_account = get_main_account(request.user)
+    if request.user == main_account.user:
+        services = Service.objects.all().exclude(service_name='Free')
+        recommended = Service.objects.filter(id=user_detail.attached_service.service.id+1)
+    else:
+        services = None
+        recommended = None
     return render(request, 'profile.html', {'user_detail': user_detail,
                                             'services': services,
                                             'recommended': recommended})
