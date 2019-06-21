@@ -25,12 +25,11 @@ def site_mode(request):
         # returns the user for the main account
         user = UserDetail.objects.get(user=main_account.user.user)
 
-        attached_services = AttachedService.objects.filter(Q(admin_users=request.user) | Q(read_only_users=request.user) | Q(user=user))
+        attached_services = AttachedService.objects.filter(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(user=user, active=True))
 
         service = Service.objects.get(id=main_account.service.id)
 
         if str(request.user.username) == str(user.user.username):
-
             editor = True
         elif request.user in main_account.admin_users.all():
             editor = True
@@ -89,20 +88,8 @@ def get_main_account(user):
     # get detail for logged in user
     user_detail = UserDetail.objects.get(user=user)
     try:
-        # get the attached service of the logged in user
-        try:
-            user_service = AttachedService.objects.get(admin_users=user, active=True)
-        except AttachedService.DoesNotExist:
-            try:
-                user_service = AttachedService.objects.get(read_only_users=user, active=True)
-            except AttachedService.DoesNotExist:
-                try:
-                    user_service = AttachedService.objects.get(user=user_detail, active=True)
-                except AttachedService.DoesNotExist:
-                    pass
-
         # get attached service of the primary user
-        attached_service = AttachedService.objects.get(user=user_service.user, active=True)
+        attached_service = AttachedService.objects.get(id=user_detail.current_service.id, active=True)
     except AttachedService.DoesNotExist:
         # update the attached service to what default
         attached_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
@@ -197,7 +184,10 @@ def profile(request):
 
     if str(request.user) == str(main_account.user):
         services = Service.objects.all().exclude(service_name='Free')
-        recommended = Service.objects.filter(id=user_detail.attached_service.service.id+1)
+        if main_account.service.service_name != 'Organisation':
+            recommended = Service.objects.filter(id=main_account.service.id+1)
+        else:
+            recommended = None
     else:
         services = None
         recommended = None

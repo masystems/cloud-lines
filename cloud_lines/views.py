@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact
 from account.models import UserDetail, AttachedService
@@ -319,3 +319,17 @@ def send_payment_error(e):
     feedback += "<br>Message is: %s" % err.get('message')
     return feedback
 
+
+def activate_primary_account(request, service):
+    user_details = UserDetail.objects.get(user=request.user)
+    try:
+        primary_account = AttachedService.objects.get(id=service)
+    except AttachedService.DoesNotExist:
+        return redirect('dashboard')
+
+    if AttachedService.objects.filter(id=service, admin_users=request.user, active=True).exists()\
+            or AttachedService.objects.filter(id=service, read_only_users=request.user, active=True).exists() \
+            or AttachedService.objects.filter(id=service, user=user_details, active=True).exists():
+        UserDetail.objects.filter(user=request.user).update(current_service=primary_account)
+
+    return redirect('dashboard')

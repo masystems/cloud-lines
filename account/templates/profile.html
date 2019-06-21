@@ -15,391 +15,390 @@
     </div>
 
 <!-- Row -->
-        <div class="row">
-            <!-- Column -->
-            <div class="col-md-12 col-lg-4 col-xlg-3">
-                <div class="card">
-                    <div class="card-body">
-                        <center class="mt-4"> <img src="../assets/images/users/5.jpg" class="img-circle" width="150" />
-                            <h4 class="card-title mt-2">{{ request.user.get_full_name }}</h4>
-                            <h6 class="card-subtitle">{% if editor %}Editor{% else %}User{% endif %}</h6>
-                            <div class="row text-center justify-content-md-center">
-                                <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-people"></i> <font class="font-medium">254</font></a></div>
-                                <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i> <font class="font-medium">54</font></a></div>
-                            </div>
-                        </center>
-                    </div>
-                    <div>
-                        <hr> </div>
-                    <div class="card-body"> <small class="text-muted">Email address </small>
-                        <h6>{{ request.user.email }}</h6>
-                        <small class="text-muted p-t-30 db">Phone</small>
-                        <h6>{{ user_detail.phone }}</h6>
-                        <small class="text-muted p-t-30 db">Service</small>
-                        <h6>{{ service.service.service_name }}</h6>
-                        <small class="text-muted p-t-30 db">Animal</small>
-                        <h6>{{ service.animal_type|title }}</h6>
-                        <small class="text-muted p-t-30 db">Site Mode</small>
-                        <h6>{{ service.site_mode|title }}</h6>
+    <div class="row">
+        <!-- Column -->
+        <div class="col-md-12 col-lg-4 col-xlg-3">
+            <div class="card">
+                <div class="card-body">
+                    <center class="mt-4"> <i class="fas fa-user-circle fa-4x"></i>
+                        <h4 class="card-title mt-2">{{ request.user.get_full_name }}</h4>
+                        <h6 class="card-subtitle">{% if editor %}Editor{% else %}User{% endif %}</h6>
+                        <div class="row text-center justify-content-md-center">
+                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-people"></i> <font class="font-medium">254</font></a></div>
+                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i> <font class="font-medium">54</font></a></div>
+                        </div>
+                    </center>
+                </div>
+                <div>
+                    <hr> </div>
+                <div class="card-body"> <small class="text-muted">Email address </small>
+                    <h6>{{ request.user.email }}</h6>
+                    <small class="text-muted p-t-30 db">Phone</small>
+                    <h6>{{ user_detail.phone }}</h6>
+                    <small class="text-muted p-t-30 db">Service</small>
+                    <h6>{{ service.service.service_name }}</h6>
+                    <small class="text-muted p-t-30 db">Animal</small>
+                    <h6>{{ service.animal_type|title }}</h6>
+                    <small class="text-muted p-t-30 db">Site Mode</small>
+                    <h6>{{ service.site_mode|title }}</h6>
 
-                    </div>
                 </div>
             </div>
-            <!-- Column -->
-            <!-- Column -->
-            <div class="col-md-12 col-lg-8 col-xlg-9">
-                <div class="card">
-                    <!-- Nav tabs -->
-                    <ul class="nav nav-tabs profile-tab" role="tablist">
-                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#account" role="tab">Account</a> </li>
-                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#users" role="tab">Users</a> </li>
-                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#settings" role="tab">Settings</a> </li>
-                    </ul>
-                    <!-- Tab panes -->
-                    <div class="tab-content">
-                        <div class="tab-pane active" id="account" role="tabpanel">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Full Name</strong>
-                                        <br>
-                                        <p class="text-muted">{{ request.user.get_full_name }}</p>
-                                    </div>
-                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Username</strong>
-                                        <br>
-                                        <p class="text-muted">{{ request.user.username }}</p>
-                                    </div>
-                                    <div class="col-md-3 col-xs-6 border-right"> <strong>Email</strong>
-                                        <br>
-                                        <p class="text-muted">{{ request.user.email }}</p>
-                                    </div>
-                                    <div class="col-md-3 col-xs-6"> <strong>Account Type</strong>
-                                        <br>
-                                        {% if request.user == service.user.user %}
-                                            <p class="text-muted">Service Owner</p>
-                                        {% else %}
-                                        <p class="text-muted"><strong>{% if editor %}Editor {% else %}Read only</strong> {% endif %} member of <strong>{{ service.service }}</strong>, owned by <strong>{{ service.user.user.get_full_name }}</strong>(<a href="mailto:{{ service.user.user.email }}">{{ service.user.user.email }}</a>)</p>
-                                        {% endif %}
-                                    </div>
+        </div>
+        <!-- Column -->
+        <!-- Column -->
+        <div class="col-md-12 col-lg-8 col-xlg-9">
+            <div class="card">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs profile-tab" role="tablist">
+                    <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#account" role="tab">Account</a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#users" role="tab">Users</a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#settings" role="tab">Settings</a> </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="account" role="tabpanel">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 col-xs-6 border-right"> <strong>Full Name</strong>
+                                    <br>
+                                    <p class="text-muted">{{ request.user.get_full_name }}</p>
                                 </div>
-                                <hr>
-                                {% if editor %}
-                                    <p class="mt-4">As an editor you're able to add/delete {{ service.animal_type }}, breeders/owners, breeds and breed groups if it's a poultry service.</p>
-                                {% else %}
-                                    <p class="mt-4">As a read only user you cannot add/delete any {{ service.animal_type }}, however you're free to browse all the data on this site.</p>
-                                {% endif %}
+                                <div class="col-md-3 col-xs-6 border-right"> <strong>Username</strong>
+                                    <br>
+                                    <p class="text-muted">{{ request.user.username }}</p>
+                                </div>
+                                <div class="col-md-3 col-xs-6 border-right"> <strong>Email</strong>
+                                    <br>
+                                    <p class="text-muted">{{ request.user.email }}</p>
+                                </div>
+                                <div class="col-md-3 col-xs-6"> <strong>Account Type</strong>
+                                    <br>
+                                    {% if request.user == service.user.user %}
+                                        <p class="text-muted">Service Owner</p>
+                                    {% else %}
+                                    <p class="text-muted"><strong>{% if editor %}Editor{% else %}Read only{% endif %}</strong>  member of <strong>{{ service.service }}</strong>, owned by <strong>{{ service.user.user.get_full_name }}</strong>(<a href="mailto:{{ service.user.user.email }}">{{ service.user.user.email }}</a>)</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <hr>
+                            {% if editor %}
+                                <p class="mt-4">As an editor you're able to add/delete {{ service.animal_type }}, breeders/owners, breeds and breed groups if it's a poultry service.</p>
+                            {% else %}
+                                <p class="mt-4">As a read only user you cannot add/delete any {{ service.animal_type }}, however you're free to browse all the data on this site.</p>
+                            {% endif %}
 
-                                {% if request.user == service.user.user %}
-                                    <h4 class="font-medium mt-4">Available Services</h4>
-                                {{services.all}}
-                                    <div class="row pricing-plan pt-2">
-                                        {% for plan in services.all %}
-                                            {% if plan.service_name != service.service.service_name %}
-                                                <div class="col-md-3 col-xs-12 col-sm-6 no-padding">
-                                                    <div class="pricing-box {% if plan.id == recommended.first.id %}featured-plan{% endif %}">
-                                                        <div class="pricing-body">
-                                                            <div class="pricing-header">
-                                                                {% if plan.id == recommended.first.id %}
-                                                                    <h4 class="price-lable text-white bg-warning"> Suggested</h4>
-                                                                {% endif %}
-                                                                <h4 class="text-center">{{ plan.service_name }}</h4>
-                                                                <h2 class="text-center"><span class="price-sign">£</span>{{ plan.price_per_month|add:"0" }}</h2>
-                                                                <p class="uppercase">per month</p>
-                                                            </div>
-                                                            <div class="price-table-content">
-                                                                <div class="price-row"><i class="fas fa-pencil-alt"></i> {{ plan.admin_users }} Editors</div>
-                                                                <div class="price-row"><i class="fas fa-book-reader"></i> {{ plan.read_only_users }} Read only Users</div>
-                                                                <div class="price-row"><i class="fas fa-paw"></i> {% if plan.number_of_animals == 99 %}
-                                                                                                                        Unlimited
-                                                                                                                    {% else %}
-                                                                                                                        {{ plan.number_of_animals }}
-                                                                                                                    {% endif %} Animals <i class="fas fa-feather-alt"></i></div>
-                                                                <div class="price-row">{% if plan.multi_breed %}
-                                                                                            <i class="fas fa-check"></i>
-                                                                                        {% else %}
-                                                                                            <i class="fas fa-times"></i>
-                                                                                        {% endif %} Multibreed</div>
-                                                                <div class="price-row">{% if plan.support %}
-                                                                                            <td><i class="fas fa-check"></i></td>
-                                                                                        {% else %}
-                                                                                            <td><i class="fas fa-times"></i></td>
-                                                                                        {% endif %} Support</div>
-                                                                <div class="price-row">
-                                                                    <a href="{% url 'order' %}"><button class="btn btn-lg {% if plan.id < recommended.first.id %}btn-warning{% else %}btn-info{% endif %} waves-effect waves-light mt-3">{% if plan.id < recommended.first.id %}Downgrade{% else %}Upgrade{% endif %}</button></a>
-                                                                </div>
+                            {% if request.user == service.user.user and service.service.service_name != 'Organisation' %}
+                                <h4 class="font-medium mt-4">Available Services</h4>
+                                <div class="row pricing-plan pt-2">
+                                    {% for plan in services.all %}
+                                        {% if plan.service_name != service.service.service_name %}
+                                            <div class="col-md-3 col-xs-12 col-sm-6 no-padding">
+                                                <div class="pricing-box {% if plan.id == recommended.first.id %}featured-plan{% endif %}">
+                                                    <div class="pricing-body">
+                                                        <div class="pricing-header">
+                                                            {% if plan.id == recommended.first.id %}
+                                                                <h4 class="price-lable text-white bg-warning"> Suggested</h4>
+                                                            {% endif %}
+                                                            <h4 class="text-center">{{ plan.service_name }}</h4>
+                                                            <h2 class="text-center"><span class="price-sign">£</span>{{ plan.price_per_month|add:"0" }}</h2>
+                                                            <p class="uppercase">per month</p>
+                                                        </div>
+                                                        <div class="price-table-content">
+                                                            <div class="price-row"><i class="fas fa-pencil-alt"></i> {{ plan.admin_users }} Editors</div>
+                                                            <div class="price-row"><i class="fas fa-book-reader"></i> {{ plan.read_only_users }} Read only Users</div>
+                                                            <div class="price-row"><i class="fas fa-paw"></i> {% if plan.number_of_animals == 99 %}
+                                                                                                                    Unlimited
+                                                                                                                {% else %}
+                                                                                                                    {{ plan.number_of_animals }}
+                                                                                                                {% endif %} Animals <i class="fas fa-feather-alt"></i></div>
+                                                            <div class="price-row">{% if plan.multi_breed %}
+                                                                                        <i class="fas fa-check"></i>
+                                                                                    {% else %}
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    {% endif %} Multibreed</div>
+                                                            <div class="price-row">{% if plan.support %}
+                                                                                        <td><i class="fas fa-check"></i></td>
+                                                                                    {% else %}
+                                                                                        <td><i class="fas fa-times"></i></td>
+                                                                                    {% endif %} Support</div>
+                                                            <div class="price-row">
+                                                                <a href="{% url 'order' %}"><button class="btn btn-lg {% if plan.id < recommended.first.id %}btn-warning{% else %}btn-info{% endif %} waves-effect waves-light mt-3">{% if plan.id < recommended.first.id %}Downgrade{% else %}Upgrade{% endif %}</button></a>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                        <!--second tab-->
-                        <div class="tab-pane" id="users" role="tabpanel">
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="{% if editor %}true{% else %}false{% endif %}" data-state="true"></table>
+                    </div>
+                    <!--second tab-->
+                    <div class="tab-pane" id="users" role="tabpanel">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="{% if editor %}true{% else %}false{% endif %}" data-state="true"></table>
+                            </div>
+                            <!-- Start Popup Model -->
+                            <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
+                                <div class="modal-dialog" role="document">
+                                    {% if editor %}
+                                    <form class="modal-content form-horizontal" id="editor">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                            <h4 class="modal-title" id="editor-title">Add User</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group required">
+                                                <label for="firstName" class="col-sm-3 control-label">First Name</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required">
+                                                <label for="lastName" class="col-sm-3 control-label">Last Name</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required">
+                                                <label for="register-form-username" class="col-sm-3 control-label">Username</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" id="register-form-username" name="register-form-username" placeholder="Username" required>
+                                                    <span id='username_message'></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="register-form-email" class="col-sm-3 control-label">Email</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email" required>
+                                                    <span id='email_message'></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="status" class="col-sm-3 control-label">Status</label>
+                                                <div class="col-sm-9">
+                                                    <select class="form-control" id="status" name="status" required>
+                                                    <option value="Read Only">Read Only</option>
+                                                    <option value="Editor">Editor</option>
+                                                </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input type="hidden" id="formType" name="formType">
+                                            <button type="submit" id="userFormBtn" class="btn btn-primary">Save changes</button>
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                    {% endif %}
                                 </div>
-                                <!-- Start Popup Model -->
-                                <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
-                                    <div class="modal-dialog" role="document">
-                                        {% if editor %}
-                                        <form class="modal-content form-horizontal" id="editor">
-                                            {% csrf_token %}
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                                                <h4 class="modal-title" id="editor-title">Add User</h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="form-group required">
-                                                    <label for="firstName" class="col-sm-3 control-label">First Name</label>
-                                                    <div class="col-sm-9">
-                                                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group required">
-                                                    <label for="lastName" class="col-sm-3 control-label">Last Name</label>
-                                                    <div class="col-sm-9">
-                                                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group required">
-                                                    <label for="register-form-username" class="col-sm-3 control-label">Username</label>
-                                                    <div class="col-sm-9">
-                                                        <input type="text" class="form-control" id="register-form-username" name="register-form-username" placeholder="Username" required>
-                                                        <span id='username_message'></span>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="register-form-email" class="col-sm-3 control-label">Email</label>
-                                                    <div class="col-sm-9">
-                                                        <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email" required>
-                                                        <span id='email_message'></span>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="status" class="col-sm-3 control-label">Status</label>
-                                                    <div class="col-sm-9">
-                                                        <select class="form-control" id="status" name="status" required>
-                                                        <option value="Read Only">Read Only</option>
-                                                        <option value="Editor">Editor</option>
-                                                    </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <input type="hidden" id="formType" name="formType">
-                                                <button type="submit" id="userFormBtn" class="btn btn-primary">Save changes</button>
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                            </div>
-                                        </form>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <!-- End Popup Model -->
-                                <script>
-                                    $(window).on('load', function() {
+                            </div>
+                            <!-- End Popup Model -->
+                            <script>
+                                $(window).on('load', function() {
 
-                                        // Add & Remove Row
-                                        // -----------------------------------------------------------------
-                                        var $modal = $('#editor-modal'),
-                                            $editor = $('#editor'),
-                                            $editorTitle = $('#editor-title'),
-                                            ft = FooTable.init('#footable-addrow', {
-                                                columns: [
-                                                  {"name":"id","title":"ID","breakpoints":"xs sm","type":"number","style":{"width":80,"maxWidth":80}},
-                                                  {"name":"firstName","title":"First Name"},
-                                                  {"name":"lastName","title":"Last Name"},
-                                                  {"name":"username","title":"Username"},
-                                                  {"name":"email","title":"Email","breakpoints":"xs sm","style":{"maxWidth":200,"overflow":"hidden","textOverflow":"ellipsis","wordBreak":"keep-all","whiteSpace":"nowrap"}},
-                                                  {"name":"status","title":"Status"}
-                                                ],
-                                                rows: [
-                                                        {% for user in service.admin_users.all %}
-                                                            {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","username":"{{ user.username }}","email":"{{ user.email }}","status":"Editor"},
-                                                        {% endfor %}
-                                                        {% for user in service.read_only_users.all %}
-                                                            {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","username":"{{ user.username }}","email":"{{ user.email }}","status":"Read Only"},
-                                                        {% endfor %}
-                                                      ],
-                                                editing: {
-                                                    addRow: function(){
-                                                        $modal.removeData('row');
-                                                        $editor[0].reset();
-                                                        $editorTitle.text('Add a new user');
-                                                        $('#formType').val('new');
-                                                        $modal.modal('show');
-                                                    },
-                                                    editRow: function(row){
-                                                        var values = row.val();
-                                                        $editor.find('#firstName').val(values.firstName);
-                                                        $editor.find('#lastName').val(values.lastName);
-                                                        $editor.find('#register-form-username').val(values.username);
-                                                        $("#register-form-username").prop("readonly", true);
-                                                        $editor.find('#register-form-email').val(values.email);
-                                                        $("#register-form-email").prop("readonly", true);
-                                                        $editor.find('#status').val(values.status);
-                                                        $modal.data('row', row);
-                                                        $editorTitle.text('Edit user #' + values.id);
-                                                        $('#formType').val('edit');
-                                                        $modal.modal('show');
-                                                    },
-                                                    deleteRow: function(row){
-                                                        if (confirm('Are you sure you want to delete this user?')){
-                                                            var values = row.val();
-                                                            $editor.find('#register-form-username').val(values.username);
-                                                            $editor.find('#register-form-email').val(values.email);
-                                                            $('#formType').val('delete');
-                                                            $('#userFormBtn').click();
-                                                            //row.delete();
-                                                            location.reload();
-                                                        }
-                                                    }
-                                                }
-                                            }),
-                                            uid = 01;
-                                        {% if editor %}
-                                            $editor.on('submit', function(e){
-                                                if (this.checkValidity && !this.checkValidity()) return;
-                                                e.preventDefault();
-                                                var row = $modal.data('row'),
-                                                    values = {
-                                                        firstName: $editor.find('#firstName').val(),
-                                                        lastName: $editor.find('#lastName').val(),
-                                                        username: $editor.find('#register-form-username').val(),
-                                                        email: $editor.find('#register-form-email').val(),
-                                                        status: $editor.find('#status').val()
-                                                    };
-
-                                                if (row instanceof FooTable.Row){
-                                                    row.val(values);
-                                                } else {
-                                                    values.id = uid++;
-                                                    ft.rows.add(values);
-                                                }
-
-                                                $.ajax({
-                                                    url: '{% url 'user_edit' %}',
-                                                    type: 'post',
-                                                    dataType: 'text',
-                                                    data: $('#editor').serialize(),
-                                                    success: function(data) {
-                                                        console.log(data)
-                                                     },
-                                                    error: function(jqXHR, textStatus, errorThrown){
-                                                        console.log('jqXHR:');
-                                                        console.log(jqXHR);
-                                                        console.log('textStatus:');
-                                                        console.log(textStatus);
-                                                        console.log('errorThrown:');
-                                                        console.log(errorThrown);
-                                                    }
-                                                });
-
-                                                $modal.modal('hide');
-                                            });
-                                        {% endif %}
-                                    });
-
-                                    var fadeout = 100;
-                                    $('#register-form-username').keyup( function() {
-
-                                        var username = document.getElementById("register-form-username").value;
-                                        $.ajax({
-                                            url: '{% url 'username_check' %}',
-                                            type: 'post',
-                                            dataType: 'text',
-                                            data: $('#register-form-username').serialize(),
-                                            success: function(data) {
-                                                if (data == 'False') {
-                                                    $('#username_message').html('');
-                                                    } else {
-                                                    $('#userFormBtn[type="submit"]').prop('disabled', true);
-                                                    $('#username_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Username is already in use!').css('color', 'red');
-                                                    }
+                                    // Add & Remove Row
+                                    // -----------------------------------------------------------------
+                                    var $modal = $('#editor-modal'),
+                                        $editor = $('#editor'),
+                                        $editorTitle = $('#editor-title'),
+                                        ft = FooTable.init('#footable-addrow', {
+                                            columns: [
+                                              {"name":"id","title":"ID","breakpoints":"xs sm","type":"number","style":{"width":80,"maxWidth":80}},
+                                              {"name":"firstName","title":"First Name"},
+                                              {"name":"lastName","title":"Last Name"},
+                                              {"name":"username","title":"Username"},
+                                              {"name":"email","title":"Email","breakpoints":"xs sm","style":{"maxWidth":200,"overflow":"hidden","textOverflow":"ellipsis","wordBreak":"keep-all","whiteSpace":"nowrap"}},
+                                              {"name":"status","title":"Status"}
+                                            ],
+                                            rows: [
+                                                    {% for user in service.admin_users.all %}
+                                                        {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","username":"{{ user.username }}","email":"{{ user.email }}","status":"Editor"},
+                                                    {% endfor %}
+                                                    {% for user in service.read_only_users.all %}
+                                                        {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","username":"{{ user.username }}","email":"{{ user.email }}","status":"Read Only"},
+                                                    {% endfor %}
+                                                  ],
+                                            editing: {
+                                                addRow: function(){
+                                                    $modal.removeData('row');
+                                                    $editor[0].reset();
+                                                    $editorTitle.text('Add a new user');
+                                                    $('#formType').val('new');
+                                                    $modal.modal('show');
                                                 },
-                                            error: function(jqXHR, textStatus, errorThrown){
-                                                console.log('jqXHR:');
-                                                console.log(jqXHR);
-                                                console.log('textStatus:');
-                                                console.log(textStatus);
-                                                console.log('errorThrown:');
-                                                console.log(errorThrown);
-                                            }
-                                        });
-                                    });
-
-                                    $('#register-form-email').keyup( function() {
-
-                                        var username = document.getElementById("register-form-email").value;
-                                        $.ajax({
-                                            url: '{% url 'email_check' %}',
-                                            type: 'post',
-                                            dataType: 'text',
-                                            data: $('#register-form-email').serialize(),
-                                            success: function(data) {
-                                            if (data == 'False') {
-                                                $('#email_message').html('');
-                                                $('#userFormBtn').prop('disabled', false);
-                                                } else {
-                                                $('#userFormBtn').prop('disabled', true);
-                                                $('#email_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Email address already in use!').css('color', 'red');
+                                                editRow: function(row){
+                                                    var values = row.val();
+                                                    $editor.find('#firstName').val(values.firstName);
+                                                    $editor.find('#lastName').val(values.lastName);
+                                                    $editor.find('#register-form-username').val(values.username);
+                                                    $("#register-form-username").prop("readonly", true);
+                                                    $editor.find('#register-form-email').val(values.email);
+                                                    $("#register-form-email").prop("readonly", true);
+                                                    $editor.find('#status').val(values.status);
+                                                    $modal.data('row', row);
+                                                    $editorTitle.text('Edit user #' + values.id);
+                                                    $('#formType').val('edit');
+                                                    $modal.modal('show');
+                                                },
+                                                deleteRow: function(row){
+                                                    if (confirm('Are you sure you want to delete this user?')){
+                                                        var values = row.val();
+                                                        $editor.find('#register-form-username').val(values.username);
+                                                        $editor.find('#register-form-email').val(values.email);
+                                                        $('#formType').val('delete');
+                                                        $('#userFormBtn').click();
+                                                        //row.delete();
+                                                        location.reload();
+                                                    }
                                                 }
-                                             },
-                                            error: function(jqXHR, textStatus, errorThrown){
-                                                console.log('jqXHR:');
-                                                console.log(jqXHR);
-                                                console.log('textStatus:');
-                                                console.log(textStatus);
-                                                console.log('errorThrown:');
-                                                console.log(errorThrown);
                                             }
+                                        }),
+                                        uid = 01;
+
+                                        $editor.on('submit', function(e){
+                                            if (this.checkValidity && !this.checkValidity()) return;
+                                            e.preventDefault();
+                                            var row = $modal.data('row'),
+                                                values = {
+                                                    firstName: $editor.find('#firstName').val(),
+                                                    lastName: $editor.find('#lastName').val(),
+                                                    username: $editor.find('#register-form-username').val(),
+                                                    email: $editor.find('#register-form-email').val(),
+                                                    status: $editor.find('#status').val()
+                                                };
+
+                                            if (row instanceof FooTable.Row){
+                                                row.val(values);
+                                            } else {
+                                                values.id = uid++;
+                                                ft.rows.add(values);
+                                            }
+
+                                            $.ajax({
+                                                url: '{% url 'user_edit' %}',
+                                                type: 'post',
+                                                dataType: 'text',
+                                                data: $('#editor').serialize(),
+                                                success: function(data) {
+                                                    console.log(data)
+                                                 },
+                                                error: function(jqXHR, textStatus, errorThrown){
+                                                    console.log('jqXHR:');
+                                                    console.log(jqXHR);
+                                                    console.log('textStatus:');
+                                                    console.log(textStatus);
+                                                    console.log('errorThrown:');
+                                                    console.log(errorThrown);
+                                                }
+                                            });
+
+                                            $modal.modal('hide');
                                         });
+
+                                });
+
+                                var fadeout = 100;
+                                $('#register-form-username').keyup( function() {
+
+                                    var username = document.getElementById("register-form-username").value;
+                                    $.ajax({
+                                        url: '{% url 'username_check' %}',
+                                        type: 'post',
+                                        dataType: 'text',
+                                        data: $('#register-form-username').serialize(),
+                                        success: function(data) {
+                                            if (data == 'False') {
+                                                $('#username_message').html('');
+                                                } else {
+                                                $('#userFormBtn[type="submit"]').prop('disabled', true);
+                                                $('#username_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Username is already in use!').css('color', 'red');
+                                                }
+                                            },
+                                        error: function(jqXHR, textStatus, errorThrown){
+                                            console.log('jqXHR:');
+                                            console.log(jqXHR);
+                                            console.log('textStatus:');
+                                            console.log(textStatus);
+                                            console.log('errorThrown:');
+                                            console.log(errorThrown);
+                                        }
                                     });
-                                </script>
-                            </div>
+                                });
+
+                                $('#register-form-email').keyup( function() {
+
+                                    var username = document.getElementById("register-form-email").value;
+                                    $.ajax({
+                                        url: '{% url 'email_check' %}',
+                                        type: 'post',
+                                        dataType: 'text',
+                                        data: $('#register-form-email').serialize(),
+                                        success: function(data) {
+                                        if (data == 'False') {
+                                            $('#email_message').html('');
+                                            $('#userFormBtn').prop('disabled', false);
+                                            } else {
+                                            $('#userFormBtn').prop('disabled', true);
+                                            $('#email_message').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Email address already in use!').css('color', 'red');
+                                            }
+                                         },
+                                        error: function(jqXHR, textStatus, errorThrown){
+                                            console.log('jqXHR:');
+                                            console.log(jqXHR);
+                                            console.log('textStatus:');
+                                            console.log(textStatus);
+                                            console.log('errorThrown:');
+                                            console.log(errorThrown);
+                                        }
+                                    });
+                                });
+                            </script>
                         </div>
-                        <div class="tab-pane" id="settings" role="tabpanel">
-                            <div class="card-body">
-                                <form class="form-horizontal form-material">
-                                    <div class="form-group">
-                                        <label class="col-md-12">Full Name</label>
-                                        <div class="col-md-12">
-                                            <input type="text" placeholder="Johnathan Doe" class="form-control form-control-line">
-                                        </div>
+                    </div>
+                    <div class="tab-pane" id="settings" role="tabpanel">
+                        <div class="card-body">
+                            <form class="form-horizontal form-material">
+                                <div class="form-group">
+                                    <label class="col-md-12">Full Name</label>
+                                    <div class="col-md-12">
+                                        <input type="text" placeholder="Johnathan Doe" class="form-control form-control-line">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="example-email" class="col-md-12">Email</label>
-                                        <div class="col-md-12">
-                                            <input type="email" placeholder="johnathan@admin.com" class="form-control form-control-line" name="example-email" id="example-email">
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="example-email" class="col-md-12">Email</label>
+                                    <div class="col-md-12">
+                                        <input type="email" placeholder="johnathan@admin.com" class="form-control form-control-line" name="example-email" id="example-email">
                                     </div>
-                                    <div class="form-group">
-                                        <label class="col-md-12">Password</label>
-                                        <div class="col-md-12">
-                                            <input type="password" value="password" class="form-control form-control-line">
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-12">Password</label>
+                                    <div class="col-md-12">
+                                        <input type="password" value="password" class="form-control form-control-line">
                                     </div>
-                                    <div class="form-group">
-                                        <label class="col-md-12">Phone No</label>
-                                        <div class="col-md-12">
-                                            <input type="text" placeholder="123 456 7890" class="form-control form-control-line">
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-12">Phone No</label>
+                                    <div class="col-md-12">
+                                        <input type="text" placeholder="123 456 7890" class="form-control form-control-line">
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-sm-12">
-                                            <button class="btn btn-success">Update Profile</button>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <button class="btn btn-success">Update Profile</button>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Column -->
         </div>
-        <!-- Row -->
+        <!-- Column -->
+    </div>
+    <!-- Row -->
 {% endblock %}

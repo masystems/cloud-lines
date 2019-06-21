@@ -7,6 +7,7 @@ class UserDetail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user')
     phone = models.CharField(max_length=15, blank=False)
     stripe_id = models.CharField(max_length=50, blank=True)
+    current_service = models.ForeignKey('AttachedService', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return str(self.user)
