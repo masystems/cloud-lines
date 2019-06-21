@@ -98,8 +98,9 @@
                     <!-- Comment -->
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-muted text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="fas fa-cloud-download-alt fa-lg"></i>
-
+                        <a class="nav-link dropdown-toggle text-muted text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="text-white align-middle"> <strong>{{ service.service.service_name }} - {% if editor %}Editor{% else %}Read Only{% endif %}</strong> </span>
+                            <i class="fas fa-angle-down fa-lg"></i>
                         </a>
                         <div class="dropdown-menu mailbox animated bounceInDown">
                             <ul>
@@ -122,7 +123,7 @@
 <!--                                    <a class="nav-link text-center" href="javascript:void(0);"> <strong>Check all notifications</strong> <i class="fa fa-angle-right"></i> </a>-->
 <!--                                </li>-->
                             </ul>
-                        </div> {{ service.service.service_name }}
+                        </div>
                     </li>
                     <!-- ============================================================== -->
                     <!-- End Comment -->
@@ -142,8 +143,7 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img
-                                src="{% static 'assets/images/users/u1.gif' %}" alt="user" class="profile-pic"/></a>
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user-circle fa-lg"></i></a>
                         {% if user.is_authenticated %}
                         <div class="dropdown-menu dropdown-menu-right animated flipInY">
                             <ul class="dropdown-user">
@@ -159,7 +159,7 @@
                                     </div>
                                 </li>
                                 <li role="separator" class="divider"></li>
-                                <li><a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Account Settings</a></li>
+                                <li><a href="{% url 'profile' %}"><i class="fas fa-user-cog"></i> Account Settings</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{% url 'logout' %}"><i class="fa fa-power-off"></i> Logout</a></li>
                             </ul>
