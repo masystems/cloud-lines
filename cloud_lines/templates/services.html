@@ -79,10 +79,6 @@
                                 <button class="button button-mini button-circle button-aqua" data-container="body"
                                    data-toggle="tooltip" data-placement="top" title="Price per month"
                                    data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
-
-                                <button class="button button-mini button-circle button-aqua" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="Price per year"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_year }} p/year</button>
                             </span>
                         </div>
                         {% autoescape off %}
@@ -94,7 +90,7 @@
                             {% if service.service_name == 'Free' %}
                                 <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-aqua">Start now!</a>
                             {% else %}
-                                <a href="{% url 'order' %}" class="button button-3d button-rounded button-yellow button-aqua">Order</a>
+                                <a href="{% url 'order' %}" class="button button-3d button-rounded button-yellow button-aqua">Buy Now!</a>
                             {% endif %}
                         {% else %}
                             <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-aqua">Login/Register</a>
@@ -133,10 +129,6 @@
                                 <button class="button button-mini button-circle button-yellow" data-container="body"
                                    data-toggle="tooltip" data-placement="top" title="Price per month"
                                    data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
-
-                                <button class="button button-mini button-circle button-yellow" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="Price per year"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_year }} p/year</button>
                             </span>
                         </div>
 
@@ -149,7 +141,7 @@
                             {% if service.service_name == 'Free' %}
                                 <a href="{% url 'dashboard' %}" class="button button-3d button-large button-rounded button-yellow">Start now!</a>
                             {% else %}
-                                <a href="{% url 'order' %}" class="button button-3d button-rounded button-yellow button-yellow">Order</a>
+                                <a href="{% url 'order' %}" class="button button-3d button-rounded button-yellow button-yellow">Buy Now!</a>
                             {% endif %}
                         {% else %}
                             <a href="{% url 'login' %}" class="button button-3d button-large button-rounded button-yellow">Login/Register</a>

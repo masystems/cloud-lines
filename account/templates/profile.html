@@ -90,8 +90,9 @@
 
                                 {% if request.user == service.user.user %}
                                     <h4 class="font-medium mt-4">Available Services</h4>
+                                {{services.all}}
                                     <div class="row pricing-plan pt-2">
-                                        {% for plan in services %}
+                                        {% for plan in services.all %}
                                             {% if plan.service_name != service.service.service_name %}
                                                 <div class="col-md-3 col-xs-12 col-sm-6 no-padding">
                                                     <div class="pricing-box {% if plan.id == recommended.first.id %}featured-plan{% endif %}">
@@ -139,7 +140,7 @@
                         <div class="tab-pane" id="users" role="tabpanel">
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="true" data-state="true"></table>
+                                    <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="{% if editor %}true{% else %}false{% endif %}" data-state="true"></table>
                                 </div>
                                 <!-- Start Popup Model -->
                                 <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
@@ -198,7 +199,6 @@
                                     </div>
                                 </div>
                                 <!-- End Popup Model -->
-                                {% if editor %}
                                 <script>
                                     $(window).on('load', function() {
 
@@ -260,48 +260,47 @@
                                                 }
                                             }),
                                             uid = 01;
+                                        {% if editor %}
+                                            $editor.on('submit', function(e){
+                                                if (this.checkValidity && !this.checkValidity()) return;
+                                                e.preventDefault();
+                                                var row = $modal.data('row'),
+                                                    values = {
+                                                        firstName: $editor.find('#firstName').val(),
+                                                        lastName: $editor.find('#lastName').val(),
+                                                        username: $editor.find('#register-form-username').val(),
+                                                        email: $editor.find('#register-form-email').val(),
+                                                        status: $editor.find('#status').val()
+                                                    };
 
-                                        $editor.on('submit', function(e){
-                                            if (this.checkValidity && !this.checkValidity()) return;
-                                            e.preventDefault();
-                                            var row = $modal.data('row'),
-                                                values = {
-                                                    firstName: $editor.find('#firstName').val(),
-                                                    lastName: $editor.find('#lastName').val(),
-                                                    username: $editor.find('#register-form-username').val(),
-                                                    email: $editor.find('#register-form-email').val(),
-                                                    status: $editor.find('#status').val()
-                                                };
-
-                                            if (row instanceof FooTable.Row){
-                                                row.val(values);
-                                            } else {
-                                                values.id = uid++;
-                                                ft.rows.add(values);
-                                            }
-
-                                            $.ajax({
-                                                url: '{% url 'user_edit' %}',
-                                                type: 'post',
-                                                dataType: 'text',
-                                                data: $('#editor').serialize(),
-                                                success: function(data) {
-                                                    console.log(data)
-                                                 },
-                                                error: function(jqXHR, textStatus, errorThrown){
-                                                    console.log('jqXHR:');
-                                                    console.log(jqXHR);
-                                                    console.log('textStatus:');
-                                                    console.log(textStatus);
-                                                    console.log('errorThrown:');
-                                                    console.log(errorThrown);
+                                                if (row instanceof FooTable.Row){
+                                                    row.val(values);
+                                                } else {
+                                                    values.id = uid++;
+                                                    ft.rows.add(values);
                                                 }
+
+                                                $.ajax({
+                                                    url: '{% url 'user_edit' %}',
+                                                    type: 'post',
+                                                    dataType: 'text',
+                                                    data: $('#editor').serialize(),
+                                                    success: function(data) {
+                                                        console.log(data)
+                                                     },
+                                                    error: function(jqXHR, textStatus, errorThrown){
+                                                        console.log('jqXHR:');
+                                                        console.log(jqXHR);
+                                                        console.log('textStatus:');
+                                                        console.log(textStatus);
+                                                        console.log('errorThrown:');
+                                                        console.log(errorThrown);
+                                                    }
+                                                });
+
+                                                $modal.modal('hide');
                                             });
-
-                                            $modal.modal('hide');
-
-
-                                        });
+                                        {% endif %}
                                     });
 
                                     var fadeout = 100;
@@ -360,7 +359,6 @@
                                         });
                                     });
                                 </script>
-                                {% endif %}
                             </div>
                         </div>
                         <div class="tab-pane" id="settings" role="tabpanel">

@@ -19,14 +19,16 @@ import string
 def site_mode(request):
 
     if request.user.is_authenticated:
+        # returns the main account the requesting user is a member of
         main_account = get_main_account(request.user)
+
+        # returns the user for the main account
         user = UserDetail.objects.get(user=main_account.user.user)
 
-        # attached_service = AttachedService.objects.filter(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(
-        #             user=user, active=True)).first()
+        attached_services = AttachedService.objects.filter(Q(admin_users=request.user) | Q(read_only_users=request.user) | Q(user=user))
 
         service = Service.objects.get(id=main_account.service.id)
-        print(request.user.username, user.user.username)
+
         if str(request.user.username) == str(user.user.username):
 
             editor = True
@@ -58,6 +60,7 @@ def site_mode(request):
             multi_breed = False
 
         return {'service': main_account,
+                'attached_services': attached_services,
                 'add_pedigree': pedigrees,
                 'admins': admins,
                 'users': users,
@@ -99,7 +102,7 @@ def get_main_account(user):
                     pass
 
         # get attached service of the primary user
-        attached_service = AttachedService.objects.get(user=user_service.user)
+        attached_service = AttachedService.objects.get(user=user_service.user, active=True)
     except AttachedService.DoesNotExist:
         # update the attached service to what default
         attached_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
@@ -191,7 +194,8 @@ def logout(request):
 def profile(request):
     user_detail = UserDetail.objects.get(user=request.user)
     main_account = get_main_account(request.user)
-    if request.user == main_account.user:
+
+    if str(request.user) == str(main_account.user):
         services = Service.objects.all().exclude(service_name='Free')
         recommended = Service.objects.filter(id=user_detail.attached_service.service.id+1)
     else:
