@@ -89,7 +89,7 @@ def get_main_account(user):
     user_detail = UserDetail.objects.get(user=user)
     try:
         # get attached service of the primary user
-        attached_service = AttachedService.objects.get(id=user_detail.current_service.id, active=True)
+        attached_service = AttachedService.objects.get(id=user_detail.current_service_id, active=True)
     except AttachedService.DoesNotExist:
         # update the attached service to what default
         attached_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
@@ -242,18 +242,19 @@ def register(request):
 
         # update user details
         user_detail = UserDetail.objects.create(user=user,
-                                            phone=request.POST.get('register-form-phone')
-                                            )
+                                                phone=request.POST.get('register-form-phone')
+                                                )
         # login
         login(request, user)
 
-        free = Service.objects.get(service_name='Free')
-        attached_service = AttachedService.objects.create(animal_type='Pedigrees',
-                                                          site_mode='mammal',
-                                                          install_available=False,
-                                                          user=user_detail,
-                                                          service=free,
-                                                          active=True)
+        UserDetail.objects.filter(user=user).update(current_service=AttachedService.objects.create(animal_type='Pedigrees',
+                                                                                                   site_mode='mammal',
+                                                                                                   install_available=False,
+                                                                                                   user=user_detail,
+                                                                                                   service=Service.objects.get(service_name='Free'),
+                                                                                                   active=True))
+        # login
+        login(request, user)
 
         return redirect('order')
     else:

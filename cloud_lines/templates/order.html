@@ -125,13 +125,14 @@
 						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore, ipsa, fuga, modi, corporis maiores illum fugit ratione cumque dolores sint obcaecati quod temporibus. Expedita, sapiente, veritatis, impedit iusto labore sed itaque sunt fugiat non quis nihil hic quos necessitatibus officiis mollitia nesciunt neque! Minus, mollitia at iusto unde voluptate repudiandae.</p>
 						<form id="serviceForm" name="serviceForm" class="nobottommargin" method="POST">
 							<div class="row form-billing">
+								<input type="hidden" name="checkout-form-upgrade" id="checkout-form-upgrade" value="{{ attached_service_upgrade }}">
 								<div class="col-6 form-group">
 									<label>Service:</label>
 									<select class="form-control required" name="checkout-form-service" id="checkout-form-service" required>
 										<option value="None">------</option>
 										{% for service in services %}
 											{% if service.service_name != 'Free' %}
-												<option value="{{ service.price_per_month }}" name="{{ service.service_name }}">{{ service.service_name }}</option>
+												<option value="{{ service.price_per_month }}" name="{{ service.service_name }}" {% if requested_service.id == service.id %}selected{% endif %}>{{ service.service_name }}</option>
 											{% endif %}
 										{% endfor %}
 									</select>
@@ -141,8 +142,8 @@
 									<label>Payment Increment:</label>
 									<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc" required>
 										<option value="None">------</option>
-										<option value="Monthly">Monthly</option>
-										<option value="Yearly">Yearly</option>
+										<option value="Monthly" {% if attached_service_upgrade and service.increment == 'monthly' %}selected{% endif %}>Monthly</option>
+										<option value="Yearly" {% if attached_service_upgrade and service.increment == 'yearly' %}selected{% endif %}>Yearly</option>
 									</select>
 								</div>
 							</div>
@@ -150,7 +151,7 @@
 							<div class="row form-billing">
 								<div class="col-6 form-group">
 									<label>Animal Type:</label>
-									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" placeholder="Cats, Dogs, Goats, Chickens">
+									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if attached_service_upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}"{% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
 									</select>
 
 								</div>
@@ -158,8 +159,8 @@
 									<label>Animal Category:</label>
 									<select class="form-control required" name="checkout-form-site-mode" id="checkout-form-site-mode" required>
 										<option value="None">------</option>
-										<option value="mammal">Mammal</option>
-										<option value="poultry">Poultry</option>
+										<option value="mammal" {% if attached_service_upgrade and service.site_mode == 'mammal' %}selected{% endif %}>Mammal</option>
+										<option value="poultry" {% if attached_service_upgrade and service.site_mode == 'poultry' %}selected{% endif %}>Poultry</option>
 									</select>
 								</div>
 							</div>
@@ -560,19 +561,19 @@
 									</div>
 									<div class="col-12 form-group">
 										<label>Address Line 1:</label>
-										<input type="text" name="checkout-form-billing-add1" id="checkout-form-billing-add1" class="form-control required" value="">
+										<input type="text" name="checkout-form-billing-add1" id="checkout-form-billing-add1" class="form-control required" value="{{ customer.address.line1 }}">
 									</div>
 									<div class="col-12 form-group">
 										<label>Address Line 2:</label>
-										<input type="text" name="checkout-form-billing-add2" id="checkout-form-billing-add2" class="form-control required" value="">
+										<input type="text" name="checkout-form-billing-add2" id="checkout-form-billing-add2" class="form-control required" value="{{ customer.address.line2 }}">
 									</div>
 									<div class="col-12 form-group">
 										<label>City:</label>
-										<input type="text" name="checkout-form-billing-city" id="checkout-form-billing-city" class="form-control required" value="">
+										<input type="text" name="checkout-form-billing-city" id="checkout-form-billing-city" class="form-control required" value="{{ customer.address.city }}">
 									</div>
 									<div class="col-12 form-group">
 										<label>Post Code:</label>
-										<input type="text" name="checkout-form-billing-post-code" id="checkout-form-billing-post-code" class="form-control required" value="">
+										<input type="text" name="checkout-form-billing-post-code" id="checkout-form-billing-post-code" class="form-control required" value="{{ customer.address.postal_code }}">
 									</div>
 
 								</div>

@@ -153,9 +153,31 @@ def contact(request):
 
 @login_required(login_url="/account/login")
 def order(request):
-    return render(request, 'order.html', {'services': Service.objects.all(),
-                                          'user_detail': UserDetail.objects.get(user=request.user),
-                                          'public_api_key': settings.STRIPE_PUBLIC_KEY})
+    context = {}
+    if 'id' in request.GET:
+        # get service the user wants to upgrade to
+        context['requested_service'] = Service.objects.get(id=request.GET['id'])
+
+    if 'upgrade' in request.GET:
+        # import stripe key
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
+
+        # get user detail object
+        context['user_detail'] = UserDetail.objects.get(user=request.user)
+        try:
+            context['customer'] = stripe.Customer.retrieve(context['user_detail'].stripe_id)
+        except stripe.error.InvalidRequestError:
+            pass
+
+        # get the attached_service to upgrade
+        if AttachedService.objects.filter(user=UserDetail.objects.get(user=request.user),
+                                          id=request.GET['upgrade']).exists():
+            context['attached_service_upgrade'] = request.GET['upgrade']
+
+    context['services'] = Service.objects.all()
+
+    return render(request, 'order.html', context)
 
 
 @login_required(login_url="/account/login")
@@ -166,13 +188,28 @@ def order_service(request):
         user_detail = UserDetail.objects.get(user=request.user)
         service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
 
-        # create attached service details object
-        attached_service = AttachedService.objects.filter(user=user_detail).update(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                                                   site_mode=request.POST.get('checkout-form-site-mode'),
-                                                                                   install_available=False,
-                                                                                   service=service,
-                                                                                   increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                                                   active=False)
+        # if upgade
+        if request.POST.get('checkout-form-upgrade'):
+            print(request.POST.get('checkout-form-animal-type'))
+            try:
+                AttachedService.objects.filter(user=user_detail,
+                                               id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
+                                                                                                    site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                                                    install_available=False,
+                                                                                                    service=service,
+                                                                                                    increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                                                                    active=False)
+            except AttachedService.DoesNotExist:
+                pass
+        else:
+            # create new attached service details object
+            AttachedService.objects.create(user=user_detail,
+                                           animal_type=request.POST.get('checkout-form-animal-type'),
+                                           site_mode=request.POST.get('checkout-form-site-mode'),
+                                           install_available=False,
+                                           service=service,
+                                           increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                           active=False)
 
     return HttpResponse('GOT IT')
 
@@ -219,7 +256,7 @@ def order_billing(request):
 @login_required(login_url="/account/login")
 def order_subscribe(request):
     user_detail = UserDetail.objects.get(user=request.user)
-    attach_service = AttachedService.objects.get(user=user_detail)
+    attach_service = AttachedService.objects.get(user=user_detail, active=False)
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
     # add payment token to user
@@ -281,12 +318,16 @@ def order_subscribe(request):
 
 
     # update the users attached service to be active
-    AttachedService.objects.filter(user=user_detail).update(active=True)
+    attach_service.active = True
 
     if attach_service.increment == 'yearly':
         plan = attach_service.service.yearly_id
     else:
         plan = attach_service.service.monthly_id
+
+    # update existing subscription if it exists
+    if attach_service.subscription_id:
+        stripe.Subscription.delete(attach_service.subscription_id)
 
     # subscribe user to the selected plan
     subscription = stripe.Subscription.create(
@@ -297,6 +338,14 @@ def order_subscribe(request):
             },
         ]
     )
+
+    if subscription:
+        attach_service.subscription_id = subscription['id']
+        attach_service.save()
+    else:
+        return HttpResponse(json.dumps({'Error': 'Something went wrong, please contact us.'}))
+
+
 
     invoice = stripe.Invoice.list(limit=1)
     receipt = stripe.Charge.list(customer=user_detail.stripe_id)

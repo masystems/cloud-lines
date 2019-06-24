@@ -23,10 +23,10 @@
                     <center class="mt-4"> <i class="fas fa-user-circle fa-4x"></i>
                         <h4 class="card-title mt-2">{{ request.user.get_full_name }}</h4>
                         <h6 class="card-subtitle">{% if editor %}Editor{% else %}User{% endif %}</h6>
-                        <div class="row text-center justify-content-md-center">
-                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-people"></i> <font class="font-medium">254</font></a></div>
-                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i> <font class="font-medium">54</font></a></div>
-                        </div>
+<!--                        <div class="row text-center justify-content-md-center">-->
+<!--                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-people"></i> <font class="font-medium">254</font></a></div>-->
+<!--                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i> <font class="font-medium">54</font></a></div>-->
+<!--                        </div>-->
                     </center>
                 </div>
                 <div>
@@ -123,7 +123,7 @@
                                                                                         <td><i class="fas fa-times"></i></td>
                                                                                     {% endif %} Support</div>
                                                             <div class="price-row">
-                                                                <a href="{% url 'order' %}"><button class="btn btn-lg {% if plan.id < recommended.first.id %}btn-warning{% else %}btn-info{% endif %} waves-effect waves-light mt-3">{% if plan.id < recommended.first.id %}Downgrade{% else %}Upgrade{% endif %}</button></a>
+                                                                <a href="{% url 'order' %}?id={{ plan.id }}&upgrade={{ service.id }}"><button class="btn btn-lg {% if plan.id < recommended.first.id %}btn-warning{% else %}btn-info{% endif %} waves-effect waves-light mt-3">{% if plan.id < recommended.first.id %}Downgrade{% else %}Upgrade{% endif %}</button></a>
                                                             </div>
                                                         </div>
                                                     </div>
