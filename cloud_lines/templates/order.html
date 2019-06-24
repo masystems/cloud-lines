@@ -44,25 +44,43 @@
 	  background-color: #fefde5 !important;
 	}
 
-	.loader {
-	  border: 10px solid #f3f3f3;
-	  border-radius: 50%;
-	  border-top: 10px solid #3498db;
-	  width: 120px;
-	  height: 120px;
-	  -webkit-animation: spin 2s linear infinite; /* Safari */
-	  animation: spin 2s linear infinite;
+	.spinner{
+	  width:100px;
+	  height:100px;
+	  border-radius:50%;
+	  border:10px solid #111;
+	  margin:10% 40%;
+	  position:relative;
+	  z-index:1;
 	}
-
-	/* Safari */
-	@-webkit-keyframes spin {
-	  0% { -webkit-transform: rotate(0deg); }
-	  100% { -webkit-transform: rotate(360deg); }
+	.spinner:before{
+	  content:'';
+	  width:100px;
+	  height:100px;
+	  border-radius:50%;
+	  border-top:10px solid #ccc;
+	  border-right:10px solid transparent;
+	  border-bottom:10px solid transparent;
+	  border-left:10px solid transparent;
+	  position:absolute;
+	  z-index:9;
+	  top:-10px;
+	  left:-10px;
+	  animation:rt 2s infinite;
 	}
-
-	@keyframes spin {
-	  0% { transform: rotate(0deg); }
-	  100% { transform: rotate(360deg); }
+	@keyframes rt{
+	  from{
+		transform:rotate(0deg);
+	  }
+	  to{
+		transform:rotate(360deg);
+	  }
+	}
+	.spinner > .fas{
+	  font-size:32px;
+	  text-align:center;
+	  display:block;
+	  margin:30% 0;
 	}
 
 </style>
@@ -293,7 +311,7 @@
 					<div id="ptab2">
 						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt, deleniti, atque soluta ratione blanditiis maxime at architecto laudantium eius eaque distinctio dolorem voluptatem nam ab molestias velit nemo. Illo, hic.</p>
 						<div align="center">
-							<div id="billingLoader" class="loader d-none"></div>
+							<div id="billingLoader" class="spinner d-none"></div>
 						</div>
 						<form id="billingForm" name="billingForm" class="nobottommargin" method="POST">
 							<div class="col-lg-12">
@@ -708,6 +726,7 @@
 										// switch to next step and start loader
 										$('#selectCardButton').click();
 										$('#loader').removeClass("d-none");
+										$('#loader').html("<i class='fas fa-lock'></i>").fadeIn(2000);
 										$('#paymentSuccess').addClass('d-none');
 										$('#paymentFail').addClass('d-none');
 								  		// Send the token to your server.
@@ -751,7 +770,7 @@
 						</script>
 					</div>
 					<div id="ptab4" align="center">
-						<div id="loader" class="loader d-none"></div>
+						<div id="loader" class="spinner d-none"></div>
 						<div id="paymentSuccess" class="mt-2 d-none" >
 							<h2>Thank You.</h2>
 							<strong>Your order has been processed.</strong>
