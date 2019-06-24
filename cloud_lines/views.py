@@ -154,17 +154,18 @@ def contact(request):
 @login_required(login_url="/account/login")
 def order(request):
     context = {}
+    # import stripe key
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
+
+    # get user detail object
+    context['user_detail'] = UserDetail.objects.get(user=request.user)
+
     if 'id' in request.GET:
         # get service the user wants to upgrade to
         context['requested_service'] = Service.objects.get(id=request.GET['id'])
 
     if 'upgrade' in request.GET:
-        # import stripe key
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-        context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
-
-        # get user detail object
-        context['user_detail'] = UserDetail.objects.get(user=request.user)
         try:
             context['customer'] = stripe.Customer.retrieve(context['user_detail'].stripe_id)
         except stripe.error.InvalidRequestError:
