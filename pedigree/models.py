@@ -1,10 +1,12 @@
 from django.db import models
+from django.contrib.auth.models import User
 from breeder.models import Breeder
 from breed.models import Breed
 from account.models import AttachedService
 
 
 class Pedigree(models.Model):
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
     breeder = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True)
     current_owner = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True, related_name='owner')

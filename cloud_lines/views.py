@@ -155,7 +155,6 @@ def contact(request):
 def order(request):
     context = {}
     # import stripe key
-    stripe.api_key = settings.STRIPE_SECRET_KEY
     context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
 
     # get user detail object
@@ -258,7 +257,6 @@ def order_billing(request):
 def order_subscribe(request):
     user_detail = UserDetail.objects.get(user=request.user)
     attach_service = AttachedService.objects.get(user=user_detail, active=False)
-    stripe.api_key = settings.STRIPE_SECRET_KEY
 
     # add payment token to user
     try:
@@ -328,7 +326,16 @@ def order_subscribe(request):
 
     # update existing subscription if it exists
     if attach_service.subscription_id:
-        stripe.Subscription.delete(attach_service.subscription_id)
+        subscription = stripe.Subscription.retrieve(attach_service.subscription_id)
+        #stripe.Subscription.delete(attach_service.subscription_id)
+        stripe.Subscription.modify(
+            attach_service.subscription_id,
+            cancel_at_period_end=False,
+            items=[{
+                'id': subscription['items']['data'][0].id,
+                'plan': plan,
+            }]
+        )
 
     # subscribe user to the selected plan
     subscription = stripe.Subscription.create(
@@ -346,9 +353,7 @@ def order_subscribe(request):
     else:
         return HttpResponse(json.dumps({'Error': 'Something went wrong, please contact us.'}))
 
-
-
-    invoice = stripe.Invoice.list(limit=1)
+    invoice = stripe.Invoice.list(customer=user_detail.stripe_id, subscription=subscription.id, limit=1)
     receipt = stripe.Charge.list(customer=user_detail.stripe_id)
 
     result = {'result': 'success',
@@ -365,7 +370,6 @@ def send_payment_error(e):
     feedback = "Status is: %s" % e.http_status
     feedback += "<br>Type is: %s" % err.get('type')
     feedback += "<br>Code is: %s" % err.get('code')
-    feedback += "<br>Param is: %s" % err.get('param')
     feedback += "<br>Message is: %s" % err.get('message')
     return feedback
 

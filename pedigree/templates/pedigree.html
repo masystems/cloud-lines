@@ -188,14 +188,14 @@ vertical-align: middle;
                                 </div>
                             {% endfor %}
                         {% else %}
-                        <h4>No children for this {% if site_mode == 'mammal' %}pedigree{% else %}bird{% endif %}, add one?</h4>
+                        <h4>No children for this {% if service.site_mode == 'mammal' %}pedigree{% else %}bird{% endif %}, add one?</h4>
                         {% endif %}
 
                         <div id="existing" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="existing" aria-hidden="true" style="display: none;">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h4 class="modal-title float-left">Choose existing {% if site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %}</h4>
+                                        <h4 class="modal-title float-left">Choose existing {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %}</h4>
                                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                     </div>
                                     <div class="modal-body">
@@ -385,6 +385,10 @@ vertical-align: middle;
             <div class="card-body">
                 <h4 class="card-title">Details</h4>
                 <ul class="feeds">
+                    {% if lvl1.creator %}
+                    <li>
+                        <div class="bg-light-primary"><i class="fas fa-plus"></i></div> Added by <span class="font-weight-normal">{{ lvl1.creator.get_full_name }}</span></li>
+                    {% endif %}
                     {% if lvl1.breeder.prefix %}
                     <li>
                         <div class="bg-light-info"><i class="fas fa-user-plus"></i></div> Breeder <span class=""><a href="{% url 'breeder' lvl1.breeder.prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.breeder.prefix }}</button></a></span></li>

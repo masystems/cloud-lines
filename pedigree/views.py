@@ -203,6 +203,7 @@ def new_pedigree_form(request):
 
         if pedigree_form.is_valid() and attributes_form.is_valid() and image_form.is_valid() and pre_checks:
             new_pedigree = Pedigree()
+            new_pedigree.creator = request.user
             try:
                 new_pedigree.breeder = Breeder.objects.get(prefix=pedigree_form['breeder'].value())
             except ObjectDoesNotExist:
@@ -312,43 +313,69 @@ def edit_pedigree_form(request, id):
 
         if pedigree_form.is_valid() and attributes_form.is_valid() and image_form.is_valid() and pre_checks:
             try:
-                pedigree.breeder = Breeder.objects.get(prefix=pedigree_form['breeder'].value())
+                if pedigree_form['breeder'].value() == '':
+                    pedigree.breeder = None
+                else:
+                    pedigree.breeder = Breeder.objects.get(prefix=pedigree_form['breeder'].value())
             except ObjectDoesNotExist:
                 pedigree.breeder = None
+
             try:
-                pedigree.current_owner = Breeder.objects.get(prefix=pedigree_form['current_owner'].value())
+                if pedigree_form['current_owner'] == '':
+                    pedigree.current_owner = None
+                else:
+                    pedigree.current_owner = Breeder.objects.get(prefix=pedigree_form['current_owner'].value())
             except ObjectDoesNotExist:
                 pass
+
             pedigree.reg_no = pedigree_form['reg_no'].value()
+
             pedigree.name = pedigree_form['name'].value()
+
             try:
                 pedigree.date_of_registration = pedigree_form['date_of_registration'].value() or None
             except:
                 pass
+
             try:
                 pedigree.dob = pedigree_form['date_of_birth'].value() or None
             except:
                 pass
+
             pedigree.sex = pedigree_form['sex'].value()
+
             try:
                 pedigree.dod = pedigree_form['date_of_death'].value() or None
             except:
                 pass
+
             try:
-                pedigree.parent_mother = Pedigree.objects.get(reg_no=pedigree_form['mother'].value())
+                if pedigree_form['mother'].value() == '':
+                    pedigree.parent_mother = None
+                else:
+                    pedigree.parent_mother = Pedigree.objects.get(reg_no=pedigree_form['mother'].value())
             except ObjectDoesNotExist:
                 pedigree.breed_group = pedigree_form['breed_group'].value() or None
+
             try:
-                pedigree.parent_father = Pedigree.objects.get(reg_no=pedigree_form['father'].value())
+                if pedigree_form['father'].value() == '':
+                    pedigree.parent_father = None
+                else:
+                    pedigree.parent_father = Pedigree.objects.get(reg_no=pedigree_form['father'].value())
             except ObjectDoesNotExist:
                 pass
+
+            pedigree.breed_group = pedigree_form['breed_group'].value()
+
             pedigree.description = pedigree_form['description'].value()
+
             pedigree.note = pedigree_form['note'].value()
+
             pedigree.save()
 
             pedigree_attributes, created = PedigreeAttributes.objects.get_or_create(reg_no=pedigree)
 
-            pedigree_attributes.breed = Breed.objects.get(breed_name=attributes_form['breed'].value())
+            pedigree_attributes.breed = Breed.objects.get(account=attached_service, breed_name=attributes_form['breed'].value())
 
             try:
                 eggs = attributes_form['eggs_per_week'].value()
