@@ -217,43 +217,39 @@ def logout(request):
 
 @login_required(login_url="/account/login")
 def profile(request):
+    context = {}
     stripe.api_key = settings.STRIPE_SECRET_KEY
-    public_api_key = settings.STRIPE_PUBLIC_KEY
-    user_detail = UserDetail.objects.get(user=request.user)
+    context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
+    context['user_detail'] = UserDetail.objects.get(user=request.user)
     main_account = get_main_account(request.user)
 
     if str(request.user) == str(main_account.user):
-        services = Service.objects.all().exclude(service_name='Free')
+        context['services'] = Service.objects.all().exclude(service_name='Free')
         if main_account.service.service_name != 'Organisation':
-            recommended = Service.objects.filter(id=main_account.service.id+1)
+            context['recommended'] = Service.objects.filter(id=main_account.service.id+1)
         else:
-            recommended = None
-    else:
-        services = None
-        recommended = None
+            context['recommended'] = None
 
-    # billing
-    charges = stripe.Charge.list(customer=main_account.user.stripe_id)
-    for charge in charges:
-        # convert to readable format
-        charge_obj = Money(amount=str(charge['amount']/100), currency=str(charge['currency']).upper())
-        charge['amount'] = charge_obj.format('en_{}'.format(charge['payment_method_details']['card']['country']))
-        # convert data to readable format
-        date = time.strftime('%d-%m-%Y', time.localtime(charge.created))
-        charge['created'] = date
-        # get invoice pdf
-        invoice = stripe.Invoice.retrieve(charge['invoice'])
-        charge['invoice'] = invoice.invoice_pdf
+        # billing
+        charges = stripe.Charge.list(customer=main_account.user.stripe_id)
+        for charge in charges:
+            # convert to readable format
+            charge_obj = Money(amount=str(charge['amount'] / 100), currency=str(charge['currency']).upper())
+            charge['amount'] = charge_obj.format(
+                'en_{}'.format(charge['payment_method_details']['card']['country']))
+            # convert data to readable format
+            date = time.strftime('%d-%m-%Y', time.localtime(charge.created))
+            charge['created'] = date
+            # get invoice pdf
+            invoice = stripe.Invoice.retrieve(charge['invoice'])
+            charge['invoice'] = invoice.invoice_pdf
 
-    # payment methods
-    cards = stripe.Customer.list_sources(main_account.user.stripe_id, object='card')
+        context['charges'] = charges
 
-    return render(request, 'profile.html', {'user_detail': user_detail,
-                                            'services': services,
-                                            'recommended': recommended,
-                                            'charges': charges,
-                                            'cards': cards,
-                                            'public_api_key': public_api_key})
+        # payment methods
+        context['cards'] = stripe.Customer.list_sources(main_account.user.stripe_id, object='card')
+
+    return render(request, 'profile.html', context)
 
 
 def install(request):
