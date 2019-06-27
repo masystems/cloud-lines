@@ -1,10 +1,12 @@
-from django.shortcuts import render, HttpResponse, render_to_response
-from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, HttpResponse
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings
@@ -312,6 +314,16 @@ def register(request):
         # login
         login(request, user)
 
+        email_body = """
+        <p><strong>Thank you for registering with Cloudlines!</strong></p>
+        
+        <p>Now that you have registered you have access to our Free service.</p>
+        
+        <p><a href="https://cloud-lines.co.uk/dashboard">Click here</a> to go to your new dashboard.</p>
+        
+        <p>Feel free to contact us about anything and enjoy!</p>"""
+        send_mail('Welcome to Cloudlines!', 'marco@masys.co.uk', user.get_full_name(), email_body)
+
         return redirect('order')
     else:
         return render(request, 'login.html')
@@ -406,3 +418,16 @@ def send_payment_error(e):
     feedback += "<br>Code is: %s" % err.get('code')
     feedback += "<br>Message is: %s" % err.get('message')
     return feedback
+
+
+def send_mail(subject, send_to, name, body):
+    subject, from_email, to = subject, 'contact@masys.co.uk', send_to
+
+    html_content = render_to_string('mail/email.html', {'name': name,
+                                                       'body': body}) # render with dynamic value
+    text_content = strip_tags(html_content) # Strip the html tag. So people can see the pure text at least.
+
+    # create the email, and attach the HTML version as well.
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()

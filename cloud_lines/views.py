@@ -387,3 +387,4 @@ def activate_primary_account(request, service):
         UserDetail.objects.filter(user=request.user).update(current_service=primary_account)
 
     return redirect('dashboard')
+
