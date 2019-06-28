@@ -20,6 +20,7 @@ urlpatterns = [
     path('breeds/', include('breed.urls')),
     path('breed_groups/', include('breed_group.urls')),
     path('account/', include('account.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('support/', include('support.urls')),
     path('dashboard', views.dashboard, name='dashboard'),
     path('primary_account/<str:service>', views.activate_primary_account, name='primary_account'),

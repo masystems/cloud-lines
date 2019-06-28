@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirec
 from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact
 from account.models import UserDetail, AttachedService
-from account.views import get_main_account
+from account.views import get_main_account, send_mail
 from django.conf import settings
 import json
 import stripe

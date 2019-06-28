@@ -421,6 +421,7 @@ def send_payment_error(e):
 
 
 def send_mail(subject, send_to, name, body):
+
     subject, from_email, to = subject, 'contact@masys.co.uk', send_to
 
     html_content = render_to_string('mail/email.html', {'name': name,
@@ -430,4 +431,7 @@ def send_mail(subject, send_to, name, body):
     # create the email, and attach the HTML version as well.
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(html_content, "text/html")
+
     msg.send()
+
+    return
