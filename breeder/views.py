@@ -83,7 +83,7 @@ def new_breeder_form(request):
     else:
         breeder_form = BreederForm()
 
-    return render(request, 'new_breeder_form.html', {'breeder_form': breeder_form})
+    return render(request, 'new_breeder_form_base.html', {'breeder_form': breeder_form})
 
 
 @login_required(login_url="/account/login")

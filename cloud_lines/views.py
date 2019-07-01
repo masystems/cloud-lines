@@ -29,19 +29,22 @@ def dashboard(request):
 
     current_month = datetime.now().month
     date = datetime.now()
-    pedigree_chart = {}
-    for month in range(0, 12):
-        month_count = Pedigree.objects.filter(account=main_account, date_added__month=current_month-month).count()
-        if month != 0:
-            date = date.replace(day=1)
-            date = date - timedelta(days=1)
-        pedigree_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
+    if total_pedigrees > 0:
+        pedigree_chart = {}
+        for month in range(0, 12):
+            month_count = Pedigree.objects.filter(account=main_account, date_added__month=current_month-month).count()
+            if month != 0:
+                date = date.replace(day=1)
+                date = date - timedelta(days=1)
+            pedigree_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
 
-    breed_chart = {}
-    for breed in Breed.objects.filter(account=main_account):
-        breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=main_account) & Q(sex='male')).count(),
-                               'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=main_account) & Q(sex='female')).count()}
+        breed_chart = {}
+        for breed in Breed.objects.filter(account=main_account):
+            breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=main_account) & Q(sex='male')).count(),
+                                   'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=main_account) & Q(sex='female')).count()}
 
+    else:
+        return redirect('install')
     # breeders_totals = {}
     # for breeder in top_breeders:
     #     breeders_totals[breeder]['pedigree_count'] = Pedigree.objects.filter(breeder__prefix__exact=breeder).count()

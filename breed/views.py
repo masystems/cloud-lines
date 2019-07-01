@@ -30,7 +30,7 @@ def new_breed_form(request):
     else:
         breed_form = BreedForm()
 
-    return render(request, 'new_breed_form.html', {'breed_form': breed_form})
+    return render(request, 'new_breed_form_base.html', {'breed_form': breed_form})
 
 
 @login_required(login_url="/account/login")

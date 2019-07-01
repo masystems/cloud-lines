@@ -11,10 +11,13 @@ from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings
 from .models import UserDetail, AttachedService
-from .forms import InstallForm, SignUpForm
+from .forms import SignUpForm
 from cloud_lines.models import Service
 from pedigree.models import Pedigree
 from breed.models import Breed
+from breed.forms import BreedForm
+from breeder.forms import BreederForm
+from pedigree.forms import PedigreeForm, AttributeForm, ImagesForm
 from money import Money
 import random
 import string
@@ -255,11 +258,16 @@ def profile(request):
 
 
 def install(request):
+    pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
+    attributes_form = AttributeForm(request.POST or None, request.FILES or None)
+    image_form = ImagesForm(request.POST or None, request.FILES or None)
+
     try:
-        install_settings = AttachedService.objects.all().first()
-        install_form = InstallForm(request.POST or None, request.FILES or None, instance=install_settings)
+        user_details = UserDetail.objects.get(user=request.user)
+        install_settings = user_details.current_service
+        install_form = BreedForm(request.POST or None, request.FILES or None, instance=install_settings)
     except:
-        install_form = InstallForm(request.POST or None, request.FILES or None)
+        install_form = BreedForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -281,9 +289,15 @@ def install(request):
 
             return redirect('home')
     else:
-        install_form = InstallForm()
+        breed_form = BreedForm()
+        breeder_form = BreederForm()
+        pedigree_form = PedigreeForm()
 
-    return render(request, 'install.html', {'install_form': install_form})
+    return render(request, 'setup_form.html', {'breed_form': breed_form,
+                                               'breeder_form': breeder_form,
+                                               'pedigree_form': pedigree_form,
+                                               'attributes_form': attributes_form,
+                                               'image_form': image_form})
 
 
 def register(request):

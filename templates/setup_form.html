@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+
+<link href="{% static 'assets/plugins/wizard/steps.css' %}" rel="stylesheet">
+
+<div class="row" id="validation">
+    <div class="col-1"></div>
+    <div class="col-10">
+        <div class="card wizard-content">
+            <div class="card-body">
+                <h4 class="card-title">Setup</h4>
+                <h6 class="card-subtitle">We need to capture a few bits of information to get you started, fill in the information below and you'll be ready to start!</h6>
+                <form id="installForm" action="{% url 'install' %}" method="POST" enctype="multipart/form-data" class="validation-wizard wizard-circle">
+                    {% csrf_token %}
+                    <!-- Step 1 -->
+                    <h6>Add breed</h6>
+                    <section>
+                        <p><strong>Add your first breed. All pedigrees must be assigned to a breed, so add your first one to get you going!</strong></p>
+                        <div class="row">
+                            <!--loop start-->
+                            {% include 'new_breed_form.html' %}
+                        </div>
+                    </section>
+                    <!-- Step 2 -->
+                    <h6>Breeder</h6>
+                    <section>
+                        <p>Now you can add your first breeder, this will probably be your information in the first instance. </p>
+                        <div class="row">
+                            <!--loop start-->
+                            {% for field in breeder_form.visible_fields %}
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                        <div class="col-md-9">
+                                            {{ field|attr:"class:form-control" }}
+                                            {% for error in field.errors %}
+                                              <span class="help-block">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    <!-- Step 3 -->
+                    <h6>Pedigree</h6>
+                    <section>
+                        <p>Now you can add your first breeder, this will probably be your information in the first instance. </p>
+                        <div class="row">
+                            <div class="form-body">
+                                {% include 'new_pedigree_form.html' %}
+                            </div>
+                        </div>
+                    </section>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'assets/plugins/wizard/steps.js' %}"></script>
+<script src="{% static 'assets/plugins/wizard/jquery.steps.min.js' %}"></script>
+<script src="{% static 'assets/plugins/wizard/jquery.validate.min.js' %}"></script>
+
+<!-- Sweet-Alert  -->
+<script src="{% static 'assets/plugins/sweetalert/sweetalert.min.js' %}"></script>
+<script src="{% static 'assets/plugins/wizard/steps.js' %}"></script>
+{% endblock %}

@@ -111,7 +111,7 @@
                     <!-- Column -->
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-primary">
-                            {% if site_mode == 'poultry' %}
+                            {% if service.site_mode == 'poultry' %}
                                 {% if editor %}
                                     <a href="{% url 'new_breed_group_form' %}">
                                         <div class="box text-center">
@@ -141,8 +141,18 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title">Total {% if site_mode == 'mammal' %}Pedigrees{% else %}Birds{% endif %}</h4>
-                                <div id="morris-line-chart"></div>
+                                <h4 class="card-title">Total {% if service.site_mode == 'mammal' %}Pedigrees{% else %}Birds{% endif %}</h4>
+                                {% if pedigree_chart %}
+                                    <div id="morris-line-chart"></div>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button>
+                                        <h3 class="text-info"><i class="fa fa-exclamation-circle"></i> Information</h3>
+                                        You have not added any pedigrees yet to your Cloudlines instance.
+                                        You can <a href="{% url 'new_pedigree_form' %}">click here</a> or click the 'Add New Pedigree' button above to get started.
+                                        Don't forget you need to have at least one breed added before you can add a pedigree!
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         <script>
@@ -177,7 +187,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">Breed Chart</h4>
-                                <div id="morris-bar-chart"></div>
+                                {% if breed_chart %}
+                                    <div id="morris-bar-chart"></div>
+                                {% else %}
+
+                                <p>You still need to <a href="{% url 'new_pedigree_form' %}">add your first Pedigree</a>!</p>
+                                {% endif %}
                             </div>
                         </div>
                         <script>
@@ -216,7 +231,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex no-block align-items-center">
-                            <h4 class="card-title">Latest {% if site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} Added</h4>
+                            <h4 class="card-title">Latest {% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} Added</h4>
                         </div>
                         <div class="table-responsive mt-2">
                             <table class="table stylish-table">
@@ -289,7 +304,7 @@
                     </div>
                 </div>
             </div>
-            {% if site_mode == 'poultry' %}
+            {% if service.site_mode == 'poultry' %}
                 <!-- latest breed groups-->
                 <div class="card">
                 <div class="card-body">
@@ -339,6 +354,5 @@
         <!-- ============================================================== -->
         <!-- End PAge Content -->
         <!-- ============================================================== -->
-
 
 {% endblock %}
