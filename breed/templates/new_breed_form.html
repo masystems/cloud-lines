@@ -27,6 +27,9 @@
             <div class="col-md-9">
                 {{ field|attr:"class:form-control" }}
                 {{ field.help_text }}
+                {% if field.label == 'Description' %}
+                    <div id="charNum"></div>
+                {% endif %}
                 {% for error in field.errors %}
                   <span class="help-block">{{ error }}</span>
                 {% endfor %}
@@ -35,3 +38,16 @@
     </div>
     {% endfor %}
 </div>
+
+<script>
+    $('#id_description').keyup( function() {
+        var max = 2000;
+            var len = $(this).val().length;
+            if (len >= max) {
+                $('#charNum').text(' you have reached the limit').fadeIn();
+            } else {
+                var char = max - len;
+                $('#charNum').text(char + ' characters left').fadeIn();
+          }
+    });
+</script>

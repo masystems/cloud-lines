@@ -8,6 +8,7 @@
 
 	<!-- Stylesheets
 	============================================= -->
+	<link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/images/favicon.png' %}">
 	<link href="http://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Istok+Web:400,700" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="{% static 'cloud-lines/css/bootstrap.css' %}" type="text/css" />
 	<link rel="stylesheet" href="{% static 'cloud-lines/css/style.css' %}" type="text/css" />
@@ -66,10 +67,10 @@
 
 					<!-- Logo
 					============================================= -->
-					<div id="logo">
+					<div class="mb-1" id="logo">
 
-						<span><a href="{% url 'home' %}" class="standard-logo" data-dark-logo="{% static 'cloud-lines/images/logo-dark.png' %}"><img src="{% static 'cloud-lines/images/logo.png' %}" alt="Canvas Logo"></a></span>
-						<a href="{% url 'home' %}" class="retina-logo" data-dark-logo="{% static 'cloud-lines/images/logo-dark@2x.png' %}"><img src="{% static 'cloud-lines/images/logo@2x.png' %}" alt="Canvas Logo"></a>
+						<span><a href="{% url 'home' %}" class="standard-logo" data-dark-logo="{% static 'assets/images/cloud-lines-logo.png' %}"><img src="{% static 'assets/images/cloud-lines-logo.png' %}" alt="Canvas Logo"></a></span>
+						<a href="{% url 'home' %}" class="retina-logo" data-dark-logo="{% static 'assets/images/cloud-lines-logo.png' %}"><img src="{% static 'assets/images/cloud-lines-logo.png' %}" alt="Canvas Logo"></a>
 					</div><!-- #logo end -->
 
 					<!-- Primary Navigation
@@ -106,7 +107,7 @@
 							<li><a href="#"><div>Admin</div></a>
 								<ul>
 									<li><a href="/admin"><div>Backend</div></a></li>
-									<li><a href="{% url 'logout' %}"><div>Logout</div></a></li>
+									<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
 								</ul>
 							</li>
 							{% endif %}

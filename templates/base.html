@@ -71,16 +71,16 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="{% url 'home' %}">
                     <!-- Logo icon -->
-                    <b>
+<!--                    <b>-->
                         <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
                         <!-- Dark Logo icon -->
-                        <i class="fas fa-cloud fa-lg" style="color:white"></i>
-                    </b>
+<!--                        <i class="fas fa-cloud fa-lg" style="color:white"></i>-->
+<!--                    </b>-->
                     <!--End Logo icon -->
                     <!-- Logo text -->
                     <span>
                         <!-- Light Logo text -->
-                         <img src="{% static 'assets/images/logo-light-text.png' %}" class="light-logo" alt="CloudLines"/></span>
+                         <img src="{% static 'assets/images/cloud-lines-logo-wide.png' %}" style="max-height:50px" class="light-logo" alt="cloud-lines-logo-white"/></span>
                 </a>
             </div>
             <!-- ============================================================== -->
@@ -164,7 +164,7 @@
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{% url 'profile' %}"><i class="fas fa-user-cog"></i> Account Settings</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li><a href="{% url 'logout' %}"><i class="fa fa-power-off"></i> Logout</a></li>
+                                <li><a href="{% url 'cl_logout' %}"><i class="fa fa-power-off"></i> Logout</a></li>
                             </ul>
                         </div>
                         {% else %}

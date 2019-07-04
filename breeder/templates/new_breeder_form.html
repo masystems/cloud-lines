@@ -26,6 +26,7 @@
             <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
             <div class="col-md-9">
                 {{ field|attr:"class:form-control" }}
+                {{ field.help_text }}
                 {% for error in field.errors %}
                   <span class="help-block">{{ error }}</span>
                 {% endfor %}

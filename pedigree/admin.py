@@ -17,15 +17,7 @@ class PedigreeAdmin(admin.ModelAdmin):
     search_fields = ['name', 'reg_no']
     ordering = ['reg_no']
     empty_value_display = '-empty-'
-    fields = (('account', 'breeder', 'current_owner'),
-              ('reg_no', 'name'),
-              ('description',),
-              ('date_of_registration',),
-              ('dob',),
-              ('dod',),
-              'sex',
-              ('parent_father', 'parent_mother', 'breed_group'),
-              'note',)
+
     save_on_top = True
     inlines = [PedigreeAttributesInline, PedigreeImagesInline]
 

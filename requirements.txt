@@ -6,7 +6,8 @@ certifi==2018.11.29
 cfn-flip==1.1.0.post1
 chardet==3.0.4
 Click==7.0
-Django==2.1.9
+Django==2.1.10
+Django==2.1.10
 django-s3-storage==0.12.4
 django-storages==1.7.1
 django-widget-tweaks==1.4.3

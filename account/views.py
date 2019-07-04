@@ -207,14 +207,14 @@ def site_login(request):
             auth.login(request, user)
             return redirect('dashboard')
         else:
-            return render(request, 'login.html', {'error': 'Username or Password does not exist.'})
+            return render(request, 'cl_login.html', {'error': 'Username or Password does not exist.'})
     else:
-        return render(request, 'login.html')
+        return render(request, 'cl_login.html')
 
 
 @login_required(login_url="/account/login")
 def logout(request):
-    # TO DO neet to go to homepage and logout
+    # TO DO need to go to homepage and logout
     # if request.method == 'POST':
     auth.logout(request)
     return redirect('home')
@@ -257,7 +257,7 @@ def profile(request):
     return render(request, 'profile.html', context)
 
 
-def install(request):
+def setup(request):
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
@@ -272,22 +272,7 @@ def install(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if install_form.is_valid():
-            username = install_form.data['username']
-            raw_password = install_form.data['password']
-            email = install_form.data['email']
-            user = User.objects.create_user(username=username,
-                                            email=email,
-                                            password=raw_password,
-                                            first_name=install_form.data['firstname'],
-                                            last_name=install_form.data['lastname'])
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            install_form.save()
-            install_settings = AttachedService.objects.all().first()
-            install_settings.install_available = False
-            install_settings.save()
-
-            return redirect('home')
+            return redirect('dashboard')
     else:
         breed_form = BreedForm()
         breeder_form = BreederForm()
