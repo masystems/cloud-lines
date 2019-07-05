@@ -72,36 +72,49 @@
                 </form>
                 <script>
                     $(document).on("click","a[href='#finish']", function (e) {
+                        var setupForm = document.getElementById('setupForm');
+                        var formData = new FormData();
+                        for(var i = 0; i < setupForm.length; i++){
+                            if (setupForm[i].name == 'image') {
+                                formData.append(setupForm[i].name, setupForm.files[0], setupForm[i].value);
+                            } else {
+                                formData.append(setupForm[i].name, setupForm[i].value);
+                            }
+                        }
+
                         $.ajax({
                             url: '{% url 'new_breed_form' %}',
                             type: 'post',
                             dataType: 'text',
-                            data: $('#setupForm').serialize(),
+                            headers: {'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                            data: formData,
                             success: function(data) {
+                                console.log(formData);
                              },
                             error: function(jqXHR, textStatus, errorThrown){
                             }
                         });
-                        $.ajax({
-                            url: '{% url 'new_breeder_form' %}',
-                            type: 'post',
-                            dataType: 'text',
-                            data: $('#setupForm').serialize(),
-                            success: function(data) {
-                             },
-                            error: function(jqXHR, textStatus, errorThrown){
-                            }
-                        });
-                        $.ajax({
-                            url: '{% url 'new_pedigree_form' %}',
-                            type: 'post',
-                            dataType: 'text',
-                            data: $('#setupForm').serialize(),
-                            success: function(data) {
-                             },
-                            error: function(jqXHR, textStatus, errorThrown){
-                            }
-                        });
+<!--                        $.ajax({-->
+<!--                            url: '{% url 'new_breeder_form' %}',-->
+<!--                            type: 'post',-->
+<!--                            dataType: 'text',-->
+<!--                            data: $('#setupForm').serialize(),-->
+<!--                            success: function(data) {-->
+<!--                             },-->
+<!--                            error: function(jqXHR, textStatus, errorThrown){-->
+<!--                            }-->
+<!--                        });-->
+<!--                        $.ajax({-->
+<!--                            url: '{% url 'new_pedigree_form' %}',-->
+<!--                            type: 'post',-->
+<!--                            dataType: 'text',-->
+<!--                            data: $('#setupForm'),-->
+<!--                            success: function(data) {-->
+<!--                             },-->
+<!--                            error: function(jqXHR, textStatus, errorThrown){-->
+<!--                            }-->
+<!--                        });-->
+<!--                        window.location.replace("{% url 'dashboard' %}");-->
                     });
                 </script>
             </div>

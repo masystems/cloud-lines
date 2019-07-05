@@ -262,21 +262,9 @@ def setup(request):
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
 
-    try:
-        user_details = UserDetail.objects.get(user=request.user)
-        install_settings = user_details.current_service
-        install_form = BreedForm(request.POST or None, request.FILES or None, instance=install_settings)
-    except:
-        install_form = BreedForm(request.POST or None, request.FILES or None)
-
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if install_form.is_valid():
-            return redirect('dashboard')
-    else:
-        breed_form = BreedForm()
-        breeder_form = BreederForm()
-        pedigree_form = PedigreeForm()
+    breed_form = BreedForm()
+    breeder_form = BreederForm()
+    pedigree_form = PedigreeForm()
 
     return render(request, 'setup_form.html', {'breed_form': breed_form,
                                                'breeder_form': breeder_form,
