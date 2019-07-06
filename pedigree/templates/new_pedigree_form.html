@@ -109,7 +109,7 @@
                     </label>
                     <div class="col-md-9">
                         {% if field.label == 'Breed' %}
-                            {% if multi_breed %}
+                            {% if service.multi_breed %}
                                 <div id="breeds">
                                     <input id="id_breed" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                                 </div>

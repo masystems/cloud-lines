@@ -54,8 +54,8 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
                                     <div class="col-md-9">
-                                        {% if field.label == 'Description' %}
-                                            <textarea name="description" id="id_description" class="form-control" cols="40" rows="10">{{ breed.description }}</textarea>
+                                        {% if field.label == 'Breed description' %}
+                                            <textarea name="description" id="id_description" class="form-control" cols="40" rows="10">{{ breed.breed_description }}</textarea>
                                         {% else %}
                                             {% render_field field class="form-control" value=breed.breed_name %}
                                         {% endif %}

@@ -27,7 +27,8 @@
             <div class="col-md-9">
                 {{ field|attr:"class:form-control" }}
                 {{ field.help_text }}
-                {% if field.label == 'Description' %}
+                {{ field.label}}
+                {% if field.label == 'Breed description' %}
                     <div id="charNum"></div>
                 {% endif %}
                 {% for error in field.errors %}
@@ -40,7 +41,7 @@
 </div>
 
 <script>
-    $('#id_description').keyup( function() {
+    $('#id_breed_description').keyup( function() {
         var max = 2000;
             var len = $(this).val().length;
             if (len >= max) {
