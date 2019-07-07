@@ -162,7 +162,11 @@
                                                                                         <td><i class="fas fa-times"></i></td>
                                                                                     {% endif %} Support</div>
                                                             <div class="price-row">
-                                                                <a href="{% url 'order' %}?id={{ plan.id }}&upgrade={{ service.id }}"><button class="btn btn-lg {% if plan.id < recommended.first.id %}btn-warning{% else %}btn-info{% endif %} waves-effect waves-light mt-3">{% if plan.id < recommended.first.id %}Downgrade{% else %}Upgrade{% endif %}</button></a>
+                                                                {% if plan.active %}
+                                                                    <a href="{% url 'order' %}?id={{ plan.id }}&upgrade={{ service.id }}"><button class="btn btn-lg {% if plan.id < recommended.first.id %}btn-warning{% else %}btn-info{% endif %} waves-effect waves-light mt-3">{% if plan.id < recommended.first.id %}Downgrade{% else %}Upgrade{% endif %}</button></a>
+                                                                {% else %}
+                                                                    <button class="btn btn-lg btn-secondary waves-effect waves-light mt-3">Coming Soon!</button>
+                                                                {% endif %}
                                                             </div>
                                                         </div>
                                                     </div>

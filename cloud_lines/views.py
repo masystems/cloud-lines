@@ -180,7 +180,7 @@ def order(request):
                                           id=request.GET['upgrade']).exists():
             context['attached_service_upgrade'] = request.GET['upgrade']
 
-    context['services'] = Service.objects.all()
+    context['services'] = Service.objects.filter(active=True)
 
     return render(request, 'order.html', context)
 

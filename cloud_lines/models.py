@@ -3,6 +3,7 @@ from django.db import models
 
 class Service(models.Model):
     ordering = models.IntegerField()
+    active = models.BooleanField(default=True)
     icon = models.CharField(max_length=500, blank=True)
     image = models.FileField(blank=True)
     service_name = models.CharField(max_length=50)
