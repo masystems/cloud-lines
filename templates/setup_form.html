@@ -7,11 +7,18 @@
 
 <div class="row" id="validation">
     <div class="col-1"></div>
+
     <div class="col-10">
         <div class="card wizard-content">
             <div class="card-body">
                 <h4 class="card-title"></h4>
                 <h6 class="card-subtitle"></h6>
+                <div class="d-flex flex-column align-items-center justify-content-center ">
+                    <div id="spinner" class="spinner-border text-info d-none" style="width: 6rem; height: 6rem;" role="status"></div>
+                    <div id="spinnerText" class="row d-none">
+                        <p><strong>Loading dashboard!</strong></p>
+                    </div>
+                </div>
                 <form id="setupForm" action="{% url 'setup' %}" method="POST" enctype="multipart/form-data" class="validation-wizard wizard-circle">
                     {% csrf_token %}
                     <!-- Step 1 -->
@@ -20,6 +27,7 @@
                         <div class="text-center">
                             <img src="{% static 'assets/images/cloud-lines-logo.png' %}" style="max-height:300px" class="img-fluid">
                         </div>
+
                         <p><strong>Welcome to Cloudlines!</strong></p>
                         <p>To get you started, follow this setup wizard through to add your first breed, breeder and pedigree.
                             The idea is to get you familiar with how the site works when it comes to manual data entry.
@@ -36,7 +44,7 @@
                         </div>
                     </section>
                     <script>
-                        $('#id_breed_name').keyup( function() {
+                        $('#id_breed_name').bind('keyup change', function(event) {
                             $('#hid_breed').removeClass('typeahead');
                             $('#hid_breed').val($('#id_breed_name').val());
                             $('#id_breed').removeClass('typeahead');
@@ -53,13 +61,19 @@
                         </div>
                     </section>
                     <script>
-                        $('#id_prefix').keyup( function() {
+                        $('#id_prefix').bind('keyup change', function(event) {
                             $('#id_breeder').removeClass('typeahead');
+                            $('#id_breeder').attr("placeholder", "");
+                            $("#id_breeder").prop("disabled", true);
                             $('#id_breeder').val($('#id_prefix').val());
                             $("#id_breeder").prop("readonly", true);
                             $('#id_current_owner').removeClass('typeahead');
+                            $('#id_current_owner').attr("placeholder", "");
+                            $("#id_current_owner").prop("disabled", true);
                             $('#id_current_owner').val($('#id_prefix').val());
                             $("#id_current_owner").prop("readonly", true);
+                            $("#id_mother").prop("disabled", true);
+                            $("#id_father").prop("disabled", true);
                         });
                     </script>
                     <!-- Step 4-->
@@ -76,6 +90,9 @@
                 </form>
                 <script>
                     $(document).on("click","a[href='#finish']", function (e) {
+                        $('#setupForm').addClass('d-none');
+                        $('#spinner').removeClass('d-none');
+                        $('#spinnerText').removeClass('d-none');
                         var formData = new FormData(document.querySelector('#setupForm'))
                         $.ajax({
                             url: '{% url 'new_breed_form' %}',

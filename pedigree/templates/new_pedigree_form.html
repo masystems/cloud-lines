@@ -44,16 +44,16 @@
 
                 {% elif field.label == 'Mother' %}
                     <div id="mothers">
-                        <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                        <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                     </div>
                 {% elif field.label == 'Father'  %}
                     <div id="fathers">
-                        <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                        <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                     </div>
                 {% elif field.label == 'Breed group' %}
                     {% if service.site_mode == 'poultry' %}
                         <div id="breed_groups">
-                            <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                            <input id="id_breed_group" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                         </div>
                     {% endif %}
                 {% elif field.label == 'Sex' %}

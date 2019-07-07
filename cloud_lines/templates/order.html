@@ -39,45 +39,6 @@
 	  background-color: #fefde5 !important;
 	}
 
-	.spinner{
-	  width:100px;
-	  height:100px;
-	  border-radius:50%;
-	  border:10px solid #111;
-	  margin:10% 40%;
-	  position:relative;
-	  z-index:1;
-	}
-	.spinner:before{
-	  content:'';
-	  width:100px;
-	  height:100px;
-	  border-radius:50%;
-	  border-top:10px solid #ccc;
-	  border-right:10px solid transparent;
-	  border-bottom:10px solid transparent;
-	  border-left:10px solid transparent;
-	  position:absolute;
-	  z-index:9;
-	  top:-10px;
-	  left:-10px;
-	  animation:rt 2s infinite;
-	}
-	@keyframes rt{
-	  from{
-		transform:rotate(0deg);
-	  }
-	  to{
-		transform:rotate(360deg);
-	  }
-	}
-	.spinner > .fas{
-	  font-size:32px;
-	  text-align:center;
-	  display:block;
-	  margin:30% 0;
-	}
-
 </style>
 
 <section id="slider" class="slider-element">
@@ -720,8 +681,8 @@
 									} else {
 										// switch to next step and start loader
 										$('#selectCardButton').click();
-										$('#loader').removeClass("d-none");
-										$('#loader').html("<i class='fas fa-lock'></i>").fadeIn(2000);
+										$('#spinner').removeClass("d-none");
+										$('#spinnerText').removeClass("d-none");
 										$('#paymentSuccess').addClass('d-none');
 										$('#paymentFail').addClass('d-none');
 								  		// Send the token to your server.
@@ -741,7 +702,8 @@
 									success: function(data) {
 										var result = JSON.parse(data);
 										console.log(result);
-										$('#loader').addClass('d-none');
+										$('#spinner').addClass('d-none');
+										$('#spinnerText').addClass('d-none');
 										if (result.result == 'fail') {
 											$('#paymentFail').removeClass('d-none');
 											$('#failedMessage').html(result.feedback);
@@ -765,7 +727,12 @@
 						</script>
 					</div>
 					<div id="ptab4" align="center">
-						<div id="loader" class="spinner d-none"></div>
+						<div class="d-flex flex-column align-items-center justify-content-center ">
+							<div id="spinner" class="spinner-border text-info d-none" style="width: 6rem; height: 6rem;" role="status"></div>
+							<div id="spinnerText" class="row d-none">
+								<p><strong>Processing Payment</strong></p>
+							</div>
+						</div>
 						<div id="paymentSuccess" class="mt-2 d-none" >
 							<h2>Thank You.</h2>
 							<strong>Your order has been processed.</strong>
