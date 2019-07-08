@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact
 from account.models import UserDetail, AttachedService
@@ -7,7 +7,7 @@ from django.conf import settings
 import json
 import stripe
 from datetime import datetime, timedelta
-from pedigree.models import Pedigree, PedigreeAttributes, PedigreeImage
+from pedigree.models import Pedigree
 from breed.models import Breed
 from breeder.models import Breeder
 from breed_group.models import BreedGroup
@@ -84,41 +84,6 @@ def services(request):
     return render(request, 'services.html', {'services': Service.objects.all()})
 
 
-# def contact(request):
-#     if request.method == 'POST':
-#         name = request.POST.get('name')
-#         email_address = request.POST.get('email')
-#         phone = request.POST.get('phone')
-#         service = request.POST.get('service')
-#         subject = request.POST.get('subject')
-#         message_body = request.POST.get('message')
-#         email = EmailMessage(
-#             subject,
-#             "From: {},\nPhone: {},\nService: {},\nMessage: {}".format(name,
-#                                                                       phone,
-#                                                                       service,
-#                                                                       message_body),
-#             'contact@cmdlb.com',
-#             ['marco@masys.co.uk', 'adam@masys.co.uk'],
-#             reply_to=[email_address],
-#         )
-#         try:
-#             email.send(fail_silently=False)
-#             email_obj = Contact.objects.create(name=name,
-#                                                email=email_address,
-#                                                phone=phone,
-#                                                service=service,
-#                                                subject=subject,
-#                                                message=message_body)
-#             email_obj.save()
-#         except:
-#             redirect('result', 'fail')
-#
-#         return redirect('result', 'success')
-#     else:
-#         return render(request, 'contact.html', {'services': Service.objects.all()})
-
-
 def contact(request):
     if request.POST:
         name = request.POST.get('name')
@@ -128,16 +93,27 @@ def contact(request):
         subject = request.POST.get('subject')
         message_body = request.POST.get('message')
 
-        # email = EmailMessage(
-        #     subject,
-        #     "From: {},\nPhone: {},\nService: {},\nMessage: {}".format(name,
-        #                                                               phone,
-        #                                                               service,
-        #                                                               message_body),
-        #     'contact@cmdlb.com',
-        #     ['marco@masys.co.uk'],
-        #     reply_to=[email_address],
-        # )
+        # send email to user
+        email_body = """
+                        <p><strong>Thank you for message!</strong></p>
+        
+                        <p>We have received your message and will be in contact with you soon.</p>
+        
+                        <p><strong>Copy of your message</strong></p>
+        
+                        <p>{}</p>
+                        <p>{}</p>""".format(subject, message_body)
+        send_mail('Cloudlines message confirmation', name, email_body, send_to=email_address)
+
+        # send mail to cloudlines
+        email_body = """
+                        <p><strong>New message from {}</strong></p>
+                        <p>Email: {}</p>
+                        <p>Phone: {}</p>
+                        <p>Service: {}</p>
+                        <p>{}</p>
+                        <p>{}</p>""".format(name, email_address, phone, service, subject, message_body)
+        send_mail('Cloudlines contact request!', 'Cloudlines Team', email_body, reply_to=email_address)
         try:
             #email.send(fail_silently=False)
             email_obj = Contact.objects.create(name=name,
@@ -197,26 +173,26 @@ def order_service(request):
         if request.POST.get('checkout-form-upgrade'):
             print(request.POST.get('checkout-form-animal-type'))
             try:
-                AttachedService.objects.filter(user=user_detail,
-                                               id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                                                                    site_mode=request.POST.get('checkout-form-site-mode'),
-                                                                                                    install_available=False,
-                                                                                                    service=service,
-                                                                                                    increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                                                                    active=False)
+                attached_service = AttachedService.objects.filter(user=user_detail,
+                                                                  id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
+                                                                                                                       site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                                                                       install_available=False,
+                                                                                                                       service=service,
+                                                                                                                       increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                                                                                       active=False)
             except AttachedService.DoesNotExist:
                 pass
         else:
             # create new attached service details object
-            AttachedService.objects.create(user=user_detail,
-                                           animal_type=request.POST.get('checkout-form-animal-type'),
-                                           site_mode=request.POST.get('checkout-form-site-mode'),
-                                           install_available=False,
-                                           service=service,
-                                           increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                           active=False)
+            attached_service = AttachedService.objects.create(user=user_detail,
+                                                              animal_type=request.POST.get('checkout-form-animal-type'),
+                                                              site_mode=request.POST.get('checkout-form-site-mode'),
+                                                              install_available=False,
+                                                              service=service,
+                                                              increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                              active=False)
 
-    return HttpResponse('GOT IT')
+    return HttpResponse(json.dumps(attached_service.id))
 
 
 @login_required(login_url="/account/login")
@@ -261,7 +237,7 @@ def order_billing(request):
 @login_required(login_url="/account/login")
 def order_subscribe(request):
     user_detail = UserDetail.objects.get(user=request.user)
-    attach_service = AttachedService.objects.get(user=user_detail, active=False)
+    attach_service = AttachedService.objects.get(id=request.POST.get('attached_service_id'), user=user_detail, active=False)
 
     # add payment token to user
     try:
@@ -365,6 +341,12 @@ def order_subscribe(request):
               'invoice': invoice.data[0].invoice_pdf,
               'receipt': receipt.data[0].receipt_url}
 
+    # set new default attached service
+    UserDetail.objects.filter(user=request.user).update(current_service=attach_service)
+
+    # delete dead attached services
+    AttachedService.objects.filter(user=user_detail, active=False).delete()
+
     return HttpResponse(json.dumps(result))
 
 
@@ -382,7 +364,7 @@ def send_payment_error(e):
 def activate_primary_account(request, service):
     user_details = UserDetail.objects.get(user=request.user)
     try:
-        primary_account = AttachedService.objects.get(id=service)
+        primary_account = AttachedService.objects.get(user=user_details, id=service)
     except AttachedService.DoesNotExist:
         return redirect('dashboard')
 

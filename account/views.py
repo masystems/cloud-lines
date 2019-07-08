@@ -309,7 +309,9 @@ def register(request):
         <p><a href="https://cloud-lines.co.uk/dashboard">Click here</a> to go to your new dashboard.</p>
         
         <p>Feel free to contact us about anything and enjoy!</p>"""
-        send_mail('Welcome to Cloudlines!', 'marco@masys.co.uk', user.get_full_name(), email_body)
+        send_mail('Welcome to Cloudlines!', user.get_full_name(), email_body, send_to=user.email)
+
+        send_mail('New site registration', user.get_full_name(), email_body, send_from=user.email)
 
         return redirect('order')
     else:
@@ -407,16 +409,17 @@ def send_payment_error(e):
     return feedback
 
 
-def send_mail(subject, send_to, name, body):
-
-    subject, from_email, to = subject, 'contact@masys.co.uk', send_to
+def send_mail(subject, name, body,
+              send_to='contact@masys.co.uk',
+              send_from='contact@masys.co.uk',
+              reply_to='contact@masys.co.uk'):
 
     html_content = render_to_string('mail/email.html', {'name': name,
-                                                       'body': body}) # render with dynamic value
-    text_content = strip_tags(html_content) # Strip the html tag. So people can see the pure text at least.
+                                                       'body': body})
+    text_content = strip_tags(html_content)
 
     # create the email, and attach the HTML version as well.
-    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg = EmailMultiAlternatives(subject, text_content, send_from, [send_to], reply_to=[reply_to])
     msg.attach_alternative(html_content, "text/html")
 
     msg.send()

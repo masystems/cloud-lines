@@ -56,12 +56,12 @@
             <div id="contactForm" data-wow-duration="1s">
                 <div class="col_half">
                     <label for="name">Name <small>*</small></label>
-                    <input type="text" id="name" name="name" value="" class="sm-form-control required" />
+                    <input type="text" id="name" name="name" value="" class="sm-form-control required" required/>
                 </div>
 
                 <div class="col_half col_last">
                     <label for="email">Email <small>*</small></label>
-                    <input type="email" id="email" name="email" value="" class="required email sm-form-control" />
+                    <input type="email" id="email" name="email" value="" class="required email sm-form-control" required/>
                 </div>
 
                 <div class="clear"></div>
@@ -85,12 +85,12 @@
 
                 <div class="col_full">
                     <label for="subject">Subject <small>*</small></label>
-                    <input type="text" id="subject" name="subject" value="" class="required sm-form-control" />
+                    <input type="text" id="subject" name="subject" value="" class="required sm-form-control" required />
                 </div>
 
                 <div class="col_full">
                     <label for="message">Message <small>*</small></label>
-                    <textarea class="required sm-form-control" id="message" name="message" rows="6" cols="30"></textarea>
+                    <textarea class="required sm-form-control" id="message" name="message" rows="6" cols="30" required></textarea>
                 </div>
 
                 <div class="col_full hidden">
@@ -101,6 +101,41 @@
                     <button class="button button-3d" id="contactMessage" type="submit">Send Message</button>
                 </div>
             </div>
+            <script>
+                $('#contactMessage').click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'contact' %}",
+                        dataType: "json",
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data: {
+                            "name": $('#name').val(),
+                            "email": $('#email').val(),
+                            "phone": $('#phone').val(),
+                            "service": $('#service').val(),
+                            "subject": $('#subject').val(),
+                            "message": $('#message').val(),
+                        },
+                        beforeSend: function() {
+                            $('#contactForm').html('<div class="d-flex flex-column align-items-center justify-content-center ">\
+                                                        <div id="spinner" class="spinner-border text-info" style="width: 6rem; height: 6rem;" role="status"></div>\
+                                                        <div id="spinnerText" class="row">\
+                                                            <p><strong>Sending Message</strong></p>\
+                                                        </div>\
+                                                    </div>');
+                        },
+
+                        success: function (data) {
+                            $('spinner').addClass('d-none');
+                            $('spinnerText').addClass('d-none');
+                            $('#contactForm').html('<h5 class="text-center">' + data.message + '</h5>').fadeIn(3000);
+                        },
+                        error: function (xhr, textStatus, error) {
+                            $('#contactForm').html('<h5 class="text-center">Something went wrong, but we are working on it!</h5>').fadeIn(3000);
+                        },
+                    });
+                });
+            </script>
         </div><!-- Contact Form Overlay End -->
     </div>
 

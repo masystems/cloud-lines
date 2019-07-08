@@ -246,15 +246,19 @@
 									url: '{% url 'order_service' %}',
 									type: 'post',
 									dataType: 'text',
+									headers: {'X-CSRFToken': '{{ csrf_token }}'},
 									data: $('#serviceForm').serialize(),
-									success: function(data) {
+									beforeSend: function() {
 										$('#serviceErrors').html('');
+									},
+									success: function(data) {
+										$('#attached_service_id').val(data)
 										$('#selectServiceButton').click();
 									 },
 									error: function(jqXHR, textStatus, errorThrown){
 										$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Change your options and try submitting again.</div>');
 										console.log('jqXHR:');
-										console.log(jqXHR);
+										console.log(jqXHR.responseText);
 										console.log('textStatus:');
 										console.log(textStatus);
 										console.log('errorThrown:');
@@ -266,8 +270,11 @@
 					</div>
 					<div id="ptab2">
 						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt, deleniti, atque soluta ratione blanditiis maxime at architecto laudantium eius eaque distinctio dolorem voluptatem nam ab molestias velit nemo. Illo, hic.</p>
-						<div align="center">
-							<div id="billingLoader" class="spinner d-none"></div>
+						<div class="d-flex flex-column align-items-center justify-content-center ">
+							<div id="billingSpinner" class="spinner-border text-info d-none" style="width: 6rem; height: 6rem;" role="status"></div>
+							<div id="billingSpinnerText" class="row d-none">
+								<p><strong>Processing Payment</strong></p>
+							</div>
 						</div>
 						<form id="billingForm" name="billingForm" class="nobottommargin" method="POST">
 							<div class="col-lg-12">
@@ -565,17 +572,22 @@
 
 						<script>
 							$('#selectBilling').click( function() {
-								$('#billingLoader').removeClass('d-none');
-								$('#billingForm').addClass('d-none');
 								$.ajax({
 									url: '{% url 'order_billing' %}',
 									type: 'post',
 									dataType: 'text',
+									headers: {'X-CSRFToken': '{{ csrf_token }}'},
 									data: $('#billingForm').serialize(),
+									beforeSend: function() {
+										$('#billingSpinner').removeClass('d-none');
+										$('#billingSpinnerText').removeClass('d-none');
+										$('#billingForm').addClass('d-none');
+									},
 									success: function(data) {
 										$('#billingErrors').html('');
 										$('#selectBillingButton').click();
-										$('#billingLoader').addClass('d-none');
+										$('#billingSpinner').addClass('d-none');
+										$('#billingSpinnerText').addClass('d-none');
 										$('#billingForm').removeClass('d-none');
 									 },
 									error: function(jqXHR, textStatus, errorThrown){
@@ -622,6 +634,7 @@
 								<div id="card-element"></div>
 								<!-- Used to display Element errors. -->
 								<div id="card-errors" role="alert"></div>
+								<input type="hidden" id="attached_service_id" value="">
 							</form>
 						</div>
 
@@ -679,12 +692,9 @@
 								  		var errorElement = document.getElementById('card-errors');
 								  		errorElement.textContent = result.error.message;
 									} else {
-										// switch to next step and start loader
+										// switch to next step
 										$('#selectCardButton').click();
-										$('#spinner').removeClass("d-none");
-										$('#spinnerText').removeClass("d-none");
-										$('#paymentSuccess').addClass('d-none');
-										$('#paymentFail').addClass('d-none');
+
 								  		// Send the token to your server.
 								  		stripeTokenHandler(result.token);
 									}
@@ -698,7 +708,17 @@
 									url: '{% url 'order_subscribe' %}',
 									type: 'post',
 									dataType: 'text',
-									data: token,
+									headers: {'X-CSRFToken': '{{ csrf_token }}'},
+									data: {
+										'token': token,
+										'attached_service_id': $('#attached_service_id').val(),
+										},
+									beforeSend: function() {
+										$('#spinner').removeClass("d-none");
+										$('#spinnerText').removeClass("d-none");
+										$('#paymentSuccess').addClass('d-none');
+										$('#paymentFail').addClass('d-none');
+									},
 									success: function(data) {
 										var result = JSON.parse(data);
 										console.log(result);
