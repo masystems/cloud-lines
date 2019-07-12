@@ -48,7 +48,10 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
         context['pedigrees'] = Pedigree.objects.filter(account=context['attached_service'])
 
         # get custom fields
-        context['custom_fields'] = json.loads(context['lvl1'].attribute.custom_fields)
+        try:
+            context['custom_fields'] = json.loads(context['lvl1'].attribute.custom_fields)
+        except json.decoder.JSONDecodeError:
+            context['custom_fields'] = ''
 
         context = generate_hirearchy(context)
 
@@ -182,6 +185,10 @@ def new_pedigree_form(request):
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
     attached_service = get_main_account(request.user)
+    try:
+        custom_fields = json.loads(attached_service.custom_fields)
+    except json.decoder.JSONDecodeError:
+        custom_fields = ''
 
     if request.method == 'POST':
         # check whether it's valid:
@@ -274,7 +281,7 @@ def new_pedigree_form(request):
                                                            'breeders': Breeder.objects.filter(account=attached_service),
                                                            'breeds': Breed.objects.filter(account=attached_service),
                                                            'breed_groups': BreedGroup.objects.filter(account=attached_service),
-                                                           'custom_fields': json.loads(attached_service.custom_fields)})
+                                                           'custom_fields': custom_fields})
 
 
 @login_required(login_url="/account/login")
@@ -288,6 +295,11 @@ def edit_pedigree_form(request, id):
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
+
+    try:
+        custom_fields = json.loads(pedigree.attribute.custom_fields)
+    except json.decoder.JSONDecodeError:
+        custom_fields = ''
 
     if request.method == 'POST':
         if 'delete' in request.POST:
@@ -413,7 +425,7 @@ def edit_pedigree_form(request, id):
                                                        'breeders': Breeder.objects.filter(account=attached_service),
                                                        'breeds': Breed.objects.filter(account=attached_service),
                                                        'breed_groups': BreedGroup.objects.filter(account=attached_service),
-                                                       'custom_fields': json.loads(pedigree.attribute.custom_fields)})
+                                                       'custom_fields': custom_fields})
 
 
 def add_existing(request, pedigree_id):
