@@ -49,8 +49,7 @@ class PedigreeImage(models.Model):
 class PedigreeAttributes(models.Model):
     reg_no = models.OneToOneField(Pedigree, on_delete=models.CASCADE, primary_key=True, related_name='attribute')
     breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed')
-    eggs_per_week = models.IntegerField(default=0)
-    prize_winning = models.BooleanField(default=False)
+    custom_fields = models.TextField(blank=True)
 
     def __str__(self):
         return str(self.reg_no)

@@ -166,7 +166,6 @@ def user_edit(request):
             return HttpResponse(True)
 
         elif request.POST.get('formType') == 'delete':
-            print('deleting user!')
             User.objects.get(username=request.POST.get('register-form-username'),
                              email=request.POST.get('register-form-email')).delete()
 
@@ -223,12 +222,15 @@ def logout(request):
 @login_required(login_url="/account/login")
 def profile(request):
     context = {}
-    stripe.api_key = settings.STRIPE_SECRET_KEY
-    context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
+    #stripe.api_key = settings.STRIPE_SECRET_KEY
+    try:
+        context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
+    except AttributeError:
+        pass
     context['user_detail'] = UserDetail.objects.get(user=request.user)
     main_account = get_main_account(request.user)
 
-    if str(request.user) == str(main_account.user):
+    if request.user == main_account.user and context['user_detail'].current_service.service.service_name != 'Free':
         context['services'] = Service.objects.all().exclude(service_name='Free')
         if main_account.service.service_name != 'Organisation':
             context['recommended'] = Service.objects.filter(id=main_account.service.id+1)
@@ -255,6 +257,74 @@ def profile(request):
         context['cards'] = stripe.Customer.list_sources(main_account.user.stripe_id, object='card')
 
     return render(request, 'profile.html', context)
+
+
+@login_required(login_url="/account/login")
+def settings(request):
+    user_detail = UserDetail.objects.get(user=request.user)
+    custom_fields = user_detail.current_service.custom_fields
+
+    try:
+        custom_fields = json.loads(custom_fields)
+    except:
+        pass
+    return render(request, 'settings.html', {'custom_fields': custom_fields})
+
+
+@login_required(login_url="/account/login")
+def custom_field_edit(request):
+    # this is the additional user customers can add/remove from their service.
+    if request.method == 'POST':
+        user_detail = UserDetail.objects.get(user=request.user)
+        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+        if user_detail.current_service.custom_fields:
+            custom_fields = json.loads(user_detail.current_service.custom_fields)
+        else:
+            custom_fields = {}
+
+        if request.POST.get('formType') == 'new':
+            # create unique key
+            for suffix in range(0, len(custom_fields)+2):
+                if 'cf_{}'.format(suffix) not in custom_fields:
+                    field_key = 'cf_{}'.format(suffix)
+                    break
+
+            custom_fields[field_key] = {'id': field_key,
+                                        'location': request.POST.get('location'),
+                                        'fieldName': request.POST.get('fieldName'),
+                                        'fieldType': request.POST.get('fieldType')}
+            attached_service.custom_fields = json.dumps(custom_fields)
+            attached_service.save()
+            return HttpResponse(True)
+
+        elif request.POST.get('formType') == 'edit':
+            custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
+                                                     'location': request.POST.get('location'),
+                                                     'fieldName': request.POST.get('fieldName'),
+                                                     'fieldType': request.POST.get('fieldType')}
+            attached_service.custom_fields = json.dumps(custom_fields)
+            attached_service.save()
+            return HttpResponse(True)
+
+        elif request.POST.get('formType') == 'delete':
+            custom_fields.pop(request.POST.get('id'), None)
+            attached_service.custom_fields = json.dumps(custom_fields)
+            attached_service.save()
+
+            # update all pedigrees
+            pedigrees = Pedigree.objects.filter(account=attached_service)
+            for pedigree in pedigrees.all():
+                custom_fields_updated = {}
+                if pedigree.attribute.custom_fields:
+                    print(json.loads(pedigree.attribute.custom_fields))
+                    for key, val in json.loads(pedigree.attribute.custom_fields).items():
+                        if key in custom_fields:
+                            custom_fields_updated[key] = val
+
+                    pedigree.attribute.custom_fields = json.dumps(custom_fields_updated)
+                    pedigree.attribute.save()
+
+            return HttpResponse(True)
 
 
 def setup(request):

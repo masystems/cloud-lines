@@ -99,15 +99,10 @@
 
     {% for field in attributes_form.visible_fields %}
         {% if field.name != 'reg_no'%}
-            <div class="col-lg-6 col-md-12">
+            <div class="col-lg-12 col-md-12">
                 <div class="form-group row">
-                    <label class="col-sm-3 text-right col-form-label">{% if service.site_mode == 'mammal' %}
-                                                                        {% if field.label != 'Eggs per week' %}
-                                                                            {{ field.label }}
-                                                                        {% endif %}
-                                                                        {% endif %}
-                    </label>
-                    <div class="col-md-9">
+                    <label class="col-sm-2 text-right col-form-label">{{ field.label }}</label>
+                    <div class="col-lg-10 col-md-10">
                         {% if field.label == 'Breed' %}
                             {% if service.multi_breed %}
                                 <div id="breeds">
@@ -117,16 +112,19 @@
                                     <input id="hid_breed" class="typeahead form-control" name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
                                     <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
                             {% endif %}
-                        {% elif field.label == 'Prize winning' %}
-                            {% for option in field %}
-                                <div class="checkbox checkbox-success pt-2">
-                                    <input id="{{ field.label }}" name='{{ field.name }}' value="1" type="checkbox">
-                                    <label for="{{ field.label }}"></label>
-                                </div>
-                            {% endfor %}
-                        {% elif field.label == 'Eggs per week' %}
-                            {% if service.site_mode == 'poultry' %}
-                                {{ field }}
+                        {% elif field.label == 'Custom fields' %}
+                            {% if custom_fields %}
+                                {% for field_key, field_vals in custom_fields.items %}
+                                    {% if field_vals.fieldType == 'textField' %}
+                                        <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
+                                        <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' type="text">
+                                    {% elif field_vals.fieldType == 'textBox' %}
+                                        <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
+                                        <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control"></textarea>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
                             {% endif %}
                         {% else %}
                             {{ field }}

@@ -59,7 +59,7 @@ vertical-align: middle;
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs customtab" role="tablist">
                     <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#profile" role="tab"><span class="hidden-sm-up"><i class="ti-info"></i></span> <span class="hidden-xs-down">Profile</span></a> </li>
-                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#stats" role="tab"><span class="hidden-sm-up"><i class="ti-dashboard"></i></span> <span class="hidden-xs-down">Stats</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#custom" role="tab"><span class="hidden-sm-up"><i class="ti-dashboard"></i></span> <span class="hidden-xs-down">Custom Data</span></a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#images" role="tab"><span class="hidden-sm-up"><i class="ti-image"></i></span> <span class="hidden-xs-down">Images</span></a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#children" role="tab"><span class="hidden-sm-up"><i class="mdi mdi-human-child"></i></span> <span class="hidden-xs-down">Children</span></a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#cert" role="tab"><span class="hidden-sm-up"><i class="mdi mdi-human-child"></i></span> <span class="hidden-xs-down">Certificate</span></a> </li>
@@ -82,72 +82,27 @@ vertical-align: middle;
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane p-3" id="stats" role="tabpanel">
+                    <div class="tab-pane p-3" id="custom" role="tabpanel">
                         <!-- Row -->
                     <div class="row">
                         <!-- Column -->
-<!--                        <div class="col-lg-3 col-md-6">-->
-<!--                            <div class="card">-->
-<!--                                <div class="card-body">-->
-<!--                                    &lt;!&ndash; Row &ndash;&gt;-->
-<!--                                    <div class="row">-->
-<!--                                        <div class="col-8"><span class="display-6">{{ lvl1.attribute.eggs_per_week }}</span>-->
-<!--                                            <h6>Eggs Laid Per Week</h6></div>-->
-<!--                                        <div class="col-4 align-self-center text-right  pl-0">-->
-<!--                                            <div id="sparklinedash3"></div>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        &lt;!&ndash; Column &ndash;&gt;-->
-<!--                        <div class="col-lg-3 col-md-6">-->
-<!--                            <div class="card">-->
-<!--                                <div class="card-body">-->
-<!--                                    &lt;!&ndash; Row &ndash;&gt;-->
-<!--                                    <div class="row">-->
-<!--                                        <div class="col-8"><span class="display-6">370 <i class="ti-angle-up font-14 text-success"></i></span>-->
-<!--                                            <h6>Offspring</h6></div>-->
-<!--                                        <div class="col-4 align-self-center text-right pl-0">-->
-<!--                                            <div id="sparklinedash"></div>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        &lt;!&ndash; Column &ndash;&gt;-->
-<!--                        <div class="col-lg-3 col-md-6">-->
-<!--                            <div class="card">-->
-<!--                                <div class="card-body">-->
-<!--                                    &lt;!&ndash; Row &ndash;&gt;-->
-<!--                                    <div class="row">-->
-<!--                                        <div class="col-8"><span class="display-7">{{ lvl1.dob }} </span>-->
-<!--                                            <h6>Date Of Birth</h6></div>-->
-<!--                                        <div class="col-4 align-self-center text-right pl-0">-->
-<!--                                            <div id="sparklinedash2"></div>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        &lt;!&ndash; Column &ndash;&gt;-->
-<!--                        <div class="col-lg-3 col-md-6">-->
-<!--                            <div class="card">-->
-<!--                                <div class="card-body">-->
-<!--                                    &lt;!&ndash; Row &ndash;&gt;-->
-<!--                                    <div class="row">-->
-<!--                                        {% if lvl1.dod %}-->
-<!--                                        <div class="col-8"><span class="display-7">{{ lvl1.dod }}</span>-->
-<!--                                            <h6>Date Of Death</h6></div>-->
-<!--                                        <div class="col-4 align-self-center text-right pl-0">-->
-<!--                                            <div id="sparklinedash4"></div>-->
-<!--                                        </div>-->
-<!--                                        {% else %}-->
-<!--                                        {% endif %}-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
+                        <div class="col-lg-6 col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- Row -->
+                                    <div class="row">
+                                        <dl>
+                                            {% if custom_fields %}
+                                                {% for field_key, field_vals in custom_fields.items %}
+                                                    <dt>{{ field_vals.fieldName }}</dt>
+                                                    <dd>{{ field_vals.field_value }}</dd>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <!-- Row -->
 

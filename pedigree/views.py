@@ -17,6 +17,7 @@ from breed_group.models import BreedGroup
 from .forms import PedigreeForm, AttributeForm, ImagesForm
 from django.db.models import Q
 import csv
+import json
 from account.views import is_editor, get_main_account
 
 
@@ -45,6 +46,9 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
 
         # get all pedigrees for typeahead fields
         context['pedigrees'] = Pedigree.objects.filter(account=context['attached_service'])
+
+        # get custom fields
+        context['custom_fields'] = json.loads(context['lvl1'].attribute.custom_fields)
 
         context = generate_hirearchy(context)
 
@@ -245,12 +249,11 @@ def new_pedigree_form(request):
             breed = Breed.objects.get(account=attached_service, breed_name=attributes_form['breed'].value())
             new_pedigree_attributes.breed = breed
 
-            try:
-                eggs = attributes_form['eggs_per_week'].value()
-                new_pedigree_attributes.eggs_per_week = int(eggs)
-            except TypeError:
-                pass
-            new_pedigree_attributes.prize_winning = attributes_form['prize_winning'].value()
+            custom_fields = json.loads(attached_service.custom_fields)
+            for id, field in custom_fields.items():
+                custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
+
+            new_pedigree_attributes.custom_fields = json.dumps(custom_fields)
             new_pedigree_attributes.save()
 
             files = request.FILES.getlist('upload_images')
@@ -270,7 +273,8 @@ def new_pedigree_form(request):
                                                            'pedigrees': Pedigree.objects.filter(account=attached_service),
                                                            'breeders': Breeder.objects.filter(account=attached_service),
                                                            'breeds': Breed.objects.filter(account=attached_service),
-                                                           'breed_groups': BreedGroup.objects.filter(account=attached_service)})
+                                                           'breed_groups': BreedGroup.objects.filter(account=attached_service),
+                                                           'custom_fields': json.loads(attached_service.custom_fields)})
 
 
 @login_required(login_url="/account/login")
@@ -376,12 +380,11 @@ def edit_pedigree_form(request, id):
 
             pedigree_attributes.breed = Breed.objects.get(account=attached_service, breed_name=attributes_form['breed'].value())
 
-            try:
-                eggs = attributes_form['eggs_per_week'].value()
-                pedigree_attributes.eggs_per_week = int(eggs)
-            except TypeError:
-                pass
-            pedigree_attributes.prize_winning = attributes_form['prize_winning'].value()
+            custom_fields = json.loads(pedigree_attributes.custom_fields)
+            for id, field in custom_fields.items():
+                custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
+
+            pedigree_attributes.custom_fields = json.dumps(custom_fields)
 
             files = request.FILES.getlist('upload_images')
             #fs = FileSystemStorage()
@@ -409,7 +412,8 @@ def edit_pedigree_form(request, id):
                                                        'pedigrees': Pedigree.objects.filter(account=attached_service),
                                                        'breeders': Breeder.objects.filter(account=attached_service),
                                                        'breeds': Breed.objects.filter(account=attached_service),
-                                                       'breed_groups': BreedGroup.objects.filter(account=attached_service)})
+                                                       'breed_groups': BreedGroup.objects.filter(account=attached_service),
+                                                       'custom_fields': json.loads(pedigree.attribute.custom_fields)})
 
 
 def add_existing(request, pedigree_id):

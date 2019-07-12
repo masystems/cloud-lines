@@ -19,6 +19,7 @@ class AttachedService(models.Model):
     read_only_users = models.ManyToManyField(User, related_name='read_only_users', blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
     animal_type = models.CharField(max_length=250)
+    custom_fields = models.TextField(blank=True)
 
     SITE_MODES = (
         ('mammal', 'Mammal'),
