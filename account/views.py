@@ -304,6 +304,7 @@ def custom_field_edit(request):
                                                      'fieldType': request.POST.get('fieldType')}
             attached_service.custom_fields = json.dumps(custom_fields)
             attached_service.save()
+
             return HttpResponse(True)
 
         elif request.POST.get('formType') == 'delete':
@@ -316,7 +317,6 @@ def custom_field_edit(request):
             for pedigree in pedigrees.all():
                 custom_fields_updated = {}
                 if pedigree.attribute.custom_fields:
-                    print(json.loads(pedigree.attribute.custom_fields))
                     for key, val in json.loads(pedigree.attribute.custom_fields).items():
                         if key in custom_fields:
                             custom_fields_updated[key] = val

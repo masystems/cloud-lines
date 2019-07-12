@@ -82,67 +82,12 @@
                                 </div>
                             </div>
                             <hr>
-                            {% if editor %}
-                                <p class="mt-4">As an editor you're able to add/delete {{ service.animal_type }}, breeders/owners, breeds and breed groups if it's a poultry service.</p>
-                            {% else %}
-                                <p class="mt-4">As a read only user you cannot add/delete any {{ service.animal_type }}, however you're free to browse all the data on this site.</p>
-                            {% endif %}
-
-                            {% if request.user == service.user.user and service.service.service_name != 'Organisation' %}
-                                <h4 class="font-medium mt-4">Available Services</h4>
-                                <div class="row pricing-plan pt-2">
-                                    {% for plan in services.all %}
-                                        {% if plan.service_name != service.service.service_name %}
-                                            <div class="col-md-3 col-xs-12 col-sm-6 no-padding">
-                                                <div class="pricing-box {% if plan.id == recommended.first.id %}featured-plan{% endif %}">
-                                                    <div class="pricing-body">
-                                                        <div class="pricing-header">
-                                                            {% if plan.id == recommended.first.id %}
-                                                                <h4 class="price-lable text-white bg-warning"> Suggested</h4>
-                                                            {% endif %}
-                                                            <h4 class="text-center">{{ plan.service_name }}</h4>
-                                                            <h2 class="text-center"><span class="price-sign">£</span>{{ plan.price_per_month|add:"0" }}</h2>
-                                                            <p class="uppercase">per month</p>
-                                                        </div>
-                                                        <div class="price-table-content">
-                                                            <div class="price-row"><i class="fas fa-pencil-alt"></i> {{ plan.admin_users }} Editors</div>
-                                                            <div class="price-row"><i class="fas fa-book-reader"></i> {{ plan.read_only_users }} Read only Users</div>
-                                                            <div class="price-row"><i class="fas fa-paw"></i> {% if plan.number_of_animals == 99 %}
-                                                                                                                    Unlimited
-                                                                                                                {% else %}
-                                                                                                                    {{ plan.number_of_animals }}
-                                                                                                                {% endif %} Animals <i class="fas fa-feather-alt"></i></div>
-                                                            <div class="price-row">{% if plan.multi_breed %}
-                                                                                        <i class="fas fa-check"></i>
-                                                                                    {% else %}
-                                                                                        <i class="fas fa-times"></i>
-                                                                                    {% endif %} Multibreed</div>
-                                                            <div class="price-row">{% if plan.support %}
-                                                                                        <td><i class="fas fa-check"></i></td>
-                                                                                    {% else %}
-                                                                                        <td><i class="fas fa-times"></i></td>
-                                                                                    {% endif %} Support</div>
-                                                            <div class="price-row">
-                                                                {% if plan.active %}
-                                                                    <a href="{% url 'order' %}?id={{ plan.id }}&upgrade={{ service.id }}"><button class="btn btn-lg {% if plan.id < recommended.first.id %}btn-warning{% else %}btn-info{% endif %} waves-effect waves-light mt-3">{% if plan.id < recommended.first.id %}Downgrade{% else %}Upgrade{% endif %}</button></a>
-                                                                {% else %}
-                                                                    <button class="btn btn-lg btn-secondary waves-effect waves-light mt-3">Coming Soon!</button>
-                                                                {% endif %}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
                     <!--second tab-->
                     <div class="tab-pane" id="customFields" role="tabpanel">
                         <div class="card-body">
-
+                            <p class="text-left">You can add your own custom fields below! Start by clicking Edit rows, then click add new.</p>
                             <div class="table-responsive">
                                 <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="{% if editor %}true{% else %}false{% endif %}" data-state="true"></table>
                             </div>

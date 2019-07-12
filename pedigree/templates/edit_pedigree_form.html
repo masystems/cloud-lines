@@ -208,12 +208,14 @@ li {
                                                 {% elif field.label == 'Custom fields' %}
                                                     {% if custom_fields %}
                                                         {% for field_key, field_vals in custom_fields.items %}
-                                                            {% if field_vals.fieldType == 'textField' %}
-                                                                <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
-                                                                <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' value="{{ field_vals.field_value }}" type="text">
-                                                            {% elif field_vals.fieldType == 'textBox' %}
-                                                                <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
-                                                                <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control">{{ field_vals.field_value }}</textarea>
+                                                            {% if field_vals.location == 'pedigree' %}
+                                                                {% if field_vals.fieldType == 'textField' %}
+                                                                    <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
+                                                                    <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' value="{{ field_vals.field_value }}" type="text">
+                                                                {% elif field_vals.fieldType == 'textBox' %}
+                                                                    <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
+                                                                    <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control">{{ field_vals.field_value }}</textarea>
+                                                                {% endif %}
                                                             {% endif %}
                                                         {% endfor %}
                                                     {% else %}

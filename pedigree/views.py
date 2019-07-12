@@ -215,11 +215,11 @@ def new_pedigree_form(request):
             new_pedigree = Pedigree()
             new_pedigree.creator = request.user
             try:
-                new_pedigree.breeder = Breeder.objects.get(prefix=pedigree_form['breeder'].value())
+                new_pedigree.breeder = Breeder.objects.get(account=attached_service, prefix=pedigree_form['breeder'].value())
             except ObjectDoesNotExist:
                 pass
             try:
-                new_pedigree.current_owner = Breeder.objects.get(prefix=pedigree_form['current_owner'].value())
+                new_pedigree.current_owner = Breeder.objects.get(account=attached_service, prefix=pedigree_form['current_owner'].value())
             except ObjectDoesNotExist:
                 pass
             new_pedigree.reg_no = pedigree_form['reg_no'].value()
@@ -238,11 +238,11 @@ def new_pedigree_form(request):
             except:
                 pass
             try:
-                new_pedigree.parent_mother = Pedigree.objects.get(reg_no=pedigree_form['mother'].value())
+                new_pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
             except ObjectDoesNotExist:
                 new_pedigree.breed_group = pedigree_form['breed_group'].value() or None
             try:
-                new_pedigree.parent_father = Pedigree.objects.get(reg_no=pedigree_form['father'].value())
+                new_pedigree.parent_father = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['father'].value())
             except ObjectDoesNotExist:
                 pass
             new_pedigree.description = pedigree_form['description'].value()
@@ -251,14 +251,18 @@ def new_pedigree_form(request):
             new_pedigree.save()
 
             new_pedigree_attributes = PedigreeAttributes()
-            new_pedigree_attributes.reg_no = Pedigree.objects.get(reg_no=new_pedigree.reg_no)
+            new_pedigree_attributes.reg_no = Pedigree.objects.get(account=attached_service, reg_no=new_pedigree.reg_no)
 
-            breed = Breed.objects.get(account=attached_service, breed_name=attributes_form['breed'].value())
+            breed = Breed.objects.get(account=attached_service, breed_name=request.POST.get('breed'))
             new_pedigree_attributes.breed = breed
 
-            custom_fields = json.loads(attached_service.custom_fields)
-            for id, field in custom_fields.items():
-                custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
+            try:
+                custom_fields = json.loads(attached_service.custom_fields)
+
+                for id, field in custom_fields.items():
+                    custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
+            except json.decoder.JSONDecodeError:
+                pass
 
             new_pedigree_attributes.custom_fields = json.dumps(custom_fields)
             new_pedigree_attributes.save()
@@ -297,9 +301,21 @@ def edit_pedigree_form(request, id):
     pre_checks = True
 
     try:
+        # get custom fields
         custom_fields = json.loads(pedigree.attribute.custom_fields)
+        # add any new custom fields
+        for field, values in json.loads(attached_service.custom_fields).items():
+            if field not in custom_fields:
+                custom_fields[field] = values
+        # get custom fields template
+        if not custom_fields:
+            custom_fields = json.loads(attached_service.custom_fields)
     except json.decoder.JSONDecodeError:
-        custom_fields = ''
+        try:
+            # get custom fields template
+            custom_fields = json.loads(attached_service.custom_fields)
+        except json.decoder.JSONDecodeError:
+            custom_fields = ''
 
     if request.method == 'POST':
         if 'delete' in request.POST:

@@ -34,14 +34,23 @@
                                                               {% endif %}</label>
             <div class="col-md-9">
                 {% if field.label == 'Breeder' %}
-                    <div id="breeders">
-                        <input id="id_breeder" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
-                    </div>
+                    {% if 'order' in request.path %}
+                        <input id="hid_breeder" type="hidden" name='{{ field.name }}' value="">
+                        <input id="id_breeder" class="typeahead form-control" type="text" placeholder="{{ field.label|title }}">
+                    {% else %}
+                        <div id="breeders">
+                            <input id="id_breeder" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                        </div>
+                    {% endif %}
                 {% elif field.label == 'Current owner' %}
-                    <div id="breeders">
-                        <input id="id_current_owner" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
-                    </div>
-
+                    {% if 'order' in request.path %}
+                        <input id="hid_current_owner" type="hidden" name='{{ field.name }}' value="">
+                        <input id="id_current_owner" class="typeahead form-control" type="text" placeholder="{{ field.label|title }}">
+                    {% else %}
+                        <div id="breeders">
+                            <input id="id_current_owner" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                        </div>
+                    {% endif %}
                 {% elif field.label == 'Mother' %}
                     <div id="mothers">
                         <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
@@ -115,12 +124,14 @@
                         {% elif field.label == 'Custom fields' %}
                             {% if custom_fields %}
                                 {% for field_key, field_vals in custom_fields.items %}
-                                    {% if field_vals.fieldType == 'textField' %}
-                                        <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
-                                        <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' type="text">
-                                    {% elif field_vals.fieldType == 'textBox' %}
-                                        <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
-                                        <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control"></textarea>
+                                    {% if field_vals.location == 'pedigree' %}
+                                        {% if field_vals.fieldType == 'textField' %}
+                                            <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
+                                            <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' type="text">
+                                        {% elif field_vals.fieldType == 'textBox' %}
+                                            <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
+                                            <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control"></textarea>
+                                        {% endif %}
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
