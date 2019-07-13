@@ -243,7 +243,7 @@ def order_subscribe(request):
     try:
         stripe.Customer.modify(
             user_detail.stripe_id,
-            source=request.POST.get('id')
+            source=request.POST.get('token[id]')
         )
     except stripe.error.CardError as e:
         # Since it's a decline, stripe.error.CardError will be caught
