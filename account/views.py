@@ -381,7 +381,7 @@ def register(request):
         <p>Feel free to contact us about anything and enjoy!</p>"""
         send_mail('Welcome to Cloudlines!', user.get_full_name(), email_body, send_to=user.email)
 
-        send_mail('New site registration', user.get_full_name(), email_body, send_from=user.email)
+        send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
 
         return redirect('order')
     else:
