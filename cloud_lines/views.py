@@ -341,6 +341,14 @@ def order_subscribe(request):
               'invoice': invoice.data[0].invoice_pdf,
               'receipt': receipt.data[0].receipt_url}
 
+    # send confirmation email
+    body = """
+        Congratulations on purchasing a new Cloudlines {} service!
+        To access your new service click <a href="https://cloud-lines.co.uk/dashboard"> HERE</a>. You should
+        find everything you need to get started there but do let is know if you have any questions.
+    """.format(attach_service.service.service_name,)
+    send_mail('New subscription!', request.user, body, send_to=request.user.email)
+
     # set new default attached service
     UserDetail.objects.filter(user=request.user).update(current_service=attach_service)
 

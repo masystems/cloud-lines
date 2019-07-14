@@ -12,11 +12,10 @@ def support(request):
         if support_form.is_valid():
             support_form.save()
             body = """
-                From: {},
                 Priority: {},
                 Subject: {},
                 Description: {},
-            """.format(request.user, request.POST.get('priority'), request.POST.get('subjects'), request.POST.get('description'))
+            """.format(request.user, request.POST.get('priority'), request.POST.get('subject'), request.POST.get('description'))
             send_mail('Support Request', request.user, body, reply_to=request.user.email)
 
             return redirect('support')
