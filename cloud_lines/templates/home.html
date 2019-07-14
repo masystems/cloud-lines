@@ -130,281 +130,47 @@
 					</div>
 					<div class="col-md-6 mt-4 mt-lg-0">
 						<div class="input-group input-group-lg">
-							<input type="text" class="form-control" placeholder="Email and/or phone number" aria-label="Email and/or phone number">
-							<div class="input-group-append">
-								<button class="btn bgcolor text-white dark">Send</button>
+
+								<input type="text" id="knowMore" class="form-control" placeholder="Email and/or phone number" aria-label="Email and/or phone number">
+
+								<div class="input-group-append">
+									<button id="knowMoreButton" class="btn bgcolor text-white dark">Send</button>
+								</div>
+
+							<div id="knowMoreSuccess">
+
 							</div>
 						</div>
+
+						<script>
+							$('#knowMoreButton').click( function() {
+								$.ajax({
+									url: '{% url 'know_more' %}',
+									type: 'post',
+									dataType: 'text',
+									headers: {'X-CSRFToken': '{{ csrf_token }}'},
+									data: {'contact': $('#knowMore').val()},
+									success: function(data) {
+										$('#knowMore').addClass('d-none');
+										$('#knowMoreButton').addClass('d-none');
+										$('#knowMoreSuccess').hide().html('<h4>Thank you, well be in touch soon!</h4>').fadeIn(2000);
+									 },
+									error: function(jqXHR, textStatus, errorThrown){
+										console.log('jqXHR:');
+										console.log(jqXHR);
+										console.log('textStatus:');
+										console.log(textStatus);
+										console.log('errorThrown:');
+										console.log(errorThrown);
+									}
+								});
+							});
+						</script>
 
 					</div>
 				</div>
 			</div>
 		</div>
-
-<!--				&lt;!&ndash; Loaction Section-->
-<!--				============================================= &ndash;&gt;-->
-<!--				<div class="section nomargin nobg">-->
-<!--					<div class="container clearfix">-->
-<!--						<div class="heading-block center mt-0 divcenter nobottomborder clearfix" style="max-width: 700px">-->
-<!--							<h2>We provide best services for you.</h2>-->
-<!--							<p>Competently recaptiualize multifunctional schemas without an expanded array of niches. Continually engage cooperative sources vis-a-vis web-enabled benefits.</p>-->
-<!--						</div>-->
-<!--						<div class="row">-->
-<!--							<div class="col-lg-5 col-md-6">-->
-<!--								<div class="heading-block mt-md-3 mt-0">-->
-<!--									<div class="before-heading color">Our Network</div>-->
-<!--									<h3 class=" nott ls0">16 TBPS Capacity and 140 Data Center Global Network</h3>-->
-<!--								</div>-->
-<!--								<div class="row">-->
-<!--									<div class="col-6">-->
-<!--										<ul class="iconlist ml-0">-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/uk.png' %}" alt=""><a href="#">United Kingdom</a></li>-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/us.png' %}" alt=""><a href="#">USA</a></li>-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/br.png' %}" alt=""><a href="#">Brazil</a></li>-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/sa.png' %}" alt=""><a href="#">South Africa</a></li>-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/in.png' %}" alt=""><a href="#">India</a></li>-->
-<!--										</ul>-->
-<!--									</div>-->
-<!--									<div class="col-6">-->
-<!--										<ul class="iconlist ml-0">-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/si.png' %}" alt=""><a href="#">Singapore</a></li>-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/ja.png' %}" alt=""><a href="#">Japan</a></li>-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/au.png' %}" alt=""><a href="#">Australia</a></li>-->
-<!--											<li><img src="{% static 'cloud-lines/demos/hosting/images/flags/ca.png' %}" alt=""><a href="#">Canada</a></li>-->
-<!--											<li><a href="#">See More..</a></li>-->
-<!--										</ul>-->
-<!--									</div>-->
-<!--								</div>-->
-<!--							</div>-->
-<!--							<div class="col-lg-7 col-md-6">-->
-<!--								<div id="hotspot-img" class="hotspot-img mt-2 responsive-hotspot-wrap">-->
-<!--							<img src="{% static 'cloud-lines/demos/hosting/images/svg/map.png' %}" class="img-responsive" alt="">-->
-
-<!--							&lt;!&ndash; Circle #1 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="1970" y="830">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>singapore</p></div>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; Circle #2 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="330" y="522">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>San Fransisco</p></div>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; Circle #3 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="2350" y="1110">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>Sydney</p></div>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; Circle #4 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="1222" y="395">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>London</p></div>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; Circle #5 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="1800" y="760">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>Bangalore</p></div>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; Circle #6 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="2250" y="560">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>Tokyo</p></div>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; Circle #7 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="1366" y="1134">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>Cape Town</p></div>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; Circle #8 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="880" y="990">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>Brasilla</p></div>-->
-<!--							</div>-->
-<!--							&lt;!&ndash; Circle #8 &ndash;&gt;-->
-<!--							<div class="hot-spot" x="710" y="395">-->
-<!--								<div class="circle"></div>-->
-<!--								<div class="tooltip"><p>Toronto</p></div>-->
-<!--							</div>-->
-<!--						</div>-->
-<!--							</div>-->
-<!--						</div>-->
-<!--					</div>-->
-<!--				</div>-->
-
-<!--				&lt;!&ndash; Pricing Section-->
-<!--				============================================= &ndash;&gt;-->
-<!--				<div class="section bg-angle notopmargin" style="background: #F9F9F9 url('{% static 'cloud-lines/demos/hosting/images/pattern-dark.png' %}') repeat center center; padding: 80px 0">-->
-<!--					<div class="container clearfix">-->
-<!--						<div class="heading-block center mt-0 divcenter nobottomborder clearfix" style="max-width: 750px">-->
-<!--							<h2>Hosting that scales with your Business</h2>-->
-<!--							<p>Competently recaptiualize multifunctional schemas without an expanded array of niches. Continually engage cooperative sources vis-a-vis web-enabled benefits.</p>-->
-<!--						</div>-->
-
-<!--						<div class="row mb-2 align-items-stretch">-->
-
-<!--							<div class="col-lg-8 col-md-8">-->
-
-<!--								<div class="row align-items-stretch clearfix">-->
-<!--									<div class="col-md-12">-->
-<!--										&lt;!&ndash; vCPU Section &ndash;&gt;-->
-<!--										<div class="row align-items-stretch">-->
-<!--											<div class="col-md-8 col-sm-8">-->
-<!--												<div class="card mb-4">-->
-<!--													<div class="card-body">-->
-<!--														<div class="d-flex justify-content-between">-->
-<!--															<h4 class="mb-4">vCPU</h4>-->
-<!--														</div>-->
-<!--														&lt;!&ndash; CPU Slider-->
-<!--														============================================= &ndash;&gt;-->
-<!--														<input class="range-slider-cpu" />-->
-<!--													</div>-->
-<!--												</div>-->
-<!--											</div>-->
-<!--											<div class="col-md-4 col-sm-4 d-none d-sm-flex card bgcolor text-white text-center mb-4">-->
-<!--												<div class="card-body">-->
-<!--													&lt;!&ndash; CPU Price Value-->
-<!--													============================================= &ndash;&gt;-->
-<!--													<h2 class="cpu-price text-white mb-0 t700"></h2>-->
-<!--													<p class="card-text mb-0" style="opacity: .8;">$10 <span class="font-italic">per vCPU</span></p>-->
-<!--												</div>-->
-<!--											</div>-->
-<!--										</div>-->
-
-<!--										&lt;!&ndash; RAM Section &ndash;&gt;-->
-<!--										<div class="row align-items-stretch">-->
-<!--											<div class="col-md-8 col-sm-8">-->
-<!--												<div class="card mb-4">-->
-<!--													<div class="card-body">-->
-<!--														<div class="d-flex justify-content-between">-->
-<!--															<h4 class="mb-4">Ram</h4>-->
-<!--														</div>-->
-<!--														&lt;!&ndash; RAM Slider-->
-<!--														============================================= &ndash;&gt;-->
-<!--														<input class="range-slider-ram" />-->
-<!--													</div>-->
-<!--												</div>-->
-<!--											</div>-->
-<!--											<div class="col-md-4 col-sm-4 d-none d-sm-flex card bgcolor text-white text-center mb-4">-->
-<!--												<div class="card-body">-->
-<!--													&lt;!&ndash; RAM Proce Value-->
-<!--													============================================= &ndash;&gt;-->
-<!--													<h2 class="ram-price text-white mb-0 t700"></h2>-->
-<!--													<p class="card-text mb-0" style="opacity: .8;">$8 <span class="font-italic">per RAM</span></p>-->
-<!--												</div>-->
-<!--											</div>-->
-<!--										</div>-->
-
-<!--										&lt;!&ndash; Storage Section &ndash;&gt;-->
-<!--										<div class="row align-items-stretch">-->
-<!--											<div class="col-md-8 col-sm-8">-->
-<!--												<div class="card">-->
-<!--													<div class="card-body">-->
-<!--														<div class="d-flex justify-content-between">-->
-<!--															<h4 class="mb-4">Storage</h4>-->
-<!--														</div>-->
-<!--														&lt;!&ndash; Storage Slider-->
-<!--														============================================= &ndash;&gt;-->
-<!--														<input class="range-slider-storage" />-->
-<!--													</div>-->
-<!--												</div>-->
-<!--											</div>-->
-<!--											<div class="col-md-4 col-sm-4 d-none d-sm-flex card bgcolor text-white text-center">-->
-<!--												<div class="card-body">-->
-<!--													&lt;!&ndash; Storage Price Value-->
-<!--													============================================= &ndash;&gt;-->
-<!--													<h2 class="storage-price text-white mb-0 t700"></h2>-->
-<!--													<p class="card-text mb-0" style="opacity: .8;">$.5 <span class="font-italic">per Storage</span></p>-->
-<!--												</div>-->
-<!--											</div>-->
-<!--										</div>-->
-<!--									</div>-->
-<!--								</div>-->
-
-<!--							</div>-->
-
-<!--							&lt;!&ndash; Price Area &ndash;&gt;-->
-<!--							<div class="col-lg-4 col-md-4 mt-4 mt-md-0">-->
-<!--								<div class="card text-center">-->
-<!--									<div class="card-body py-4">-->
-<!--										<h3 class="card-title t400">Your Plan</h3>-->
-<!--										&lt;!&ndash; Price Value &ndash;&gt;-->
-<!--										<div class="pricing-price t600 py-2"></div>-->
-<!--										<p class="card-text pricing-sub">Billed Monthly</p>-->
-<!--									</div>-->
-<!--									<div class="line my-1"></div>-->
-<!--									<div class="card-body py-4">-->
-<!--										<ul class="iconlist ml-0" style="opacity: .8">-->
-<!--											<li>Un-Mitered Bandwith</li>-->
-<!--											<li>2 Dedicated IPs</li>-->
-<!--											<li>Shared SSL certificate</li>-->
-<!--											<li>30 Days Money Back</li>-->
-<!--										</ul>-->
-<!--										<a href="#" class="button button-rounded button-large ls0 t400 m-0 nott">Order Now</a>-->
-<!--									</div>-->
-<!--								</div>-->
-<!--							</div>-->
-
-<!--						</div>-->
-
-<!--						<div class="clear"></div>-->
-
-<!--						<div class="row mt-5 clearfix">-->
-<!--							<div class="col-lg-3 col-sm-6">-->
-<!--								<h4 class="t500 mb-3">Free Includes:</h4>-->
-<!--								<ul class="iconlist price-compare mb-2">-->
-<!--									<li><a href="#" class="t300">Unmetered Mitigation of DDoS</a></li>-->
-<!--									<li><a href="#" class="t300">Global CDN</a></li>-->
-<!--									<li><a href="#" class="t300">Shared SSL certificate</a></li>-->
-<!--									<li><a href="#" class="t300">I'm Under Attack™ mode</a></li>-->
-<!--									<li><a href="#" class="t300">Access to account Audit Logs</a></li>-->
-<!--								</ul>-->
-<!--								<a href="#" class="btn btn-link mt-2 t400 color p-0" style="font-size: 14px">All Features &#8250;</a>-->
-<!--							</div>-->
-<!--							<div class="col-lg-3 col-sm-6 mt-4 mt-sm-0">-->
-<!--								<h4 class="t500 mb-3">Pro Includes:</h4>-->
-<!--								<ul class="iconlist price-compare mb-2">-->
-<!--									<li><a href="#" class="t300">100 GB of disk space</a></li>-->
-<!--									<li><a href="#" class="t300">1000 GB/mo data transfer</a></li>-->
-<!--									<li><a href="#" class="t300">1 domain + 100 subdomains</a></li>-->
-<!--									<li><a href="#" class="t300">10 site pages</a></li>-->
-<!--									<li><a href="#" class="t300">5 email addresses</a></li>-->
-<!--									<li><a href="#" class="t300">Site design tools</a></li>-->
-<!--									<li><a href="#" class="t300">Account access for colleagues/friends</a></li>-->
-<!--								</ul>-->
-<!--								<a href="#" class="btn btn-link mt-2 t400 color p-0" style="font-size: 14px">All Features &#8250;</a>-->
-<!--							</div>-->
-<!--							<div class="col-lg-3 col-sm-6 mt-4 mt-lg-0">-->
-<!--								<h4 class="t500 mb-3">Business Includes:</h4>-->
-<!--								<ul class="iconlist price-compare mb-2">-->
-<!--									<li><a href="#" class="t300">Unlimited site pages</a></li>-->
-<!--									<li><a href="#" class="t300">10 email addresses</a></li>-->
-<!--									<li><a href="#" class="t300">500 GB of disk space</a></li>-->
-<!--									<li><a href="#" class="t300">5000 GB/mo data transfer</a></li>-->
-<!--									<li><a href="#" class="t300">1 domain + 500 subdomains</a></li>-->
-<!--									<li><a href="#" class="t300">Secure FTP File Manager</a></li>-->
-<!--									<li><a href="#" class="t300">WordPress blogging</a></li>-->
-<!--									<li><a href="#" class="t300">PHP 5.3.6, Perl 5.8.7, MySQL 5.1</a></li>-->
-<!--								</ul>-->
-<!--								<a href="#" class="btn btn-link mt-2 t400 color p-0" style="font-size: 14px">All Features &#8250;</a>-->
-<!--							</div>-->
-<!--							<div class="col-lg-3 col-sm-6 mt-4 mt-lg-0">-->
-<!--								<h4 class="t500 mb-3">Advanced Includes:</h4>-->
-<!--								<ul class="iconlist price-compare mb-2">-->
-<!--									<li><a href="#" class="t300">20 email addresses</a></li>-->
-<!--									<li><a href="#" class="t300">Unlimited disk space</a></li>-->
-<!--									<li><a href="#" class="t300">Unlimited data transfer</a></li>-->
-<!--									<li><a href="#" class="t300">Private registration</a></li>-->
-<!--									<li><a href="#" class="t300">Named solution and customer success engineers-->
-<!--									Access to China data centers (additional cost)</a></li>-->
-<!--									<li><a href="#" class="t300">30-day satisfaction guarantee</a></li>-->
-<!--									<li><a href="#" class="t300">24/7 phone, chat and online support</a></li>-->
-
-<!--								</ul>-->
-<!--								<a href="#" class="btn btn-link mt-2 t400 color p-0" style="font-size: 14px">All Features &#8250;</a>-->
-<!--							</div>-->
-<!--						</div>-->
-<!--					</div>-->
-<!--				</div>-->
 
 		<!-- Addition Service Section
 		============================================= -->

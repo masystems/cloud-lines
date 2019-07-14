@@ -385,3 +385,12 @@ def activate_primary_account(request, service):
 
     return redirect('dashboard')
 
+
+def know_more(request):
+    if request.POST:
+        body = """
+            Contact request: {}
+            """.format(request.POST.get('contact'))
+        send_mail('Contact Request', 'Site user', body)
+    return HttpResponse(True)
+
