@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import SupportForm
 from .models import Ticket
+from account.views import send_mail
 
 @login_required(login_url="/account/login")
 def support(request):
@@ -10,6 +11,13 @@ def support(request):
     if request.method == 'POST':
         if support_form.is_valid():
             support_form.save()
+            body = """
+                From: {},
+                Priority: {},
+                Subject: {},
+                Description: {},
+            """.format(request.user, request.POST.get('priority'), request.POST.get('subjects'), request.POST.get('description'))
+            send_mail('Support Request', request.user, body, reply_to=request.user.email)
 
             return redirect('support')
 
