@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ca65e522-4d0f-409c-bde2-2d82bd0bafaa" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/cloud_lines/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloud_lines/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloud_lines/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/templates/home.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cloud_lines/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/support/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/support/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,23 +15,44 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/account/views.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/cloud_lines/templates/home.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="228">
-              <caret line="481" column="34" lean-forward="true" selection-start-line="481" selection-start-column="34" selection-end-line="481" selection-end-column="34" />
+            <state relative-caret-position="330">
+              <caret line="489" column="52" selection-start-line="489" selection-start-column="52" selection-end-line="489" selection-end-column="52" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cloud_lines/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="468">
+              <caret line="64" column="29" lean-forward="true" selection-start-line="64" selection-start-column="29" selection-end-line="64" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cloud_lines/admin.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="8" column="32" lean-forward="true" selection-start-line="8" selection-start-column="32" selection-end-line="8" selection-end-column="32" />
               <folding>
-                <element signature="e#0#49#0" expanded="true" />
+                <element signature="e#0#32#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cloud_lines/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="243">
-              <caret line="347" column="99" selection-start-line="347" selection-start-column="99" selection-end-line="347" selection-end-column="99" />
+            <state relative-caret-position="465">
+              <caret line="67" lean-forward="true" selection-start-line="67" selection-end-line="67" />
+              <folding>
+                <element signature="e#0#59#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -46,7 +69,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>data-content</find>
       <find>SignUpForm</find>
       <find>Native Style</find>
       <find>you dat</find>
@@ -76,6 +98,7 @@
       <find>icons</find>
       <find>url</find>
       <find>attached_service_id</find>
+      <find>Many Happy Users</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -84,7 +107,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/cloud_lines/templates/faqs.html" />
         <option value="$PROJECT_DIR$/account/urls.py" />
         <option value="$PROJECT_DIR$/template/style-boxes.html" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/login.html" />
@@ -112,10 +134,8 @@
         <option value="$PROJECT_DIR$/breed/views.py" />
         <option value="$PROJECT_DIR$/cloudlines/custom_storages.py" />
         <option value="$PROJECT_DIR$/static/css/style.css" />
-        <option value="$PROJECT_DIR$/cloud_lines/models.py" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/services.html" />
         <option value="$PROJECT_DIR$/account/templates/profile.html" />
-        <option value="$PROJECT_DIR$/cloud_lines/templates/home.html" />
         <option value="$PROJECT_DIR$/template/css/font-icons.css" />
         <option value="$PROJECT_DIR$/account/templates/mail/email_base.html" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/contact.html" />
@@ -134,7 +154,10 @@
         <option value="$PROJECT_DIR$/account/views.py" />
         <option value="$PROJECT_DIR$/cloud_lines/templates/home_base.html" />
         <option value="$PROJECT_DIR$/support/views.py" />
+        <option value="$PROJECT_DIR$/cloud_lines/models.py" />
+        <option value="$PROJECT_DIR$/cloud_lines/admin.py" />
         <option value="$PROJECT_DIR$/cloud_lines/views.py" />
+        <option value="$PROJECT_DIR$/cloud_lines/templates/home.html" />
       </list>
     </option>
   </component>
@@ -161,6 +184,12 @@
               <item name="cloud-lines" type="b2602c69:ProjectViewProjectNode" />
               <item name="cloud-lines" type="462c0819:PsiDirectoryNode" />
               <item name="cloud_lines" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cloud-lines" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cloud-lines" type="462c0819:PsiDirectoryNode" />
+              <item name="cloud_lines" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -249,27 +278,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/account/forms.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" selection-start-line="7" selection-start-column="2" selection-end-line="10" selection-end-column="28" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/account/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="51" lean-forward="true" selection-start-line="8" selection-start-column="51" selection-end-line="8" selection-end-column="51" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/breed/templates/__init__.py" />
     <entry file="file://$PROJECT_DIR$/pedigree/templates/__init__.py" />
     <entry file="file://$PROJECT_DIR$/breed/templates/new_breed_form_base.html">
       <provider selected="true" editor-type-id="text-editor">
@@ -391,13 +399,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cloud_lines/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="46" lean-forward="true" selection-start-line="5" selection-start-column="46" selection-end-line="5" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cloud_lines/templates/services.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="424">
@@ -480,13 +481,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1875">
           <caret line="125" column="26" selection-start-line="118" selection-start-column="24" selection-end-line="125" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cloud_lines/templates/home.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="50" selection-start-line="25" selection-start-column="50" selection-end-line="25" selection-end-column="50" />
         </state>
       </provider>
     </entry>
@@ -638,10 +632,56 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/breeder/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="21" selection-start-line="5" selection-start-column="21" selection-end-line="5" selection-end-column="98" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/breeder/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/cloud_lines/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="243">
-          <caret line="347" column="99" selection-start-line="347" selection-start-column="99" selection-end-line="347" selection-end-column="99" />
+        <state relative-caret-position="465">
+          <caret line="67" lean-forward="true" selection-start-line="67" selection-end-line="67" />
+          <folding>
+            <element signature="e#0#59#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cloud_lines/admin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="32" lean-forward="true" selection-start-line="8" selection-start-column="32" selection-end-line="8" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cloud_lines/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="64" column="29" lean-forward="true" selection-start-line="64" selection-start-column="29" selection-end-line="64" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cloud_lines/templates/home.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="489" column="52" selection-start-line="489" selection-start-column="52" selection-end-line="489" selection-end-column="52" />
         </state>
       </provider>
     </entry>

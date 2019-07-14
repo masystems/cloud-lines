@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
-from .models import Service, Page, Faq, Contact
+from .models import Service, Page, Faq, Contact, Testimonial
 from account.models import UserDetail, AttachedService
 from account.views import get_main_account, send_mail
 from django.conf import settings
@@ -62,7 +62,8 @@ def dashboard(request):
 
 
 def home(request):
-    return render(request, 'home.html', {'services': Service.objects.all()})
+    return render(request, 'home.html', {'services': Service.objects.all(),
+                                         'testimonials': Testimonial.objects.all()})
 
 
 def about(request):
@@ -348,6 +349,7 @@ def order_subscribe(request):
         find everything you need to get started there but do let is know if you have any questions.
     """.format(attach_service.service.service_name,)
     send_mail('New subscription!', request.user, body, send_to=request.user.email)
+    send_mail('New subscription!', request.user, body, reply_to=request.user.email)
 
     # set new default attached service
     UserDetail.objects.filter(user=request.user).update(current_service=attach_service)

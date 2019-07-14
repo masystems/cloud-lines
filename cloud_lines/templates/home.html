@@ -477,90 +477,23 @@
 				============================================= -->
 				<div id="oc-testimonials" class="owl-carousel center testimonials-carousel testimonial-full carousel-widget mt-5" data-margin="0" data-items-xs="1" data-items-sm="1" data-items-md="1" data-items-lg="2" data-items-xl="3" data-center="true" data-loop="true" data-autoplay="4000" data-speed="500">
 
-					<!-- Item 1 -->
-					<div class="oc-item">
-						<div class="testimonial p-4 noborder noshadow">
-							<div class="testi-image">
-								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/1.jpg' %}" alt="Customer Testimonails"></a>
-							</div>
-							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-half-full"></i></li></ul>
-							<div class="testi-content">
-								<p class="font-body font-normal">Incidunt deleniti blanditiis quas aperiam recusandae consequatur ullam quibusdam cum libero illo rerum repellendus!</p>
-								<div class="testi-meta">
-									John Doe
-									<span>XYZ Inc.</span>
+					{% for item in testimonials %}
+						<div class="oc-item">
+							<div class="testimonial p-4 noborder noshadow">
+								<div class="testi-image">
+									<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/1.jpg' %}" alt="Customer Testimonails"></a>
+								</div>
+								<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-half-full"></i></li></ul>
+								<div class="testi-content">
+									<p class="font-body font-normal">{{ item.body }}</p>
+									<div class="testi-meta">
+										{{ item.name }}
+										<span>{{ item.service }}</span>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-
-					<!-- Item 2 -->
-					<div class="oc-item">
-						<div class="testimonial p-4 noborder noshadow">
-							<div class="testi-image">
-								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/2.jpg' %}" alt="Customer Testimonails"></a>
-							</div>
-							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-empty"></i></li></ul>
-							<div class="testi-content">
-								<p class="font-body font-normal">Natus voluptatum enim quod necessitatibus quis expedita harum provident eos obcaecati id culpa corporis molestias.</p>
-								<div class="testi-meta">
-									Collis Ta'eed
-									<span>Envato Inc.</span>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Item 3 -->
-					<div class="oc-item">
-						<div class="testimonial p-4 noborder noshadow">
-							<div class="testi-image">
-								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/5.jpg' %}" alt="Customer Testimonails"></a>
-							</div>
-							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i></li></ul>
-							<div class="testi-content">
-								<p class="font-normal font-body">Fugit officia dolor sed harum excepturi ex iusto magnam asperiores molestiae qui natus obcaecati facere sint amet.</p>
-								<div class="testi-meta">
-									Mary Jane
-									<span>Google Inc.</span>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Item 4 -->
-					<div class="oc-item">
-						<div class="testimonial p-4 noborder noshadow">
-							<div class="testi-image">
-								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/4.jpg' %}" alt="Customer Testimonails"></a>
-							</div>
-							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i></li></ul>
-							<div class="testi-content">
-								<p class="font-normal font-body">Similique fugit repellendus expedita excepturi iure perferendis provident quia eaque. Repellendus, vero numquam?</p>
-								<div class="testi-meta">
-									Steve Jobs
-									<span>Apple Inc.</span>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Item 5 -->
-					<div class="oc-item">
-						<div class="testimonial p-4 noborder noshadow">
-							<div class="testi-image">
-								<a href="#"><img src="{% static 'cloud-lines/demos/hosting/images/users/3.jpg' %}" alt="Customer Testimonails"></a>
-							</div>
-							<ul class="list-unstyled ml-0 mt-4 mb-2"><li class="color"><i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star3"></i> <i class="icon-star-empty"></i></li></ul>
-							<div class="testi-content">
-								<p class="font-normal font-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus, perspiciatis illum totam dolore deleniti labore.</p>
-								<div class="testi-meta">
-									Jamie Morrison
-									<span>Adobe Inc.</span>
-								</div>
-							</div>
-						</div>
-					</div>
+					{% endfor %}
 
 				</div>
 			</div>

@@ -57,3 +57,9 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class Testimonial(models.Model):
+    name = models.CharField(max_length=250)
+    service = models.ForeignKey(Service, on_delete=models.SET_NULL, blank=True, null=True)
+    body = models.TextField()
