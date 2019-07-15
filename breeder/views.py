@@ -6,6 +6,7 @@ from breed_group.models import BreedGroup
 from account.views import is_editor, get_main_account
 from .forms import BreederForm
 import csv
+import json
 
 
 @login_required(login_url="/account/login")
@@ -15,10 +16,16 @@ def breeder(request, breeder):
     pedigrees = Pedigree.objects.filter(account=attached_service, breeder__prefix__exact=breeder)
     owned = Pedigree.objects.filter(account=attached_service, current_owner__prefix__exact=breeder)
     groups = BreedGroup.objects.filter(breeder=breeder)
+    # get custom fields
+    try:
+        custom_fields = json.loads(breeder.custom_fields)
+    except json.decoder.JSONDecodeError:
+        custom_fields = {}
     return render(request, 'breeder.html', {'breeder': breeder,
                                             'pedigrees': pedigrees,
                                             'owned': owned,
-                                            'groups': groups})
+                                            'groups': groups,
+                                            'custom_fields': custom_fields})
 
 
 @login_required(login_url="/account/login")
@@ -61,8 +68,13 @@ def breeder_csv(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def new_breeder_form(request):
-    breeder_form = BreederForm(request.POST or None, request.FILES or None)
     attached_service = get_main_account(request.user)
+    breeder_form = BreederForm(request.POST or None, request.FILES or None)
+
+    try:
+        custom_fields = json.loads(attached_service.custom_fields)
+    except json.decoder.JSONDecodeError:
+        custom_fields = {}
 
     if request.method == 'POST':
         if breeder_form.is_valid():
@@ -75,22 +87,43 @@ def new_breeder_form(request):
             new_breeder.email = breeder_form['email'].value()
             new_breeder.active = breeder_form['active'].value()
             new_breeder.account = attached_service
-            new_breeder.save()
 
+            try:
+                custom_fields = json.loads(attached_service.custom_fields)
+
+                for id, field in custom_fields.items():
+                    custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
+            except json.decoder.JSONDecodeError:
+                pass
+
+            new_breeder.custom_fields = json.dumps(custom_fields)
+            new_breeder.save()
 
             return redirect('breeder', new_breeder.prefix)
 
     else:
         breeder_form = BreederForm()
 
-    return render(request, 'new_breeder_form_base.html', {'breeder_form': breeder_form})
+    return render(request, 'new_breeder_form_base.html', {'breeder_form': breeder_form,
+                                                          'custom_fields': custom_fields})
 
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def edit_breeder_form(request, breeder_id):
-    breeder = get_object_or_404(Breeder, id=breeder_id)
+    attached_service = get_main_account(request.user)
+    breeder = get_object_or_404(Breeder, id=breeder_id, account=attached_service)
     breeder_form = BreederForm(request.POST or None, request.FILES or None, instance=breeder)
+
+    try:
+        # get custom fields
+        custom_fields = json.loads(breeder.custom_fields)
+    except json.decoder.JSONDecodeError:
+        try:
+            # get custom fields template
+            custom_fields = json.loads(attached_service.custom_fields)
+        except json.decoder.JSONDecodeError:
+            custom_fields = {}
 
     if request.method == 'POST':
         if 'delete' in request.POST:
@@ -99,11 +132,17 @@ def edit_breeder_form(request, breeder_id):
         if breeder_form.is_valid():
             breeder_form.save()
 
-            return redirect('breeder', breeder.prefix)
+            for id, field in custom_fields.items():
+                custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
 
+            breeder.custom_fields = json.dumps(custom_fields)
+            breeder.save()
+
+            return redirect('breeder', breeder.prefix)
 
     else:
         breeder_form = BreederForm()
 
     return render(request, 'edit_breeder_form.html', {'breeder_form': breeder_form,
-                                                      'breeder': breeder})
+                                                      'breeder': breeder,
+                                                      'custom_fields': custom_fields})

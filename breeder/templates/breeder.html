@@ -46,6 +46,16 @@
             <dt class="col-sm-3">State</dt>
             <dd class="col-sm-9"><span class="label {% if breeder.active %}label-light-success{% else %}label-light-danger{% endif %}">{% if breeder.active %}Active{% else %}Inactive{% endif %}</span></dd>
         </dl>
+        <dl>
+            {% if custom_fields %}
+                {% for field_key, field_vals in custom_fields.items %}
+                    {% if field_vals.location == 'breeder' %}
+                        <dt>{{ field_vals.fieldName }}</dt>
+                        <dd>{% if field_vals.field_value %}{{ field_vals.field_value }}{% else %}<br>{% endif %}</dd>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </dl>
         <h4>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} currently owned by {{ breeder.prefix }}</h4>
         <input class="form-control" id="ownerInput" type="text" placeholder="Search..">
         <table class="table table-sm table-hover">

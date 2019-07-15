@@ -25,8 +25,31 @@
         <div class="form-group row">
             <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
             <div class="col-md-9">
-                {{ field|attr:"class:form-control" }}
-                {{ field.help_text }}
+                {% if field.label == 'Custom fields' %}
+                    {% if custom_fields %}
+                        {% for field_key, field_vals in custom_fields.items %}
+
+                            {% if field_vals.location == 'breeder' %}
+                                {% if field_vals.fieldType == 'textField' %}
+                                    <label class="col-sm-6 col-form-label">{{ field_vals.fieldName }}</label>
+                                    <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' type="text">
+                                {% elif field_vals.fieldType == 'textBox' %}
+                                    <label class="col-sm-6 col-form-label">{{ field_vals.fieldName }}</label>
+                                    <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control"></textarea>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% if 'account/setup' not in request.path %}
+                            <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
+                        {% else %}
+                            <small>Make sure you add some custom fields in the 'Site Settings' section after this!</small>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    {{ field|attr:"class:form-control" }}
+                    {{ field.help_text }}
+                {% endif %}
                 {% for error in field.errors %}
                   <span class="help-block">{{ error }}</span>
                 {% endfor %}

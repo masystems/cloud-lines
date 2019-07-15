@@ -16,6 +16,7 @@ from cloud_lines.models import Service
 from pedigree.models import Pedigree
 from breed.models import Breed
 from breed.forms import BreedForm
+from breeder.models import Breeder
 from breeder.forms import BreederForm
 from pedigree.forms import PedigreeForm, AttributeForm, ImagesForm
 from money import Money
@@ -295,6 +296,34 @@ def custom_field_edit(request):
                                         'fieldType': request.POST.get('fieldType')}
             attached_service.custom_fields = json.dumps(custom_fields)
             attached_service.save()
+
+            # update the model
+            if request.POST.get('location') == 'pedigree':
+                objects = Pedigree.objects.filter(account=attached_service)
+            elif request.POST.get('location') == 'breeder':
+                objects = Breeder.objects.filter(account=attached_service)
+
+            for object in objects.all():
+                try:
+                    if request.POST.get('location') == 'pedigree':
+                        object_custom_fields = json.loads(object.attribute.custom_fields)
+                    else:
+                        object_custom_fields = json.loads(object.custom_fields)
+
+                except json.decoder.JSONDecodeError:
+                    object_custom_fields = {}
+
+                object_custom_fields[field_key] = {'id': field_key,
+                                                   'location': request.POST.get('location'),
+                                                   'fieldName': request.POST.get('fieldName'),
+                                                   'fieldType': request.POST.get('fieldType')}
+
+                if request.POST.get('location') == 'pedigree':
+                    object.attribute.custom_fields = json.dumps(object_custom_fields)
+                    object.attribute.save()
+                else:
+                    object.custom_fields = json.dumps(object_custom_fields)
+                    object.save()
             return HttpResponse(True)
 
         elif request.POST.get('formType') == 'edit':
@@ -305,6 +334,19 @@ def custom_field_edit(request):
             attached_service.custom_fields = json.dumps(custom_fields)
             attached_service.save()
 
+            pedigrees = Pedigree.objects.filter(account=attached_service)
+            for pedigree in pedigrees.all():
+                try:
+                    pedigree_custom_fields = json.loads(pedigree.attribute.custom_fields)
+                except json.decoder.JSONDecodeError:
+                    pedigree_custom_fields = {}
+
+                pedigree_custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
+                                                                  'location': request.POST.get('location'),
+                                                                  'fieldName': request.POST.get('fieldName'),
+                                                                  'fieldType': request.POST.get('fieldType')}
+                pedigree.attribute.custom_fields = json.dumps(pedigree_custom_fields)
+                pedigree.attribute.save()
             return HttpResponse(True)
 
         elif request.POST.get('formType') == 'delete':

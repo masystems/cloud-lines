@@ -11,6 +11,7 @@ class Breeder(models.Model):
     phone_number1 = models.CharField(max_length=100, blank=True)
     phone_number2 = models.CharField(max_length=100, blank=True)
     email = models.CharField(max_length=100, blank=True)
+    custom_fields = models.TextField(blank=True)
 
     active = models.BooleanField(default=False)
 

@@ -51,7 +51,7 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
         try:
             context['custom_fields'] = json.loads(context['lvl1'].attribute.custom_fields)
         except json.decoder.JSONDecodeError:
-            context['custom_fields'] = ''
+            context['custom_fields'] = {}
 
         context = generate_hirearchy(context)
 
@@ -188,7 +188,7 @@ def new_pedigree_form(request):
     try:
         custom_fields = json.loads(attached_service.custom_fields)
     except json.decoder.JSONDecodeError:
-        custom_fields = ''
+        custom_fields = {}
 
     if request.method == 'POST':
         # check whether it's valid:
@@ -303,19 +303,12 @@ def edit_pedigree_form(request, id):
     try:
         # get custom fields
         custom_fields = json.loads(pedigree.attribute.custom_fields)
-        # add any new custom fields
-        for field, values in json.loads(attached_service.custom_fields).items():
-            if field not in custom_fields:
-                custom_fields[field] = values
-        # get custom fields template
-        if not custom_fields:
-            custom_fields = json.loads(attached_service.custom_fields)
     except json.decoder.JSONDecodeError:
         try:
             # get custom fields template
             custom_fields = json.loads(attached_service.custom_fields)
         except json.decoder.JSONDecodeError:
-            custom_fields = ''
+            custom_fields = {}
 
     if request.method == 'POST':
         if 'delete' in request.POST:
@@ -408,7 +401,10 @@ def edit_pedigree_form(request, id):
 
             pedigree_attributes.breed = Breed.objects.get(account=attached_service, breed_name=attributes_form['breed'].value())
 
-            custom_fields = json.loads(pedigree_attributes.custom_fields)
+            try:
+                custom_fields = json.loads(pedigree_attributes.custom_fields)
+            except json.decoder.JSONDecodeError:
+                custom_fields = {}
             for id, field in custom_fields.items():
                 custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
 

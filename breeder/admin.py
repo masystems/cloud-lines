@@ -18,7 +18,7 @@ class BreederAdmin(admin.ModelAdmin):
             'fields': ('prefix', 'active')
         }),
         ('Contact options', {
-            'fields': ('contact_name', 'address', 'phone_number1', 'phone_number2', 'email'),
+            'fields': ('contact_name', 'address', 'phone_number1', 'phone_number2', 'email', 'custom_fields'),
         }),
     )
     save_on_top = True

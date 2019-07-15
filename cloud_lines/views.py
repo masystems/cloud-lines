@@ -391,6 +391,6 @@ def know_more(request):
         body = """
             Contact request: {}
             """.format(request.POST.get('contact'))
-        send_mail('Contact Request', 'Site user', body)
+        send_mail('Contact Request', 'Cloudlines Team', body)
     return HttpResponse(True)
 
