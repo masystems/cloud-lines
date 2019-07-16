@@ -136,103 +136,110 @@
                                         </div>
                                     </form>
                                     {% endif %}
-                                </div>
-                            </div>
-                            <!-- End Popup Model -->
-                            <script>
-                                $(window).on('load', function() {
+                                    <script>
+                                        $(window).on('load', function() {
 
-                                    // Add & Remove Row
-                                    // -----------------------------------------------------------------
-                                    var $modal = $('#editor-modal'),
-                                        $editor = $('#editor'),
-                                        $editorTitle = $('#editor-title'),
-                                        ft = FooTable.init('#footable-addrow', {
-                                            columns: [
-                                              {"name":"id","title":"ID"},
-                                              {"name":"location","title":"Location"},
-                                              {"name":"fieldName","title":"Field Name"},
-                                              {"name":"fieldType","title":"Field Type"},
-                                            ],
-                                            rows: [{% for field_key, field_vals in custom_fields.items %}
-                                                       {{ field_vals|safe }},
-                                                   {% endfor %}],
-                                            editing: {
-                                                addRow: function(){
-                                                    $modal.removeData('row');
-                                                    $editor[0].reset();
-                                                    $editorTitle.text('Add a new field');
-                                                    $('#formType').val('new');
-                                                    $modal.modal('show');
-                                                },
-                                                editRow: function(row){
-                                                    var values = row.val();
-                                                    $editor.find('#id').val(values.id);
-                                                    $editor.find('#location').val(values.location);
-                                                    $editor.find('#fieldName').val(values.fieldName);
-                                                    $editor.find('#fieldType').val(values.fieldType);
-                                                    $modal.data('row', row);
-                                                    $editorTitle.text('Edit user #' + values.id);
-                                                    $('#formType').val('edit');
-                                                    $modal.modal('show');
-                                                },
-                                                deleteRow: function(row){
-                                                    var values = row.val();
-                                                    $editor.find('#id').val(values.id);
-                                                    $editor.find('#fieldName').val(values.fieldName);
-                                                    $('#formType').val('delete');
-                                                    if (confirm('Are you sure you want to delete this field?')){
+                                            // Add & Remove Row
+                                            // -----------------------------------------------------------------
+                                            var $modal = $('#editor-modal'),
+                                            $editor = $('#editor'),
+                                            $editorTitle = $('#editor-title'),
+                                            ft = FooTable.init('#footable-addrow', {
+                                                columns: [
+                                                  {"name":"id","title":"ID"},
+                                                  {"name":"location","title":"Location"},
+                                                  {"name":"fieldName","title":"Field Name"},
+                                                  {"name":"fieldType","title":"Field Type"},
+                                                ],
+                                                rows: [{% for field_key, field_vals in custom_fields.items %}
+                                                           {{ field_vals|safe }},
+                                                       {% endfor %}],
+                                                editing: {
+                                                    addRow: function(){
+                                                        $modal.removeData('row');
+                                                        $editor[0].reset();
+                                                        $editorTitle.text('Add a new field');
+                                                        $('#formType').val('new');
+                                                        $modal.modal('show');
+                                                    },
+                                                    editRow: function(row){
+                                                        var values = row.val();
+                                                        $editor.find('#id').val(values.id);
+                                                        $editor.find('#location').val(values.location);
+                                                        $editor.find('#fieldName').val(values.fieldName);
+                                                        $editor.find('#fieldType').val(values.fieldType);
+                                                        $modal.data('row', row);
+                                                        $editorTitle.text('Edit user #' + values.id);
+                                                        $('#formType').val('edit');
+                                                        $modal.modal('show');
+                                                    },
+                                                    deleteRow: function(row){
+                                                        var values = row.val();
+                                                        $editor.find('#id').val(values.id);
+                                                        $editor.find('#fieldName').val(values.fieldName);
+                                                        $('#formType').val('delete');
+                                                        if (confirm('Are you sure you want to delete this field?')){
 
-                                                        $('#userFormBtn').click();
-                                                        //row.delete();
-                                                        location.reload();
+                                                            $('#userFormBtn').click();
+                                                            //row.delete();
+                                                            location.reload();
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        }),
-                                        uid = 01;
+                                            }),
+                                            uid = 01;
 
-                                        $editor.on('submit', function(e){
-                                            if (this.checkValidity && !this.checkValidity()) return;
-                                            e.preventDefault();
-                                            var row = $modal.data('row'),
-                                                values = {
-                                                    id: $editor.find('#id').val(),
-                                                    location: $editor.find('#location').val(),
-                                                    fieldName: $editor.find('#fieldName').val(),
-                                                    fieldType: $editor.find('#fieldType').val(),
-                                                };
+                                            $editor.on('submit', function(e){
+                                                if (this.checkValidity && !this.checkValidity()) return;
+                                                e.preventDefault();
+                                                var row = $modal.data('row'),
+                                                    values = {
+                                                        id: $editor.find('#id').val(),
+                                                        location: $editor.find('#location').val(),
+                                                        fieldName: $editor.find('#fieldName').val(),
+                                                        fieldType: $editor.find('#fieldType').val(),
+                                                    };
 
-                                            if (row instanceof FooTable.Row){
-                                                row.val(values);
-                                            } else {
-                                                values.id = uid++;
-                                                ft.rows.add(values);
-                                            }
-
-                                            $.ajax({
-                                                url: '{% url 'custom_field_edit' %}',
-                                                type: 'post',
-                                                dataType: 'text',
-                                                async: false,
-                                                data: $('#editor').serialize(),
-                                                success: function(data) {
-                                                    console.log(data)
-                                                 },
-                                                error: function(jqXHR, textStatus, errorThrown){
-                                                    console.log('jqXHR:');
-                                                    console.log(jqXHR);
-                                                    console.log('textStatus:');
-                                                    console.log(textStatus);
-                                                    console.log('errorThrown:');
-                                                    console.log(errorThrown);
+                                                if (row instanceof FooTable.Row){
+                                                    row.val(values);
+                                                } else {
+                                                    values.id = uid++;
+                                                    ft.rows.add(values);
                                                 }
-                                            });
 
-                                            $modal.modal('hide');
+                                                $.ajax({
+                                                    url: '{% url 'custom_field_edit' %}',
+                                                    type: 'post',
+                                                    dataType: 'text',
+                                                    async: false,
+                                                    data: $('#editor').serialize(),
+                                                    success: function(data) {
+                                                        console.log(data)
+                                                     },
+                                                    error: function(jqXHR, textStatus, errorThrown){
+                                                        console.log('jqXHR:');
+                                                        console.log(jqXHR);
+                                                        console.log('textStatus:');
+                                                        console.log(textStatus);
+                                                        console.log('errorThrown:');
+                                                        console.log(errorThrown);
+                                                    }
+                                                });
+
+                                                $modal.modal('hide');
+                                            });
                                         });
-                                });
-                            </script>
+                                    </script>
+
+                                </div>
+
+                            </div>
+                            <!-- End Popup Model -->
+                            <hr>
+                            <h4>Parent Titles</h4>
+                            <p>Parent titles can be changed from the default to anything you like. Use the free text boxes below to set custom Mother and Father titles.</p>
+
+
                         </div>
                     </div>
                 </div>
