@@ -73,6 +73,7 @@
                     <thead>
                     <tr>
                         <th scope="col">Reg No.</th>
+                        <th scope="col">Tag No.</th>
                         <th scope="col">Name</th>
                         <th scope="col">DOB</th>
                         <th scope="col">DOD</th>
@@ -86,6 +87,7 @@
                     <tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
                         style="cursor: pointer;">
                         <th scope="row">{{ pedigree.reg_no }}</th>
+                        <th scope="row">{{ pedigree.tag_no }}</th>
                         <td>{{ pedigree.name }}</td>
                         <td>{{ pedigree.dob }}</td>
                         <td>{% if pedigree.dod %}{{ pedigree.dod }}{% endif %}</td>

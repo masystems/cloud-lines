@@ -138,6 +138,8 @@ li {
 
                                         {% elif field.label == 'Registration Number' %}
                                             {% render_field field class="form-control" value=pedigree.reg_no %}
+                                        {% elif field.label == 'Tag Number' %}
+                                            {% render_field field class="form-control" value=pedigree.tag_no %}
                                         {% elif field.label == 'Name' %}
                                             {% render_field field class="form-control" value=pedigree.name %}
                                         {% elif field.label == 'Date of registration' %}

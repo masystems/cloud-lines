@@ -356,7 +356,11 @@ vertical-align: middle;
                     {% endif %}
                     {% if lvl1.reg_no %}
                     <li>
-                        <div class="bg-light-warning"><i class="far fa-id-card"></i></div> Registration Numbers.<span class="font-weight-normal">{{ lvl1.reg_no }}</span></li>
+                        <div class="bg-light-warning"><i class="far fa-id-card"></i></div> Registration Number<span class="font-weight-normal">{{ lvl1.reg_no }}</span></li>
+                    {% endif %}
+                    {% if lvl1.tag_no %}
+                    <li>
+                        <div class="bg-light-warning"><i class="far fa-id-card"></i></div> Tag Number<span class="font-weight-normal">{{ lvl1.tag_no }}</span></li>
                     {% endif %}
                     {% if lvl1.name %}
                     <li>

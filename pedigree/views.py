@@ -223,6 +223,7 @@ def new_pedigree_form(request):
             except ObjectDoesNotExist:
                 pass
             new_pedigree.reg_no = pedigree_form['reg_no'].value()
+            new_pedigree.tag_no = pedigree_form['tag_no'].value()
             new_pedigree.name = pedigree_form['name'].value()
             try:
                 new_pedigree.date_of_registration = pedigree_form['date_of_registration'].value() or None
@@ -353,7 +354,7 @@ def edit_pedigree_form(request, id):
                 pass
 
             pedigree.reg_no = pedigree_form['reg_no'].value()
-
+            pedigree.tag_no = pedigree_form['tag_no'].value()
             pedigree.name = pedigree_form['name'].value()
 
             try:
