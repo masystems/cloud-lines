@@ -124,7 +124,7 @@
 
 							<div class="row form-billing">
 								<div class="col-6 form-group">
-									<label>Animal Type:</label>
+									<label>Animal Type(plural):</label>
 									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if attached_service_upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}"{% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
 									</select>
 

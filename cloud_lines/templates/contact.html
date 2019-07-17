@@ -102,6 +102,37 @@
                 </div>
             </div>
             <script>
+                function validateForm() {
+                    $("#contactMessage").validate({
+
+                        rules: {
+                            email: {
+                                required: true,
+                                email: true
+                            },
+                            mobile: {
+                                required: true,
+                                number: true,
+                                minlength: 10,
+                                maxlength: 10
+                            }
+                        },
+                        messages: {
+                            email: {
+                                required: "Please enter a valid email address.",
+                                email: "Invalid Email Address."
+                            },
+                            mobile: {
+                                required: "Please provide a mobile number.",
+                                minlength: "Your mobile number must be 10 characters long.",
+                                maxlength: "Your mobile number must be 10 characters long.",
+                                number: "Please Enter number only."
+                            }
+                        }
+                    });
+                    return false;
+                }
+
                 $('#contactMessage').click(function () {
                     $.ajax({
                         type: "POST",
@@ -117,12 +148,17 @@
                             "message": $('#message').val(),
                         },
                         beforeSend: function() {
-                            $('#contactForm').html('<div class="d-flex flex-column align-items-center justify-content-center ">\
-                                                        <div id="spinner" class="spinner-border text-info" style="width: 6rem; height: 6rem;" role="status"></div>\
-                                                        <div id="spinnerText" class="row">\
-                                                            <p><strong>Sending Message</strong></p>\
-                                                        </div>\
-                                                    </div>');
+                            if (validateForm()) {
+                                $('#contactForm').html('<div class="d-flex flex-column align-items-center justify-content-center ">\
+                                                            <div id="spinner" class="spinner-border text-info" style="width: 6rem; height: 6rem;" role="status"></div>\
+                                                            <div id="spinnerText" class="row">\
+                                                                <p><strong>Sending Message</strong></p>\
+                                                            </div>\
+                                                        </div>');
+                            } else {
+                                // don't send form
+                                return false;
+                            }
                         },
 
                         success: function (data) {

@@ -3,14 +3,18 @@ from django.contrib.auth.decorators import login_required
 from .forms import SupportForm
 from .models import Ticket
 from account.views import send_mail
+from account.views import is_editor, get_main_account
+
 
 @login_required(login_url="/account/login")
 def support(request):
     support_form = SupportForm(request.POST or None, request.FILES or None)
+    attached_service = get_main_account(request.user)
 
     if request.method == 'POST':
         if support_form.is_valid():
-            support_form.save()
+            support = support_form.save()
+            Ticket.objects.filter(id=support.id).update(account=attached_service, user=request.user)
             body = """
                 Priority: {},
                 Subject: {},
@@ -24,7 +28,7 @@ def support(request):
         support_form = SupportForm()
 
     return render(request, 'support.html', {'support_form': support_form,
-                                            'tickets': Ticket.objects.order_by('-date_time')})
+                                            'tickets': Ticket.objects.filter(account=attached_service).order_by('-date_time')})
 
 
 @login_required(login_url="/account/login")

@@ -1,7 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import User
+from account.models import AttachedService
 
 
 class Ticket(models.Model):
+    account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     date_time = models.DateTimeField(auto_now_add=True)
     subject = models.CharField(max_length=250, blank=False)
 

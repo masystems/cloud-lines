@@ -6,4 +6,4 @@ class SupportForm(ModelForm):
     class Meta:
         model = Ticket
         fields = '__all__'
-        exclude = ('status',)
+        exclude = ('status', 'account', 'user')

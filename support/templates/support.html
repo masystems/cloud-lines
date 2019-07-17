@@ -76,9 +76,10 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Logged By</th>
                                     <th>Subject</th>
                                     <th>Priority</th>
-                                    <th>Problem</th>
+                                    <th>Issue</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -86,6 +87,7 @@
                             {% for ticket in tickets.all %}
                                 <tr>
                                     <td>{{ ticket.id }}</td>
+                                    <td>{{ ticket.user.get_full_name }}</td>
                                     <td>{{ ticket.subject }}</td>
                                     <td><span class="label {% if ticket.priority == 'low' %} label-info{% elif ticket.priority == 'medium' %} label-warning{% else %} label-danger{% endif %}">{{ ticket.priority|title }}</span></td>
                                     <td>{{ ticket.description }}</td>
