@@ -54,111 +54,77 @@
             <!-- Contact Form
             ============================================= -->
             <div id="contactForm" data-wow-duration="1s">
-                <div class="col_half">
-                    <label for="name">Name <small>*</small></label>
-                    <input type="text" id="name" name="name" value="" class="sm-form-control required" required/>
-                </div>
-
-                <div class="col_half col_last">
-                    <label for="email">Email <small>*</small></label>
-                    <input type="email" id="email" name="email" value="" class="required email sm-form-control" required/>
-                </div>
-
-                <div class="clear"></div>
-
-                <div class="col_half">
-                    <label for="phone">Phone</label>
-                    <input type="text" id="phone" name="phone" value="" class="sm-form-control" />
-                </div>
-
-                <div class="col_half col_last">
-                    <label for="service">Services</label>
-                    <select id="service" name="service" class="sm-form-control">
-                        <option value="">-- Select One --</option>
-                        {% for service in services %}
-                            <option value="{{ service }}">{{ service }}</option>
+                {% if contact_form.errors %}
+                    {% for field in contact_form %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">
+                                <strong>{{ field.label }}: {{ error }}</strong>
+                            </div>
                         {% endfor %}
-                    </select>
-                </div>
+                    {% endfor %}
+                    {% for error in contact_form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="row">
+                    {% for hidden in breed_form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
 
-                <div class="clear"></div>
+                    {% for field in contact_form.visible_fields %}
+                        {% if field.label == 'Subject' or field.label == 'Message' %}
+                            <div class="col-lg-12 col-md-12">{% else %}<div class="col-lg-6 col-md-12">
+                        {% endif %}
+                            <div class="form-group row">
+                                {% if field.label == 'Subject' or field.label == 'Message' %}
+                                    <label class="col-sm-2 text-left col-form-label">{{ field.label|title }}</label>
+                                    <div class="col-md-10">
+                                {% else %}
+                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                    <div class="col-md-9">
+                                {% endif %}
+                                    {{ field }}
+                                    {{ field.help_text }}
+                                    {% for error in field.errors %}
+                                      <span class="help-block">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="col_full">
-                    <label for="subject">Subject <small>*</small></label>
-                    <input type="text" id="subject" name="subject" value="" class="required sm-form-control" required />
-                </div>
-
-                <div class="col_full">
-                    <label for="message">Message <small>*</small></label>
-                    <textarea class="required sm-form-control" id="message" name="message" rows="6" cols="30" required></textarea>
-                </div>
-
-                <div class="col_full hidden">
-                    <input type="text" id="botcheck" name="botcheck" value="" class="sm-form-control" />
+                    {% endfor %}
                 </div>
 
                 <div class="col_full">
                     <button class="button button-3d" id="contactMessage" type="submit">Send Message</button>
                 </div>
             </div>
+
             <script>
-                function validateForm() {
-                    $("#contactMessage").validate({
-
-                        rules: {
-                            email: {
-                                required: true,
-                                email: true
-                            },
-                            mobile: {
-                                required: true,
-                                number: true,
-                                minlength: 10,
-                                maxlength: 10
-                            }
-                        },
-                        messages: {
-                            email: {
-                                required: "Please enter a valid email address.",
-                                email: "Invalid Email Address."
-                            },
-                            mobile: {
-                                required: "Please provide a mobile number.",
-                                minlength: "Your mobile number must be 10 characters long.",
-                                maxlength: "Your mobile number must be 10 characters long.",
-                                number: "Please Enter number only."
-                            }
-                        }
-                    });
-                    return false;
-                }
-
                 $('#contactMessage').click(function () {
+
                     $.ajax({
                         type: "POST",
                         url: "{% url 'contact' %}",
                         dataType: "json",
                         headers: {'X-CSRFToken': '{{ csrf_token }}'},
                         data: {
-                            "name": $('#name').val(),
-                            "email": $('#email').val(),
-                            "phone": $('#phone').val(),
-                            "service": $('#service').val(),
-                            "subject": $('#subject').val(),
-                            "message": $('#message').val(),
+                            "name": $('#id_name').val(),
+                            "email": $('#id_email').val(),
+                            "phone": $('#id_phone').val(),
+                            "service": $('#id_service').val(),
+                            "subject": $('#id_subject').val(),
+                            "message": $('#id_message').val(),
                         },
                         beforeSend: function() {
-                            if (validateForm()) {
-                                $('#contactForm').html('<div class="d-flex flex-column align-items-center justify-content-center ">\
-                                                            <div id="spinner" class="spinner-border text-info" style="width: 6rem; height: 6rem;" role="status"></div>\
-                                                            <div id="spinnerText" class="row">\
-                                                                <p><strong>Sending Message</strong></p>\
-                                                            </div>\
-                                                        </div>');
-                            } else {
-                                // don't send form
-                                return false;
-                            }
+                            $('#contactForm').html('<div class="d-flex flex-column align-items-center justify-content-center ">\
+                                                        <div id="spinner" class="spinner-border text-info" style="width: 6rem; height: 6rem;" role="status"></div>\
+                                                        <div id="spinnerText" class="row">\
+                                                            <p><strong>Sending Message</strong></p>\
+                                                        </div>\
+                                                    </div>');
                         },
 
                         success: function (data) {

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact, Testimonial
+from .forms import ContactForm
 from account.models import UserDetail, AttachedService
 from account.views import get_main_account, send_mail
 from django.conf import settings
@@ -86,51 +87,51 @@ def services(request):
 
 
 def contact(request):
+    contact_form = ContactForm(request.POST or None, request.FILES or None)
     if request.POST:
-        name = request.POST.get('name')
-        email_address = request.POST.get('email')
-        phone = request.POST.get('phone')
-        service = request.POST.get('service')
-        subject = request.POST.get('subject')
-        message_body = request.POST.get('message')
+        if contact_form.is_valid():
+            contact_form.save()
 
-        # send email to user
-        email_body = """
-                        <p><strong>Thank you for message!</strong></p>
-        
-                        <p>We have received your message and will be in contact with you soon.</p>
-        
-                        <p><strong>Copy of your message</strong></p>
-        
-                        <p>{}</p>
-                        <p>{}</p>""".format(subject, message_body)
-        send_mail('Cloudlines message confirmation', name, email_body, send_to=email_address)
+            name = request.POST.get('name')
+            email_address = request.POST.get('email')
+            phone = request.POST.get('phone')
+            service = request.POST.get('service')
+            subject = request.POST.get('subject')
+            message_body = request.POST.get('message')
 
-        # send mail to cloudlines
-        email_body = """
-                        <p><strong>New message from {}</strong></p>
-                        <p>Email: {}</p>
-                        <p>Phone: {}</p>
-                        <p>Service: {}</p>
-                        <p>{}</p>
-                        <p>{}</p>""".format(name, email_address, phone, service, subject, message_body)
-        send_mail('Cloudlines contact request!', 'Cloudlines Team', email_body, reply_to=email_address)
-        try:
-            #email.send(fail_silently=False)
-            email_obj = Contact.objects.create(name=name,
-                                               email=email_address,
-                                               phone=phone,
-                                               service=service,
-                                               subject=subject,
-                                               message=message_body)
-            email_obj.save()
+            # send email to user
+            email_body = """
+                            <p><strong>Thank you for message!</strong></p>
+            
+                            <p>We have received your message and will be in contact with you soon.</p>
+            
+                            <p><strong>Copy of your message</strong></p>
+            
+                            <p>{}</p>
+                            <p>{}</p>""".format(subject, message_body)
+            send_mail('Cloudlines message confirmation', name, email_body, send_to=email_address)
+
+            # send mail to cloudlines
+            email_body = """
+                            <p><strong>New message from {}</strong></p>
+                            <p>Email: {}</p>
+                            <p>Phone: {}</p>
+                            <p>Service: {}</p>
+                            <p>{}</p>
+                            <p>{}</p>""".format(name, email_address, phone, service, subject, message_body)
+            send_mail('Cloudlines contact request!', 'Cloudlines Team', email_body, reply_to=email_address)
+
             message = {'message': "Thank you for your email, we'll be in touch soon!"}
-        except:
-            message = {'message': "Something went wrong, but we're working on it!"}
 
-        return HttpResponse(json.dumps(message), content_type='application/json')
+            return HttpResponse(json.dumps(message), content_type='application/json')
+        else:
+            message = {'message': "shit!"}
+
+            return HttpResponse(json.dumps(message), content_type='application/json')
     else:
-        return render(request, 'contact.html', {'services': Service.objects.all()})
+        contact_form = ContactForm()
+        return render(request, 'contact.html', {'services': Service.objects.all(),
+                                                'contact_form': contact_form})
 
 
 @login_required(login_url="/account/login")
