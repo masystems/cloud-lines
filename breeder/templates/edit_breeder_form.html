@@ -22,7 +22,7 @@
     <div class="container pt-5">
         <div class="card ">
             <div class="card-header">
-                <h4 class="mb-0 ">Edit Breeder: {{ breeder.prefix }}</h4>
+                <h4 class="mb-0 ">Edit Breeder: {{ breeder.breeding_prefix }}</h4>
             </div>
             <div class="card-body">
                 <form action="{% url 'edit_breeder_form' breeder.id%}" method="POST" class="form-horizontal" enctype="multipart/form-data">
@@ -54,8 +54,8 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
                                     <div class="col-md-9">
-                                        {% if field.label == 'Prefix' %}
-                                            {% render_field field class="form-control" value=breeder.prefix %}
+                                        {% if field.label == 'Breeding prefix' %}
+                                            {% render_field field class="form-control" value=breeder.breeding_prefix %}
                                         {% elif field.label == 'Contact name' %}
                                             {% render_field field class="form-control" value=breeder.contact_name %}
                                         {% elif field.label == 'Address' %}
@@ -106,12 +106,12 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <button type="submit" class="btn btn-success">Submit</button>
-                                            <a href="{% url 'breeder' breeder.prefix %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
+                                            <a href="{% url 'breeder' breeder.breeding_prefix %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
                                                 <button type="button" data-toggle="modal" data-target="#delete" class="model_img img-fluid btn btn-danger float-right">Delete</button>
                                         </div>
                                     </div>
                                 </div>
-                                {% include 'delete.html' with name=breeder.prefix %}
+                                {% include 'delete.html' with name=breeder.breeding_prefix %}
                             </div>
                         </div>
                     </div>

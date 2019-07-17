@@ -37,7 +37,7 @@
                         <thead>
                         <tr>
                             <th scope="col">Name</th>
-                            <th scope="col">Prefix</th>
+                            <th scope="col">Breeding Prefix</th>
                             <th scope="col">Address</th>
                             <th scope="col">Email</th>
                             <th scope="col">Phone</th>
@@ -46,10 +46,10 @@
                         </thead>
                         <tbody id="bredTable">
                         {% for breeder in breeders.all %}
-                            <tr onclick="window.location='{% url 'breeder' breeder.prefix %}';"
+                            <tr onclick="window.location='{% url 'breeder' breeder.breeding_prefix %}';"
                                                 style="cursor: pointer;">
                                 <th scope="row">{{ breeder.contact_name }}</th>
-                                <td>{{ breeder.prefix }}</td>
+                                <td>{{ breeder.breeding_prefix }}</td>
                                 <td>{{ breeder.address }}</td>
                                 <td>{{ breeder.email }}</td>
                                 <td>{{ breeder.phone_number1 }}</td>

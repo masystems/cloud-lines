@@ -346,13 +346,13 @@ vertical-align: middle;
                     <li>
                         <div class="bg-light-primary"><i class="fas fa-plus"></i></div> Added by <span class="font-weight-normal">{{ lvl1.creator.get_full_name }}</span></li>
                     {% endif %}
-                    {% if lvl1.breeder.prefix %}
+                    {% if lvl1.breeder.breeding_prefix %}
                     <li>
-                        <div class="bg-light-info"><i class="fas fa-user-plus"></i></div> Breeder <span class=""><a href="{% url 'breeder' lvl1.breeder.prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.breeder.prefix }}</button></a></span></li>
+                        <div class="bg-light-info"><i class="fas fa-user-plus"></i></div> Breeder <span class=""><a href="{% url 'breeder' lvl1.breeder.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.breeder.breeding_prefix }}</button></a></span></li>
                     {% endif %}
-                    {% if lvl1.current_owner.prefix %}
+                    {% if lvl1.current_owner.breeding_prefix %}
                     <li>
-                        <div class="bg-light-success"><i class="fas fa-user"></i></div> Owner <span class=""><a href="{% url 'breeder' lvl1.breeder.prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.current_owner.prefix }}</button></a></span></li>
+                        <div class="bg-light-success"><i class="fas fa-user"></i></div> Owner <span class=""><a href="{% url 'breeder' lvl1.breeder.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.current_owner.breeding_prefix }}</button></a></span></li>
                     {% endif %}
                     {% if lvl1.reg_no %}
                     <li>

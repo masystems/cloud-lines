@@ -4,7 +4,7 @@ from account.models import AttachedService
 
 class Breeder(models.Model):
     account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
-    prefix = models.CharField(max_length=100, blank=False)
+    breeding_prefix = models.CharField(max_length=100, blank=False)
     contact_name = models.CharField(max_length=100, blank=True)
 
     address = models.CharField(max_length=250, blank=True)
@@ -16,4 +16,4 @@ class Breeder(models.Model):
     active = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.prefix
+        return self.breeding_prefix

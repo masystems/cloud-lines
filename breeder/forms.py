@@ -9,7 +9,7 @@ class BreederForm(ModelForm):
         fields = '__all__'
         exclude = ('account',)
         help_texts = {
-            'prefix': _('The name the breeder goes by e.g. Devon Dogs'),
+            'breeding_prefix': _('The name the breeder goes by e.g. Devon Dogs'),
             'contact_name': _('Point of contact for the breeder'),
             'active': _('Is the breeder currently active?'),
         }

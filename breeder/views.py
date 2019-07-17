@@ -12,9 +12,9 @@ import json
 @login_required(login_url="/account/login")
 def breeder(request, breeder):
     attached_service = get_main_account(request.user)
-    breeder = Breeder.objects.get(account=attached_service, prefix=breeder)
-    pedigrees = Pedigree.objects.filter(account=attached_service, breeder__prefix__exact=breeder)
-    owned = Pedigree.objects.filter(account=attached_service, current_owner__prefix__exact=breeder)
+    breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breeder)
+    pedigrees = Pedigree.objects.filter(account=attached_service, breeder__breeding_prefix__exact=breeder)
+    owned = Pedigree.objects.filter(account=attached_service, current_owner__breeding_prefix__exact=breeder)
     groups = BreedGroup.objects.filter(breeder=breeder)
     # get custom fields
     try:
@@ -44,7 +44,7 @@ def breeder_csv(request):
     response['Content-Disposition'] = 'attachment; filename="breeder_db.csv"'
 
     writer = csv.writer(response)
-    writer.writerow(['prefix',
+    writer.writerow(['breeding_prefix',
                      'contact_name',
                      'address',
                      'phone_number1',
@@ -53,7 +53,7 @@ def breeder_csv(request):
                      'active'])
     breeder = Breeder.objects.filter(account=attached_service)
     for row in breeder.all():
-        writer.writerow([row.prefix,
+        writer.writerow([row.breeding_prefix,
                          row.contact_name,
                          row.address,
                          row.phone_number1,
@@ -79,7 +79,7 @@ def new_breeder_form(request):
     if request.method == 'POST':
         if breeder_form.is_valid():
             new_breeder = Breeder()
-            new_breeder.prefix = breeder_form['prefix'].value()
+            new_breeder.breeding_prefix = breeder_form['breeding_prefix'].value()
             new_breeder.contact_name = breeder_form['contact_name'].value()
             new_breeder.address = breeder_form['address'].value()
             new_breeder.phone_number1 = breeder_form['phone_number1'].value()
@@ -99,7 +99,7 @@ def new_breeder_form(request):
             new_breeder.custom_fields = json.dumps(custom_fields)
             new_breeder.save()
 
-            return redirect('breeder', new_breeder.prefix)
+            return redirect('breeder', new_breeder.breeding_prefix)
 
     else:
         breeder_form = BreederForm()
@@ -138,7 +138,7 @@ def edit_breeder_form(request, breeder_id):
             breeder.custom_fields = json.dumps(custom_fields)
             breeder.save()
 
-            return redirect('breeder', breeder.prefix)
+            return redirect('breeder', breeder.breeding_prefix)
 
     else:
         breeder_form = BreederForm()
