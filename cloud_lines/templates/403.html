@@ -1,0 +1,58 @@
+{% extends 'home_base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .slider-element {
+    top: -100px;
+    bottom: -100px;
+    height: 100px !important;
+    margin-bottom: -100px;
+}
+</style>
+
+<section id="slider" class="slider-element">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+</section><!-- #slider end -->
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+	<div class="container clearfix">
+		<h1>Permission Denied</h1>
+		<span>You shouldn't be here!</span>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Permission Denied</li>
+		</ol>
+	</div>
+</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+	<div class="content-wrap">
+        <div class="container clearfix">
+            <div class="col_half nobottommargin">
+                <div class="error404 center">403</div>
+            </div>
+
+            <div class="col_half nobottommargin col_last">
+
+                <div class="heading-block nobottomborder">
+                    <h4>Ooops! The Page you were looking for, couldn't be reached.</h4>
+                    <span>Seems you don't have permission to view this page.</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

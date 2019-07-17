@@ -24,7 +24,7 @@ from account.views import is_editor, get_main_account
 @login_required(login_url="/account/login")
 def search(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service)
+    pedigrees = Pedigree.objects.filter(account=attached_service)[0:1000]
     return render(request, 'search.html', {'pedigrees': pedigrees})
 
 
@@ -151,7 +151,9 @@ def search_results(request):
 
         # lvl 1
         try:
-            results = Pedigree.objects.filter(Q(account=attached_service, reg_no__icontains=search_string.upper()) | Q(account=attached_service, name__icontains=search_string))
+            results = Pedigree.objects.filter(Q(account=attached_service,
+                                                reg_no__icontains=search_string.upper()) | Q(account=attached_service,
+                                                                                             name__icontains=search_string))[0:1000]
         except ObjectDoesNotExist:
             breeders = Breeder.objects
             error = "No pedigrees found using: "
