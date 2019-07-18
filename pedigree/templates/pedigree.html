@@ -199,12 +199,13 @@ vertical-align: middle;
                                         <!--## col1 ##-->
                                         <td rowspan="4">
                                             <!--cell text-->
-                                            {% if lvl2_1 %}
+                                            {% if lvl2_1 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl2_1 %}
                                             {% else %}
                                             <p>{{ no_pedigree_text }}</p>
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
                                             {% endif %}
+
                                         </td>
                                         <!--## col2 ##-->
                                         <td rowspan="2">
@@ -263,7 +264,7 @@ vertical-align: middle;
                                         <!--## col1 ##-->
                                         <td rowspan="4">
                                             <!--cell text-->
-                                            {% if lvl2_2 %}
+                                            {% if lvl2_2 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl2_2 %}
                                             {% else %}
                                             {% include 'add_new_pedigree.html' with pedigree=lvl2_2 %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
@@ -11,7 +11,6 @@ from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings
 from .models import UserDetail, AttachedService
-from .forms import SignUpForm
 from cloud_lines.models import Service
 from pedigree.models import Pedigree
 from breed.models import Breed
@@ -272,6 +271,7 @@ def settings(request):
     return render(request, 'settings.html', {'custom_fields': custom_fields})
 
 
+@user_passes_test(is_editor)
 @login_required(login_url="/account/login")
 def custom_field_edit(request):
     # this is the additional user customers can add/remove from their service.
@@ -369,6 +369,22 @@ def custom_field_edit(request):
             return HttpResponse(True)
 
 
+@user_passes_test(is_editor)
+@login_required(login_url="/account/login")
+def update_titles(request):
+    if request.method == 'POST':
+        user_detail = UserDetail.objects.get(user=request.user)
+        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+        attached_service.mother_title = request.POST.get('mother')
+        attached_service.father_title = request.POST.get('father')
+        attached_service.save()
+
+        return HttpResponse('Done')
+    return HttpResponse('Fail')
+
+
+@user_passes_test(is_editor)
+@login_required(login_url="/account/login")
 def setup(request):
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     attributes_form = AttributeForm(request.POST or None, request.FILES or None)

@@ -20,6 +20,8 @@ class AttachedService(models.Model):
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
     animal_type = models.CharField(max_length=250)
     custom_fields = models.TextField(blank=True)
+    mother_title = models.CharField(max_length=250, default='Mother')
+    father_title = models.CharField(max_length=250, default='Father')
 
     SITE_MODES = (
         ('mammal', 'Mammal'),

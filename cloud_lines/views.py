@@ -96,6 +96,7 @@ def contact(request):
             email_address = request.POST.get('email')
             phone = request.POST.get('phone')
             service = request.POST.get('service')
+            service = Service.objects.get(id=service)
             subject = request.POST.get('subject')
             message_body = request.POST.get('message')
 
@@ -118,7 +119,7 @@ def contact(request):
                             <p>Phone: {}</p>
                             <p>Service: {}</p>
                             <p>{}</p>
-                            <p>{}</p>""".format(name, email_address, phone, service, subject, message_body)
+                            <p>{}</p>""".format(name, email_address, phone, service.service_name, subject, message_body)
             send_mail('Cloudlines contact request!', 'Cloudlines Team', email_body, reply_to=email_address)
 
             message = {'message': "Thank you for your email, we'll be in touch soon!"}

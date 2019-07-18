@@ -93,6 +93,14 @@
                             </div>
                             <!-- Start Popup Model -->
                             <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
+                                <style scoped>
+                                    /* provides a red astrix to denote required fields - this should be included in common stylesheet */
+                                    .form-group.required .control-label:after {
+                                        content:"*";
+                                        color:red;
+                                        margin-left: 4px;
+                                    }
+                                </style>
                                 <div class="modal-dialog" role="document">
                                     {% if editor %}
                                     <form class="modal-content form-horizontal" id="editor">
@@ -113,7 +121,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group required">
-                                                <label for="fieldName" class="col-sm-3 control-label">Field Name</label>
+                                                <label for="fieldName" class="col-sm-4 control-label">Field Name</label>
                                                 <div class="col-sm-9">
                                                     <input type="text" class="form-control" id="fieldName" name="fieldName" placeholder="Field Name" required>
                                                 </div>
@@ -131,7 +139,7 @@
                                         <div class="modal-footer">
                                             <input type="hidden" id="formType" name="formType">
                                             <input type="hidden" id="id" name="id">
-                                            <button type="submit" id="userFormBtn" class="btn btn-primary">Save changes</button>
+                                            <button type="submit" id="userFormBtn" class="btn btn-success">Save changes</button>
                                             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                         </div>
                                     </form>
@@ -214,7 +222,6 @@
                                                     async: false,
                                                     data: $('#editor').serialize(),
                                                     success: function(data) {
-                                                        console.log(data)
                                                      },
                                                     error: function(jqXHR, textStatus, errorThrown){
                                                         console.log('jqXHR:');
@@ -239,7 +246,54 @@
                             <h4>Parent Titles</h4>
                             <p>Parent titles can be changed from the default to anything you like. Use the free text boxes below to set custom Mother and Father titles.</p>
 
+                            <div class="form-group">
+                                <label class="col-md-12">Mother</label>
+                                <div class="col-md-12">
+                                    <input type="text" value="{{ service.mother_title }}" name="mother" id="mother" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">Father</label>
+                                <div class="col-md-12">
+                                    <input type="text" value="{{ service.father_title }}" name="father" id="father" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-10">
+                                    <div class="alert " id="userSettingsAlert"> <div id="titleSettingsMessage"></div>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <button id="selectTitleSettings" class="btn btn-success float-right">Update Titles</button>
+                                </div>
 
+                            </div>
+                            <script>
+                                $('#selectTitleSettings').click(function () {
+
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "{% url 'update_titles' %}",
+                                        dataType: "text",
+                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                        data: {
+                                            "mother": $('#mother').val(),
+                                            "father": $('#father').val(),
+                                        },
+                                        beforeSend: function() {
+                                            $('#titleSettingsMessage').hide().html('<h5 class="text-right">Updating</h5>').fadeIn(1000);
+                                        },
+                                        success: function (data) {
+                                            $('#titleSettingsMessage').hide().html('<h5 class="text-right">Titles updated!</h5>').fadeIn(1000);
+                                            console.log(data);
+                                        },
+                                        error: function (xhr, textStatus, error) {
+                                            $('#titleSettingsMessage').hide().html('<h5 class="text-right">Something went wrong, but we are working on it!</h5>').fadeIn(1000);
+                                            console.log(error);
+                                        },
+                                    });
+                                });
+                            </script>
                         </div>
                     </div>
                 </div>
