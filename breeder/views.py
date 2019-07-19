@@ -100,6 +100,8 @@ def new_breeder_form(request):
             new_breeder.save()
 
             return redirect('breeder', new_breeder.breeding_prefix)
+        else:
+            print(request.POST)
 
     else:
         breeder_form = BreederForm()

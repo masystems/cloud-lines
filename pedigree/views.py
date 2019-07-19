@@ -13,6 +13,7 @@ from datetime import datetime
 from .models import Pedigree, PedigreeAttributes, PedigreeImage
 from breed.models import Breed
 from breeder.models import Breeder
+from breeder.forms import BreederForm
 from breed_group.models import BreedGroup
 from .forms import PedigreeForm, AttributeForm, ImagesForm
 from django.db.models import Q
@@ -288,7 +289,8 @@ def new_pedigree_form(request):
                                                            'breeders': Breeder.objects.filter(account=attached_service),
                                                            'breeds': Breed.objects.filter(account=attached_service),
                                                            'breed_groups': BreedGroup.objects.filter(account=attached_service),
-                                                           'custom_fields': custom_fields})
+                                                           'custom_fields': custom_fields,
+                                                           'breeder_form': BreederForm()})
 
 
 @login_required(login_url="/account/login")
