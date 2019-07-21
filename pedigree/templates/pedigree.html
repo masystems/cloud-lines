@@ -361,7 +361,7 @@ vertical-align: middle;
                     {% endif %}
                     {% if lvl1.tag_no %}
                     <li>
-                        <div class="bg-light-warning"><i class="far fa-id-card"></i></div> Tag Number<span class="font-weight-normal">{{ lvl1.tag_no }}</span></li>
+                        <div class="bg-light-warning"><i class="far fa-id-card"></i></div> {% if service.site_mode == 'mammal' %}Tag Number{% else %}Ring Number{% endif %}<span class="font-weight-normal">{{ lvl1.tag_no }}</span></li>
                     {% endif %}
                     {% if lvl1.name %}
                     <li>

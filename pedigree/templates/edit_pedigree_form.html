@@ -113,7 +113,15 @@ li {
                             {% for field in pedigree_form.visible_fields %}
                             <div class="col-lg-6 col-md-12">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                    <label class="col-sm-3 text-right col-form-label">{% if service.site_mode == 'mammal' %}
+                                                                                            {{ field.label|title }}
+                                                                                        {% else %}
+                                                                                            {% if field.label == 'Tag Number' %}
+                                                                                                Ring Number
+                                                                                            {% else %}
+                                                                                                {{ field.label|title }}
+                                                                                            {% endif %}
+                                                                                        {% endif %}</label>
                                     <div class="col-md-9">
                                         {% if field.label == 'Breeder' %}
                                             <div id="breeders">

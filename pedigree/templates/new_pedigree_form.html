@@ -30,7 +30,11 @@
                                                                 {% else %}
                                                                 {% endif %}
                                                               {% else %}
-                                                                {{ field.label|title }}
+                                                                {% if field.label == 'Tag Number' %}
+                                                                    Ring Number
+                                                                {% else %}
+                                                                    {{ field.label|title }}
+                                                                {% endif %}
                                                               {% endif %}</label>
             <div class="col-md-9">
                 {% if field.label == 'Breeder' %}
