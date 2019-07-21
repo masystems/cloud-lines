@@ -46,7 +46,9 @@
                             <input id="id_breeder" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                         </div>
                     {% endif %}
-                    <i id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="fas fa-plus-square" style="color:green"></i>
+                    {% if 'setup' not in request.get_full_path %}
+                        <i id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="fas fa-plus-square" style="color:green"></i>
+                    {% endif %}
                 {% elif field.label == 'Current owner' %}
                     {% if 'setup' in request.path %}
                         <input id="hid_current_owner" type="hidden" name='{{ field.name }}' value="">
@@ -87,6 +89,22 @@
         </div>
     </div>
     {% endfor %}
+    <script>
+        $('#id_mother').bind('keyup change', function(event) {
+            if ($('#id_mother').val() != '' ) {
+                $('#id_breed_group').prop("disabled", true);
+            } else {
+                $('#id_breed_group').prop("disabled", false);
+            }
+        });
+        $('#id_breed_group').bind('keyup change', function(event) {
+            if ($('#id_breed_group').val() != '' ) {
+                $('#id_mother').prop("disabled", true);
+            } else {
+                $('#id_mother').prop("disabled", false);
+            }
+        });
+    </script>
 
 </div>
 <h3 class="box-title">Attributes</h3>

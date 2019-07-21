@@ -114,7 +114,10 @@ li {
                             <div class="col-lg-6 col-md-12">
                                 <div class="form-group row">
                                     <label class="col-sm-3 text-right col-form-label">{% if service.site_mode == 'mammal' %}
-                                                                                            {{ field.label|title }}
+                                                                                            {% if field.label|title != 'Breed Group' %}
+                                                                                                {{ field.label|title }}
+                                                                                            {% else %}
+                                                                                            {% endif %}
                                                                                         {% else %}
                                                                                             {% if field.label == 'Tag Number' %}
                                                                                                 Ring Number
@@ -133,12 +136,14 @@ li {
                                             </div>
                                         {% elif field.label == 'Mother' %}
                                             <div id="mothers">
-                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
+                                                <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
                                             </div>
                                         {% elif field.label == 'Breed group' %}
-                                            <div id="breed_groups">
-                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.breed_group != None %}{{ pedigree.breed_group }}{% endif %}">
-                                            </div>
+                                            {% if service.site_mode == 'poultry' %}
+                                                <div id="breed_groups">
+                                                    <input id="id_breed_group" class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.breed_group != None %}{{ pedigree.breed_group }}{% endif %}">
+                                                </div>
+                                            {% endif %}
                                         {% elif field.label == 'Father' %}
                                             <div id="fathers">
                                                 <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_father != None %}{{ pedigree.parent_father }}{% endif %}">
@@ -313,10 +318,27 @@ li {
                     </div>
                 </form>
             </div>
-        </form>
+            <script>
+                $('#id_mother').bind('keyup change', function(event) {
+                    if ($('#id_mother').val() != '' ) {
+                        $('#id_breed_group').prop("disabled", true);
+                    } else {
+                        $('#id_breed_group').prop("disabled", false);
+                    }
+                });
+                $('#id_breed_group').bind('keyup change', function(event) {
+                    if ($('#id_breed_group').val() != '' ) {
+                        $('#id_mother').prop("disabled", true);
+                    } else {
+                        $('#id_mother').prop("disabled", false);
+                    }
+                });
+            </script>
+        </div>
     </div>
 
-    </div>
+
+
 
 
 

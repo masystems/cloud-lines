@@ -61,18 +61,18 @@
                         </div>
                     </section>
                     <script>
-                        $('#id_prefix').bind('keyup change', function(event) {
+                        $('#id_breeding_prefix').bind('keyup change', function(event) {
                             $('#id_breeder').removeClass('typeahead');
                             $('#id_breeder').attr("placeholder", "");
                             $("#id_breeder").prop("readonly", true);
-                            $('#hid_breeder').val($('#id_prefix').val());
-                            $('#id_breeder').val($('#id_prefix').val());
+                            $('#hid_breeder').val($('#id_breeding_prefix').val());
+                            $('#id_breeder').val($('#id_breeding_prefix').val());
                             $("#id_breeder").prop("readonly", true);
                             $('#id_current_owner').removeClass('typeahead');
                             $('#id_current_owner').attr("placeholder", "");
                             $("#id_current_owner").prop("readonly", true);
-                            $('#hid_current_owner').val($('#id_prefix').val());
-                            $('#id_current_owner').val($('#id_prefix').val());
+                            $('#hid_current_owner').val($('#id_breeding_prefix').val());
+                            $('#id_current_owner').val($('#id_breeding_prefix').val());
                             $("#id_current_owner").prop("readonly", true);
                             $("#id_mother").prop("readonly", true);
                             $("#id_father").prop("readonly", true);
