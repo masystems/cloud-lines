@@ -18,6 +18,54 @@
     <!-- ============================================================== -->
     <!-- End Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
+    <!-- add new breeder modal content -->
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="newBreederModal" aria-hidden="true" style="display: none;">
+         <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="breederForm">
+                        {% include 'new_breeder_form.html' %}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                    <button id="saveBreeder" type="button" class="btn btn-success waves-effect waves-light">Save breeder</button>
+                </div>
+                <script>
+                $('#saveBreeder').click(function () {
+                    var local = breeders;
+                    var data = $('#breederForm').serialize();
+                    $.ajax({
+                        url: '{% url 'new_breeder_form' %}',
+                        type: 'post',
+                        dataType: 'text',
+                        headers: {'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                        data: data,
+                        beforeSend: function() {
+                            // setting a timeout
+                            if ($('#id_breeding_prefix').val().trim() == '') {
+                                $("#id_breeding_prefix").css({"border-color": "red"});;
+                                return false;
+                            }
+                        },
+                        success: function(data) {
+                            breeders.push($('#id_breeding_prefix').val());
+
+                            $('#showNewBreederModal').click();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown){
+                        }
+                    });
+                });
+                </script>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal -->
 
     <div class="container pt-5">
         {% if not breeds.all.first %}

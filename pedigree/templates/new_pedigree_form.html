@@ -1,44 +1,4 @@
 
-<!-- add new breeder modal content -->
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="display: none;">
-     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title"></h4>
-            </div>
-            <div class="modal-body">
-                <form id="breederForm" enctype="multipart/form-data">
-                    {% include 'new_breeder_form.html' %}
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                <button id="saveBreeder" type="button" class="btn btn-success waves-effect waves-light">Save breeder</button>
-            </div>
-            <script>
-            $('#saveBreeder').click(function () {
-                var data = $('#breederForm').serialize();
-                console.log(data);
-                $.ajax({
-                    url: '{% url 'new_breeder_form' %}',
-                    type: 'post',
-                    dataType: 'text',
-                    headers: {'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
-                    data: $('#breederForm').serialize(),
-                    success: function(data) {
-                        console.log(data);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown){
-                    }
-                });
-            });
-            </script>
-        </div>
-    </div>
-</div>
-<!-- /.modal -->
-
 <h3 class="box-title">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Info</h3>
 <hr class="mt-0 mb-5">
 {% if pedigree_form.errors %}
@@ -82,7 +42,7 @@
                             <input id="id_breeder" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                         </div>
                     {% endif %}
-                    <i data-toggle="modal" data-target=".bs-example-modal-lg" class="fas fa-plus-square"></i>
+                    <i id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="fas fa-plus-square" style="color:green"></i>
                 {% elif field.label == 'Current owner' %}
                     {% if 'setup' in request.path %}
                         <input id="hid_current_owner" type="hidden" name='{{ field.name }}' value="">
