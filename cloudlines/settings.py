@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'breed_group',
     'account',
     'support',
+    'impex',
     'widget_tweaks',
     'django_s3_storage',
     'storages',

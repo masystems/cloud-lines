@@ -29,6 +29,8 @@
     <link href="{% static 'assets/plugins/morrisjs/morris.css' %}" rel="stylesheet">
     <!-- Footable-->
     <link href="{% static 'assets/plugins/footable/css/footable.bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Dropify-->
+    <link rel="stylesheet" href="{% static 'assets/plugins/dropify/dist/css/dropify.min.css' %}">
     <!-- STRIPE-->
 	<script src="https://js.stripe.com/v3/"></script>
     <!-- Custom CSS -->
@@ -216,7 +218,7 @@
                         <a class="has-arrow " href="#" aria-expanded="false"><i class="fas fa-arrow-alt-circle-down"></i><span
                                 class="hide-menu"> Impex Database</span></a>
                         <ul aria-expanded="false" class="collapse">
-                            <li><a href="#">Import</a></li>
+                            <li><a href="{% url 'import' %}">Import</a></li>
                             <li><a href="{% url 'export' %}">Export</a></li>
                         </ul>
                     </li>
@@ -313,6 +315,9 @@
 <!-- icheck -->
 <script src="{% static 'assets/plugins/icheck/icheck.min.js' %}"></script>
 <script src="{% static 'assets/plugins/icheck/icheck.init.js' %}"></script>
+
+<!-- Dropzone Plugin JavaScript -->
+<script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
 
 <script>
     $(function() {

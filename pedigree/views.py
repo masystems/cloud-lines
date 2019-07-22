@@ -9,7 +9,6 @@ from io import BytesIO
 from django.template.loader import get_template
 from django.views.generic import View
 from xhtml2pdf import pisa
-from datetime import datetime
 from .models import Pedigree, PedigreeAttributes, PedigreeImage
 from breed.models import Breed
 from breeder.models import Breeder
@@ -17,7 +16,7 @@ from breeder.forms import BreederForm
 from breed_group.models import BreedGroup
 from .forms import PedigreeForm, AttributeForm, ImagesForm
 from django.db.models import Q
-import csv
+
 import json
 from account.views import is_editor, get_main_account
 
@@ -460,41 +459,3 @@ def add_existing(request, pedigree_id):
         child.save()
 
     return redirect('pedigree', pedigree_id)
-
-
-@login_required(login_url="/account/login")
-@user_passes_test(is_editor)
-def export(request):
-    if request.method == 'POST':
-        attached_service = get_main_account(request.user)
-        fields = request.POST.getlist('fields')
-        date = datetime.now()
-        if request.POST['submit'] == 'xlsx':
-            pass
-        elif request.POST['submit'] == 'csv':
-            # Create the HttpResponse object with the appropriate CSV header.
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="pedigree_db{}.csv"'.format(date.strftime("%Y-%m-%d"))
-
-            writer = csv.writer(response)
-            header = False
-
-            for pedigree in Pedigree.objects.filter(account=attached_service):
-                head = ''
-                row = ''
-                for key, val in pedigree.__dict__.items():
-                    if not header:
-                        if key != '_state':
-                            head += '{},'.format(key)
-                    if key in fields:
-                        row += '{},'.format(val)
-                if not header:
-                    writer.writerow([head])
-                    header = True
-                writer.writerow([row])
-
-            return response
-        elif request.POST['submit'] == 'pdf':
-            pass
-
-    return render(request, 'export.html', {'fields': Pedigree._meta.get_fields(include_parents=False, include_hidden=False)})
