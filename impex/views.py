@@ -1,8 +1,9 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ValidationError
-from pedigree.models import Pedigree
+from pedigree.models import Pedigree, PedigreeAttributes, PedigreeImage
 from breeder.models import Breeder
+from breed.models import Breed
 from account.views import is_editor, get_main_account
 from .models import DatabaseUpload
 from datetime import datetime
@@ -72,9 +73,11 @@ def importx(request):
         upload_database.save(database_file)
 
         # get model headings
-        forbidden_fields = ['id', 'creator', 'account', 'date_added']
-        pedigree_headings = [field for field in Pedigree._meta.get_fields(include_parents=False, include_hidden=False) if field.name not in forbidden_fields]
-
+        forbidden_pedigree_fields = ['id', 'creator', 'account', 'date_added']
+        forbidden_pedigree_att_fields = ['id', 'account', 'custom_fields', 'reg_no']
+        pedigree_headings = [field for field in Pedigree._meta.get_fields(include_parents=False, include_hidden=False) if field.name not in forbidden_pedigree_fields]
+        pedigree_att_headings = [field for field in PedigreeAttributes._meta.get_fields(include_parents=False, include_hidden=False) if field.name not in forbidden_pedigree_att_fields]
+        pedigree_headings = pedigree_headings + pedigree_att_headings
         return render(request, 'analyse.html', {'imported_headings': imported_headings,
                                                 'pedigree_headings': pedigree_headings})
     return render(request, 'import.html')
@@ -103,9 +106,10 @@ def import_data(request):
         # get all options
         breeder = post_data['breeder']
         current_owner = post_data['current_owner']
+        breed = post_data['breed'] or ''
         reg_no = post_data['reg_no'] or ''
         tag_no = post_data['tag_no'] or ''
-        name = post_data['name'] or None
+        name = post_data['name'] or ''
         description = post_data['description'] or ''
         date_of_registration = post_data['date_of_registration'] or ''
         dob = post_data['dob'] or ''
@@ -129,28 +133,74 @@ def import_data(request):
                 pedigree.breeder = breeder
             except ValueError:
                 pass
+            #############################
             try:
                 pedigree.current_owner = current_owner
             except ValueError:
                 pass
-            pedigree.tag_no = row[tag_no]
-            pedigree.name = row[name]
-            pedigree.description = row[description]
+            #############################
+            try:
+                pedigree.tag_no = row[tag_no]
+            except KeyError:
+                pass
+            #############################
+            try:
+                pedigree.name = row[name]
+            except KeyError:
+                pass
+            #############################
+            try:
+                pedigree.description = row[description]
+            except KeyError:
+                pass
+            #############################
             try:
                 pedigree.date_of_registration = row[date_of_registration]
             except ValidationError:
                 pass
+            except KeyError:
+                pass
+            #############################
             try:
                 pedigree.dob = row[dob]
             except ValidationError:
                 pass
+            except KeyError:
+                pass
+            #############################
             try:
                 pedigree.dod = row[dod]
             except ValidationError:
                 pass
-            pedigree.sex = row[sex]
-            pedigree.note = row[note]
+            except KeyError:
+                pass
+            #############################
+            try:
+                pedigree.sex = row[sex]
+            except KeyError:
+                pass
+            #############################
+            try:
+                pedigree.note = row[note]
+            except KeyError:
+                pass
+            #############################
 
             print(pedigree)
             pedigree.save()
 
+            # create breed if it doesn't exist
+            if breed != '---':
+                try:
+                    breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
+                except KeyError:
+                    breed_obj = None
+
+            attributes, created = PedigreeAttributes.objects.get_or_create(reg_no=pedigree)
+            try:
+                attributes.breed = breed_obj
+            except KeyError:
+                pass
+            attributes.custom_fields = attached_service.custom_fields
+            attributes.save()
+    return redirect('dashboard')

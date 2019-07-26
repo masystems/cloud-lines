@@ -52,6 +52,8 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
             context['custom_fields'] = json.loads(context['lvl1'].attribute.custom_fields)
         except json.decoder.JSONDecodeError:
             context['custom_fields'] = {}
+        except ObjectDoesNotExist:
+            context['custom_fields'] = {}
 
         context = generate_hirearchy(context)
 
@@ -313,6 +315,8 @@ def edit_pedigree_form(request, id):
             custom_fields = json.loads(attached_service.custom_fields)
         except json.decoder.JSONDecodeError:
             custom_fields = {}
+    except ObjectDoesNotExist:
+        custom_fields = {}
 
     if request.method == 'POST':
         if 'delete' in request.POST:

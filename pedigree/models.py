@@ -40,8 +40,6 @@ class Pedigree(models.Model):
         return self.reg_no
 
 
-
-
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return 'acc_{0}/{1}'.format(instance.account.id, filename)
@@ -60,7 +58,7 @@ class PedigreeImage(models.Model):
 
 class PedigreeAttributes(models.Model):
     reg_no = models.OneToOneField(Pedigree, on_delete=models.CASCADE, primary_key=True, related_name='attribute')
-    breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed')
+    breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed', verbose_name='breed')
     custom_fields = models.TextField(blank=True)
 
     def __str__(self):
