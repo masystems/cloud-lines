@@ -46,3 +46,4 @@ xhtml2pdf
 dj-stripe
 django_extensions
 money
+python-magic

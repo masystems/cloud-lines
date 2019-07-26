@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="row page-titles">
+    <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Database Import</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Impex</li>
+                <li class="breadcrumb-item"><a href="{% url 'import' %}">Import</a></li>
+                <li class="breadcrumb-item active">Analyse</li>
+            </ol>
+        </div>
+    <div class="col-md-6 col-4 align-self-center">
+
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-2">
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Match uploaded headings</h4>
+                        <h6></h6>
+                        {% if error %}
+                            <div class="alert alert-danger">{{ error }} </div>
+                        {% endif %}
+                        <form action="{% url 'import_data' %}" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {% for pedigree_heading in pedigree_headings %}
+                                {% if pedigree_heading.verbose_name != None %}
+                                    <div class="row mx-lg-n5">
+                                        <div class="col px-lg-5 bg-light border">{{ pedigree_heading.verbose_name|title }}</div>
+                                            <div class="col bg-light border"><div class="dropdown bootstrap-select mb-3 mr-2">
+                                                <select class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-98">
+                                                        <option data-tokens="" selected>---</option>
+                                                    {% for imported_heading in imported_headings %}
+                                                        <option data-tokens="{{ pedigree_heading.name }}">{{ imported_heading }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            <button class="btn btn-block btn-outline-info">Import Data</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

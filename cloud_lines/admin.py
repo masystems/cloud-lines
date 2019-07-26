@@ -1,6 +1,6 @@
 from django.contrib import admin
-from.models import Service, Page, Faq, Contact, Testimonial
-# Register your models here.
+from .models import Service, Page, Faq, Contact, Testimonial
+
 
 admin.site.register(Service)
 admin.site.register(Page)

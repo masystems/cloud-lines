@@ -273,7 +273,7 @@ def new_pedigree_form(request):
             files = request.FILES.getlist('upload_images')
 
             for file in files:
-                upload = PedigreeImage(image=file, reg_no=new_pedigree)
+                upload = PedigreeImage(account=attached_service, image=file, reg_no=new_pedigree)
                 upload.save()
 
             new_pedigree.save()
@@ -417,13 +417,13 @@ def edit_pedigree_form(request, id):
             files = request.FILES.getlist('upload_images')
             #fs = FileSystemStorage()
 
-            for image in PedigreeImage.objects.all():
-                img = request.POST.get('{}-{}'.format(id, image.id))
+            for image in PedigreeImage.objects.filter(account=attached_service):
+                img = request.POST.get('{}-{}'.format(pedigree.id, image.id))
                 if img:
                     image.delete()
 
             for file in files:
-                upload = PedigreeImage(image=file, reg_no=pedigree)
+                upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
                 upload.save()
 
             pedigree.save()

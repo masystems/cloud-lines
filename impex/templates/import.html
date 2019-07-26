@@ -24,9 +24,15 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Upload your existing database file</h4>
-                        <label for="input-file-now">Remember to do one file at a time.</label>
-                        <input type="file" id="uploadDatabase" class="dropify" />
-                        <button id="uploadDatabaseButton" class="btn btn-block btn-outline-info">Analyse File</button>
+                        <h6>Please upload one file at a time.</h6>
+                        {% if error %}
+                            <div class="alert alert-danger">{{ error }} </div>
+                        {% endif %}
+                        <form action="{% url 'import' %}" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="file" id="uploadDatabase" name="uploadDatabase" class="dropify" />
+                            <button id="uploadDatabaseButton" class="btn btn-block btn-outline-info">Analyse File</button>
+                        </form>
                     </div>
                 </div>
             </div>
