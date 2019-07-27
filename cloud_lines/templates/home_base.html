@@ -91,7 +91,7 @@
 										<li>
 											<div class="feature-box not-dark fbox-small fbox-center nobottommargin">
 												<div class="fbox-icon">
-													<a href="{% url 'services' %}#{{ service.service_name }}"><img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="width: 52px;"></a>
+													<a href="{% url 'services' %}#{{ service.service_name }}"><img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="max-height: 50px;"></a>
 												</div>
 												<h3 class="t500"><a href="{% url 'services' %}#{{ service.service_name }}">{{ service.service_name }}</a></h3>
 												<p class="d-none d-lg-block mb-0 t300">{{ service.service_description|truncatechars:150 }}</p>
