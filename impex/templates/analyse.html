@@ -34,8 +34,12 @@
                             {% for pedigree_heading in pedigree_headings %}
                                 {% if pedigree_heading.verbose_name != None %}
                                     <div class="row mx-lg-n5">
-                                        <div class="col px-lg-5 bg-light border">{{ pedigree_heading.verbose_name|title }}</div>
-                                            <div class="col bg-light border"><div class="dropdown bootstrap-select mb-3 mr-2">
+                                        <div class="col bg-light border">
+                                            <p class="mt-2"><strong>{{ pedigree_heading.verbose_name|title }}</strong></p>
+                                            <p><small>{{ pedigree_heading.help_text }}</small></p>
+                                        </div>
+                                        <div class="col bg-light border">
+                                            <div class="dropdown bootstrap-select mb-3 mr-2">
                                                 <select class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-98">
                                                         <option data-tokens="" selected>---</option>
                                                     {% for imported_heading in imported_headings %}

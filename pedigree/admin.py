@@ -14,7 +14,7 @@ class PedigreeAdmin(admin.ModelAdmin):
     list_display = ('account', 'creator', 'reg_no', 'name', 'breeder', 'note')
     list_display_links = ['account']
     list_filter = ('account', 'creator', 'date_of_registration', 'breeder', 'current_owner', 'date_added')
-    search_fields = ['account', 'creator', 'date_of_registration', 'breeder', 'current_owner', 'date_added']
+    search_fields = ['account', 'creator', 'reg_no', 'name', 'breeder', 'current_owner', 'date_added']
     ordering = ['account']
     empty_value_display = '-empty-'
 

@@ -52,7 +52,7 @@ def export(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def importx(request):
-    allowed_file_types = ('.xls', 'xlsx', '.csv')
+    allowed_file_types = ('.csv')
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
         database_file = request.FILES['uploadDatabase']
@@ -94,7 +94,7 @@ def import_data(request):
         date_fields = ['date_of_registration', 'dob', 'dod']
         post_data = {}
 
-        # remove blank ('---') entries
+        # remove blank ('---') entries ###################
         for key, val in request.POST.items():
             if val == '---':
                 if key in date_fields:
@@ -103,9 +103,9 @@ def import_data(request):
             else:
                 post_data[key] = val
 
-        # get all options
-        breeder = post_data['breeder']
-        current_owner = post_data['current_owner']
+        # get all options ###################
+        breeder = post_data['breeder'] or ''
+        current_owner = post_data['current_owner'] or ''
         breed = post_data['breed'] or ''
         reg_no = post_data['reg_no'] or ''
         tag_no = post_data['tag_no'] or ''
@@ -115,28 +115,114 @@ def import_data(request):
         dob = post_data['dob'] or ''
         dod = post_data['dod'] or ''
         sex = post_data['sex'] or ''
+        father = post_data['parent_father'] or ''
+        mother = post_data['parent_mother'] or ''
         note = post_data['note'] or ''
 
         for row in database_items:
-            # create breeder if it doesn't exist
-            if not breeder:
-                breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder])
+            # create breeder if it doesn't exist ###################
+            if row[breeder] not in ('', None):
+                breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder], active=True)
+            else:
+                breeder_obj = None
 
-            # create current owner if it doesn't exist
-            if not current_owner:
-                current_owner, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[current_owner])
+            # create current owner if it doesn't exist ###################
+            if row[current_owner] not in ('', None):
+                current_owner_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[current_owner], active=True)
+            else:
+                current_owner_obj = None
 
-            # create each new pedigree
+            # get or create parents ###################
+            def get_or_create_parent(parent):
+                if parent not in ('', None):
+                    if Pedigree.objects.filter(account=attached_service, reg_no=parent).count() <= 1:
+                        pedigree_object, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=parent)
+                        return pedigree_object
+                    else:
+                        return Pedigree.objects.filter(account=attached_service, reg_no=parent).first()
+                else:
+                    return None
+
+            try:
+                father_obj = get_or_create_parent(row[father])
+            except KeyError:
+                father_obj = None
+
+            try:
+                mother_obj = get_or_create_parent(row[mother])
+            except KeyError:
+                mother_obj = None
+
+            # convert dates ###################
+            def convert_date(date):
+                from django.utils.dateparse import parse_date
+                if date not in ('', None):
+                    try:
+                        date = datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    try:
+                        date = datetime.strptime(date, '%y-%m-%d').strftime('%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    try:
+                        date = datetime.strptime(date, '%d-%m-%y').strftime('%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    try:
+                        date = datetime.strptime(date, '%d-%m-%Y').strftime('%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    try:
+                        date = datetime.strptime(date, '%Y/%m/%d').strftime('%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    try:
+                        date = datetime.strptime(date, '%y/%m/%d').strftime('%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    try:
+                        date = datetime.strptime(date, '%d/%m/%y').strftime('%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    try:
+                        date = datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
+                    except ValueError:
+                        pass
+                    return parse_date(date)
+                else:
+                    return None
+
+            try:
+                date_of_registration_converted = convert_date(row[date_of_registration])
+            except KeyError:
+                date_of_registration_converted = None
+
+            try:
+                dob_converted = convert_date(row[dob])
+            except KeyError:
+                dob_converted = None
+
+            try:
+                dod_converted = convert_date(row[dod])
+            except KeyError:
+                dod_converted = None
+
+            # create each new pedigree ###################
             pedigree, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=row[reg_no])
             pedigree.creator = request.user
             try:
-                pedigree.breeder = breeder
+                pedigree.breeder = breeder_obj
             except ValueError:
+                pass
+            except UnboundLocalError:
                 pass
             #############################
             try:
-                pedigree.current_owner = current_owner
+                pedigree.current_owner = current_owner_obj
             except ValueError:
+                pass
+            except UnboundLocalError:
                 pass
             #############################
             try:
@@ -155,21 +241,21 @@ def import_data(request):
                 pass
             #############################
             try:
-                pedigree.date_of_registration = row[date_of_registration]
+                pedigree.date_of_registration = date_of_registration_converted
             except ValidationError:
                 pass
             except KeyError:
                 pass
             #############################
             try:
-                pedigree.dob = row[dob]
+                pedigree.dob = dob_converted
             except ValidationError:
                 pass
             except KeyError:
                 pass
             #############################
             try:
-                pedigree.dod = row[dod]
+                pedigree.dod = dod_converted
             except ValidationError:
                 pass
             except KeyError:
@@ -181,15 +267,24 @@ def import_data(request):
                 pass
             #############################
             try:
+                pedigree.parent_father = father_obj
+            except KeyError:
+                pass
+            #############################
+            try:
+                pedigree.parent_mother = mother_obj
+            except KeyError:
+                pass
+            #############################
+            try:
                 pedigree.note = row[note]
             except KeyError:
                 pass
             #############################
 
-            print(pedigree)
             pedigree.save()
 
-            # create breed if it doesn't exist
+            # create breed if it doesn't exist ###################
             if breed != '---':
                 try:
                     breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])

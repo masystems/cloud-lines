@@ -3,8 +3,8 @@ from django.contrib import admin
 from .models import Breeder
 
 class BreederAdmin(admin.ModelAdmin):
-    list_display = ('account', 'breeding_prefix', 'contact_name', 'address', 'phone_number1', 'phone_number2', 'email')
-    list_display_links = ('breeding_prefix', 'contact_name', 'address', 'phone_number1', 'phone_number2', 'email')
+    list_display = ('breeding_prefix', 'account', 'contact_name', 'address', 'phone_number1', 'phone_number2', 'email')
+    list_display_links = ['breeding_prefix']
     search_fields = ('breeding_prefix', 'contact_name', 'address', 'phone_number1', 'phone_number2', 'email')
     list_filter = ('account', 'active', 'breeding_prefix')
     ordering = ['breeding_prefix']
