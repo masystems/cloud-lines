@@ -31,7 +31,7 @@ class Pedigree(models.Model):
     parent_father = models.ForeignKey('self', related_name='father', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='father')
     parent_mother = models.ForeignKey('self', related_name='mother', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='mother')
     breed_group = models.CharField(max_length=255, blank=True, null=True, verbose_name='breed group name')
-    note = models.CharField(max_length=255, blank=True, verbose_name='Notes')
+    note = models.CharField(max_length=500, blank=True, verbose_name='Notes')
 
     # hidden
     date_added = models.DateTimeField(auto_now_add=True)
