@@ -49,6 +49,7 @@
                 {% else %}
                     {{ field|attr:"class:form-control" }}
                     {{ field.help_text }}
+                    <span id='{{ field.name }}Message'></span>
                 {% endif %}
                 {% for error in field.errors %}
                   <span class="help-block">{{ error }}</span>

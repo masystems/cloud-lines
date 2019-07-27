@@ -61,6 +61,33 @@
                         }
                     });
                 });
+
+                var fadeout = 100;
+                $('#id_breeding_prefix').keyup( function() {
+                    $.ajax({
+                        url: '{% url 'breeder_check' %}',
+                        type: 'post',
+                        dataType: 'text',
+                        data: $('#id_breeding_prefix').serialize(),
+                        success: function(data) {
+                        if (data == 'False') {
+                            $('#saveBreeder').attr('disabled', false);
+                            $('#breeding_prefixMessage').html('');
+                            } else {
+                            $('#saveBreeder').attr('disabled', true);
+                            $('#breeding_prefixMessage').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Breeding prefix is already in use!').css('color', 'red');
+                            }
+                         },
+                        error: function(jqXHR, textStatus, errorThrown){
+                            console.log('jqXHR:');
+                            console.log(jqXHR);
+                            console.log('textStatus:');
+                            console.log(textStatus);
+                            console.log('errorThrown:');
+                            console.log(errorThrown);
+                        }
+                    });
+                });
                 </script>
             </div>
         </div>

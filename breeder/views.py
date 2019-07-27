@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
-from .models import Breeder
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Breeder
 from pedigree.models import Pedigree
 from breed_group.models import BreedGroup
 from account.views import is_editor, get_main_account
@@ -148,3 +149,10 @@ def edit_breeder_form(request, breeder_id):
     return render(request, 'edit_breeder_form.html', {'breeder_form': breeder_form,
                                                       'breeder': breeder,
                                                       'custom_fields': custom_fields})
+
+
+@csrf_exempt
+def breeder_check(request):
+    if request.method == 'POST':
+        breeding_prefix = request.POST.get('breeding_prefix')
+        return HttpResponse(Breeder.objects.filter(breeding_prefix=breeding_prefix).exists())
