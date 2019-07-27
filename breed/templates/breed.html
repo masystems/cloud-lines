@@ -38,6 +38,20 @@
                         <img src="{{ breed.image.url }}" style="max-width:350px" class="float-left pr-2">
                     {% endif %}
                     <p class="card-text">{{ breed.breed_description|linebreaks }}</p>
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <dl>
+                                {% if custom_fields %}
+                                    {% for field_key, field_vals in custom_fields.items %}
+                                        {% if field_vals.location == 'breed' %}
+                                            <dt>{{ field_vals.fieldName }}</dt>
+                                            <dd>{% if field_vals.field_value %}{{ field_vals.field_value }}{% else %}<br>{% endif %}</dd>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

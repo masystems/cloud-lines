@@ -55,7 +55,23 @@
                                     <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
                                     <div class="col-md-9">
                                         {% if field.label == 'Breed description' %}
-                                            <textarea name="description" id="id_description" class="form-control" cols="40" rows="10">{{ breed.breed_description }}</textarea>
+                                            <textarea name="breed_description" id="id_description" class="form-control" cols="40" rows="10">{{ breed.breed_description }}</textarea>
+                                        {% elif field.label == 'Custom fields' %}
+                                            {% if custom_fields %}
+                                                {% for field_key, field_vals in custom_fields.items %}
+                                                    {% if field_vals.location == 'breed' %}
+                                                        {% if field_vals.fieldType == 'textField' %}
+                                                            <label class="col-sm-6 col-form-label">{{ field_vals.fieldName }}</label>
+                                                            <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' value="{{ field_vals.field_value }}" type="text">
+                                                        {% elif field_vals.fieldType == 'textBox' %}
+                                                            <label class="col-sm-6 col-form-label">{{ field_vals.fieldName }}</label>
+                                                            <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control">{{ field_vals.field_value }}</textarea>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% else %}
+                                                <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
+                                            {% endif %}
                                         {% else %}
                                             {% render_field field class="form-control" value=breed.breed_name %}
                                         {% endif %}

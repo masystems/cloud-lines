@@ -7,6 +7,7 @@ class Breed(models.Model):
     breed_name = models.CharField(max_length=100)
     image = models.ImageField(blank=True)
     breed_description = models.TextField(max_length=2000, blank=True)
+    custom_fields = models.TextField(blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

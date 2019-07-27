@@ -109,7 +109,7 @@
 						</div>
 						<h3 class="t500 text-dark">{{ service.service_name }}</h3>
 						<p class="t300">{{ service.service_description|truncatechars:200 }}</p>
-						<a href="{% url 'services' %}#{{ service.service_name }}" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
+						<p><a href="{% url 'services' %}#{{ service.service_name }}" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a></p>
 					</div>
 				</div>
 				{% endfor %}

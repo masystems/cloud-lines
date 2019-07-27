@@ -14,5 +14,5 @@ class BreedForm(forms.ModelForm):
             'breed_description': _('What are the common attributes about this breed?')
         }
         widgets = {
-            'breed_description': forms.Textarea(attrs={'rows': 4, 'cols': 15, 'maxlength': '2000',}),
+            'breed_description': forms.Textarea(attrs={'rows': 4, 'cols': 15, 'maxlength': 2000,}),
         }
