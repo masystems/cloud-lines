@@ -114,13 +114,21 @@ li {
                             <div class="col-lg-6 col-md-12">
                                 <div class="form-group row">
                                     <label class="col-sm-3 text-right col-form-label">{% if service.site_mode == 'mammal' %}
-                                                                                            {% if field.label|title != 'Breed Group' %}
-                                                                                                {{ field.label|title }}
+                                                                                            {% if field.label|title == 'Breed Group' %}
+                                                                                            {% elif field.label|title == 'Mother' %}
+                                                                                                {{ service.mother_title }}
+                                                                                            {% elif field.label|title == 'Father' %}
+                                                                                                {{ service.father_title }}
                                                                                             {% else %}
+                                                                                                {{ field.label|title }}
                                                                                             {% endif %}
                                                                                         {% else %}
                                                                                             {% if field.label == 'Tag Number' %}
                                                                                                 Ring Number
+                                                                                            {% elif field.label|title == 'Mother' %}
+                                                                                                {{ service.mother_title }}
+                                                                                            {% elif field.label|title == 'Father' %}
+                                                                                                {{ service.father_title }}
                                                                                             {% else %}
                                                                                                 {{ field.label|title }}
                                                                                             {% endif %}

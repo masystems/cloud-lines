@@ -290,8 +290,10 @@ def import_data(request):
                     breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
                 except KeyError:
                     breed_obj = None
+            else:
+                breed_obj = None
 
-            attributes, created = PedigreeAttributes.objects.get_or_create(reg_no=pedigree)
+            attributes, created = PedigreeAttributes.objects.get_or_create(account=attached_service, reg_no=pedigree)
             try:
                 attributes.breed = breed_obj
             except KeyError:
