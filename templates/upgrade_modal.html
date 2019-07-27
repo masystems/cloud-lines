@@ -8,8 +8,8 @@
             <div class="modal-body">
                 <p>You cannot create any more {{ type }} until you upgrade your account.</p>
                 <hr>
-                <button type="button" class="btn waves-effect waves-light btn-outline-success">Upgrade</button>
-                <button type="button" class="btn waves-effect waves-light btn-outline-info">Contact us</button>
+                <a href="{% url 'profile' %}"><button type="button" class="btn waves-effect waves-light btn-outline-success">Upgrade</button></a>
+                <a href="{% url 'contact' %}"><button type="button" class="btn waves-effect waves-light btn-outline-info">Contact us</button></a>
             </div>
         </div>
     </div>

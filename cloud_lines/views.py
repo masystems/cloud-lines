@@ -26,7 +26,7 @@ def dashboard(request):
     total_breeders = Breeder.objects.filter(account=main_account).count()
     top_pedigrees = Pedigree.objects.filter(account=main_account).order_by('-date_added')[:5]
     breed_groups = BreedGroup.objects.filter(account=main_account).order_by('-date_added')[:5]
-    top_breeders = Breeder.objects.filter(account=main_account)
+    top_breeders = Breeder.objects.filter(account=main_account).order_by('id')[:5]
 
     current_month = datetime.now().month
     date = datetime.now()
@@ -126,7 +126,7 @@ def contact(request):
 
             return HttpResponse(json.dumps(message), content_type='application/json')
         else:
-            message = {'message': "shit!"}
+            message = {'message': "Oops! Looks like the form wasn't valid."}
 
             return HttpResponse(json.dumps(message), content_type='application/json')
     else:

@@ -67,6 +67,9 @@
                             <input id="id_current_owner" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                         </div>
                     {% endif %}
+                    {% if 'setup' not in request.get_full_path %}
+                        <i id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="fas fa-plus-square" style="color:green"></i>
+                    {% endif %}
                 {% elif field.label == 'Mother' %}
                     <div id="mothers">
                         <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}">

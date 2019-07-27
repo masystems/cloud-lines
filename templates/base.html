@@ -218,7 +218,11 @@
                         <a class="has-arrow " href="#" aria-expanded="false"><i class="fas fa-arrow-alt-circle-down"></i><span
                                 class="hide-menu"> Impex Database</span></a>
                         <ul aria-expanded="false" class="collapse">
-                            <li><a href="{% url 'import' %}">Import</a></li>
+                            {% if add_pedigree %}
+                                <li><a href="{% url 'import' %}">Import</a></li>
+                            {% else %}
+                                <li><a href="#" data-toggle="modal" data-target="#upgrade">Import</a></li>
+                            {% endif %}
                             <li><a href="{% url 'export' %}">Export</a></li>
                         </ul>
                     </li>
@@ -242,7 +246,16 @@
         <!-- Container fluid  -->
         <!-- ============================================================== -->
         <div class="container-fluid">
+            {% if not editor %}
+                {% include 'login_modal.html' %}
+            {% endif %}
+            {% if not add_pedigree %}
+                {% include 'upgrade_modal.html' with type='animals' %}
+            {% endif %}
 
+            {% if not multi_breed %}
+                {% include 'upgrade_modal.html' with type='breeds' %}
+            {% endif %}
 
             {% block content %}
 

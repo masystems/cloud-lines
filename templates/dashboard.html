@@ -9,16 +9,6 @@
         <div class="col-md-6 col-8 align-self-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Dashboard</h3>
         </div>
-        {% if not editor %}
-            {% include 'login_modal.html' %}
-        {% endif %}
-        {% if not add_pedigree %}
-            {% include 'upgrade_modal.html' with type='animals' %}
-        {% endif %}
-
-        {% if not multi_breed %}
-            {% include 'upgrade_modal.html' with type='breeds' %}
-        {% endif %}
     </div>
     <!-- ============================================================== -->
     <!-- End Bread crumb and right sidebar toggle -->
