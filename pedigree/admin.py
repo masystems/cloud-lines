@@ -11,11 +11,11 @@ class PedigreeImagesInline(admin.TabularInline):
 
 
 class PedigreeAdmin(admin.ModelAdmin):
-    list_display = ('reg_no', 'name', 'breeder', 'note')
-    list_display_links = ('name', 'breeder', 'reg_no')
-    list_filter = ('date_of_registration', 'breeder', 'current_owner', 'date_added')
-    search_fields = ['name', 'reg_no']
-    ordering = ['reg_no']
+    list_display = ('account', 'creator', 'reg_no', 'name', 'breeder', 'note')
+    list_display_links = ['account']
+    list_filter = ('account', 'creator', 'date_of_registration', 'breeder', 'current_owner', 'date_added')
+    search_fields = ['account', 'creator', 'date_of_registration', 'breeder', 'current_owner', 'date_added']
+    ordering = ['account']
     empty_value_display = '-empty-'
 
     save_on_top = True

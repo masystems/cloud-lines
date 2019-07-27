@@ -3,7 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="ca65e522-4d0f-409c-bde2-2d82bd0bafaa" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pedigree/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/pedigree/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/account/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/breed/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/breed/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/breed_group/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/breed_group/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/breeder/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/breeder/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/impex/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/impex/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pedigree/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/pedigree/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/support/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/support/admin.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
