@@ -299,7 +299,7 @@ def import_pedigree_data(request):
             else:
                 breed_obj = None
 
-            attributes, created = PedigreeAttributes.objects.get_or_create(account=attached_service, reg_no=pedigree)
+            attributes, created = PedigreeAttributes.objects.get_or_create(reg_no=pedigree)
             try:
                 attributes.breed = breed_obj
             except KeyError:
@@ -367,7 +367,7 @@ def import_breeder_data(request):
             ###################
             try:
                 if row[active].title() in ('True', 'False'):
-                    breeder.active = row[active]
+                    breeder.active = row[active].title()
                 else:
                     pass
             except ValidationError:

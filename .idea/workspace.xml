@@ -2,11 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ca65e522-4d0f-409c-bde2-2d82bd0bafaa" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/account/templates/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/account/templates/settings.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/breeder/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/breeder/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/impex/templates/analyse.html" beforeDir="false" afterPath="$PROJECT_DIR$/impex/templates/analyse.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/impex/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/impex/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/impex/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/impex/views.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
