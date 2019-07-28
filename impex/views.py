@@ -72,20 +72,26 @@ def importx(request):
         upload_database = DatabaseUpload(account=attached_service, database=database_file, file_type=f_type)
         upload_database.save(database_file)
 
-        # get model headings
+        # get pedigree model headings
         forbidden_pedigree_fields = ['id', 'creator', 'account', 'date_added']
         forbidden_pedigree_att_fields = ['id', 'account', 'custom_fields', 'reg_no']
         pedigree_headings = [field for field in Pedigree._meta.get_fields(include_parents=False, include_hidden=False) if field.name not in forbidden_pedigree_fields]
         pedigree_att_headings = [field for field in PedigreeAttributes._meta.get_fields(include_parents=False, include_hidden=False) if field.name not in forbidden_pedigree_att_fields]
         pedigree_headings = pedigree_headings + pedigree_att_headings
+
+        # get breeder model headings
+        forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
+        breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
+                             if field.name not in forbidden_breeeder_fields]
         return render(request, 'analyse.html', {'imported_headings': imported_headings,
-                                                'pedigree_headings': pedigree_headings})
+                                                'pedigree_headings': pedigree_headings,
+                                                'breeder_headings': breeder_headings})
     return render(request, 'import.html')
 
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
-def import_data(request):
+def import_pedigree_data(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
         db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
@@ -300,4 +306,75 @@ def import_data(request):
                 pass
             attributes.custom_fields = attached_service.custom_fields
             attributes.save()
-    return redirect('dashboard')
+    return redirect('pedigree_search')
+
+
+@login_required(login_url="/account/login")
+@user_passes_test(is_editor)
+def import_breeder_data(request):
+    if request.method == 'POST':
+        attached_service = get_main_account(request.user)
+        db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
+        decoded_file = db.database.file.read().decode('utf-8').splitlines()
+        database_items = csv.DictReader(decoded_file)
+
+        post_data = {}
+
+        # remove blank ('---') entries ###################
+        for key, val in request.POST.items():
+            if val == '---':
+                post_data[key] = ''
+            else:
+                post_data[key] = val
+
+        # get all options ###################
+        breeding_prefix = post_data['breeding_prefix'] or ''
+        contact_name = post_data['contact_name'] or ''
+        address = post_data['address'] or ''
+        phone_number1 = post_data['phone_number1'] or ''
+        phone_number2 = post_data['phone_number2'] or ''
+        email = post_data['email'] or ''
+        active = post_data['active'] or ''
+
+        # get or create each new pedigree ###################
+        for row in database_items:
+            breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix])
+
+            try:
+                breeder.contact_name = row[contact_name]
+            except KeyError:
+                pass
+            ###################
+            try:
+                breeder.address = row[address]
+            except KeyError:
+                pass
+            ###################
+            try:
+                breeder.phone_number1 = row[phone_number1]
+            except KeyError:
+                pass
+            ###################
+            try:
+                breeder.phone_number2 = row[phone_number2]
+            except KeyError:
+                pass
+            ###################
+            try:
+                breeder.email = row[email]
+            except KeyError:
+                pass
+            ###################
+            try:
+                if row[active].title() in ('True', 'False'):
+                    breeder.active = row[active]
+                else:
+                    pass
+            except ValidationError:
+                pass
+            except KeyError:
+                pass
+            ###################
+
+            breeder.save()
+    return redirect('breeders')
