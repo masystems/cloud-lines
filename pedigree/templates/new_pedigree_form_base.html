@@ -36,58 +36,107 @@
                     <button id="saveBreeder" type="button" class="btn btn-success waves-effect waves-light">Save breeder</button>
                 </div>
                 <script>
-                $('#saveBreeder').click(function () {
-                    var local = breeders;
-                    var data = $('#breederForm').serialize();
-                    $.ajax({
-                        url: '{% url 'new_breeder_form' %}',
-                        type: 'post',
-                        dataType: 'text',
-                        headers: {'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
-                        data: data,
-                        beforeSend: function() {
-                            // setting a timeout
-                            if ($('#id_breeding_prefix').val().trim() == '') {
-                                $("#id_breeding_prefix").css({"border-color": "red"});;
-                                return false;
-                            }
-                        },
-                        success: function(data) {
-                            breeders.push($('#id_breeding_prefix').val());
+                    $('#saveBreeder').click(function () {
+                        var local = breeders;
+                        var data = $('#breederForm').serialize();
+                        $.ajax({
+                            url: '{% url 'new_breeder_form' %}',
+                            type: 'post',
+                            dataType: 'text',
+                            headers: {'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                            data: data,
+                            beforeSend: function() {
+                                // setting a timeout
+                                if ($('#id_breeding_prefix').val().trim() == '') {
+                                    $("#id_breeding_prefix").css({"border-color": "red"});;
+                                    return false;
+                                }
+                            },
+                            success: function(data) {
+                                breeders.push($('#id_breeding_prefix').val());
 
-                            $('#showNewBreederModal').click();
-                        },
-                        error: function(jqXHR, textStatus, errorThrown){
-                        }
-                    });
-                });
-
-                var fadeout = 100;
-                $('#id_breeding_prefix').keyup( function() {
-                    $.ajax({
-                        url: '{% url 'breeder_check' %}',
-                        type: 'post',
-                        dataType: 'text',
-                        data: $('#id_breeding_prefix').serialize(),
-                        success: function(data) {
-                        if (data == 'False') {
-                            $('#saveBreeder').attr('disabled', false);
-                            $('#breeding_prefixMessage').html('');
-                            } else {
-                            $('#saveBreeder').attr('disabled', true);
-                            $('#breeding_prefixMessage').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Breeding prefix is already in use!').css('color', 'red');
+                                $('#showNewBreederModal').click();
+                            },
+                            error: function(jqXHR, textStatus, errorThrown){
                             }
-                         },
-                        error: function(jqXHR, textStatus, errorThrown){
-                            console.log('jqXHR:');
-                            console.log(jqXHR);
-                            console.log('textStatus:');
-                            console.log(textStatus);
-                            console.log('errorThrown:');
-                            console.log(errorThrown);
-                        }
+                        });
                     });
-                });
+
+                    var fadeout = 100;
+                    $('#id_breeding_prefix').keyup( function() {
+                        $.ajax({
+                            url: '{% url 'breeder_check' %}',
+                            type: 'post',
+                            dataType: 'text',
+                            data: $('#id_breeding_prefix').serialize(),
+                            success: function(data) {
+                            if (data == 'False') {
+                                $('#saveBreeder').attr('disabled', false);
+                                $('#breeding_prefixMessage').html('');
+                                } else {
+                                $('#saveBreeder').attr('disabled', true);
+                                $('#breeding_prefixMessage').html('<i class="icon-warning-sign"></i> <strong>Warning!</strong> Breeding prefix is already in use!').css('color', 'red');
+                                }
+                             },
+                            error: function(jqXHR, textStatus, errorThrown){
+                                console.log('jqXHR:');
+                                console.log(jqXHR);
+                                console.log('textStatus:');
+                                console.log(textStatus);
+                                console.log('errorThrown:');
+                                console.log(errorThrown);
+                            }
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+    <!-- /.modal -->
+    <!-- add new breed modal content -->
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" id="newBreedModal" aria-labelledby="newBreedModal" aria-hidden="true" style="display: none;">
+         <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="breedForm">
+                        {% include 'new_breed_form.html' %}
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                    <button id="saveBreed" type="button" class="btn btn-success waves-effect waves-light">Save breed</button>
+                </div>
+                <script>
+                    $('#saveBreed').click(function () {
+                        if (typeof image_array !== 'undefined' && image_array.length > 0) {
+                            // the array is defined and has at least one element
+                            var local = breeds;
+                        } else {
+                            var breeds = [];
+                        }
+                        var data = $('#breedForm').serialize();
+                        $.ajax({
+                            url: '{% url 'new_breed_form' %}',
+                            type: 'post',
+                            dataType: 'text',
+                            headers: {'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
+                            data: data,
+                            beforeSend: function() {
+
+                            },
+                            success: function(data) {
+                                breeds.push($('#id_breed_name').val());
+                                $('id_breed').val($('#id_breed_name').val());
+                                $('#showNewBreedModal').click();
+                            },
+                            error: function(jqXHR, textStatus, errorThrown){
+                            }
+                        });
+                    });
                 </script>
             </div>
         </div>

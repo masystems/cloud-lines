@@ -56,7 +56,7 @@
                         </div>
                     {% endif %}
                     {% if 'setup' not in request.get_full_path %}
-                        <i id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="fas fa-plus-square" style="color:green"></i>
+                        <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Breeder</button>
                     {% endif %}
                 {% elif field.label == 'Current owner' %}
                     {% if 'setup' in request.path %}
@@ -68,7 +68,7 @@
                         </div>
                     {% endif %}
                     {% if 'setup' not in request.get_full_path %}
-                        <i id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="fas fa-plus-square" style="color:green"></i>
+                        <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Owner</button>
                     {% endif %}
                 {% elif field.label == 'Mother' %}
                     <div id="mothers">
@@ -155,6 +155,9 @@
                             {% else %}
                                     <input id="hid_breed" class="typeahead form-control" name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
                                     <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
+                            {% endif %}
+                            {% if 'setup' not in request.get_full_path %}
+                                <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="#newBreedModal" class="btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Breed</button>
                             {% endif %}
                         {% elif field.label == 'Custom fields' %}
                             {% if custom_fields %}
