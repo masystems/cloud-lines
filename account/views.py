@@ -30,51 +30,54 @@ def site_mode(request):
 
     if request.user.is_authenticated:
         # returns the main account the requesting user is a member of
-        main_account = get_main_account(request.user)
+        attached_service = get_main_account(request.user)
 
         # returns the user for the main account
-        user = UserDetail.objects.get(user=main_account.user.user)
+        user = UserDetail.objects.get(user=attached_service.user.user)
         user_detail = UserDetail.objects.get(user=request.user)
 
         attached_services = AttachedService.objects.filter(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(user=user_detail, active=True))
 
-        service = Service.objects.get(id=main_account.service.id)
+        service = Service.objects.get(id=attached_service.service.id)
 
         if str(request.user.username) == str(user.user.username):
             editor = True
-        elif request.user in main_account.admin_users.all():
+        elif request.user in attached_service.admin_users.all():
             editor = True
-        elif request.user in main_account.read_only_users.all():
+        elif request.user in attached_service.read_only_users.all():
             editor = False
         else:
             editor = False
 
-        if Pedigree.objects.filter(account=main_account).count() < service.number_of_animals:
+        if Pedigree.objects.filter(account=attached_service).count() < service.number_of_animals:
             pedigrees = True
         else:
             pedigrees = False
 
-        if main_account.admin_users.all().count() < service.admin_users:
+        if attached_service.admin_users.all().count() < service.admin_users:
             admins = True
         else:
             admins = False
 
-        if main_account.read_only_users.all().count() < service.read_only_users:
+        if attached_service.read_only_users.all().count() < service.read_only_users:
             users = True
         else:
             users = False
 
-        if main_account.site_mode == 'poultry' or Breed.objects.filter(account=main_account).count() < 1:
-            multi_breed = True
+        if not attached_service.service.multi_breed:
+            if Breed.objects.all().count() < 1:
+                add_breed = True
+            else:
+                add_breed = False
         else:
-            multi_breed = False
+            add_breed = True
 
-        return {'service': main_account,
+        return {'service': attached_service,
                 'attached_services': attached_services,
                 'add_pedigree': pedigrees,
                 'admins': admins,
                 'users': users,
-                'multi_breed': multi_breed,
+                'add_breed': add_breed,
                 'editor': editor}
 
     return {'authenticated': 'no'}

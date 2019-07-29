@@ -210,7 +210,7 @@
                     {% endif %}
 
                     <li><a href="{% url 'breeds' %}"><i class="fas fa-random"></i><span
-                            class="hide-menu"> Breed{% if multi_breed %}s{% endif %}</span></a></li>
+                            class="hide-menu"> Breed{% if service.service.multi_breed %}s{% endif %}</span></a></li>
 
                     <li class="nav-devider"></li>
                     <li class="nav-small-cap"> Database Management</li>
@@ -253,7 +253,7 @@
                 {% include 'upgrade_modal.html' with type='animals' %}
             {% endif %}
 
-            {% if not multi_breed %}
+            {% if not service.service.multi_breed %}
                 {% include 'upgrade_modal.html' with type='breeds' %}
             {% endif %}
 
