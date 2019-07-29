@@ -56,7 +56,7 @@
                         </div>
                     {% endif %}
                     {% if 'setup' not in request.get_full_path %}
-                        <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Breeder</button>
+                        <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Breeder</button>
                     {% endif %}
                 {% elif field.label == 'Current owner' %}
                     {% if 'setup' in request.path %}
@@ -68,7 +68,7 @@
                         </div>
                     {% endif %}
                     {% if 'setup' not in request.get_full_path %}
-                        <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Owner</button>
+                        <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Owner</button>
                     {% endif %}
                 {% elif field.label == 'Mother' %}
                     <div id="mothers">
@@ -87,10 +87,10 @@
                 {% elif field.label == 'Sex' %}
                     <div class="radio radio-info pt-2">
                         {% for option in field %}
-                            <input type="radio" name="sex" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}">
-                                <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }} </label>
+                            <input type="radio" name="sex" class="radio radio-info" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if option.choice_label == 'Female' %}checked{% endif %}>
+                            <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
                         {% endfor %}
-                </div>
+                    </div>
                 {% else %}
                     {{ field }}
                 {% endif %}
@@ -157,7 +157,7 @@
                                     <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
                             {% endif %}
                             {% if 'setup' not in request.get_full_path %}
-                                <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="#newBreedModal" class="btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Breed</button>
+                                <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="#newBreedModal" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Breed</button>
                             {% endif %}
                         {% elif field.label == 'Custom fields' %}
                             {% if custom_fields %}

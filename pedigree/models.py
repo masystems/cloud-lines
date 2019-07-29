@@ -27,7 +27,7 @@ class Pedigree(models.Model):
         ('castrated', 'Castrated'),
     )
 
-    sex = models.CharField(max_length=10, choices=GENDERS, default=None, null=True, help_text="Accepted formats: male, female, castrated")
+    sex = models.CharField(max_length=10, choices=GENDERS, null=True, default='female', help_text="Accepted formats: male, female, castrated")
     parent_father = models.ForeignKey('self', related_name='father', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='father', help_text="This should be the parents registration number.")
     parent_mother = models.ForeignKey('self', related_name='mother', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='mother', help_text="This should be the parents registration number.")
     breed_group = models.CharField(max_length=255, blank=True, null=True, verbose_name='breed group name')
