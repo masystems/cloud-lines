@@ -38,10 +38,10 @@
                         <tr>
                             <th scope="col">Name</th>
                             <th scope="col">Breeding Prefix</th>
-                            <th scope="col">Address</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Phone</th>
-                            <th scope="col">Status</th>
+                            <th scope="col" class="d-none d-sm-table-cell">Address</th>
+                            <th scope="col" class="d-none d-sm-table-cell">Email</th>
+                            <th scope="col" class="d-none d-sm-table-cell">Phone</th>
+                            <th scope="col" class="d-none d-sm-table-cell">Status</th>
                         </tr>
                         </thead>
                         <tbody id="bredTable">
@@ -50,10 +50,10 @@
                                                 style="cursor: pointer;">
                                 <th scope="row">{{ breeder.contact_name }}</th>
                                 <td>{{ breeder.breeding_prefix }}</td>
-                                <td>{{ breeder.address }}</td>
-                                <td>{{ breeder.email }}</td>
-                                <td>{{ breeder.phone_number1 }}</td>
-                                <td><span class="label {% if breeder.active %}label-light-success{% else %}label-light-danger{% endif %}">{% if breeder.active %}Active{% else %}Inactive{% endif %}</span></td>
+                                <td class="d-none d-sm-table-cell">{{ breeder.address }}</td>
+                                <td class="d-none d-sm-table-cell">{{ breeder.email }}</td>
+                                <td class="d-none d-sm-table-cell">{{ breeder.phone_number1 }}</td>
+                                <td class="d-none d-sm-table-cell"><span class="label {% if breeder.active %}label-light-success{% else %}label-light-danger{% endif %}">{% if breeder.active %}Active{% else %}Inactive{% endif %}</span></td>
                             </tr>
                         {% endfor %}
                         </tbody>

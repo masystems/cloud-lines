@@ -39,10 +39,10 @@
                         <thead>
                         <tr>
                             <th scope="col">Name</th>
-                            <th scope="col">Breeder</th>
+                            <th scope="col" class="d-none d-sm-table-cell">Breeder</th>
                             <th scope="col">Breed</th>
-                            <th scope="col">Male</th>
-                            <th scope="col">Female</th>
+                            <th scope="col" class="d-none d-sm-table-cell">Male</th>
+                            <th scope="col" class="d-none d-sm-table-cell">Female</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -50,14 +50,14 @@
                             {% for group in groups.all %}
                                 <tr>
                                     <td>{{ group.group_name }}</td>
-                                    <td>{{ group.breeder }}</td>
+                                    <td class="d-none d-sm-table-cell">{{ group.breeder }}</td>
                                     <td>{{ group.breed }}</td>
-                                    <td>{% for member in group.group_members.all %}
+                                    <td class="d-none d-sm-table-cell">{% for member in group.group_members.all %}
                                             {% if member.sex == 'male' %}
                                                 {% include 'relative.html' with pedigree=member %}
                                             {% endif %}
                                         {% endfor %}</td>
-                                    <td>{% for member in group.group_members.all %}
+                                    <td class="d-none d-sm-table-cell">{% for member in group.group_members.all %}
                                             {% if member.sex == 'female' %}
                                                 {% include 'relative.html' with pedigree=member %} |
                                             {% endif %}

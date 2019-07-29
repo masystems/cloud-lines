@@ -273,7 +273,7 @@
                                 <tr>
                                     <th colspan="2">Breeding Prefix</th>
                                     <th>Name</th>
-                                    <th>Active</th>
+                                    <th class="d-none d-sm-table-cell">Active</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -286,7 +286,7 @@
                                         <td>
                                             <h6>{{ breeder.breeding_prefix|truncatechars:12 }}</h6><small class="text-muted">{{ breeder.address|truncatewords:"3" }}</small></td>
                                         <td>{{ breeder.contact_name }}</td>
-                                        <td><span class="label {% if breeder.active %}label-light-success{% else %}label-light-danger{% endif %}">{% if breeder.active %}Active{% else %}Inactive{% endif %}</span></td>
+                                        <td class="d-none d-sm-table-cell"><span class="label {% if breeder.active %}label-light-success{% else %}label-light-danger{% endif %}">{% if breeder.active %}Active{% else %}Inactive{% endif %}</span></td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -307,7 +307,7 @@
                                 <tr>
                                     <th colspan="2">Count/Name</th>
                                     <th>Members</th>
-                                    <th>Active</th>
+                                    <th class="d-none d-sm-table-cell">Active</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -322,7 +322,7 @@
                                         <td>{% for member in breed_group.group_members.all %}
                                                 {{ member.reg_no }}
                                             {% endfor %}</td>
-                                        <td><span class="label {% if breed_group.group_members.all.count > 0 %}label-light-success{% else %}label-light-danger{% endif %}">
+                                        <td class="d-none d-sm-table-cell"><span class="label {% if breed_group.group_members.all.count > 0 %}label-light-success{% else %}label-light-danger{% endif %}">
                                             {% if breed_group.group_members.all.count > 0  %}Active{% else %}Inactive{% endif %}</span></td>
                                     </tr>
                                 {% endfor %}

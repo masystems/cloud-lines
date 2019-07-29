@@ -66,20 +66,19 @@
                                     {{ error }}<strong>{{ search_string }}</strong>.
                                 </div>
                             {% endif %}
-<!--                            <button type="submit" class="btn btn-outline-success">Search</button>-->
                         </div>
                     </form>
                     <table id="table" class="table table-bordered table-striped">
                     <thead>
                     <tr>
                         <th scope="col">Reg No.</th>
-                        <th scope="col">{% if service.site_mode == 'mammal' %}Tag No.{% else %}Ring No.{% endif %}</th>
+                        <th scope="col" class="d-none d-sm-table-cell">{% if service.site_mode == 'mammal' %}Tag No.{% else %}Ring No.{% endif %}</th>
                         <th scope="col">Name</th>
-                        <th scope="col">DOB</th>
-                        <th scope="col">DOD</th>
-                        <th scope="col">Breed</th>
-                        <th scope="col">Sex</th>
-                        <th scope="col">Notes</th>
+                        <th scope="col" class="d-none d-sm-table-cell">DOB</th>
+                        <th scope="col" class="d-none d-sm-table-cell">DOD</th>
+                        <th scope="col" class="d-none d-sm-table-cell">Breed</th>
+                        <th scope="col" class="d-none d-sm-table-cell">Sex</th>
+                        <th scope="col" class="d-none d-sm-table-cell">Notes</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -87,13 +86,13 @@
                     <tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
                         style="cursor: pointer;">
                         <th scope="row">{{ pedigree.reg_no }}</th>
-                        <th scope="row">{{ pedigree.tag_no }}</th>
+                        <th scope="row" class="d-none d-sm-table-cell">{{ pedigree.tag_no }}</th>
                         <td>{{ pedigree.name }}</td>
-                        <td>{{ pedigree.dob }}</td>
-                        <td>{% if pedigree.dod %}{{ pedigree.dod }}{% endif %}</td>
-                        <td>{{ pedigree.attribute.breed.breed_name }}</td>
-                        <td><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
-                        <td>{{ pedigree.note }}</td>
+                        <td class="d-none d-sm-table-cell">{{ pedigree.dob }}</td>
+                        <td class="d-none d-sm-table-cell">{% if pedigree.dod %}{{ pedigree.dod }}{% endif %}</td>
+                        <td class="d-none d-sm-table-cell">{{ pedigree.attribute.breed.breed_name }}</td>
+                        <td class="d-none d-sm-table-cell"><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
+                        <td class="d-none d-sm-table-cell">{{ pedigree.note }}</td>
                     </tr>
                     {% endfor %}
                     </tbody>

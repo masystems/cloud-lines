@@ -38,13 +38,14 @@
                 <table id="table" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                    <th scope="col">Reg No.</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">DOB</th>
-                    <th scope="col">DOD</th>
-                    <th scope="col">Breed</th>
-                    <th scope="col">Sex</th>
-                    <th scope="col">Notes</th>
+                        <th scope="col">Reg No.</th>
+                        <th scope="col" class="d-none d-sm-table-cell">{% if service.site_mode == 'mammal' %}Tag No.{% else %}Ring No.{% endif %}</th>
+                        <th scope="col">Name</th>
+                        <th scope="col" class="d-none d-sm-table-cell">DOB</th>
+                        <th scope="col" class="d-none d-sm-table-cell">DOD</th>
+                        <th scope="col" class="d-none d-sm-table-cell">Breed</th>
+                        <th scope="col" class="d-none d-sm-table-cell">Sex</th>
+                        <th scope="col" class="d-none d-sm-table-cell">Notes</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -52,12 +53,13 @@
                 <tr onclick="window.location='{% url 'pedigree' result.id %}';"
                     style="cursor: pointer;">
                     <th scope="row">{{ result.reg_no }}</th>
+                    <th scope="row" class="d-none d-sm-table-cell">{{ pedigree.tag_no }}</th>
                     <td>{{ result.name }}</td>
-                    <td>{{ result.dob }}</td>
-                    <td>{{ result.dod }}</td>
-                    <td>{{ result.attribute.breed.breed_name }}</td>
-                    <td><span class="label {% if result.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ result.sex }} </span></td>
-                    <td>{{ result.notes }}</td>
+                    <td class="d-none d-sm-table-cell">{{ result.dob }}</td>
+                    <td class="d-none d-sm-table-cell">{{ result.dod }}</td>
+                    <td class="d-none d-sm-table-cell">{{ result.attribute.breed.breed_name }}</td>
+                    <td class="d-none d-sm-table-cell"><span class="label {% if result.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ result.sex }} </span></td>
+                    <td class="d-none d-sm-table-cell">{{ result.notes }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>
