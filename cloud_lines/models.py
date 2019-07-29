@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Service(models.Model):
@@ -66,3 +67,17 @@ class Testimonial(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+class LargeTierQueue(models.Model):
+    from account.models import UserDetail, AttachedService
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='luser')
+    user_detail = models.ForeignKey(UserDetail, on_delete=models.CASCADE, null=True, related_name='user_detail')
+    attached_service = models.ForeignKey(AttachedService, on_delete=models.CASCADE, null=True, related_name='lattached_service')
+
+    BUILD_STATE = (
+        ('waiting', 'Waiting'),
+        ('building', 'Building'),
+        ('complete', 'Complete'),
+    )
+    build_state = models.CharField(max_length=20, choices=BUILD_STATE, default='waiting')
