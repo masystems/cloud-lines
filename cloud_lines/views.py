@@ -347,7 +347,7 @@ def order_subscribe(request):
     # send confirmation email
     body = """
         Congratulations on purchasing a new Cloudlines {} service!
-        To access your new service click <a href="https://cloud-lines.co.uk/dashboard"> HERE</a>. You should
+        To access your new service click <a href="https://cloud-lines.com/dashboard"> HERE</a>. You should
         find everything you need to get started there but do let is know if you have any questions.
     """.format(attach_service.service.service_name,)
     send_mail('New subscription!', request.user, body, send_to=request.user.email)

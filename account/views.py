@@ -468,7 +468,7 @@ def register(request):
         
         <p>Now that you have registered you have access to our Free service.</p>
         
-        <p><a href="https://cloud-lines.co.uk/dashboard">Click here</a> to go to your new dashboard.</p>
+        <p><a href="https://cloud-lines.com/dashboard">Click here</a> to go to your new dashboard.</p>
         
         <p>Feel free to contact us about anything and enjoy!</p>"""
         send_mail('Welcome to Cloudlines!', user.get_full_name(), email_body, send_to=user.email)
