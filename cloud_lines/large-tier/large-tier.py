@@ -10,7 +10,7 @@ import boto3
 from botocore.config import Config
 from git import Repo
 
-sys.path.append('/opt/cloud-lines/cloud-lines')
+sys.path.append('/opt/cloudlines/cloud-lines')
 os.environ["DJANGO_SETTINGS_MODULE"] = "cloudlines.settings"
 django.setup()
 
@@ -19,8 +19,8 @@ from cloud_lines.models import LargeTierQueue
 
 class LargeTier:
     def __init__(self):
+
         self.waiting = LargeTierQueue.objects.filter(build_state='waiting')
-        self.target_dir = '/opt/instances/{}/{}'.format(self.site_name, self.site_name)
 
         # Generate passwords
         self.django_password = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(50)])
@@ -29,13 +29,17 @@ class LargeTier:
 
         self.boto_config = Config(retries=dict(max_attempts=20))
 
-        self.dependency_packages = os.listdir('/opt/files/')
+        self.dependency_packages = os.listdir('/opt/dependencies/')
 
-        # set template dir root
-        self.env = Environment(loader=FileSystemLoader(self.target_dir))
 
     def deploy(self):
         for deployment in self.waiting:
+            self.site_name = deployment.subdomain
+            self.target_dir = '/opt/instances/{}/{}'.format(self.site_name, self.site_name)
+
+            # set template dir root
+            self.env = Environment(loader=FileSystemLoader(self.target_dir))
+
             self.site_name = deployment.subdomain
             # create database
             client = boto3.client(
@@ -60,32 +64,37 @@ class LargeTier:
                 "PubliclyAccessible": True,
                 "StorageType": "gp2",
             }
-            new_db = client.create_db_instance(**db_vars)
+            #new_db = client.create_db_instance(**db_vars)
 
             # clone repo
+            print('clone repo')
             Repo.clone_from('https://masystems:H5m6RZK0AVh3IumrybH3@github.com/masystems/pedigreedb_template.git',
-                            'instances/{}/{}'.format(self.site_name, self.site_name))
+                            self.target_dir)
 
             # copy in dependencies
-
+            print('copy dependcies')
             for dep in self.dependency_packages:
-                fullpath = os.path.join('/opt/files/', dep)
+                fullpath = os.path.join('/opt/dependcies/', dep)
                 if os.path.isfile(fullpath):
                     shutil.copy(fullpath, self.target_dir)
 
             # update zappa settings
+            print('set zappa settings')
             template = self.env.get_template('zappa_settings.j2')
             with open(os.path.join(self.target_dir, 'zappa_settings.json'), 'w') as fh:
                 fh.write(template.render(site_name=self.site_name))
 
             # create virtualenv
+            print('creating virtual env')
             subprocess.Popen(['virtualenv', '-p', 'python3', '/opt/instances/{}/venv'.format(self.site_name)])
 
             # wait for db to be created
+            print('wating for DB to be created')
             waiter = client.get_waiter("db_instance_available")
             waiter.wait(DBInstanceIdentifier=self.site_name, WaiterConfig={"Delay": 10, "MaxAttempts": 60}, )
 
             # get db endpoint
+            print('getting db endpoint')
             details = client.describe_db_instances(DBInstanceIdentifier=self.site_name)
             db_host = details['DBInstances'][0]['Endpoint']['Address']
 
@@ -100,8 +109,9 @@ class LargeTier:
                                          db_password=self.db_password,
                                          db_host=db_host))
 
-            subprocess.Popen(['/opt/venv.sh', self.site_name, '/opt/instances/{}/'.format(self.site_name)])
+            subprocess.Popen(['/opt/venv.sh', self.site_name])
 
 
 if __name__ == '__main__':
     lt = LargeTier()
+    lt.deploy()
