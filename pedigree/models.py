@@ -13,7 +13,7 @@ class Pedigree(models.Model):
     account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
     breeder = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True, help_text="Often the same as Current Owner")
     current_owner = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True, related_name='owner', verbose_name='current owner', help_text="Often the same as Breeder")
-    reg_no = models.CharField(max_length=100, blank=True, verbose_name='registration number', help_text="Must be unique")
+    reg_no = models.CharField(max_length=100, blank=True, unique=True, verbose_name='registration number', help_text="Must be unique")
     tag_no = models.CharField(max_length=100, blank=True, null=True, verbose_name='tag number')
     name = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True, null=True, help_text="Max 1000 characters")
