@@ -154,5 +154,6 @@ def edit_breeder_form(request, breeder_id):
 @csrf_exempt
 def breeder_check(request):
     if request.method == 'POST':
+        attached_service = get_main_account(request.user)
         breeding_prefix = request.POST.get('breeding_prefix')
-        return HttpResponse(Breeder.objects.filter(breeding_prefix=breeding_prefix).exists())
+        return HttpResponse(Breeder.objects.filter(account=attached_service, breeding_prefix=breeding_prefix).exists())
