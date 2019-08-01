@@ -13,6 +13,7 @@ from breed.models import Breed
 from breeder.models import Breeder
 from breed_group.models import BreedGroup
 from django.db.models import Q
+from re import match
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -63,6 +64,8 @@ def dashboard(request):
 
 
 def home(request):
+    if match('(.*).cloud-lines.com', request.META['domain']):
+        return redirect('dashboard')
     return render(request, 'home.html', {'services': Service.objects.all(),
                                          'testimonials': Testimonial.objects.all()})
 

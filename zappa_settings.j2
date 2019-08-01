@@ -1,0 +1,18 @@
+{
+    "{{ site_name }}": {
+        "aws_region": "eu-west-2",
+        "django_settings": "pedigreedb.settings",
+        "profile_name": "default",
+        "project_name": "cloudlines-{{ site_name }}",
+        "runtime": "python3.6",
+        "s3_bucket": "zappa-qe7qp81u8",
+        "memory_size": 1024,
+        "apigateway_description": "Cloud-Lines: {{ site_name }}",
+	    "vpc_config" : {
+            "SubnetIds": [ "subnet-09cdb0c14a9835ace","subnet-0b5af8c7cb672580d" ], // use the private subnet
+            "SecurityGroupIds": [ "sg-0a2432a6a0c703f5e" ]
+        }
+        "certificate_arn": "arn:aws:acm:us-east-1:456152681251:certificate/855af7bf-f805-44d7-b453-172271e7992c",
+        "domain": "{{ site_name }}.cloud-lines.com"
+    }
+}

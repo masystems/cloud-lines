@@ -68,7 +68,7 @@ class LargeTier:
 
             # clone repo
             print('clone repo')
-            Repo.clone_from('https://masystems:H5m6RZK0AVh3IumrybH3@github.com/masystems/pedigreedb_template.git',
+            Repo.clone_from('https://masystems:H5m6RZK0AVh3IumrybH3@github.com/masystems/cloud-lines.git',
                             self.target_dir)
 
             # copy in dependencies
