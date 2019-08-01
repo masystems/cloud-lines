@@ -9,6 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 import boto3
 from botocore.config import Config
 from git import Repo
+import json
 
 sys.path.append('/opt/cloudlines/cloud-lines')
 os.environ["DJANGO_SETTINGS_MODULE"] = "cloudlines.settings"
@@ -109,6 +110,17 @@ class LargeTier:
                                          db_password=self.db_password,
                                          db_host=db_host))
 
+            # generate user data
+            process = subprocess.Popen(['python', 'manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
+            stdout = process.communicate()[0]
+
+            users = json.loads(stdout)
+            for user in users:
+                if user['pk'] == deployment.user.pk:
+                    with open(os.path.join(self.target_dir, 'user.json'), 'w') as outfile:
+                        json.dump(user, outfile)
+
+            # run commands inside the venv
             subprocess.Popen(['/opt/venv.sh', self.site_name])
 
 
