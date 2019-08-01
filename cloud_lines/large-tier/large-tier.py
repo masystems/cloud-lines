@@ -58,7 +58,7 @@ class LargeTier:
                 ],
                 "DBSubnetGroupName": "default-vpc-016908fc41dd3e6f8",
                 "DBParameterGroupName": "default.postgres10",
-                "BackupRetentionPeriod": 7,
+                "BackupRetentionPeriod": 0,
                 "MultiAZ": False,
                 "EngineVersion": "10.6",
                 "PubliclyAccessible": True,
