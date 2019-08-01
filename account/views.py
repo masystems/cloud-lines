@@ -19,6 +19,7 @@ from breeder.models import Breeder
 from breeder.forms import BreederForm
 from pedigree.forms import PedigreeForm, AttributeForm, ImagesForm
 from money import Money
+from re import match
 import random
 import string
 import stripe
@@ -209,9 +210,15 @@ def site_login(request):
             auth.login(request, user)
             return redirect('dashboard')
         else:
-            return render(request, 'cl_login.html', {'error': 'Username or Password does not exist.'})
+            if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+                return render(request, 'lt_login.html', {'error': 'Username or Password does not exist.'})
+            else:
+                return render(request, 'cl_login.html', {'error': 'Username or Password does not exist.'})
     else:
-        return render(request, 'cl_login.html')
+        if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+            return render(request, 'lt_login.html')
+        else:
+            return render(request, 'cl_login.html')
 
 
 @login_required(login_url="/account/login")
