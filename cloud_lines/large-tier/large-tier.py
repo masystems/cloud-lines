@@ -121,7 +121,14 @@ class LargeTier:
                         json.dump(user, outfile)
 
             # run commands inside the venv
-            subprocess.Popen(['/opt/venv.sh', self.site_name])
+            subprocess.Popen(['/opt/venv.sh',
+                              self.site_name, # $SITE_NAME
+                              deployment.pk, # $USER_PK
+                              deployment.attached_service.service.pk, # $SERVICE_PK
+                              deployment.user_detail.stripe_id, # $STRIPE_ID
+                              deployment.attached_service.site_mode, # $SITE_MODE
+                              deployment.attached_service.animal_type,  # $ANIMAL_TYPE
+            ])
 
 
 if __name__ == '__main__':
