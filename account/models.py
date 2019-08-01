@@ -37,6 +37,7 @@ class AttachedService(models.Model):
     active = models.BooleanField(default=False)
     subscription_id = models.CharField(max_length=250, blank=True)
 
+
     install_available = models.BooleanField(default=False)
 
     def __str__(self):
