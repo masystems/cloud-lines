@@ -113,10 +113,10 @@ def get_main_account(user):
     except AttachedService.DoesNotExist:
         # update the attached service to what default
         attached_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
-                                                                               site_mode='mammal',
-                                                                               install_available=False,
-                                                                               service=Service.objects.get(service_name='Free'),
-                                                                               active=True)
+                                                                                   site_mode='mammal',
+                                                                                   install_available=False,
+                                                                                   service=Service.objects.get(service_name='Free'),
+                                                                                   active=True)
 
     return attached_service
 
@@ -237,7 +237,6 @@ def logout(request):
 @login_required(login_url="/account/login")
 def profile(request):
     context = {}
-    #stripe.api_key = settings.STRIPE_SECRET_KEY
     try:
         context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
     except AttributeError:
