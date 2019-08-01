@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from .models import Service, Page, Faq, Contact, Testimonial
 from .forms import ContactForm
@@ -64,7 +64,6 @@ def dashboard(request):
 
 
 def home(request):
-    print(request.META['HTTP_HOST'])
     if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
         return redirect('dashboard')
     return render(request, 'home.html', {'services': Service.objects.all(),
@@ -72,25 +71,35 @@ def home(request):
 
 
 def about(request):
+    if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+        return redirect('dashboard')
     return render(request, 'std_page.html', {'content': Page.objects.get(title='About'),
                                              'services': Service.objects.all()})
 
 
 def extras(request):
+    if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+        return redirect('dashboard')
     return render(request, 'std_page.html', {'content': Page.objects.get(title='Extras'),
                                              'services': Service.objects.all()})
 
 
 def faqs(request):
+    if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+        return redirect('dashboard')
     return render(request, 'faqs.html', {'faqs': Faq.objects.all(),
                                          'services': Service.objects.all()})
 
 
 def services(request):
+    if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+        return redirect('dashboard')
     return render(request, 'services.html', {'services': Service.objects.all()})
 
 
 def contact(request):
+    if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+        return HttpResponseRedirect('https://cloud-lines.com/contact')
     contact_form = ContactForm(request.POST or None, request.FILES or None)
     if request.POST:
         if contact_form.is_valid():
