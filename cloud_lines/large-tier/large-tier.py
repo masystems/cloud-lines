@@ -64,7 +64,7 @@ class LargeTier:
                 "PubliclyAccessible": True,
                 "StorageType": "gp2",
             }
-            #new_db = client.create_db_instance(**db_vars)
+            new_db = client.create_db_instance(**db_vars)
 
             # clone repo
             print('clone repo')
@@ -99,8 +99,8 @@ class LargeTier:
             db_host = details['DBInstances'][0]['Endpoint']['Address']
 
             # update local settings
-            template = self.env.get_template('pedigreedb/local_settings.j2')
-            with open(os.path.join(self.target_dir, 'pedigreedb/local_settings.py'), 'w') as fh:
+            template = self.env.get_template('cloudlines/local_settings.j2')
+            with open(os.path.join(self.target_dir, 'cloudlines/local_settings.py'), 'w') as fh:
                 fh.write(template.render(site_name=self.site_name,
                                          site_mode='hierarchy',
                                          django_password=self.django_password,
