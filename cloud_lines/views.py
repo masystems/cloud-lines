@@ -64,7 +64,7 @@ def dashboard(request):
 
 
 def home(request):
-    if match('(.*).cloud-lines.com', request.META['domain']):
+    if match('(.*).cloud-lines.com', request.META['domainName']):
         return redirect('dashboard')
     return render(request, 'home.html', {'services': Service.objects.all(),
                                          'testimonials': Testimonial.objects.all()})
