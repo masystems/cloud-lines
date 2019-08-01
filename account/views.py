@@ -87,7 +87,12 @@ def site_mode(request):
 def is_editor(user):
     try:
         main_account = get_main_account(user)
-        if user in main_account.admin_users.all():
+        try:
+            admins = main_account.admin_users.all()
+        except AttributeError:
+            # no admin users!
+            admins = []
+        if user in admins:
             return True
         elif user == main_account.user.user:
             return True
