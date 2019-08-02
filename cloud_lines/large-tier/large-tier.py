@@ -35,6 +35,10 @@ class LargeTier:
 
     def deploy(self):
         for deployment in self.waiting:
+            # update settings
+            deployment.build_state = 'building'
+            deployment.save()
+
             self.site_name = deployment.subdomain
             self.target_dir = '/opt/instances/{}/{}'.format(self.site_name, self.site_name)
 
@@ -42,6 +46,11 @@ class LargeTier:
             self.env = Environment(loader=FileSystemLoader(self.target_dir))
 
             self.site_name = deployment.subdomain
+
+            # update settings
+            deployment.build_status = "Captured your settings\n"
+            deployment.save()
+
             # create database
             client = boto3.client(
                 'rds', region_name='eu-west-2', config=self.boto_config
@@ -67,10 +76,18 @@ class LargeTier:
             }
             new_db = client.create_db_instance(**db_vars)
 
+            # update settings
+            deployment.build_status = "Initiating database creation\n"
+            deployment.save()
+
             # clone repo
             print('clone repo')
             Repo.clone_from('https://masystems:H5m6RZK0AVh3IumrybH3@github.com/masystems/cloud-lines.git',
                             self.target_dir)
+
+            # update settings
+            deployment.build_status = "Created clone of Cloud-Lines\n"
+            deployment.save()
 
             # copy in dependencies
             print('copy dependcies')
@@ -79,25 +96,45 @@ class LargeTier:
                 if os.path.isfile(fullpath):
                     shutil.copy(fullpath, self.target_dir)
 
+            # update settings
+            deployment.build_status = "Added in some dependencies\n"
+            deployment.save()
+
             # update zappa settings
             print('set zappa settings')
             template = self.env.get_template('zappa_settings.j2')
             with open(os.path.join(self.target_dir, 'zappa_settings.json'), 'w') as fh:
                 fh.write(template.render(site_name=self.site_name))
 
+            # update settings
+            deployment.build_status = "Created site configuration file\n"
+            deployment.save()
+
             # create virtualenv
             print('creating virtual env')
             subprocess.Popen(['virtualenv', '-p', 'python3', '/opt/instances/{}/venv'.format(self.site_name)])
+
+            # update settings
+            deployment.build_status = "Created virtual environment\n"
+            deployment.save()
 
             # wait for db to be created
             print('wating for DB to be created')
             waiter = client.get_waiter("db_instance_available")
             waiter.wait(DBInstanceIdentifier=self.site_name, WaiterConfig={"Delay": 10, "MaxAttempts": 60}, )
 
+            # update settings
+            deployment.build_status = "Database has been created\n"
+            deployment.save()
+
             # get db endpoint
             print('getting db endpoint')
             details = client.describe_db_instances(DBInstanceIdentifier=self.site_name)
             db_host = details['DBInstances'][0]['Endpoint']['Address']
+
+            # update settings
+            deployment.build_status = "Captured new database settings\n"
+            deployment.save()
 
             # update local settings
             template = self.env.get_template('cloudlines/local_settings.j2')
@@ -110,6 +147,10 @@ class LargeTier:
                                          db_password=self.db_password,
                                          db_host=db_host))
 
+            # update settings
+            deployment.build_status = "Connected site to database\n"
+            deployment.save()
+
             # generate user data
             process = subprocess.Popen(['python3', '/opt/cloudlines/cloud-lines/manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
             stdout = process.communicate()[0]
@@ -119,12 +160,17 @@ class LargeTier:
                     with open(os.path.join(self.target_dir, 'user.json'), 'w') as outfile:
                         json.dump(user, outfile)
 
+
             # wrap user.json in square brackets because django said so!
             with open(os.path.join(self.target_dir, 'user.json'), "r+") as original:
                 data = original.read()
 
             with open(os.path.join(self.target_dir, 'user.json'), "w") as original:
                 original.write('[{}]'.format(data))
+
+            # update settings
+            deployment.build_status = "Captured users settings\n"
+            deployment.save()
 
             # run commands inside the venv
             subprocess.Popen(['/opt/venv.sh',
@@ -140,6 +186,11 @@ class LargeTier:
                                deployment.attached_service.site_mode,
                                # $ANIMAL_TYPE
                                deployment.attached_service.animal_type,])
+
+            # update settings
+            deployment.build_status = "New Cloud-Lines site build complete!\n"
+            deployment.save()
+
 
 
 if __name__ == '__main__':
