@@ -26,4 +26,5 @@ urlpatterns = [
     path('impex/', include('impex.urls')),
     path('dashboard', views.dashboard, name='dashboard'),
     path('primary_account/<str:service>', views.activate_primary_account, name='primary_account'),
+    path('get_build_status', views.get_build_status, name='get_build_status')
 ]

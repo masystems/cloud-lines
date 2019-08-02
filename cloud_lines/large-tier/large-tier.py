@@ -174,23 +174,22 @@ class LargeTier:
 
             # run commands inside the venv
             subprocess.Popen(['/opt/venv.sh',
-                               # $SITE_NAME
-                               self.site_name,
-                               # $USERNAME
-                               str(deployment.user.username),
-                               # $SERVICE_PK
-                               str(deployment.attached_service.service.pk),
-                               # $STRIPE_ID
-                               deployment.user_detail.stripe_id,
-                               # $SITE_MODE
-                               deployment.attached_service.site_mode,
-                               # $ANIMAL_TYPE
-                               deployment.attached_service.animal_type,])
+                              # $SITE_NAME
+                              self.site_name,
+                              # $USERNAME
+                              str(deployment.user.username),
+                              # $SERVICE_PK
+                              str(deployment.attached_service.service.pk),
+                              # $STRIPE_ID
+                              deployment.user_detail.stripe_id,
+                              # $SITE_MODE
+                              deployment.attached_service.site_mode,
+                              # $ANIMAL_TYPE
+                              deployment.attached_service.animal_type,])
 
             # update settings
             deployment.build_status = deployment.build_status + "New Cloud-Lines site build complete!\n"
             deployment.save()
-
 
 
 if __name__ == '__main__':

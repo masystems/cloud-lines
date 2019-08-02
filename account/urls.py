@@ -15,5 +15,6 @@ urlpatterns = [
     path('custom_field_edit', views.custom_field_edit, name='custom_field_edit'),
     path('update_titles', views.update_titles, name='update_titles'),
     path('update_card', views.update_card, name='update_card'),
-    path('update_user', views.update_user, name='update_user')
+    path('update_user', views.update_user, name='update_user'),
+    path('subdomain_check', views.subdomain_check, name='subdomain_check')
 ]

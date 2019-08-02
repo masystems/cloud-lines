@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from .models import Service, Page, Faq, Contact, Testimonial
+from .models import Service, Page, Faq, Contact, Testimonial, LargeTierQueue
 from .forms import ContactForm
 from account.models import UserDetail, AttachedService
 from account.views import get_main_account, send_mail
@@ -182,18 +182,19 @@ def order(request):
 @login_required(login_url="/account/login")
 def order_service(request):
     if request.POST:
-        # attach_services = AttachedService.objects.all()
-        # attach_services.delete()
         user_detail = UserDetail.objects.get(user=request.user)
         service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
 
+        if request.POST.get('checkout-form-sub-domain'):
+            domain = 'https://{}.cloud-lines.com'.format(request.POST.get('checkout-form-sub-domain'))
+
         # if upgade
         if request.POST.get('checkout-form-upgrade'):
-            print(request.POST.get('checkout-form-animal-type'))
             try:
                 attached_service = AttachedService.objects.filter(user=user_detail,
                                                                   id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
                                                                                                                        site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                                                                       domain=domain,
                                                                                                                        install_available=False,
                                                                                                                        service=service,
                                                                                                                        increment=request.POST.get('checkout-form-payment-inc').lower(),
@@ -205,6 +206,7 @@ def order_service(request):
             attached_service = AttachedService.objects.create(user=user_detail,
                                                               animal_type=request.POST.get('checkout-form-animal-type'),
                                                               site_mode=request.POST.get('checkout-form-site-mode'),
+                                                              domain=domain,
                                                               install_available=False,
                                                               service=service,
                                                               increment=request.POST.get('checkout-form-payment-inc').lower(),
@@ -255,7 +257,8 @@ def order_billing(request):
 @login_required(login_url="/account/login")
 def order_subscribe(request):
     user_detail = UserDetail.objects.get(user=request.user)
-    attach_service = AttachedService.objects.get(id=request.POST.get('attached_service_id'), user=user_detail, active=False)
+    attached_service = AttachedService.objects.get(id=request.POST.get('attached_service_id'), user=user_detail, active=False)
+    large_tier = ['Small Society', 'Large Society', 'Organisation']
 
     # add payment token to user
     try:
@@ -316,19 +319,19 @@ def order_subscribe(request):
 
 
     # update the users attached service to be active
-    attach_service.active = True
+    attached_service.active = True
 
-    if attach_service.increment == 'yearly':
-        plan = attach_service.service.yearly_id
+    if attached_service.increment == 'yearly':
+        plan = attached_service.service.yearly_id
     else:
-        plan = attach_service.service.monthly_id
+        plan = attached_service.service.monthly_id
 
     # update existing subscription if it exists
-    if attach_service.subscription_id:
-        subscription = stripe.Subscription.retrieve(attach_service.subscription_id)
-        #stripe.Subscription.delete(attach_service.subscription_id)
+    if attached_service.subscription_id:
+        subscription = stripe.Subscription.retrieve(attached_service.subscription_id)
+        #stripe.Subscription.delete(attached_service.subscription_id)
         stripe.Subscription.modify(
-            attach_service.subscription_id,
+            attached_service.subscription_id,
             cancel_at_period_end=False,
             items=[{
                 'id': subscription['items']['data'][0].id,
@@ -347,8 +350,8 @@ def order_subscribe(request):
     )
 
     if subscription:
-        attach_service.subscription_id = subscription['id']
-        attach_service.save()
+        attached_service.subscription_id = subscription['id']
+        attached_service.save()
     else:
         return HttpResponse(json.dumps({'Error': 'Something went wrong, please contact us.'}))
 
@@ -364,15 +367,20 @@ def order_subscribe(request):
         Congratulations on purchasing a new Cloudlines {} service!
         To access your new service click <a href="https://cloud-lines.com/dashboard"> HERE</a>. You should
         find everything you need to get started there but do let is know if you have any questions.
-    """.format(attach_service.service.service_name,)
+    """.format(attached_service.service.service_name,)
     send_mail('New subscription!', request.user, body, send_to=request.user.email)
     send_mail('New subscription!', request.user, body, reply_to=request.user.email)
 
     # set new default attached service
-    UserDetail.objects.filter(user=request.user).update(current_service=attach_service)
+    UserDetail.objects.filter(user=request.user).update(current_service=attached_service)
 
     # delete dead attached services
     AttachedService.objects.filter(user=user_detail, active=False).delete()
+
+    if attached_service.service.service_name in large_tier:
+        queue_item = LargeTierQueue.objects.create(subdomain=request.POST.get('subdomain'), user=request.user, user_detail=user_detail, attached_service=attached_service)
+        result['tier'] = 'large'
+        result['build_id'] = queue_item.id
 
     return HttpResponse(json.dumps(result))
 
@@ -411,3 +419,10 @@ def know_more(request):
         send_mail('Contact Request', 'Cloudlines Team', body)
     return HttpResponse(True)
 
+
+def get_build_status(request):
+    if request.method == 'POST':
+        queue_id = request.POST.get('build_id')
+        queue_item = LargeTierQueue.objects.get(id=queue_id)
+        status = {'status': queue_item.build_status}
+        return HttpResponse(json.dumps(status))

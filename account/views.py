@@ -505,6 +505,13 @@ def email_check(request):
         return HttpResponse(User.objects.filter(email=email).exists())
 
 
+@csrf_exempt
+def subdomain_check(request):
+    if request.method == 'POST':
+        domain = request.POST.get('checkout-form-sub-domain')
+        return HttpResponse(AttachedService.objects.filter(domain='https://{}.cloud-lines.com'.format(domain)).exists())
+
+
 @login_required(login_url="/account/login")
 @csrf_exempt
 def update_card(request):

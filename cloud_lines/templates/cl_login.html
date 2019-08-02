@@ -163,7 +163,6 @@
 						});
 
 						$('#register-form-email').keyup( function() {
-
 							var username = document.getElementById("register-form-email").value;
 							$.ajax({
 								url: '{% url 'email_check' %}',
