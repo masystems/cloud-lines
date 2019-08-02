@@ -77,7 +77,7 @@ class LargeTier:
             new_db = client.create_db_instance(**db_vars)
 
             # update settings
-            deployment.build_status = "Initiating database creation\n"
+            deployment.build_status = deployment.build_status + "Initiating database creation\n"
             deployment.save()
 
             # clone repo
@@ -86,7 +86,7 @@ class LargeTier:
                             self.target_dir)
 
             # update settings
-            deployment.build_status = "Created clone of Cloud-Lines\n"
+            deployment.build_status = deployment.build_status + "Created clone of Cloud-Lines\n"
             deployment.save()
 
             # copy in dependencies
@@ -97,7 +97,7 @@ class LargeTier:
                     shutil.copy(fullpath, self.target_dir)
 
             # update settings
-            deployment.build_status = "Added in some dependencies\n"
+            deployment.build_status = deployment.build_status + "Added in some dependencies\n"
             deployment.save()
 
             # update zappa settings
@@ -107,7 +107,7 @@ class LargeTier:
                 fh.write(template.render(site_name=self.site_name))
 
             # update settings
-            deployment.build_status = "Created site configuration file\n"
+            deployment.build_status = deployment.build_status + "Created site configuration file\n"
             deployment.save()
 
             # create virtualenv
@@ -115,7 +115,7 @@ class LargeTier:
             subprocess.Popen(['virtualenv', '-p', 'python3', '/opt/instances/{}/venv'.format(self.site_name)])
 
             # update settings
-            deployment.build_status = "Created virtual environment\n"
+            deployment.build_status = deployment.build_status + "Created virtual environment\n"
             deployment.save()
 
             # wait for db to be created
@@ -124,7 +124,7 @@ class LargeTier:
             waiter.wait(DBInstanceIdentifier=self.site_name, WaiterConfig={"Delay": 10, "MaxAttempts": 60}, )
 
             # update settings
-            deployment.build_status = "Database has been created\n"
+            deployment.build_status = deployment.build_status + "Database has been created\n"
             deployment.save()
 
             # get db endpoint
@@ -133,7 +133,7 @@ class LargeTier:
             db_host = details['DBInstances'][0]['Endpoint']['Address']
 
             # update settings
-            deployment.build_status = "Captured new database settings\n"
+            deployment.build_status = deployment.build_status + "Captured new database settings\n"
             deployment.save()
 
             # update local settings
@@ -148,7 +148,7 @@ class LargeTier:
                                          db_host=db_host))
 
             # update settings
-            deployment.build_status = "Connected site to database\n"
+            deployment.build_status = deployment.build_status + "Connected site to database\n"
             deployment.save()
 
             # generate user data
@@ -169,7 +169,7 @@ class LargeTier:
                 original.write('[{}]'.format(data))
 
             # update settings
-            deployment.build_status = "Captured users settings\n"
+            deployment.build_status = deployment.build_status + "Captured users settings\n"
             deployment.save()
 
             # run commands inside the venv
@@ -188,7 +188,7 @@ class LargeTier:
                                deployment.attached_service.animal_type,])
 
             # update settings
-            deployment.build_status = "New Cloud-Lines site build complete!\n"
+            deployment.build_status = deployment.build_status + "New Cloud-Lines site build complete!\n"
             deployment.save()
 
 
