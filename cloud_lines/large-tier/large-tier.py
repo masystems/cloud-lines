@@ -120,18 +120,18 @@ class LargeTier:
                         json.dump(user, outfile)
 
             # wrap user.json in square brackets because django said so!
-            with open("user.json", "r+") as original:
+            with open(os.path.join(self.target_dir, 'user.json'), "r+") as original:
                 data = original.read()
 
-            with open("user.json", "w") as original:
+            with open(os.path.join(self.target_dir, 'user.json'), "w") as original:
                 original.write('[{}]'.format(data))
 
             # run commands inside the venv
             subprocess.Popen(['/opt/venv.sh',
                                # $SITE_NAME
                                self.site_name,
-                               # $USER_PK
-                               str(deployment.pk),
+                               # $USERNAME
+                               str(deployment.user.username),
                                # $SERVICE_PK
                                str(deployment.attached_service.service.pk),
                                # $STRIPE_ID
