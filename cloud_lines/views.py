@@ -22,6 +22,8 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 @login_required(login_url="/account/login")
 def dashboard(request):
     main_account = get_main_account(request.user)
+    if main_account.domain and not match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+        return HttpResponseRedirect(main_account.domain)
 
     total_pedigrees = Pedigree.objects.filter(account=main_account).count()
     total_breeders = Breeder.objects.filter(account=main_account).count()

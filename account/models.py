@@ -18,6 +18,7 @@ class AttachedService(models.Model):
     admin_users = models.ManyToManyField(User, related_name='admin_users', blank=True)
     read_only_users = models.ManyToManyField(User, related_name='read_only_users', blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
+    domain = models.CharField(max_length=250, blank=True)
     animal_type = models.CharField(max_length=250)
     custom_fields = models.TextField(blank=True)
     mother_title = models.CharField(max_length=250, default='Mother')
