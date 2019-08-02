@@ -111,7 +111,7 @@ class LargeTier:
                                          db_host=db_host))
 
             # generate user data
-            process = subprocess.Popen(['python3', 'manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
+            process = subprocess.Popen(['python3', '/opt/cloudlines/cloud-lines/manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
             stdout = process.communicate()[0]
 
             users = json.loads(stdout)
