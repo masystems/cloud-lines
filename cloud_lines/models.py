@@ -82,7 +82,7 @@ class LargeTierQueue(models.Model):
         ('complete', 'Complete'),
     )
     build_state = models.CharField(max_length=20, choices=BUILD_STATE, default='waiting')
-    build_status = models.CharField(max_length=255, blank=True)
+    build_status = models.TextField(blank=True)
 
     def __str__(self):
         return str(self.subdomain)
