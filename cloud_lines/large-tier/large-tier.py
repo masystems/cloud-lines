@@ -111,9 +111,8 @@ class LargeTier:
                                          db_host=db_host))
 
             # generate user data
-            process = subprocess.Popen(['python3', 'manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
+            process = subprocess.Popen(['python3', '/opt/cloudlines/cloud-lines/manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
             stdout = process.communicate()[0]
-
             users = json.loads(stdout)
             for user in users:
                 if user['pk'] == deployment.user.pk:
@@ -122,13 +121,18 @@ class LargeTier:
 
             # run commands inside the venv
             subprocess.Popen(['/opt/venv.sh',
-                              self.site_name, # $SITE_NAME
-                              deployment.pk, # $USER_PK
-                              deployment.attached_service.service.pk, # $SERVICE_PK
-                              deployment.user_detail.stripe_id, # $STRIPE_ID
-                              deployment.attached_service.site_mode, # $SITE_MODE
-                              deployment.attached_service.animal_type,  # $ANIMAL_TYPE
-            ])
+                              # $SITE_NAME
+                              self.site_name,
+                              # $USER_PK
+                              deployment.pk,
+                              # $SERVICE_PK
+                              deployment.attached_service.service.pk,
+                              # $STRIPE_ID
+                              deployment.user_detail.stripe_id,
+                              # $SITE_MODE
+                              deployment.attached_service.site_mode,
+                              # $ANIMAL_TYPE
+                              deployment.attached_service.animal_type])
 
 
 if __name__ == '__main__':
