@@ -820,10 +820,11 @@
 												if (result.status != ''){
 													if (result.status == 'complete'){
 														$('#buildSpinner').addClass('d-none');
+														$('#buildMessage').removeClass('d-none');
 														$('#dashboardButton').removeClass('d-none');
 													} else {
 														var lines = result.status.split('\n');
-														$('#buildStatus').html('<ul>');
+														$('#buildStatus').html('<ul class="iconlist">');
 														for(var i = 0;i < lines.length;i++){
 															$('#buildStatus').append('<li><i class="far fa-check-circle" style="color:#1ABC9C"></i> ' + lines[i] + '</li>');
 														}
@@ -853,7 +854,8 @@
 						<div id="paymentSuccess" class="mt-2 d-none" >
 							<h2>Thank You.</h2>
 							<strong>Your order has been processed.</strong>
-							<div id="buildStatus" class="mt-4 mb-4 d-none"><strong>Your bespoke Cloud-Lines instance will start building in <1 minute, please wait.</strong></div>
+							<div id="buildStatus" class="mt-4 d-none"><strong>Your bespoke Cloud-Lines instance will start building in <1 minute, please wait.</strong></div>
+							<div id="buildMessage" class="mt-1 d-none"><strong>Please allow 25 hours (normally only 20 minutes) for your bespoke address to start working.</strong></div>
 							<div id="dashboardButton">
 								<a href="{% url 'dashboard' %}" class="button button-desc button-3d button-rounded button-teal center mt-5">Dashboard<span>Click here to go to your new dashboard!</span></a>
 							</div>
