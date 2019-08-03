@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import django
 import sys
 import os

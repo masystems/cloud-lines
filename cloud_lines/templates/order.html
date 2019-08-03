@@ -816,8 +816,13 @@
 												  // not started yet
 												  var result = '';
 												}
-												console.log(result.status);
-												$('#buildStatus').text(result.status)
+
+												var lines = result.status.split('\n');
+												for(var i = 0;i < lines.length;i++){
+													//code here using lines[i] which will give you each line
+													$('#buildStatus').html($('#buildStatus').val() + '<p><i class="far fa-check-circle"></i>' + line[i] + '</p>)
+												}
+
 												updateBuildStatus(buildId);
 											},
 											error: function(){
