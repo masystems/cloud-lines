@@ -424,5 +424,8 @@ def get_build_status(request):
     if request.method == 'POST':
         queue_id = request.POST.get('build_id')
         queue_item = LargeTierQueue.objects.get(id=queue_id)
-        status = {'status': queue_item.build_status}
+        if queue_item.build_state == 'complete':
+            status = {'status': 'complete'}
+        else:
+            status = {'status': queue_item.build_status}
         return HttpResponse(json.dumps(status))

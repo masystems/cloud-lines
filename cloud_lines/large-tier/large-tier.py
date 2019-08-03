@@ -192,6 +192,10 @@ class LargeTier:
             deployment.build_status = deployment.build_status + "New Cloud-Lines site build complete!\n"
             deployment.save()
 
+            # update settings
+            deployment.build_state = 'complete'
+            deployment.save()
+
 
 if __name__ == '__main__':
     lt = LargeTier()
