@@ -199,7 +199,7 @@ class LargeTier:
 
             # wait for domain to come up
             while True:
-                domain = 'http://{}.cloud-lines.com'.format(deployment.subdomain)
+                domain = 'https://{}.cloud-lines.com'.format(deployment.subdomain)
                 request = requests.get(domain)
                 if request.status_code == 200:
                     print('Web site exists')
