@@ -819,14 +819,16 @@
 
 												if (result.status != ''){
 													if (result.status == 'complete'){
+														$('#buildSpinner').addClass('d-none');
 														$('#dashboardButton').removeClass('d-none');
 													} else {
 														var lines = result.status.split('\n');
 														$('#buildStatus').html('<ul>');
 														for(var i = 0;i < lines.length;i++){
-															$('#buildStatus').append('<li><i class="far fa-check-circle"></i> ' + lines[i] + '</li>');
+															$('#buildStatus').append('<li><i class="far fa-check-circle" style="color:#1ABC9C"></i> ' + lines[i] + '</li>');
 														}
 														$('#buildStatus').append('</ul>');
+														$('#buildStatus').append('<i id='buildSpinner' class="fas fa-spinner fa-pulse"></i>');
 													}
 												}
 
