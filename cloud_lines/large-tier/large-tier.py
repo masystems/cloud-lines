@@ -208,10 +208,10 @@ class LargeTier:
                     
                     Enjoy your new Cloud-Lines instance!"""
                     # send to user
-                    send_mail('Your Cloud-Lines instance is live!', deployment.user.get_full_name(), msg, send_to=deployment.user.email)
+                    send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg, send_to=deployment.user.email)
 
                     # send to admin
-                    send_mail('Your Cloud-Lines instance is live!', deployment.user.get_full_name(), msg)
+                    send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg)
                     break
                 else:
                     print('Web site does not exist')
