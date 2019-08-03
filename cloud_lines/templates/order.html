@@ -781,7 +781,7 @@
 											if (result.tier == 'large') {
 												$('#dashboardButton').addClass('d-none');
 												$('#buildStatus').removeClass('d-none');
-												updateBuildStatus(result.build_id)
+												updateBuildStatus(result.build_id);
 											} else {
 
 											}
@@ -819,8 +819,7 @@
 
 												var lines = result.status.split('\n');
 												for(var i = 0;i < lines.length;i++){
-													//code here using lines[i] which will give you each line
-													$('#buildStatus').html($('#buildStatus').val() + '<p><i class="far fa-check-circle"></i>' + line[i] + '</p>)
+													$('#buildStatus').html($('#buildStatus').val() + '<p><i class="far fa-check-circle"></i>' + line[i] + '</p>');
 												}
 
 												updateBuildStatus(buildId);
