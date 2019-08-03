@@ -6,6 +6,7 @@ import shutil
 import random
 import string
 import subprocess
+import requests
 from jinja2 import Environment, FileSystemLoader
 import boto3
 from botocore.config import Config
@@ -17,7 +18,7 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "cloudlines.settings"
 django.setup()
 
 from cloud_lines.models import LargeTierQueue
-
+from account.views import send_mail
 
 class LargeTier:
     def __init__(self):
@@ -195,6 +196,25 @@ class LargeTier:
             # update settings
             deployment.build_state = 'complete'
             deployment.save()
+
+            # wait for domain to come up
+            while True:
+                domain = 'http://{}.cloud-lines.com'.format(deployment.subdomain)
+                request = requests.get(domain)
+                if request.status_code == 200:
+                    print('Web site exists')
+                    # send mail
+                    msg = """Your site is now live at <a href="{}">{}</a>
+                    
+                    Enjoy your new Cloud-Lines instance!"""
+                    # send to user
+                    send_mail('Your Cloud-Lines instance is live!', deployment.user.get_full_name(), msg, send_to=deployment.user.email)
+
+                    # send to admin
+                    send_mail('Your Cloud-Lines instance is live!', deployment.user.get_full_name(), msg)
+                    break
+                else:
+                    print('Web site does not exist')
 
 
 if __name__ == '__main__':
