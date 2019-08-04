@@ -821,7 +821,6 @@
 													if (result.status == 'complete'){
 														$('#buildSpinner').addClass('d-none');
 														$('#buildMessage').removeClass('d-none');
-														$('#dashboardButton').removeClass('d-none');
 													} else {
 														var lines = result.status.split('\n');
 														$('#buildStatus').html('<ul class="iconlist">');
