@@ -122,12 +122,12 @@
 								<li class="{% if 'faqs' in request.path %}current{% endif %}"><a href="{% url 'faqs' %}"><div>FAQs</div></a></li>
 								<li class="{% if 'contact' in request.path %}current{% endif %}"><a href="{% url 'contact' %}"><div>Contact</div></a></li>
 								{% if user.is_authenticated %}
-									<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
-								{% endif %}
-								{% if user.issuperuser %}
-									<li><a href="#"><div>Admin</div></a>
+									<li><a href="#"><div>Account</div></a>
 										<ul>
-											<li><a href="/admin"><div>Backend</div></a></li>
+											{% if user.is_superuser %}
+												<li><a href="/admin"><div>Backend</div></a></li>
+											{% endif %}
+											<li><a href="{% url 'settings' %}"><div>Settings</div></a></li>
 											<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
 										</ul>
 									</li>
