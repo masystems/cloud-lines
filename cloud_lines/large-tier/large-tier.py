@@ -11,7 +11,9 @@ from jinja2 import Environment, FileSystemLoader
 import boto3
 from botocore.config import Config
 from git import Repo
+from time import sleep
 import json
+
 
 sys.path.append('/opt/cloudlines/cloud-lines')
 os.environ["DJANGO_SETTINGS_MODULE"] = "cloudlines.settings"
@@ -206,18 +208,22 @@ class LargeTier:
                         print('Web site exists')
                         # send mail
                         msg = """Your site is now live at <a href="{}">{}</a>
-                        Enjoy your new Cloud-Lines instance!"""
+                        Enjoy your new Cloud-Lines instance!""".format(domain, domain)
                         # send to user
-                        send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg, send_to=deployment.user.email)
+                        send_mail('Your new Cloud-Lines instance is live!', deployment.user.username, msg, send_to=deployment.user.email)
                         # send to admin
-                        send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg)
-                        break
+                        send_mail('Your new Cloud-Lines instance is live!', deployment.user.username, msg)
                     else:
                         print('Web site does not exist')
                 except requests.exceptions.ConnectionError as err:
+                    if 'Max retries exceeded with url' in str(err):
+                        print('max retries exceeded')
+                        break
                     print(err)
                 except Exception as err:
                     print(err)
+
+                    sleep(60)
 
 if __name__ == '__main__':
     lt = LargeTier()
