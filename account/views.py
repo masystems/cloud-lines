@@ -1,4 +1,4 @@
-from django.shortcuts import HttpResponse
+from django.shortcuts import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -28,7 +28,6 @@ import json
 
 
 def site_mode(request):
-
     if request.user.is_authenticated:
         # returns the main account the requesting user is a member of
         attached_service = get_main_account(request.user)
@@ -242,6 +241,7 @@ def logout(request):
 
 @login_required(login_url="/account/login")
 def profile(request):
+
     context = {}
     try:
         context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
