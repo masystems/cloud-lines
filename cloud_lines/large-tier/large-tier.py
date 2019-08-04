@@ -200,16 +200,20 @@ class LargeTier:
             # wait for domain to come up
             while True:
                 domain = 'https://{}.cloud-lines.com'.format(deployment.subdomain)
-                request = requests.get(domain)
+                try:
+                    request = requests.get(domain)
+                except requests.exceptions.ConnectionError:
+                    request.status_code = 404
+                except:
+                    request.status_code = 404
+
                 if request.status_code == 200:
                     print('Web site exists')
                     # send mail
                     msg = """Your site is now live at <a href="{}">{}</a>
-                    
                     Enjoy your new Cloud-Lines instance!"""
                     # send to user
                     send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg, send_to=deployment.user.email)
-
                     # send to admin
                     send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg)
                     break
