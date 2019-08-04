@@ -94,45 +94,46 @@
 					<!-- Primary Navigation
 					============================================= -->
 					<nav id="primary-menu" class="not-dark with-arrows">
-
-						<ul class="not-dark">
-							<li class=""><a href="{% url 'home' %}"><div>Home</div></a></li>
-							<li class="mega-menu"><a href="{% url 'services' %}"><div>Services</div></a>
-								<!-- Mega Menu Content
-								============================================= -->
-								<div class="mega-menu-content style-2 border-top-0 clearfix">
-									{% for service in services.all %}
-									<ul class="mega-menu-column col-lg-2">
-										<li>
-											<div class="feature-box not-dark fbox-small fbox-center nobottommargin">
-												<div class="fbox-icon">
-													<a href="{% url 'services' %}#{{ service.service_name }}"><img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="max-height: 50px;"></a>
+						{% if request.META.HTTP_HOST == 'cloud-lines.com' or request.META.HTTP_HOST == 'localhost:8000' %}
+							<ul class="not-dark">
+								<li class=""><a href="{% url 'home' %}"><div>Home</div></a></li>
+								<li class="mega-menu"><a href="{% url 'services' %}"><div>Services</div></a>
+									<!-- Mega Menu Content
+									============================================= -->
+									<div class="mega-menu-content style-2 border-top-0 clearfix">
+										{% for service in services.all %}
+										<ul class="mega-menu-column col-lg-2">
+											<li>
+												<div class="feature-box not-dark fbox-small fbox-center nobottommargin">
+													<div class="fbox-icon">
+														<a href="{% url 'services' %}#{{ service.service_name }}"><img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="max-height: 50px;"></a>
+													</div>
+													<h3 class="t500"><a href="{% url 'services' %}#{{ service.service_name }}">{{ service.service_name }}</a></h3>
+													<p class="d-none d-lg-block mb-0 t300">{{ service.service_description|truncatechars:150 }}</p>
+													<a href="{% url 'services' %}#{{ service.service_name }}" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
 												</div>
-												<h3 class="t500"><a href="{% url 'services' %}#{{ service.service_name }}">{{ service.service_name }}</a></h3>
-												<p class="d-none d-lg-block mb-0 t300">{{ service.service_description|truncatechars:150 }}</p>
-												<a href="{% url 'services' %}#{{ service.service_name }}" class="btn btn-link mt-2 color p-0">Learn More &#8250;</a>
-											</div>
-										</li>
-									</ul>
-									{% endfor %}
-								</div>
-							</li>
-							<li class="{% if 'about' in request.path %}current{% endif %}"><a href="{% url 'about' %}"><div>About</div></a></li>
-							<li class="{% if 'extras' in request.path %}current{% endif %}"><a href="{% url 'extras' %}"><div>Extras</div></a></li>
-							<li class="{% if 'faqs' in request.path %}current{% endif %}"><a href="{% url 'faqs' %}"><div>FAQs</div></a></li>
-							<li class="{% if 'contact' in request.path %}current{% endif %}"><a href="{% url 'contact' %}"><div>Contact</div></a></li>
-							{% if user.is_authenticated %}
-								<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
-							{% endif %}
-							{% if user.issuperuser %}
-								<li><a href="#"><div>Admin</div></a>
-									<ul>
-										<li><a href="/admin"><div>Backend</div></a></li>
-										<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
-									</ul>
+											</li>
+										</ul>
+										{% endfor %}
+									</div>
 								</li>
-							{% endif %}
-						</ul>
+								<li class="{% if 'about' in request.path %}current{% endif %}"><a href="{% url 'about' %}"><div>About</div></a></li>
+								<li class="{% if 'extras' in request.path %}current{% endif %}"><a href="{% url 'extras' %}"><div>Extras</div></a></li>
+								<li class="{% if 'faqs' in request.path %}current{% endif %}"><a href="{% url 'faqs' %}"><div>FAQs</div></a></li>
+								<li class="{% if 'contact' in request.path %}current{% endif %}"><a href="{% url 'contact' %}"><div>Contact</div></a></li>
+								{% if user.is_authenticated %}
+									<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
+								{% endif %}
+								{% if user.issuperuser %}
+									<li><a href="#"><div>Admin</div></a>
+										<ul>
+											<li><a href="/admin"><div>Backend</div></a></li>
+											<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
+										</ul>
+									</li>
+								{% endif %}
+							</ul>
+						{% endif %}
 
 						<!-- Top Search
 						============================================= -->
@@ -153,23 +154,27 @@
 
 				<!-- Bottom Section
 				============================================= -->
-				{% if not 'order' in request.path %}
-					<div class="section bgcolor dark m-0">
-						<div class="container">
-							<div class="row center justify-content-center">
-								<div class="col-md-8">
-									<h2 class="t700 text-white mb-3">Start your free instance now!</h2>
-								</div>
-								<div class="col-md-8">
-									{% if request.user.is_authenticated %}
-										<a href="{% url 'dashboard' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
-									{% elif not request.user.is_authenticated %}
-										<a href="{% url 'login' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
-									{% endif %}
+				{% if request.META.HTTP_HOST == 'cloud-lines.com' or request.META.HTTP_HOST == 'localhost:8000' %}
+					{% if not 'order' in request.path %}
+						<div class="section bgcolor dark m-0">
+							<div class="container">
+								<div class="row center justify-content-center">
+									<div class="col-md-8">
+										<h2 class="t700 text-white mb-3">Start your free instance now!</h2>
+									</div>
+									<div class="col-md-8">
+
+											{% if request.user.is_authenticated %}
+												<a href="{% url 'dashboard' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
+											{% elif not request.user.is_authenticated %}
+												<a href="{% url 'login' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
+											{% endif %}
+
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					{% endif %}
 				{% endif %}
 
 			</div>
@@ -286,12 +291,13 @@
 						<div class="copyright-links"><a href="#">Terms of Use</a> / <a href="#">Privacy Policy</a></div>
 
 					</div>
-
-					<div class="col_half col_last tright">
-						<div class="copyrights-menu copyright-links clearfix">
-							<a href="/">Home</a>/<a href="{% url 'services' %}">Services</a>/<a href="{% url 'about' %}">About</a>/<a href="{% url 'extras' %}">Extras</a>/<a href="{% url 'faqs' %}">FAQs</a>/<a href="{% url 'contact' %}">Contact</a>
+					{% if request.META.HTTP_HOST == 'cloud-lines.com' or request.META.HTTP_HOST == 'localhost:8000' %}
+						<div class="col_half col_last tright">
+							<div class="copyrights-menu copyright-links clearfix">
+								<a href="/">Home</a>/<a href="{% url 'services' %}">Services</a>/<a href="{% url 'about' %}">About</a>/<a href="{% url 'extras' %}">Extras</a>/<a href="{% url 'faqs' %}">FAQs</a>/<a href="{% url 'contact' %}">Contact</a>
+							</div>
 						</div>
-					</div>
+					{% endif %}
 
 				</div>
 
