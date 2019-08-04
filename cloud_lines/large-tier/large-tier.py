@@ -202,24 +202,22 @@ class LargeTier:
                 domain = 'https://{}.cloud-lines.com'.format(deployment.subdomain)
                 try:
                     request = requests.get(domain)
-                except requests.exceptions.ConnectionError:
-                    request.status_code = 404
-                except:
-                    request.status_code = 404
-
-                if request.status_code == 200:
-                    print('Web site exists')
-                    # send mail
-                    msg = """Your site is now live at <a href="{}">{}</a>
-                    Enjoy your new Cloud-Lines instance!"""
-                    # send to user
-                    send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg, send_to=deployment.user.email)
-                    # send to admin
-                    send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg)
-                    break
-                else:
-                    print('Web site does not exist')
-
+                    if request.status_code == 200:
+                        print('Web site exists')
+                        # send mail
+                        msg = """Your site is now live at <a href="{}">{}</a>
+                        Enjoy your new Cloud-Lines instance!"""
+                        # send to user
+                        send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg, send_to=deployment.user.email)
+                        # send to admin
+                        send_mail('Your Cloud-Lines instance is live!', deployment.user.username, msg)
+                        break
+                    else:
+                        print('Web site does not exist')
+                except requests.exceptions.ConnectionError as err:
+                    print(err)
+                except Exception as err:
+                    print(err)
 
 if __name__ == '__main__':
     lt = LargeTier()
