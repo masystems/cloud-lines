@@ -7,6 +7,7 @@ import random
 import string
 import subprocess
 import requests
+from requests.adapters import HTTPAdapter
 from jinja2 import Environment, FileSystemLoader
 import boto3
 from botocore.config import Config
@@ -200,10 +201,14 @@ class LargeTier:
             deployment.save()
 
             # wait for domain to come up
-            while True:
-                domain = 'https://{}.cloud-lines.com'.format(deployment.subdomain)
+            domain = 'https://{}.cloud-lines.com'.format(deployment.subdomain)
+            status = ''
+            for x in range(0,500):
                 try:
-                    request = requests.get(domain)
+                    session = requests.Session()
+                    session.mount(domain, HTTPAdapter(max_retries=1))
+                    request = session.get(domain, timeout=5)
+
                     if request.status_code == 200:
                         print('Web site exists')
                         # send mail
@@ -213,17 +218,39 @@ class LargeTier:
                         send_mail('Your new Cloud-Lines instance is live!', deployment.user.username, msg, send_to=deployment.user.email)
                         # send to admin
                         send_mail('Your new Cloud-Lines instance is live!', deployment.user.username, msg)
+                        break
                     else:
                         print('Web site does not exist')
-                except requests.exceptions.ConnectionError as err:
-                    if 'Max retries exceeded with url' in str(err):
-                        print('max retries exceeded')
-                        break
-                    print(err)
-                except Exception as err:
-                    print(err)
-
-                    sleep(60)
+                except requests.exceptions.ConnectionError:
+                    status = "DOWN"
+                except requests.exceptions.HTTPError:
+                    status = "HttpError"
+                except requests.exceptions.ProxyError:
+                    status = "ProxyError"
+                except requests.exceptions.Timeout:
+                    status = "TimeoutError"
+                except requests.exceptions.ConnectTimeout:
+                    status = "connectTimeout"
+                except requests.exceptions.ReadTimeout:
+                    status = "ReadTimeout"
+                except requests.exceptions.TooManyRedirects:
+                    status = "TooManyRedirects"
+                except requests.exceptions.MissingSchema:
+                    status = "MissingSchema"
+                except requests.exceptions.InvalidURL:
+                    status = "InvalidURL"
+                except requests.exceptions.InvalidHeader:
+                    status = "InvalidHeader"
+                except requests.exceptions.URLRequired:
+                    status = "URLmissing"
+                except requests.exceptions.InvalidProxyURL:
+                    status = "InvalidProxy"
+                except requests.exceptions.RetryError:
+                    status = "RetryError"
+                except requests.exceptions.InvalidSchema:
+                    status = "InvalidSchema"
+                print(status)
+                sleep(5)
 
 if __name__ == '__main__':
     lt = LargeTier()
