@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -11,7 +11,7 @@ from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings
 from .models import UserDetail, AttachedService
-from cloud_lines.models import Service
+from cloud_lines.models import Service, Page
 from pedigree.models import Pedigree
 from breed.models import Breed
 from breed.forms import BreedForm
@@ -79,7 +79,8 @@ def site_mode(request):
                 'admins': admins,
                 'users': users,
                 'add_breed': add_breed,
-                'editor': editor}
+                'editor': editor,
+                'gdpr': Page.objects.get(title='gdpr')}
 
     return {'authenticated': 'no'}
 
