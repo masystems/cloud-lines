@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 <style>
     .slider-element {
     top: -100px;
@@ -543,6 +543,9 @@
                                         <!-- Used to display Element errors. -->
                                         <div id="card-errors" role="alert"></div>
                                     </form>
+                                    <a href="#"><img src="{% static 'cloud-lines/images/cards/1.png' %}" alt="Card"></a>
+                                    <a href="#"><img src="{% static 'cloud-lines/images/cards/2.png' %}" alt="Card"></a>
+                                    <a href="#"><img src="{% static 'cloud-lines/images/cards/22.png' %}" alt="Card"></a>
                                 </div>
 
                                 <div class="line"></div>
