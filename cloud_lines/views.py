@@ -187,6 +187,8 @@ def order_service(request):
 
         if request.POST.get('checkout-form-sub-domain'):
             domain = 'https://{}.cloud-lines.com'.format(request.POST.get('checkout-form-sub-domain'))
+        else:
+            domain = ''
 
         # if upgade
         if request.POST.get('checkout-form-upgrade'):
