@@ -121,20 +121,23 @@
 							<li class="{% if 'extras' in request.path %}current{% endif %}"><a href="{% url 'extras' %}"><div>Extras</div></a></li>
 							<li class="{% if 'faqs' in request.path %}current{% endif %}"><a href="{% url 'faqs' %}"><div>FAQs</div></a></li>
 							<li class="{% if 'contact' in request.path %}current{% endif %}"><a href="{% url 'contact' %}"><div>Contact</div></a></li>
-							{% if user.is_superuser %}
-							<li><a href="#"><div>Admin</div></a>
-								<ul>
-									<li><a href="/admin"><div>Backend</div></a></li>
-									<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
-								</ul>
-							</li>
+							{% if user.is_authenticated %}
+								<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
+							{% endif %}
+							{% if user.issuperuser %}
+								<li><a href="#"><div>Admin</div></a>
+									<ul>
+										<li><a href="/admin"><div>Backend</div></a></li>
+										<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
+									</ul>
+								</li>
 							{% endif %}
 						</ul>
 
 						<!-- Top Search
 						============================================= -->
 
-						<a href="{% url 'dashboard' %}" class="button bg-white text-dark button-light button-rounded color"><span class="d-none d-lg-block">Login to Cloud Lines</span><span class="d-lg-none d-sm-block d-md-block"><i class="icon-dashboard"></i></span></a>
+						<a href="{% url 'dashboard' %}" class="button bg-white text-dark button-light button-rounded color"><span class="d-none d-lg-block">{% if user.is_authenticated %}Go to Dashboard{% else %}Login to Cloud Lines{% endif %}</span><span class="d-lg-none d-sm-block d-md-block"><i class="icon-dashboard"></i></span></a>
 
 					</nav><!-- #primary-menu end -->
 
