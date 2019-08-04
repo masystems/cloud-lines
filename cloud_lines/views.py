@@ -363,11 +363,21 @@ def order_subscribe(request):
               'receipt': receipt.data[0].receipt_url}
 
     # send confirmation email
-    body = """
-        Congratulations on purchasing a new Cloudlines {} service!
-        To access your new service click <a href="https://cloud-lines.com/dashboard"> HERE</a>. You should
-        find everything you need to get started there but do let is know if you have any questions.
-    """.format(attached_service.service.service_name,)
+    if attached_service.service.service_name in large_tier:
+        body = """
+            Congratulations on purchasing a new Cloudlines {} service!
+            Your new service is building now. We will send you another email once it's built and ready to access.
+            
+            Remember you can always use the in built feature to import any existing data but if you would prefer you can
+            <a href="https://cloud-lines.com/contact">Contact us</a> and we'd be happy to help.
+            
+        """.format(attached_service.service.service_name, )
+    else:
+        body = """
+            Congratulations on purchasing a new Cloudlines {} service!
+            To access your new service click <a href="https://cloud-lines.com/dashboard"> HERE</a>. You should
+            find everything you need to get started there but do let is know if you have any questions.
+        """.format(attached_service.service.service_name,)
     send_mail('New subscription!', request.user, body, send_to=request.user.email)
     send_mail('New subscription!', request.user, body, reply_to=request.user.email)
 
