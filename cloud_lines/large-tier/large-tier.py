@@ -203,7 +203,7 @@ class LargeTier:
             # wait for domain to come up
             domain = 'https://{}.cloud-lines.com'.format(deployment.subdomain)
             status = ''
-            for x in range(0,500):
+            for x in range(0, 500):
                 try:
                     session = requests.Session()
                     session.mount(domain, HTTPAdapter(max_retries=1))
