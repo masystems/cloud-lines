@@ -73,6 +73,11 @@ def site_mode(request):
         else:
             add_breed = True
 
+        # get gdpr
+        try:
+            gdpr = Page.objects.get(title='gdpr')
+        except Page.DoesNotExist:
+            gdpr = ''
         return {'service': attached_service,
                 'attached_services': attached_services,
                 'add_pedigree': pedigrees,
@@ -80,7 +85,7 @@ def site_mode(request):
                 'users': users,
                 'add_breed': add_breed,
                 'editor': editor,
-                'gdpr': Page.objects.get(title='gdpr')}
+                'gdpr': gdpr}
 
     return {'authenticated': 'no'}
 
