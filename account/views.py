@@ -241,13 +241,10 @@ def logout(request):
 
 @login_required(login_url="/account/login")
 def profile(request):
+    from django.conf import settings
+    stripe_pk = settings.STRIPE_PUBLIC_KEY
+    context = {'public_api_key': stripe_pk, 'user_detail': UserDetail.objects.get(user=request.user)}
 
-    context = {}
-    try:
-        context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
-    except AttributeError:
-        pass
-    context['user_detail'] = UserDetail.objects.get(user=request.user)
     main_account = get_main_account(request.user)
 
     if request.user == main_account.user and context['user_detail'].current_service.service.service_name != 'Free':

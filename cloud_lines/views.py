@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from .models import Service, Page, Faq, Contact, Testimonial, LargeTierQueue
+from .models import Service, Page, Faq, Testimonial, LargeTierQueue
 from .forms import ContactForm
 from account.models import UserDetail, AttachedService
 from account.views import get_main_account, send_mail
