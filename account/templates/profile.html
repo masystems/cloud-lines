@@ -551,6 +551,32 @@
                                 </div>
 
                                 <div class="line"></div>
+
+                                <!-- cancel sub modal content -->
+                                <div id="cancelSub" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="vcenter" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="vcenter">Cancel Subscription</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h4>Are you sure you want to cancel your subscription to Cloud-Lines?</h4>
+                                                <p>If you cancel your subscription your data maybe deleted!</p>
+                                            </div>
+                                            <div id="cancelSubSuccessMsg" class="alert alert-success d-none"><strong>Sorry to see you go!</strong> Your subscription has now been cancled.</div>
+                                            <div class="modal-footer">
+                                                <button id="cancelSubscriptionConfirm" type="button" class="btn btn-danger waves-effect">Cancel my subscription</button>
+                                                <button type="button" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                        <!-- /.modal-content -->
+                                    </div>
+                                    <!-- /.modal-dialog -->
+                                </div>
+                                <!-- /.modal -->
+
+                                <a href="#" id="card-button" class="btn btn-outline-danger float-left" data-toggle="modal" data-target="#cancelSub" rel="4">Cancel Subscription</a>
                                 <a href="#" id="card-button" class="btn btn-outline-info float-right" rel="4">Update Card</a>
                                 <button id="selectCardButton" type="button" style="display: none;" class="tab-linker" rel="4"></button>
 
@@ -639,6 +665,29 @@
                                             }
                                         });
                                     }
+
+                                    $( "#cancelSubscriptionConfirm" ).click(function() {
+                                      $.ajax({
+                                            url: '{% url 'cancel_sub' %}',
+                                            type: 'get',
+                                            dataType: 'text',
+                                            data: {},
+                                            success: function(data) {
+                                                var result = JSON.parse(data);
+                                                if (result.result == 'canceled') {
+                                                    $('#cancelSubSuccessMsg').removeClass('d-none');
+                                                }
+                                             },
+                                            error: function(jqXHR, textStatus, errorThrown){
+                                                console.log('jqXHR:');
+                                                console.log(jqXHR);
+                                                console.log('textStatus:');
+                                                console.log(textStatus);
+                                                console.log('errorThrown:');
+                                                console.log(errorThrown);
+                                            }
+                                        });
+                                    });
                                 </script>
                             </div>
                         </div>

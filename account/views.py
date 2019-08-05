@@ -592,6 +592,19 @@ def send_payment_error(e):
     return feedback
 
 
+@login_required(login_url="/account/login")
+@csrf_exempt
+def cancel_sub(request):
+    from django.conf import settings
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    attached_service = get_main_account(request.user)
+    stripe.Subscription.delete(attached_service.subscription_id)
+    attached_service.active = False
+    attached_service.save()
+    result = {'result': 'canceled'}
+    return HttpResponse(json.dumps(result))
+
+
 def send_mail(subject, name, body,
               send_to='contact@masys.co.uk',
               send_from='contact@masys.co.uk',
