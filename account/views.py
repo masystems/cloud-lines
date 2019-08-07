@@ -117,11 +117,17 @@ def get_main_account(user):
         attached_service = AttachedService.objects.get(id=user_detail.current_service_id, active=True)
     except AttachedService.DoesNotExist:
         # update the attached service to what default
-        attached_service = AttachedService.objects.filter(user=user_detail).update(animal_type='Pedigrees',
-                                                                                   site_mode='mammal',
-                                                                                   install_available=False,
-                                                                                   service=Service.objects.get(service_name='Free'),
-                                                                                   active=True)
+        attached_service, created = AttachedService.objects.get_or_create(user=user_detail,
+                                                                          animal_type='Pedigrees',
+                                                                          site_mode='mammal',
+                                                                          service=Service.objects.get(service_name='Free'))
+        attached_service.install_available = False
+        attached_service.active = True
+        attached_service.save()
+        user_detail.current_service = attached_service
+        user_detail.save()
+
+        print('tits')
 
     return attached_service
 

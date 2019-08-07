@@ -23,6 +23,7 @@ django.setup()
 from cloud_lines.models import LargeTierQueue
 from account.views import send_mail
 
+
 class LargeTier:
     def __init__(self):
 
