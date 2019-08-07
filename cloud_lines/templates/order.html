@@ -833,7 +833,7 @@
 													if (result.status == 'complete'){
 														$('#buildMessage').removeClass('d-none');
 													} else {
-														$('#buildStatusMsg').html('<span>STATUS:</span> ' + result.status);
+														$('#buildStatusMsg').html('<span>Status:</span> ' + result.status);
 														$('#buildProgress').css('width', result.percent + "%");
 													}
 												} else {
@@ -862,13 +862,13 @@
 							<h2>Thank You.</h2>
 							<strong>Your order has been processed.</strong>
 
-							<div id="buildMessage" class="mt-1 d-none">
-								<p><strong>Build finished! An email has been sent to you with information about your new Cloud-Lines instance.</strong></p>
-								<p><small>Please allow 24 hours (normally only 20 minutes) for your bespoke address to start working.</small></p>
-							</div>
-							<div class="title-block mt-3">
+
+							<div class="title-block mt-3 text-left">
 								<h2 id="buildStatusMsg"></h2>
 								<span>Note: This process will take approximately 15 minutes. You do not need to keep this window open as we will send you an email once it has comepleted.</span>
+							</div>
+							<div id="buildMessage" class="mt-1 d-none">
+								<p><code>Please allow 24 hours (normally only 20 minutes) for your bespoke address to start working.</code></p>
 							</div>
 							<div id="buildProgressDiv" class="progress active mt-2 d-none">
 								<div id="buildProgress" class="progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; height:20px; background-color:#1ABC9C !important" role="progressbar"></div>
