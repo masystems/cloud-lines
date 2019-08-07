@@ -440,4 +440,6 @@ def get_build_status(request):
             status = {'status': 'complete'}
         else:
             status = {'status': queue_item.build_status}
+
+        status['percent'] = queue_item.percentage_complete
         return HttpResponse(json.dumps(status))

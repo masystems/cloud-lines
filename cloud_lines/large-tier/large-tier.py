@@ -54,6 +54,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Captured your settings"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # create database
@@ -82,7 +83,8 @@ class LargeTier:
             new_db = client.create_db_instance(**db_vars)
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nInitiating database creation"
+            deployment.build_status = "Initiating database creation"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # clone repo
@@ -91,7 +93,8 @@ class LargeTier:
                             self.target_dir)
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nCreated clone of Cloud-Lines"
+            deployment.build_status = "Created clone of Cloud-Lines"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # copy in dependencies
@@ -102,7 +105,8 @@ class LargeTier:
                     shutil.copy(fullpath, self.target_dir)
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nAdded in some dependencies"
+            deployment.build_status = "Added in some dependencies"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # update zappa settings
@@ -112,7 +116,8 @@ class LargeTier:
                 fh.write(template.render(site_name=self.site_name))
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nCreated site configuration file"
+            deployment.build_status = "Created site configuration file"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # create virtualenv
@@ -120,7 +125,8 @@ class LargeTier:
             subprocess.Popen(['/usr/local/bin/virtualenv', '-p', 'python3', '/opt/instances/{}/venv'.format(self.site_name)])
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nCreated virtual environment"
+            deployment.build_status = "Created virtual environment"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # wait for db to be created
@@ -129,7 +135,8 @@ class LargeTier:
             waiter.wait(DBInstanceIdentifier=self.site_name, WaiterConfig={"Delay": 10, "MaxAttempts": 60}, )
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nDatabase has been created"
+            deployment.build_status = "Database has been created"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # get db endpoint
@@ -138,7 +145,8 @@ class LargeTier:
             db_host = details['DBInstances'][0]['Endpoint']['Address']
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nCaptured new database settings"
+            deployment.build_status = "Captured new database settings"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # update local settings
@@ -153,7 +161,8 @@ class LargeTier:
                                          db_host=db_host))
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nConnected site to database"
+            deployment.build_status = "Connected site to database"
+            deployment.percentage_complete = 10
             deployment.save()
 
             # generate user data
@@ -174,7 +183,8 @@ class LargeTier:
                 original.write('[{}]'.format(data))
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nCaptured users settings"
+            deployment.build_status = "Captured users settings"
+            deployment.percentage_complete = 5
             deployment.save()
 
             # run commands inside the venv
@@ -193,7 +203,8 @@ class LargeTier:
                               deployment.attached_service.animal_type,])
 
             # update settings
-            deployment.build_status = deployment.build_status + "\nNew Cloud-Lines site build complete!"
+            deployment.build_status = "New Cloud-Lines site build complete!"
+            deployment.percentage_complete = 5
             deployment.save()
 
             # update settings

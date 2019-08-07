@@ -807,6 +807,8 @@
 								});
 
 								function updateBuildStatus(buildId) {
+								    // activate loading bar
+									$('#buildProgressDiv').removeClass('d-none');
 									setTimeout(function () {
 										$.ajax({
 											url: '{% url 'get_build_status' %}',
@@ -826,18 +828,16 @@
 												}
 
 												if (result.status != ''){
+													$('#buildStatusInitial').addClass('d-none');
+
 													if (result.status == 'complete'){
-														$('#buildSpinner').addClass('d-none');
 														$('#buildMessage').removeClass('d-none');
 													} else {
-														var lines = result.status.split('\n');
-														$('#buildStatus').html('<ul class="iconlist">');
-														for(var i = 0;i < lines.length;i++){
-															$('#buildStatus').append('<li><i class="far fa-check-circle" style="color:#1ABC9C"></i> ' + lines[i] + '</li>');
-														}
-														$('#buildStatus').append('</ul>');
-														$('#buildStatus').append('<i id="buildSpinner" class="fas fa-spinner fa-pulse"></i>');
+														$('#buildStatusMsg').html('<span>STATUS:</span> ' + result.status);
+														$('#buildProgress').css('width', result.percent + "%");
 													}
+												} else {
+													$('#buildStatusMsg').html('<span>Status: </span> Waiting to start...');
 												}
 
 												updateBuildStatus(buildId);
@@ -861,11 +861,21 @@
 						<div id="paymentSuccess" class="mt-2 d-none" >
 							<h2>Thank You.</h2>
 							<strong>Your order has been processed.</strong>
-							<div id="buildStatus" class="mt-4 d-none nobottommargin"><strong>Your bespoke Cloud-Lines instance will start building in <1 minute, please wait.</strong></div>
+
 							<div id="buildMessage" class="mt-1 d-none">
 								<p><strong>Build finished! An email has been sent to you with information about your new Cloud-Lines instance.</strong></p>
 								<p><small>Please allow 24 hours (normally only 20 minutes) for your bespoke address to start working.</small></p>
 							</div>
+							<div class="title-block mt-3">
+								<h2 id="buildStatusMsg"></h2>
+								<span>Note: This process will take approximately 15 minutes. You do not need to keep this window open as we will send you an email once it has comepleted.</span>
+							</div>
+							<div id="buildProgressDiv" class="progress active mt-2 d-none">
+								<div id="buildProgress" class="progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; height:20px; background-color:#1ABC9C !important" role="progressbar"></div>
+							</div>
+
+
+
 							<div id="dashboardButton">
 								<a href="{% url 'dashboard' %}" class="button button-desc button-3d button-rounded button-teal center mt-5">Dashboard<span>Click here to go to your new dashboard!</span></a>
 							</div>
