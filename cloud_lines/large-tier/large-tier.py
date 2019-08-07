@@ -84,7 +84,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Initiating database creation"
-            deployment.percentage_complete = 10
+            deployment.percentage_complete = 20
             deployment.save()
 
             # clone repo
@@ -94,7 +94,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Created clone of Cloud-Lines"
-            deployment.percentage_complete = 10
+            deployment.percentage_complete = 30
             deployment.save()
 
             # copy in dependencies
@@ -106,7 +106,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Added in some dependencies"
-            deployment.percentage_complete = 10
+            deployment.percentage_complete = 40
             deployment.save()
 
             # update zappa settings
@@ -117,7 +117,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Created site configuration file"
-            deployment.percentage_complete = 10
+            deployment.percentage_complete = 50
             deployment.save()
 
             # create virtualenv
@@ -126,7 +126,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Created virtual environment"
-            deployment.percentage_complete = 10
+            deployment.percentage_complete = 60
             deployment.save()
 
             # wait for db to be created
@@ -136,7 +136,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Database has been created"
-            deployment.percentage_complete = 10
+            deployment.percentage_complete = 70
             deployment.save()
 
             # get db endpoint
@@ -146,7 +146,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Captured new database settings"
-            deployment.percentage_complete = 10
+            deployment.percentage_complete = 80
             deployment.save()
 
             # update local settings
@@ -162,7 +162,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Connected site to database"
-            deployment.percentage_complete = 10
+            deployment.percentage_complete = 90
             deployment.save()
 
             # generate user data
@@ -184,7 +184,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "Captured users settings"
-            deployment.percentage_complete = 5
+            deployment.percentage_complete = 95
             deployment.save()
 
             # run commands inside the venv
@@ -204,7 +204,7 @@ class LargeTier:
 
             # update settings
             deployment.build_status = "New Cloud-Lines site build complete!"
-            deployment.percentage_complete = 5
+            deployment.percentage_complete = 100
             deployment.save()
 
             # update settings
