@@ -96,7 +96,7 @@
 
 					<div id="ptab1">
 
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore, ipsa, fuga, modi, corporis maiores illum fugit ratione cumque dolores sint obcaecati quod temporibus. Expedita, sapiente, veritatis, impedit iusto labore sed itaque sunt fugiat non quis nihil hic quos necessitatibus officiis mollitia nesciunt neque! Minus, mollitia at iusto unde voluptate repudiandae.</p>
+						<p>Please select your desired service type, payment increment and give us a couple of details about your animals.</p>
 						<form id="serviceForm" name="serviceForm" class="nobottommargin" method="POST">
 							<div class="row form-billing">
 								<input type="hidden" name="checkout-form-upgrade" id="checkout-form-upgrade" value="{{ attached_service_upgrade }}">
@@ -132,7 +132,7 @@
 
 							<div class="row form-billing">
 								<div class="col-6 form-group">
-									<label>Animal Type(plural):</label>
+									<label>Animal Type (plural):</label>
 									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if attached_service_upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}"{% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
 									</select>
 
@@ -316,7 +316,7 @@
 						</script>
 					</div>
 					<div id="ptab2">
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nesciunt, deleniti, atque soluta ratione blanditiis maxime at architecto laudantium eius eaque distinctio dolorem voluptatem nam ab molestias velit nemo. Illo, hic.</p>
+						<p>Please enter your billing information.</p>
 						<div class="d-flex flex-column align-items-center justify-content-center ">
 							<div id="billingSpinner" class="spinner-border text-info d-none" style="width: 6rem; height: 6rem;" role="status"></div>
 							<div id="billingSpinnerText" class="row d-none">
@@ -653,7 +653,9 @@
 						</script>
 					</div>
 					<div id="ptab3">
-						<p>Card: 4000 0582 6000 0005</p>
+						{% if user.is_superuser %}
+							<p>Card: 4000 0582 6000 0005</p>
+						{% endif %}
 						<div class="table pt-2">
 							<table class="table table-striped">
 								<thead>
@@ -832,6 +834,7 @@
 
 													if (result.status == 'complete'){
 														$('#buildMessage').removeClass('d-none');
+														$('#buildStatusNote').text('Your new Cloud-Lines instance will soon be ready to use. Please keep an eye on your email inbox, you should receive your activation email within 24 hours (usually much sooner).');
 													} else {
 														$('#buildStatusMsg').html('<span>Status:</span> ' + result.status);
 														$('#buildProgress').css('width', result.percent + "%");
@@ -865,7 +868,7 @@
 
 							<div class="title-block mt-3 text-left">
 								<h2 id="buildStatusMsg"></h2>
-								<span>Note: This process will take approximately 15 minutes. You do not need to keep this window open as we will send you an email once it has comepleted.</span>
+								<span id="buildStatusNote">Note: This process will take approximately 15 minutes. You do not need to keep this window open as we will send you an email once it has comepleted.</span>
 							</div>
 							<div id="buildMessage" class="mt-1 d-none">
 								<p><code>Please allow 24 hours (normally only 20 minutes) for your bespoke address to start working.</code></p>

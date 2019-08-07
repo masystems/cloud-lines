@@ -28,17 +28,17 @@
                             <img src="{% static 'assets/images/cloud-lines-logo.png' %}" style="max-height:300px" class="img-fluid">
                         </div>
 
-                        <p><strong>Welcome to Cloudlines!</strong></p>
-                        <p>To get you started, follow this setup wizard through to add your first breed, breeder and pedigree.
-                            The idea is to get you familiar with how the site works when it comes to manual data entry.
-                        You can of course skip it if you already know the system or if you want to bulk add your items.</p>
+                        <p><strong>Welcome to Cloud-Lines!</strong></p>
+                        <p>To get you started, follow this setup wizard to add your first breed, breeder and pedigree.
+                           This wizard will familiarise you with way the site works and data entry.
+                           Alternatively you can use the navigation bar above where you'll find the 'Impex' tool to import bulk data.</p>
 
-                        <p>We wish you all the best and welcome to the Cloudlines community!</p>
+                        <p>We wish you all the best and welcome you to the Cloud-lines community!</p>
                     </section>
                     <!-- Step 2 -->
                     <h6>Add breed</h6>
                     <section>
-                        <p><strong>Add your first breed. All pedigrees must be assigned to a breed, so add your first one to get you going!</strong></p>
+                        <p><strong>Add your chosen animal breed. All pedigrees records must be assigned to a breed.</strong></p>
                         <div class="row">
                             {% include 'new_breed_form.html' %}
                         </div>
@@ -83,7 +83,9 @@
                     <h6>Pedigree</h6>
                     <section>
                         <p>Now you can add your first pedigree! We have already filled in some fields for you like breeder and owner.
-                            If these are not correct you can change them later.</p>
+                            If these are not correct you can change them later.
+                            As this is your first pedigree record you cannot assign a mother or father to this animal
+                        </p>
                         <div class="row">
                             <div class="form-body">
                                 {% include 'new_pedigree_form.html' %}
