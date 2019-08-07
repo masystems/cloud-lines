@@ -411,7 +411,7 @@ def send_payment_error(e):
 def activate_primary_account(request, service):
     user_details = UserDetail.objects.get(user=request.user)
     try:
-        primary_account = AttachedService.objects.get(user=user_details, id=service)
+        primary_account = AttachedService.objects.get(id=service)
     except AttachedService.DoesNotExist:
         return redirect('dashboard')
 
