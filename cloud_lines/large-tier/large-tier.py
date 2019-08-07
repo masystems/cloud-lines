@@ -56,6 +56,7 @@ class LargeTier:
             deployment.build_status = "Captured your settings"
             deployment.percentage_complete = 10
             deployment.save()
+            sleep(10)
 
             # create database
             client = boto3.client(
@@ -86,6 +87,7 @@ class LargeTier:
             deployment.build_status = "Initiating database creation"
             deployment.percentage_complete = 20
             deployment.save()
+            sleep(10)
 
             # clone repo
             print('clone repo')
@@ -96,6 +98,7 @@ class LargeTier:
             deployment.build_status = "Created clone of Cloud-Lines"
             deployment.percentage_complete = 30
             deployment.save()
+            sleep(10)
 
             # copy in dependencies
             print('copy dependcies')
@@ -108,6 +111,7 @@ class LargeTier:
             deployment.build_status = "Added in some dependencies"
             deployment.percentage_complete = 40
             deployment.save()
+            sleep(10)
 
             # update zappa settings
             print('set zappa settings')
@@ -119,6 +123,7 @@ class LargeTier:
             deployment.build_status = "Created site configuration file"
             deployment.percentage_complete = 50
             deployment.save()
+            sleep(10)
 
             # create virtualenv
             print('creating virtual env')
@@ -128,6 +133,7 @@ class LargeTier:
             deployment.build_status = "Created virtual environment"
             deployment.percentage_complete = 60
             deployment.save()
+            sleep(10)
 
             # wait for db to be created
             print('wating for DB to be created')
@@ -138,6 +144,7 @@ class LargeTier:
             deployment.build_status = "Database has been created"
             deployment.percentage_complete = 70
             deployment.save()
+            sleep(10)
 
             # get db endpoint
             print('getting db endpoint')
@@ -148,6 +155,7 @@ class LargeTier:
             deployment.build_status = "Captured new database settings"
             deployment.percentage_complete = 80
             deployment.save()
+            sleep(10)
 
             # update local settings
             template = self.env.get_template('cloudlines/local_settings.j2')
@@ -164,6 +172,7 @@ class LargeTier:
             deployment.build_status = "Connected site to database"
             deployment.percentage_complete = 90
             deployment.save()
+            sleep(10)
 
             # generate user data
             process = subprocess.Popen(['python3', '/opt/cloudlines/cloud-lines/manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
@@ -186,6 +195,7 @@ class LargeTier:
             deployment.build_status = "Captured users settings"
             deployment.percentage_complete = 95
             deployment.save()
+            sleep(10)
 
             # run commands inside the venv
             subprocess.Popen(['/opt/venv.sh',
@@ -206,6 +216,7 @@ class LargeTier:
             deployment.build_status = "New Cloud-Lines site build complete!"
             deployment.percentage_complete = 100
             deployment.save()
+            sleep(10)
 
             # update settings
             deployment.build_state = 'complete'
