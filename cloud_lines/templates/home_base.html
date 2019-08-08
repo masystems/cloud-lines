@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load static %}
 <!DOCTYPE html>
 <html dir="ltr" lang="en-GB">
 <head>
@@ -35,6 +36,10 @@
 	<link rel="stylesheet" href="{% static 'cloud-lines/demos/hosting/css/fonts.css' %}" type="text/css" />
 	<link rel="stylesheet" href="{% static 'cloud-lines/demos/hosting/hosting.css' %}" type="text/css" />
 	<!-- / -->
+
+	<meta property=“og:image” content=“{% static 'cloud-lines/demos/hosting/images/cat_dog.jpg' %}” />
+	<meta property=”og:image:width” content=”640″ />
+	<meta property=”og:image:height” content=”376″ />
 
 	{% block head %}
 
