@@ -28,6 +28,12 @@ import json
 
 
 def site_mode(request):
+    # get gdpr
+    try:
+        gdpr = Page.objects.get(title='gdpr')
+    except Page.DoesNotExist:
+        gdpr = ''
+
     if request.user.is_authenticated:
         # returns the main account the requesting user is a member of
         attached_service = get_main_account(request.user)
@@ -72,11 +78,7 @@ def site_mode(request):
         else:
             add_breed = True
 
-        # get gdpr
-        try:
-            gdpr = Page.objects.get(title='gdpr')
-        except Page.DoesNotExist:
-            gdpr = ''
+
         return {'service': attached_service,
                 'attached_services': attached_services,
                 'add_pedigree': pedigrees,
@@ -86,7 +88,8 @@ def site_mode(request):
                 'editor': editor,
                 'gdpr': gdpr}
 
-    return {'authenticated': 'no'}
+    return {'authenticated': 'no',
+            'gdpr': gdpr}
 
 
 def is_editor(user):
