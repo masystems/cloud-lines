@@ -1,0 +1,341 @@
+Already using interpreter /usr/bin/python3
+Using base prefix '/usr'
+New python executable in /opt/instances/test3/venv/bin/python3
+Also creating executable in /opt/instances/test3/venv/bin/python
+Installing setuptools, pip, wheel...
+done.
+/opt/instances/test3 /opt/cloudlines/cloud-lines/cloud_lines/large-tier
+clone repo
+copy dependcies
+set zappa settings
+creating virtual env
+wating for DB to be created
+getting db endpoint
+Collecting argcomplete==1.9.3 (from -r requirements.txt (line 1))
+  Using cached https://files.pythonhosted.org/packages/0d/f2/058910b2c732092175875820177dae9d390e71a5f30a9895f92e6a6ca466/argcomplete-1.9.3-py2.py3-none-any.whl
+Collecting awacs==0.8.2 (from -r requirements.txt (line 2))
+Collecting boto3==1.9.96 (from -r requirements.txt (line 3))
+  Using cached https://files.pythonhosted.org/packages/3c/75/d19c335d1ea81437f4f3ac4fc09ef21c0d00a842aa2c5c42f95420fd2359/boto3-1.9.96-py2.py3-none-any.whl
+Collecting botocore==1.12.96 (from -r requirements.txt (line 4))
+  Using cached https://files.pythonhosted.org/packages/01/bd/25e57c0b7821f5ced18f2e392b60c0c626cb10ae545946a58b0d2d86aa44/botocore-1.12.96-py2.py3-none-any.whl
+Collecting certifi==2018.11.29 (from -r requirements.txt (line 5))
+  Using cached https://files.pythonhosted.org/packages/9f/e0/accfc1b56b57e9750eba272e24c4dddeac86852c2bebd1236674d7887e8a/certifi-2018.11.29-py2.py3-none-any.whl
+Collecting cfn-flip==1.1.0.post1 (from -r requirements.txt (line 6))
+  Using cached https://files.pythonhosted.org/packages/2b/98/c91146bf03087ea35fedeac0e7a751af9cbc29b560f576e6422aaacbe13d/cfn_flip-1.1.0.post1-py3-none-any.whl
+Collecting chardet==3.0.4 (from -r requirements.txt (line 7))
+  Using cached https://files.pythonhosted.org/packages/bc/a9/01ffebfb562e4274b6487b4bb1ddec7ca55ec7510b22e4c51f14098443b8/chardet-3.0.4-py2.py3-none-any.whl
+Collecting Click==7.0 (from -r requirements.txt (line 8))
+  Using cached https://files.pythonhosted.org/packages/fa/37/45185cb5abbc30d7257104c434fe0b07e5a195a6847506c074527aa599ec/Click-7.0-py2.py3-none-any.whl
+Collecting Django==2.1.10 (from -r requirements.txt (line 9))
+  Using cached https://files.pythonhosted.org/packages/d4/66/dbf6b7fabb0882eac49a33baac096396f98e5ba0cdea7c02e0a3bf02e8fb/Django-2.1.10-py3-none-any.whl
+Collecting django-s3-storage==0.12.4 (from -r requirements.txt (line 11))
+Collecting django-storages==1.7.1 (from -r requirements.txt (line 12))
+  Using cached https://files.pythonhosted.org/packages/a0/00/b15822dbc3ea8ea3b80dca394fafc758f5ced6bf4aa357f636f43e08de8d/django_storages-1.7.1-py2.py3-none-any.whl
+Collecting django-widget-tweaks==1.4.3 (from -r requirements.txt (line 13))
+  Using cached https://files.pythonhosted.org/packages/eb/16/86c8fdbc774c97a93028846cef1ddbe4f3ebb1ff933b54aed920cf619bf4/django_widget_tweaks-1.4.3-py2.py3-none-any.whl
+Collecting docutils==0.14 (from -r requirements.txt (line 14))
+  Using cached https://files.pythonhosted.org/packages/36/fa/08e9e6e0e3cbd1d362c3bbee8d01d0aedb2155c4ac112b19ef3cae8eed8d/docutils-0.14-py3-none-any.whl
+Collecting durationpy==0.5 (from -r requirements.txt (line 15))
+Collecting future==0.16.0 (from -r requirements.txt (line 16))
+Collecting hjson==3.0.1 (from -r requirements.txt (line 17))
+Collecting idna==2.8 (from -r requirements.txt (line 18))
+  Using cached https://files.pythonhosted.org/packages/14/2c/cd551d81dbe15200be1cf41cd03869a46fe7226e7450af7a6545bfc474c9/idna-2.8-py2.py3-none-any.whl
+Collecting Jinja2==2.10.1 (from -r requirements.txt (line 19))
+  Using cached https://files.pythonhosted.org/packages/1d/e7/fd8b501e7a6dfe492a433deb7b9d833d39ca74916fa8bc63dd1a4947a671/Jinja2-2.10.1-py2.py3-none-any.whl
+Collecting jmespath==0.9.3 (from -r requirements.txt (line 20))
+  Using cached https://files.pythonhosted.org/packages/b7/31/05c8d001f7f87f0f07289a5fc0fc3832e9a57f2dbd4d3b0fee70e0d51365/jmespath-0.9.3-py2.py3-none-any.whl
+Collecting kappa==0.6.0 (from -r requirements.txt (line 21))
+Collecting lambda-packages==0.20.0 (from -r requirements.txt (line 22))
+Collecting MarkupSafe==1.1.0 (from -r requirements.txt (line 23))
+  Using cached https://files.pythonhosted.org/packages/08/04/f2191b50fb7f0712f03f064b71d8b4605190f2178ba02e975a87f7b89a0d/MarkupSafe-1.1.0-cp36-cp36m-manylinux1_x86_64.whl
+Collecting Pillow==5.4.1 (from -r requirements.txt (line 24))
+  Using cached https://files.pythonhosted.org/packages/85/5e/e91792f198bbc5a0d7d3055ad552bc4062942d27eaf75c3e2783cf64eae5/Pillow-5.4.1-cp36-cp36m-manylinux1_x86_64.whl
+Collecting placebo==0.9.0 (from -r requirements.txt (line 25))
+Collecting psycopg2==2.7.7 (from -r requirements.txt (line 26))
+  Using cached https://files.pythonhosted.org/packages/37/25/53e8398975aa3323de46a5cc2745aeb4c9db11352ca905d3a15c53b6a816/psycopg2-2.7.7-cp36-cp36m-manylinux1_x86_64.whl
+Collecting python-dateutil==2.6.1 (from -r requirements.txt (line 27))
+  Using cached https://files.pythonhosted.org/packages/4b/0d/7ed381ab4fe80b8ebf34411d14f253e1cf3e56e2820ffa1d8844b23859a2/python_dateutil-2.6.1-py2.py3-none-any.whl
+Collecting python-slugify==1.2.4 (from -r requirements.txt (line 28))
+  Using cached https://files.pythonhosted.org/packages/9f/77/ab7134b731d0e831cf82861c1ab0bb318e80c41155fa9da18958f9d96057/python_slugify-1.2.4-py2.py3-none-any.whl
+Collecting pytz==2018.9 (from -r requirements.txt (line 29))
+  Using cached https://files.pythonhosted.org/packages/61/28/1d3920e4d1d50b19bc5d24398a7cd85cc7b9a75a490570d5a30c57622d34/pytz-2018.9-py2.py3-none-any.whl
+Collecting PyYAML==4.2b1 (from -r requirements.txt (line 30))
+Collecting requests==2.21.0 (from -r requirements.txt (line 31))
+  Using cached https://files.pythonhosted.org/packages/7d/e3/20f3d364d6c8e5d2353c72a67778eb189176f08e873c9900e10c0287b84b/requests-2.21.0-py2.py3-none-any.whl
+Collecting s3transfer==0.2.0 (from -r requirements.txt (line 32))
+  Using cached https://files.pythonhosted.org/packages/d7/de/5737f602e22073ecbded7a0c590707085e154e32b68d86545dcc31004c02/s3transfer-0.2.0-py2.py3-none-any.whl
+Collecting six==1.12.0 (from -r requirements.txt (line 33))
+  Using cached https://files.pythonhosted.org/packages/73/fb/00a976f728d0d1fecfe898238ce23f502a721c0ac0ecfedb80e0d88c64e9/six-1.12.0-py2.py3-none-any.whl
+Collecting toml==0.10.0 (from -r requirements.txt (line 34))
+  Using cached https://files.pythonhosted.org/packages/a2/12/ced7105d2de62fa7c8fb5fce92cc4ce66b57c95fb875e9318dba7f8c5db0/toml-0.10.0-py2.py3-none-any.whl
+Collecting tqdm==4.19.1 (from -r requirements.txt (line 35))
+  Using cached https://files.pythonhosted.org/packages/c0/d3/7f930cbfcafae3836be39dd3ed9b77e5bb177bdcf587a80b6cd1c7b85e74/tqdm-4.19.1-py2.py3-none-any.whl
+Collecting troposphere==2.4.4 (from -r requirements.txt (line 36))
+Collecting Unidecode==1.0.23 (from -r requirements.txt (line 37))
+  Using cached https://files.pythonhosted.org/packages/31/39/53096f9217b057cb049fe872b7fc7ce799a1a89b76cf917d9639e7a558b5/Unidecode-1.0.23-py2.py3-none-any.whl
+Collecting urllib3==1.24.2 (from -r requirements.txt (line 38))
+  Using cached https://files.pythonhosted.org/packages/df/1c/59cca3abf96f991f2ec3131a4ffe72ae3d9ea1f5894abe8a9c5e3c77cfee/urllib3-1.24.2-py2.py3-none-any.whl
+Collecting Werkzeug==0.14.1 (from -r requirements.txt (line 39))
+  Using cached https://files.pythonhosted.org/packages/20/c4/12e3e56473e52375aa29c4764e70d1b8f3efa6682bef8d0aae04fe335243/Werkzeug-0.14.1-py2.py3-none-any.whl
+Collecting wsgi-request-logger==0.4.6 (from -r requirements.txt (line 40))
+Collecting zappa (from -r requirements.txt (line 41))
+  Using cached https://files.pythonhosted.org/packages/b8/c9/285b4d161331b9ef3c5359d4d8c4dc5b9e1d830dbb4ac436c54ed8b724d7/zappa-0.48.2-py3-none-any.whl
+Collecting zappa-django-utils==0.4.0 (from -r requirements.txt (line 42))
+  Using cached https://files.pythonhosted.org/packages/49/db/2438d10cc85916bd12852008e415a228013f1d35abdc3d271e7805df268c/zappa_django_utils-0.4.0-py3-none-any.whl
+Collecting weasyprint (from -r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/c7/23/b54a5952e28a631e872df882e9160ce0d630f9a07e2dd56f5407a968b90b/WeasyPrint-48-py3-none-any.whl
+Collecting django_weasyprint (from -r requirements.txt (line 44))
+  Using cached https://files.pythonhosted.org/packages/f4/bc/07e80c8fd18cb9b0ae7d193f2e4e5d1b4c650b9cdf64eb6bdb3f06949112/django_weasyprint-0.5.4-py2.py3-none-any.whl
+Collecting xhtml2pdf (from -r requirements.txt (line 45))
+Collecting dj-stripe (from -r requirements.txt (line 46))
+  Using cached https://files.pythonhosted.org/packages/a2/5e/b72b797bc86f5f8d2852a30a6326f21409bd2adbae557152f91c88302f9f/dj_stripe-2.0.3-py2.py3-none-any.whl
+Collecting django_extensions (from -r requirements.txt (line 47))
+  Using cached https://files.pythonhosted.org/packages/72/0d/fde2cf0ae7e1d12d105683d0259c17c151de4efd5d166c0ec1335541e7ba/django_extensions-2.2.1-py2.py3-none-any.whl
+Collecting money (from -r requirements.txt (line 48))
+Collecting python-magic (from -r requirements.txt (line 49))
+  Using cached https://files.pythonhosted.org/packages/42/a1/76d30c79992e3750dac6790ce16f056f870d368ba142f83f75f694d93001/python_magic-0.4.15-py2.py3-none-any.whl
+Requirement already satisfied: pip>=9.0.1 in /opt/instances/test3/venv/lib/python3.6/site-packages (from zappa->-r requirements.txt (line 41)) (19.2.1)
+Requirement already satisfied: wheel>=0.30.0 in /opt/instances/test3/venv/lib/python3.6/site-packages (from zappa->-r requirements.txt (line 41)) (0.33.4)
+Collecting Pyphen>=0.8 (from weasyprint->-r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/15/82/08a3629dce8d1f3d91db843bb36d4d7db6b6269d5067259613a0d5c8a9db/Pyphen-0.9.5-py2.py3-none-any.whl
+Collecting cssselect2>=0.1 (from weasyprint->-r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/12/e2/91fcd4cd32545beec6e11628d64d3e20f11b5a95dd1ccf3216fd69f176b7/cssselect2-0.2.1-py2.py3-none-any.whl
+Requirement already satisfied: setuptools>=39.2.0 in /opt/instances/test3/venv/lib/python3.6/site-packages (from weasyprint->-r requirements.txt (line 43)) (41.0.1)
+Collecting tinycss2>=1.0.0 (from weasyprint->-r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/94/2c/4e501f9c351343c8ba10d70b5a7ca97cdab2690af043a6e52ada65b85b6b/tinycss2-1.0.2-py3-none-any.whl
+Collecting CairoSVG>=2.4.0 (from weasyprint->-r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/fd/97/d0f51b1022aecdc3b77385daea0292f3978ec26fee31e65e8a1592ebeff1/CairoSVG-2.4.0-py3-none-any.whl
+Collecting html5lib>=0.999999999 (from weasyprint->-r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/a5/62/bbd2be0e7943ec8504b517e62bab011b4946e1258842bc159e5dfde15b96/html5lib-1.0.1-py2.py3-none-any.whl
+Collecting cffi>=0.6 (from weasyprint->-r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/5f/bf/6aa1925384c23ffeb579e97a5569eb9abce41b6310b329352b8252cee1c3/cffi-1.12.3-cp36-cp36m-manylinux1_x86_64.whl
+Collecting cairocffi>=0.9.0 (from weasyprint->-r requirements.txt (line 43))
+Collecting reportlab>=3.0 (from xhtml2pdf->-r requirements.txt (line 45))
+  Using cached https://files.pythonhosted.org/packages/9e/60/d4a6ca69e859774fdaf689d654a3b70429d199ab71ed22f3c367ea1529a8/reportlab-3.5.23-cp36-cp36m-manylinux1_x86_64.whl
+Collecting pyPdf2 (from xhtml2pdf->-r requirements.txt (line 45))
+Collecting stripe>=2.3.0 (from dj-stripe->-r requirements.txt (line 46))
+  Using cached https://files.pythonhosted.org/packages/94/ba/c5a5e9c2da725365d2934965f6b478c0a613ac0b9d2c23a93d3181e93849/stripe-2.33.0-py2.py3-none-any.whl
+Collecting jsonfield>=2.0.2 (from dj-stripe->-r requirements.txt (line 46))
+  Using cached https://files.pythonhosted.org/packages/39/ab/00f09d604f1d659831cc4d7f26419bbf2bd70852951a4f77691bd78f527e/jsonfield-2.0.2-py2.py3-none-any.whl
+Collecting webencodings>=0.4 (from tinycss2>=1.0.0->weasyprint->-r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/f4/24/2a3e3df732393fed8b3ebf2ec078f05546de641fe1b667ee316ec1dcf3b7/webencodings-0.5.1-py2.py3-none-any.whl
+Collecting defusedxml (from CairoSVG>=2.4.0->weasyprint->-r requirements.txt (line 43))
+  Using cached https://files.pythonhosted.org/packages/06/74/9b387472866358ebc08732de3da6dc48e44b0aacd2ddaa5cb85ab7e986a2/defusedxml-0.6.0-py2.py3-none-any.whl
+Collecting pycparser (from cffi>=0.6->weasyprint->-r requirements.txt (line 43))
+Installing collected packages: argcomplete, awacs, jmespath, docutils, six, python-dateutil, urllib3, botocore, s3transfer, boto3, certifi, PyYAML, Click, cfn-flip, chardet, pytz, Django, django-s3-storage, django-storages, django-widget-tweaks, durationpy, future, hjson, idna, MarkupSafe, Jinja2, placebo, kappa, lambda-packages, Pillow, psycopg2, Unidecode, python-slugify, requests, toml, tqdm, troposphere, Werkzeug, wsgi-request-logger, zappa, zappa-django-utils, Pyphen, webencodings, tinycss2, cssselect2, defusedxml, pycparser, cffi, cairocffi, CairoSVG, html5lib, weasyprint, django-weasyprint, reportlab, pyPdf2, xhtml2pdf, stripe, jsonfield, dj-stripe, django-extensions, money, python-magic
+Successfully installed CairoSVG-2.4.0 Click-7.0 Django-2.1.10 Jinja2-2.10.1 MarkupSafe-1.1.0 Pillow-5.4.1 PyYAML-4.2b1 Pyphen-0.9.5 Unidecode-1.0.23 Werkzeug-0.14.1 argcomplete-1.9.3 awacs-0.8.2 boto3-1.9.96 botocore-1.12.96 cairocffi-1.0.2 certifi-2018.11.29 cffi-1.12.3 cfn-flip-1.1.0.post1 chardet-3.0.4 cssselect2-0.2.1 defusedxml-0.6.0 dj-stripe-2.0.3 django-extensions-2.2.1 django-s3-storage-0.12.4 django-storages-1.7.1 django-weasyprint-0.5.4 django-widget-tweaks-1.4.3 docutils-0.14 durationpy-0.5 future-0.16.0 hjson-3.0.1 html5lib-1.0.1 idna-2.8 jmespath-0.9.3 jsonfield-2.0.2 kappa-0.6.0 lambda-packages-0.20.0 money-1.3.0 placebo-0.9.0 psycopg2-2.7.7 pyPdf2-1.26.0 pycparser-2.19 python-dateutil-2.6.1 python-magic-0.4.15 python-slugify-1.2.4 pytz-2018.9 reportlab-3.5.23 requests-2.21.0 s3transfer-0.2.0 six-1.12.0 stripe-2.33.0 tinycss2-1.0.2 toml-0.10.0 tqdm-4.19.1 troposphere-2.4.4 urllib3-1.24.2 weasyprint-48 webencodings-0.5.1 wsgi-request-logger-0.4.6 xhtml2pdf-0.2.3 zappa-0.48.2 zappa-django-utils-0.4.0
+INIT
+Oh no! An error occurred! :(
+
+==============
+
+
+==============
+
+Need help? Found a bug? Let us know! :D
+File bug reports on GitHub here: https://github.com/Miserlou/Zappa
+And join our Slack channel here: https://slack.zappa.io
+Love!,
+ ~ Team Zappa!
+DEPLOY
+Calling update for stage test3..
+Downloading and installing dependencies..
+ - reportlab==3.5.23: Using locally cached manylinux wheel
+ - psycopg2==2.7.7: Using locally cached manylinux wheel
+ - pillow==5.4.1: Using locally cached manylinux wheel
+ - markupsafe==1.1.0: Using locally cached manylinux wheel
+ - cffi==1.12.3: Using locally cached manylinux wheel
+ - sqlite==python3: Using precompiled lambda package
+Packaging project as zip.
+Uploading cloudlines-test3-test3-1564831960.zip (29.0MiB)..
+Updating Lambda function code..
+Updating Lambda function configuration..
+Uploading cloudlines-test3-test3-template-1564831973.json (1.6KiB)..
+Deploying API Gateway..
+Scheduling..
+Unscheduled 9c17a3376953a344ba06121fa7620a6c442ad-handler.keep_warm_callback.
+Scheduled 9c17a3376953a344ba06121fa7620a6c442ad-handler.keep_warm_callback with expression rate(4 minutes)!
+Calling update for stage test3..
+Downloading and installing dependencies..
+ - reportlab==3.5.23: Using locally cached manylinux wheel
+ - psycopg2==2.7.7: Using locally cached manylinux wheel
+ - pillow==5.4.1: Using locally cached manylinux wheel
+ - markupsafe==1.1.0: Using locally cached manylinux wheel
+ - cffi==1.12.3: Using locally cached manylinux wheel
+ - sqlite==python3: Using precompiled lambda package
+Packaging project as zip.
+Uploading cloudlines-test3-test3-1564831981.zip (29.0MiB)..
+Updating Lambda function code..
+Updating Lambda function configuration..
+Uploading cloudlines-test3-test3-template-1564831992.json (1.6KiB)..
+Deploying API Gateway..
+Scheduling..
+Unscheduled 9c17a3376953a344ba06121fa7620a6c442ad-handler.keep_warm_callback.
+Scheduled 9c17a3376953a344ba06121fa7620a6c442ad-handler.keep_warm_callback with expression rate(4 minutes)!
+CERTIFY
+Calling certify for stage test3..
+Certifying domain test3.cloud-lines.com..
+Oh no! An error occurred! :(
+
+==============
+
+
+==============
+
+Need help? Found a bug? Let us know! :D
+File bug reports on GitHub here: https://github.com/Miserlou/Zappa
+And join our Slack channel here: https://slack.zappa.io
+Love!,
+ ~ Team Zappa!
+Calling update for stage test3..
+Downloading and installing dependencies..
+ - reportlab==3.5.23: Using locally cached manylinux wheel
+ - psycopg2==2.7.7: Using locally cached manylinux wheel
+ - pillow==5.4.1: Using locally cached manylinux wheel
+ - markupsafe==1.1.0: Using locally cached manylinux wheel
+ - cffi==1.12.3: Using locally cached manylinux wheel
+ - sqlite==python3: Using precompiled lambda package
+Packaging project as zip.
+Uploading cloudlines-test3-test3-1564832012.zip (29.0MiB)..
+Updating Lambda function code..
+Updating Lambda function configuration..
+Uploading cloudlines-test3-test3-template-1564832023.json (1.6KiB)..
+Deploying API Gateway..
+Scheduling..
+Unscheduled 9c17a3376953a344ba06121fa7620a6c442ad-handler.keep_warm_callback.
+Scheduled 9c17a3376953a344ba06121fa7620a6c442ad-handler.keep_warm_callback with expression rate(4 minutes)!
+[36m[1m[START][0m [32m[1mRequestId:[0m [35m[35m6980f1a3-f12b-4744-abee-ec7d8240eb42[0m[0m [32m[1mVersion:[0m $LATEST
+[36m[1m[DEBUG][0m 2019-08-03T11:33:55.661Z [35m[35m6980f1a3-f12b-4744-abee-ec7d8240eb42[0m[0m [32m[1mZappa Event:[0m {'manage': 'migrate'}
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying sessions.0001_initial... OK
+[36m[1m[END][0m [32m[1mRequestId:[0m [35m[35m6980f1a3-f12b-4744-abee-ec7d8240eb42[0m[0m
+[36m[1m[REPORT][0m [32m[1mRequestId:[0m [35m[35m6980f1a3-f12b-4744-abee-ec7d8240eb42[0m[0m
+[32m[1mDuration:[0m 549.47 ms
+[32m[1mBilled[0m [32m[1mDuration:[0m 600 ms 
+[32m[1mMemory Size:[0m 1024 MB
+[32m[1mMax Memory Used:[0m 71 MB
+
+MAKEMIGRATIONS
+Migrations for 'account':
+  account/migrations/0001_initial.py
+    - Create model AttachedService
+    - Create model UserDetail
+  account/migrations/0002_auto_20190803_1134.py
+    - Add field service to attachedservice
+    - Add field user to attachedservice
+Migrations for 'breed':
+  breed/migrations/0001_initial.py
+    - Create model Breed
+Migrations for 'breeder':
+  breeder/migrations/0001_initial.py
+    - Create model Breeder
+Migrations for 'cloud_lines':
+  cloud_lines/migrations/0001_initial.py
+    - Create model Contact
+    - Create model Faq
+    - Create model LargeTierQueue
+    - Create model Page
+    - Create model Service
+    - Create model Testimonial
+    - Add field service to contact
+Migrations for 'pedigree':
+  pedigree/migrations/0001_initial.py
+    - Create model Pedigree
+    - Create model PedigreeImage
+    - Create model PedigreeAttributes
+    - Add field reg_no to pedigreeimage
+    - Add field account to pedigree
+    - Add field breeder to pedigree
+    - Add field creator to pedigree
+    - Add field current_owner to pedigree
+    - Add field parent_father to pedigree
+    - Add field parent_mother to pedigree
+Migrations for 'support':
+  support/migrations/0001_initial.py
+    - Create model Ticket
+Migrations for 'breed_group':
+  breed_group/migrations/0001_initial.py
+    - Create model BreedGroup
+MIGRATE
+Operations to perform:
+  Apply all migrations: account, admin, auth, breed, breed_group, breeder, cloud_lines, contenttypes, pedigree, sessions, support
+Running migrations:
+  Applying account.0001_initial... OK
+  Applying cloud_lines.0001_initial... OK
+  Applying account.0002_auto_20190803_1134... OK
+  Applying breed.0001_initial... OK
+  Applying breeder.0001_initial... OK
+  Applying pedigree.0001_initial... OK
+  Applying breed_group.0001_initial... OK
+  Applying support.0001_initial... OK
+UPDATE
+Calling update for stage test3..
+Downloading and installing dependencies..
+ - reportlab==3.5.23: Using locally cached manylinux wheel
+ - psycopg2==2.7.7: Using locally cached manylinux wheel
+ - pillow==5.4.1: Using locally cached manylinux wheel
+ - markupsafe==1.1.0: Using locally cached manylinux wheel
+ - cffi==1.12.3: Using locally cached manylinux wheel
+ - sqlite==python3: Using precompiled lambda package
+Packaging project as zip.
+Uploading cloudlines-test3-test3-1564832045.zip (29.1MiB)..
+Updating Lambda function code..
+Updating Lambda function configuration..
+Uploading cloudlines-test3-test3-template-1564832057.json (1.6KiB)..
+Deploying API Gateway..
+Scheduling..
+Unscheduled 9c17a3376953a344ba06121fa7620a6c442ad-handler.keep_warm_callback.
+Scheduled 9c17a3376953a344ba06121fa7620a6c442ad-handler.keep_warm_callback with expression rate(4 minutes)!
+Your updated Zappa deployment is live!: https://test3.cloud-lines.com (https://fyj4d1yaxd.execute-api.eu-west-2.amazonaws.com/test3)
+Installed 6 object(s) from 1 fixture(s)
+Installed 1 object(s) from 1 fixture(s)
+USER: MARCO
+Calling invoke for stage test3..
+[36m[1m[START][0m [32m[1mRequestId:[0m [35m[35md4c45cc7-92d1-4fcc-bdad-7a41ec0d52f6[0m[0m [32m[1mVersion:[0m $LATEST
+[36m[1m[DEBUG][0m 2019-08-03T11:34:27.10Z [35m[35md4c45cc7-92d1-4fcc-bdad-7a41ec0d52f6[0m[0m [32m[1mZappa Event:[0m {'raw_command': "from django.contrib.auth.models import User;                               from account.models import UserDetail, AttachedService;                               from cloud_lines.models import Service;                               user = User.objects.create_superuser('marco', 'marco@masys.co.uk', 'br3ak0ut');                               user_detail, created = UserDetail.objects.get_or_create(user=user);                               service = Service.objects.get(id=1);                               attached_service, created = AttachedService.objects.get_or_create(user=user_detail, service=service, site_mode='poultry', animal_type='Pedigrees', active=True);                               user_detail.current_service = attached_service; user_detail.save()"}
+[36m[1m[END][0m [32m[1mRequestId:[0m [35m[35md4c45cc7-92d1-4fcc-bdad-7a41ec0d52f6[0m[0m
+[36m[1m[REPORT][0m [32m[1mRequestId:[0m [35m[35md4c45cc7-92d1-4fcc-bdad-7a41ec0d52f6[0m[0m
+[32m[1mDuration:[0m 204.00 ms
+[32m[1mBilled[0m [32m[1mDuration:[0m 300 ms 
+[32m[1mMemory Size:[0m 1024 MB
+[32m[1mMax Memory Used:[0m 69 MB
+
+USER: ADAM
+Calling invoke for stage test3..
+[36m[1m[START][0m [32m[1mRequestId:[0m [35m[35mc9424eec-3605-4550-99c8-d19df479f10e[0m[0m [32m[1mVersion:[0m $LATEST
+[36m[1m[DEBUG][0m 2019-08-03T11:34:27.939Z [35m[35mc9424eec-3605-4550-99c8-d19df479f10e[0m[0m [32m[1mZappa Event:[0m {'raw_command': "from django.contrib.auth.models import User;                               from account.models import UserDetail, AttachedService;                               from cloud_lines.models import Service;                               user = User.objects.create_superuser('adam', 'adam@masys.co.uk', 'Fullh0m0');                               user_detail, created = UserDetail.objects.get_or_create(user=user);                               service = Service.objects.get(id=1);                               attached_service, created = AttachedService.objects.get_or_create(user=user_detail, service=service, site_mode='poultry', animal_type='Pedigrees', active=True);                               user_detail.current_service = attached_service; user_detail.save()"}
+[36m[1m[END][0m [32m[1mRequestId:[0m [35m[35mc9424eec-3605-4550-99c8-d19df479f10e[0m[0m
+[36m[1m[REPORT][0m [32m[1mRequestId:[0m [35m[35mc9424eec-3605-4550-99c8-d19df479f10e[0m[0m
+[32m[1mDuration:[0m 182.57 ms
+[32m[1mBilled[0m [32m[1mDuration:[0m 200 ms 
+[32m[1mMemory Size:[0m 1024 MB
+[32m[1mMax Memory Used:[0m 69 MB
+
+USER: USER
+Calling invoke for stage test3..
+[36m[1m[START][0m [32m[1mRequestId:[0m [35m[35m334ca81f-7240-43ef-99fc-86e145f15f81[0m[0m [32m[1mVersion:[0m $LATEST
+[36m[1m[DEBUG][0m 2019-08-03T11:34:28.838Z [35m[35m334ca81f-7240-43ef-99fc-86e145f15f81[0m[0m [32m[1mZappa Event:[0m {'raw_command': "from django.contrib.auth.models import User;                               from account.models import UserDetail, AttachedService;                               from cloud_lines.models import Service;                               user = User.objects.get(username='mshanks');                               user_detail, created = UserDetail.objects.get_or_create(user=user, stripe_id='cus_FQYegpUpzHk87d');                               service = Service.objects.get(id=6);                               attached_service, created = AttachedService.objects.get_or_create(user=user_detail, service=service, site_mode='poultry', animal_type='Dogs', active=True);                               user_detail.current_service = attached_service; user_detail.save()"}
+[36m[1m[END][0m [32m[1mRequestId:[0m [35m[35m334ca81f-7240-43ef-99fc-86e145f15f81[0m[0m
+[36m[1m[REPORT][0m [32m[1mRequestId:[0m [35m[35m334ca81f-7240-43ef-99fc-86e145f15f81[0m[0m
+[32m[1mDuration:[0m 18.48 ms
+[32m[1mBilled[0m [32m[1mDuration:[0m 100 ms 
+[32m[1mMemory Size:[0m 1024 MB
+[32m[1mMax Memory Used:[0m 69 MB
+
+/opt/cloudlines/cloud-lines/cloud_lines/large-tier

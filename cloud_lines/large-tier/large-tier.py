@@ -128,7 +128,7 @@ class LargeTier:
 
             # create virtualenv
             print('creating virtual env')
-            subprocess.Popen(['virtualenv', '-p', 'python3', '/opt/instances/{}/venv'.format(self.site_name)])
+            subprocess.Popen(['/usr/local/bin/virtualenv', '-p', 'python3', '/opt/instances/{}/venv'.format(self.site_name)])
 
             # update settings
             deployment.build_status = "Created virtual environment"
@@ -176,7 +176,7 @@ class LargeTier:
             sleep(10)
 
             # generate user data
-            process = subprocess.Popen(['python3', '/opt/cloudlines/cloud-lines/manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
+            process = subprocess.Popen(['/usr/bin/python3', '/opt/cloudlines/cloud-lines/manage.py', 'dumpdata', 'auth.user'], stdout=subprocess.PIPE)
             stdout = process.communicate()[0]
             users = json.loads(stdout)
             for user in users:
