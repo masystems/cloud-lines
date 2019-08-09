@@ -3,7 +3,7 @@ from account.models import AttachedService
 
 
 def user_directory_path(instance, filename):
-    return 'acc_{0}_{1}/{2}'.format(instance.account.id, instance.account.domain, filename)
+    return 'acc_{0}_{1}/{2}'.format(instance.account.id, instance.account.domain.replace('https://', ''), filename)
 
 
 class Breed(models.Model):
