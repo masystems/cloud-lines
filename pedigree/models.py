@@ -41,8 +41,7 @@ class Pedigree(models.Model):
 
 
 def user_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-    return 'acc_{0}/{1}'.format(instance.account.id, filename)
+    return 'acc_{0}_{1}/{2}'.format(instance.account.id, instance.account.domain, filename)
 
 
 class PedigreeImage(models.Model):
