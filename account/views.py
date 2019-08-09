@@ -78,7 +78,6 @@ def site_mode(request):
         else:
             add_breed = True
 
-
         return {'service': attached_service,
                 'attached_services': attached_services,
                 'add_pedigree': pedigrees,
