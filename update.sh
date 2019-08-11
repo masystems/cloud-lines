@@ -2,7 +2,7 @@
 
 pushd $1
 
-source ../venv/bin/actviate
+source ../venv/bin/activate
 
 python manage.py makemigrations
 python manage.py makemigrations impex
