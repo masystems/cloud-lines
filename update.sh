@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd argv[0]
+pushd $1
 
 source ../venv/bin/actviate
 
