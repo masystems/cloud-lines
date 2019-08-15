@@ -42,7 +42,6 @@
 	<meta property="og:image:height" content="257" />
 	<meta name="description" content="Track your own poultry/pets/livestock online, with Cloud-Lines.">
 
-
 	{% block head %}
 
 	{% endblock %}
@@ -168,16 +167,23 @@
 						<div class="section bgcolor dark m-0">
 							<div class="container">
 								<div class="row center justify-content-center">
-									<div class="col-md-8">
-										<h2 class="t700 text-white mb-3">Start your free instance now!</h2>
-									</div>
-									<div class="col-md-8">
-										{% if request.user.is_authenticated %}
-											<a href="{% url 'dashboard' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
-										{% elif not request.user.is_authenticated %}
+									{% if request.user.is_authenticated %}
+										<div class="col-md-8">
+											<h2 class="t700 text-white mb-3">Go to your dashboard!</h2>
+										</div>
+										<div class="col-md-8">
+											<a href="{% url 'dashboard' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Dashboard!</a>
+									{% elif not request.user.is_authenticated %}
+										<div class="col-md-8">
+											<h2 class="t700 text-white mb-3">Try the demo or start your free instance now!</h2>
+										</div>
+										<div class="col-md-8">
+											<a href="https://demo.cloud-lines.com" class="button button-border button-rounded button-light button-large ml-0">Demo</a>
+
 											<a href="{% url 'login' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
-										{% endif %}
-									</div>
+											<p>For demo use - Username: demo, Password: demo</p>
+									{% endif %}
+										</div>
 								</div>
 							</div>
 						</div>

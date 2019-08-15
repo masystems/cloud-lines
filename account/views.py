@@ -71,7 +71,7 @@ def site_mode(request):
             users = False
 
         if not attached_service.service.multi_breed:
-            if Breed.objects.all().count() < 1:
+            if Breed.objects.filter(account=attached_service).count() < 1:
                 add_breed = True
             else:
                 add_breed = False

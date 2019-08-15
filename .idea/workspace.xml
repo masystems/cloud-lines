@@ -3,9 +3,14 @@
   <component name="ChangeListManager">
     <list default="true" id="ca65e522-4d0f-409c-bde2-2d82bd0bafaa" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/cloud_lines/templates/home_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/templates/home_base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cloud_lines/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cloudlines/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloudlines/urls.py" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/cloud_lines/templates/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/templates/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloud_lines/templates/home_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_lines/templates/home_base.html" afterDir="false" />
+>>>>>>> fcda79fca4528aefcf62a2c031bbcc6d21b55d45
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

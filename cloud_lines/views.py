@@ -149,13 +149,11 @@ def contact(request):
         return render(request, 'contact.html', {'services': Service.objects.all(),
                                                 'contact_form': contact_form})
 
-
 def privacy_policy(request):
     if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
         return redirect('dashboard')
     return render(request, 'std_page.html', {'content': Page.objects.get(title='privacy policy'),
                                              'services': Service.objects.all()})
-
 
 @login_required(login_url="/account/login")
 def order(request):
