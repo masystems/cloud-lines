@@ -58,7 +58,10 @@ def edit_breed_group_form(request, breed_group_id):
         if 'delete' in request.POST:
             breed_group.delete()
             return redirect('breed_groups')
-        breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
+        try:
+            breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
+        except Breeder.DoesNotExist:
+            pass
         breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         breed_group.group_name = breed_group_form['group_name'].value()
         # clear existing members

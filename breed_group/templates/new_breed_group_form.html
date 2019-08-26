@@ -63,16 +63,41 @@
                                         {% elif field.label == 'Breed' %}
                                                     <div id="breeds">
                                                         <input class="typeahead form-control" id="breed" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}" required>
-                                                        <small>Typing in the field will refresh the available birds in the group members field below.</small>
                                                     </div>
                                         {% elif field.label == 'Group members' %}
-                                            <div class="col-lg-6 col-xlg-4  mb-4" id="members">
-                                                <select id='pre-selected-options' name='{{ field.name }}' multiple='multiple'>
+                                            <div class="mb-4" id="members">
+                                                <select multiple id="public-methods" name='{{ field.name }}'>
                                                     {% for pedigree in pedigree.all %}
                                                         <option value="{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}">{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}</option>
                                                     {% endfor %}
                                                 </select>
+                                                <div class="button-box mt-3">
+                                                    <a id="select-all" class="btn btn-outline-info" href="#">select all</a>
+                                                    <a id="deselect-all" class="btn btn-outline-danger" href="#">deselect all</a>
+                                                    <a id="refresh" class="btn btn-outline-warning" href="#">refresh</a>
+                                                </div>
                                             </div>
+                                             <script>
+                                                 $(document).ready(function(){
+                                                    $("#breed").on("input propertychange paste", function(){
+                                                        var breed = document.getElementById('breed').value.toLowerCase();
+                                                        var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.attribute.breed.breed_name }}', {% endfor %} };
+                                                        console.log(breed);
+                                                        $('#public-methods').empty();
+
+                                                        $.each(options, function(key, value) {
+                                                            if (value.toLowerCase().includes(breed)) {
+                                                                var option = document.createElement('option');
+                                                                    option.setAttribute("value", key);
+                                                                var val = document.createTextNode(key);
+                                                                    option.appendChild(val);
+                                                                document.getElementById("public-methods").appendChild(option);
+                                                            }
+                                                        });
+                                                        $("#refresh").click();
+                                                    });
+                                                });
+                                            </script>
                                         {% else %}
                                             {{ field|attr:"class:form-control" }}
                                         {% endif %}
