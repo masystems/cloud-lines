@@ -62,38 +62,17 @@
                                             </div>
                                         {% elif field.label == 'Breed' %}
                                                     <div id="breeds">
-                                                        <input class="typeahead form-control" id="breed" onchange="updateMembers()" onkeyup='updateMembers()' onclick="updateMembers()" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}" required>
+                                                        <input class="typeahead form-control" id="breed" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}" required>
                                                         <small>Typing in the field will refresh the available birds in the group members field below.</small>
                                                     </div>
                                         {% elif field.label == 'Group members' %}
-                                            <div id="members">
-                                                <select class="form-control" id='mem' name='{{ field.name }}' multiple='multiple' size="10" style="height: 100%;">
+                                            <div class="col-lg-6 col-xlg-4  mb-4" id="members">
+                                                <select id='pre-selected-options' name='{{ field.name }}' multiple='multiple'>
                                                     {% for pedigree in pedigree.all %}
                                                         <option value="{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}">{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}</option>
                                                     {% endfor %}
                                                 </select>
-
-                                                <small>Hold down CTRL to select multiple birds.</small>
                                             </div>
-
-                                        <script>
-                                            function updateMembers() {
-                                                var breed = document.getElementById('breed').value;
-                                                var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.attribute.breed.breed_name }}', {% endfor %} };
-
-                                                $('#mem').empty();
-
-                                                $.each(options, function(key, value) {
-                                                    if (value.includes(breed)) {
-                                                        var option = document.createElement('option')
-                                                            option.setAttribute("value", key);
-                                                        var val = document.createTextNode(key);
-                                                            option.appendChild(val);
-                                                        document.getElementById("mem").appendChild(option);
-                                                    }
-                                                });
-                                            }
-                                        </script>
                                         {% else %}
                                             {{ field|attr:"class:form-control" }}
                                         {% endif %}
