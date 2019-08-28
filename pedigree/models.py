@@ -29,9 +29,10 @@ class Pedigree(models.Model):
 
     sex = models.CharField(max_length=10, choices=GENDERS, null=True, default='female', help_text="Accepted formats: male, female, castrated")
     parent_father = models.ForeignKey('self', related_name='father', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='father', help_text="This should be the parents registration number.")
+    parent_father_notes = models.CharField(max_length=500, blank=True, verbose_name='Father Notes', help_text="Max 500 characters")
     parent_mother = models.ForeignKey('self', related_name='mother', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='mother', help_text="This should be the parents registration number.")
+    parent_mother_notes = models.CharField(max_length=500, blank=True, verbose_name='Mother Notes', help_text="Max 500 characters")
     breed_group = models.CharField(max_length=255, blank=True, null=True, verbose_name='breed group name')
-    note = models.CharField(max_length=500, blank=True, verbose_name='Notes', help_text="Max 500 characters")
 
     # hidden
     date_added = models.DateTimeField(auto_now_add=True)

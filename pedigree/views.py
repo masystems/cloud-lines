@@ -243,16 +243,28 @@ def new_pedigree_form(request):
                 new_pedigree.dod = pedigree_form['date_of_death'].value() or None
             except:
                 pass
+
+            ### mother ###
             try:
                 new_pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
             except ObjectDoesNotExist:
                 new_pedigree.breed_group = pedigree_form['breed_group'].value() or None
             try:
+                new_pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or None
+            except:
+                pass
+
+            ### father ###
+            try:
                 new_pedigree.parent_father = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['father'].value())
             except ObjectDoesNotExist:
                 pass
+            try:
+                new_pedigree.parent_father_notes = pedigree_form['father_notes'].value() or None
+            except:
+                pass
+
             new_pedigree.description = pedigree_form['description'].value()
-            new_pedigree.note = pedigree_form['note'].value()
             new_pedigree.account = attached_service
             new_pedigree.save()
 
@@ -390,6 +402,10 @@ def edit_pedigree_form(request, id):
                     pedigree.parent_mother = Pedigree.objects.get(reg_no=pedigree_form['mother'].value())
             except ObjectDoesNotExist:
                 pedigree.breed_group = pedigree_form['breed_group'].value() or None
+            try:
+                pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or None
+            except:
+                pass
 
             try:
                 if pedigree_form['father'].value() == '':
@@ -398,12 +414,14 @@ def edit_pedigree_form(request, id):
                     pedigree.parent_father = Pedigree.objects.get(reg_no=pedigree_form['father'].value())
             except ObjectDoesNotExist:
                 pass
+            try:
+                pedigree.parent_father_notes = pedigree_form['father_notes'].value() or None
+            except:
+                pass
 
             pedigree.breed_group = pedigree_form['breed_group'].value()
 
             pedigree.description = pedigree_form['description'].value()
-
-            pedigree.note = pedigree_form['note'].value()
 
             pedigree.save()
 

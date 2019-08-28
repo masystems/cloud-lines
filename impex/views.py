@@ -122,7 +122,9 @@ def import_pedigree_data(request):
         dod = post_data['dod'] or ''
         sex = post_data['sex'] or ''
         father = post_data['parent_father'] or ''
+        father_notes = post_data['parent_father_notes'] or ''
         mother = post_data['parent_mother'] or ''
+        mother_notes = post_data['parent_mother_notes'] or ''
         note = post_data['note'] or ''
 
         for row in database_items:
@@ -283,7 +285,12 @@ def import_pedigree_data(request):
                 pass
             #############################
             try:
-                pedigree.note = row[note]
+                pedigree.parent_father_notes = row[father_notes]
+            except KeyError:
+                pass
+            #############################
+            try:
+                pedigree.parent_mother_notes = row[mother_notes]
             except KeyError:
                 pass
             #############################
