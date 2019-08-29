@@ -297,7 +297,9 @@ def import_pedigree_data(request):
             pedigree.save()
 
             # create breed if it doesn't exist ###################
-            if breed != '---':
+            if attached_service.service.service_name != 'Organisation':
+                breed_obj = Breed.objects.all(account=attached_service).first()
+            elif breed != '---':
                 try:
                     breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
                 except KeyError:
