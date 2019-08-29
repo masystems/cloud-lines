@@ -265,7 +265,7 @@
                 <div class="card">
                 <div class="card-body">
                     <div class="d-flex no-block align-items-center">
-                        <h4 class="card-title">Top Breeders/Owners</h4>
+                        <h4 class="card-title">Latest Breeders/Owners</h4>
                     </div>
                     <div class="table-responsive mt-2">
                         <table class="table stylish-table">
@@ -277,7 +277,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for key, breeder in top_breeders.items %}
+                                {% for breeder in latest_breeders.all %}
                                     <tr onclick="window.location='{% url 'breeder' breeder.breeding_prefix %}';"
                                         style="cursor: pointer;">
                                         <td style="width:50px;">

@@ -29,15 +29,8 @@ def dashboard(request):
     #total_breeders = Breeder.objects.filter(account=main_account).count()
     top_pedigrees = Pedigree.objects.filter(account=main_account).order_by('-date_added')[:5]
     breed_groups = BreedGroup.objects.filter(account=main_account).order_by('-date_added')[:5]
+    latest_breeders = Breeder.objects.filter(account=main_account).order_by('-id')[:5]
 
-    top_pedigree_breeders = Pedigree.objects.filter(account=main_account).order_by('breeder')[:5]
-    top_breeders = {}
-    for pedigree in top_pedigree_breeders.all():
-        print(pedigree.breeder)
-        try:
-            top_breeders[pedigree.breeder] = Breeder.objects.get(account=main_account, breeding_prefix=pedigree.breeder.breeding_prefix)
-        except AttributeError:
-            pass
 
     current_month = datetime.now().month
     date = datetime.now()
@@ -67,7 +60,7 @@ def dashboard(request):
     return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
                                               #'total_breeders': total_breeders,
                                               'top_pedigrees': top_pedigrees,
-                                              'top_breeders': top_breeders,
+                                              'latest_breeders': latest_breeders,
                                               'breed_groups': breed_groups,
                                               'breed_chart': breed_chart,
                                               'pedigree_chart': pedigree_chart})
