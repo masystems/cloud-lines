@@ -29,7 +29,11 @@ def new_breed_form(request):
 
     if request.method == 'POST':
         if breed_form.is_valid():
-            breed = breed_form.save()
+            breed = Breed.objects.create(account=attached_service,
+                                         breed_name=breed_form['breed_name'].value(),
+                                         breed_description=breed_form['breed_description'].value())
+            breed.save()
+            breed.image = request.FILES['image']
 
             try:
                 custom_fields = json.loads(attached_service.custom_fields)
@@ -41,7 +45,6 @@ def new_breed_form(request):
 
             breed.custom_fields = json.dumps(custom_fields)
             breed.save()
-            Breed.objects.filter(id=breed.id).update(account=attached_service)
             return redirect('breeds')
 
     else:
