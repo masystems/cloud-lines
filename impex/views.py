@@ -125,7 +125,6 @@ def import_pedigree_data(request):
         father_notes = post_data['parent_father_notes'] or ''
         mother = post_data['parent_mother'] or ''
         mother_notes = post_data['parent_mother_notes'] or ''
-        note = post_data['note'] or ''
 
         for row in database_items:
             # create breeder if it doesn't exist ###################
