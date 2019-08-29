@@ -58,7 +58,7 @@ class PedigreeImage(models.Model):
 
 class PedigreeAttributes(models.Model):
     reg_no = models.OneToOneField(Pedigree, on_delete=models.CASCADE, primary_key=True, related_name='attribute')
-    breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed', verbose_name='breed')
+    breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed', verbose_name='breed', help_text='tits')
     custom_fields = models.TextField(blank=True)
 
     def __str__(self):

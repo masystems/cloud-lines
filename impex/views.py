@@ -129,13 +129,13 @@ def import_pedigree_data(request):
         for row in database_items:
             # create breeder if it doesn't exist ###################
             if row[breeder] not in ('', None):
-                breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder])
+                breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder].rstrip())
             else:
                 breeder_obj = None
 
             # create current owner if it doesn't exist ###################
             if row[current_owner] not in ('', None):
-                current_owner_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[current_owner], active=True)
+                current_owner_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[current_owner].rstrip())
             else:
                 current_owner_obj = None
 
@@ -346,7 +346,7 @@ def import_breeder_data(request):
 
         # get or create each new pedigree ###################
         for row in database_items:
-            breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix])
+            breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
 
             try:
                 breeder.contact_name = row[contact_name]
