@@ -129,7 +129,7 @@ def import_pedigree_data(request):
         for row in database_items:
             # create breeder if it doesn't exist ###################
             if row[breeder] not in ('', None):
-                breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder], active=True)
+                breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder])
             else:
                 breeder_obj = None
 
