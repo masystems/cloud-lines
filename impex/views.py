@@ -298,7 +298,7 @@ def import_pedigree_data(request):
 
             # create breed if it doesn't exist ###################
             if attached_service.service.service_name != 'Organisation':
-                breed_obj = Breed.objects.all(account=attached_service).first()
+                breed_obj = Breed.objects.filter(account=attached_service).first()
             elif breed != '---':
                 try:
                     breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
