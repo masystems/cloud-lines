@@ -277,7 +277,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for breeder in top_breeders.all %}
+                                {% for key, breeder in top_breeders.items %}
                                     <tr onclick="window.location='{% url 'breeder' breeder.breeding_prefix %}';"
                                         style="cursor: pointer;">
                                         <td style="width:50px;">

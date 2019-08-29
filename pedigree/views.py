@@ -386,22 +386,22 @@ def edit_pedigree_form(request, id):
             return redirect('pedigree_search')
 
         # check whether it's valid:
-        if not Breeder.objects.filter(breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
+        if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
             pedigree_form.add_error('breeder', 'Selected breeder does not exist')
             pre_checks = False
-        if not Breeder.objects.filter(breeding_prefix=pedigree_form['current_owner'].value()).exists() and pedigree_form['current_owner'].value() not in ['Current Owner', '', 'None', None]:
+        if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value()).exists() and pedigree_form['current_owner'].value() not in ['Current Owner', '', 'None', None]:
             pedigree_form.add_error('current_owner', 'Selected owner does not exist')
             pre_checks = False
-        if not Pedigree.objects.filter(reg_no=pedigree_form['mother'].value()).exists() and pedigree_form['mother'].value() not in ['Mother', '', 'None', None]:
+        if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['mother'].value()).exists() and pedigree_form['mother'].value() not in ['Mother', '', 'None', None]:
             pedigree_form.add_error('mother', 'Selected mother does not exist')
             pre_checks = False
-        if not Pedigree.objects.filter(reg_no=pedigree_form['father'].value()).exists() and pedigree_form['father'].value() not in ['Father', '', 'None', None]:
+        if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['father'].value()).exists() and pedigree_form['father'].value() not in ['Father', '', 'None', None]:
             pedigree_form.add_error('father', 'Selected father does not exist')
             pre_checks = False
-        if not BreedGroup.objects.filter(group_name=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
+        if not BreedGroup.objects.filter(account=attached_service, group_name=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
             pedigree_form.add_error('breed_group', 'Selected breed group does not exist')
             pre_checks = False
-        if not Breed.objects.filter(breed_name=attributes_form['breed'].value()).exists() and attributes_form['breed'].value() not in ['Breed', '', 'None', None]:
+        if not Breed.objects.filter(account=attached_service, breed_name=attributes_form['breed'].value()).exists() and attributes_form['breed'].value() not in ['Breed', '', 'None', None]:
             attributes_form.add_error('breed', 'Selected breed does not exist')
             pre_checks = False
 
@@ -410,7 +410,7 @@ def edit_pedigree_form(request, id):
                 if pedigree_form['breeder'].value() == '':
                     pedigree.breeder = None
                 else:
-                    pedigree.breeder = Breeder.objects.get(breeding_prefix=pedigree_form['breeder'].value())
+                    pedigree.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=pedigree_form['breeder'].value())
             except ObjectDoesNotExist:
                 pedigree.breeder = None
 
@@ -418,7 +418,7 @@ def edit_pedigree_form(request, id):
                 if pedigree_form['current_owner'] == '':
                     pedigree.current_owner = None
                 else:
-                    pedigree.current_owner = Breeder.objects.get(breeding_prefix=pedigree_form['current_owner'].value())
+                    pedigree.current_owner = Breeder.objects.get(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value())
             except ObjectDoesNotExist:
                 pass
 
@@ -447,7 +447,7 @@ def edit_pedigree_form(request, id):
                 if pedigree_form['mother'].value() == '':
                     pedigree.parent_mother = None
                 else:
-                    pedigree.parent_mother = Pedigree.objects.get(reg_no=pedigree_form['mother'].value())
+                    pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
             except ObjectDoesNotExist:
                 pedigree.breed_group = pedigree_form['breed_group'].value() or None
             try:
@@ -459,7 +459,7 @@ def edit_pedigree_form(request, id):
                 if pedigree_form['father'].value() == '':
                     pedigree.parent_father = None
                 else:
-                    pedigree.parent_father = Pedigree.objects.get(reg_no=pedigree_form['father'].value())
+                    pedigree.parent_father = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['father'].value())
             except ObjectDoesNotExist:
                 pass
             try:
