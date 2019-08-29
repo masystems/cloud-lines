@@ -222,7 +222,7 @@ vertical-align: middle;
                                     <tr>
                                         <!--## col2 ##-->
                                         <td rowspan="2">
-                                            {% if lvl3_2 %}{{ service.mother_title }}
+                                            {% if lvl3_2 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_2 %}
                                             {% else %}
                                             {% include 'add_new_pedigree.html' with pedigree=lvl3_2 %}
@@ -285,7 +285,7 @@ vertical-align: middle;
                                     <tr>
                                         <!--## col2 ##-->
                                         <td rowspan="2">
-                                            {% if lvl3_4 %}{{ service.mother_title }}
+                                            {% if lvl3_4 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_4 %}
                                             {% else %}
                                             {% include 'add_new_pedigree.html' with pedigree=lvl3_4 %}
