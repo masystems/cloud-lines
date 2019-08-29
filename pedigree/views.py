@@ -143,6 +143,54 @@ def generate_hirearchy(context):
     except:
         context['lvl3_4'] = ''
 
+    # lvl 4
+    # 1
+    try:
+        context['lvl4_1'] = Pedigree.objects.get(reg_no=context['lvl3_1'].parent_mother)
+    except:
+        context['lvl4_1'] = ''
+
+    # 2
+    try:
+        context['lvl4_2'] = Pedigree.objects.get(reg_no=context['lvl3_1'].parent_father)
+    except:
+        context['lvl4_2'] = ''
+
+    # 3
+    try:
+        context['lvl4_3'] = Pedigree.objects.get(reg_no=context['lvl3_2'].parent_mother)
+    except:
+        context['lvl4_3'] = ''
+
+    # 4
+    try:
+        context['lvl4_4'] = Pedigree.objects.get(reg_no=context['lvl3_2'].parent_father)
+    except:
+        context['lvl4_4'] = ''
+    # 5
+    try:
+        context['lvl4_5'] = Pedigree.objects.get(reg_no=context['lvl3_3'].parent_mother)
+    except:
+        context['lvl4_5'] = ''
+
+    # 6
+    try:
+        context['lvl4_6'] = Pedigree.objects.get(reg_no=context['lvl3_3'].parent_father)
+    except:
+        context['lvl4_6'] = ''
+
+    # 7
+    try:
+        context['lvl4_7'] = Pedigree.objects.get(reg_no=context['lvl3_4'].parent_mother)
+    except:
+        context['lvl4_7'] = ''
+
+    # 8
+    try:
+        context['lvl4_8'] = Pedigree.objects.get(reg_no=context['lvl3_4'].parent_father)
+    except:
+        context['lvl4_8'] = ''
+
     return context
 
 
