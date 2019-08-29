@@ -284,7 +284,7 @@
                                             <span class="round">{{ breeder.breeding_prefix|slice:"1" }}</span>
                                         </td>
                                         <td>
-                                            <h6>{{ breeder.breeding_prefix|truncatechars:12 }}</h6><small class="text-muted">{{ breeder.address|truncatewords:"3" }}</small></td>
+                                            <h6>{{ breeder.breeding_prefix|truncatechars:12 }}</h6><small class="text-muted">{{ breeder.address|truncatechars:12 }}</small></td>
                                         <td>{{ breeder.contact_name }}</td>
                                         <td class="d-none d-sm-table-cell"><span class="label {% if breeder.active %}label-light-success{% else %}label-light-danger{% endif %}">{% if breeder.active %}Active{% else %}Inactive{% endif %}</span></td>
                                     </tr>
