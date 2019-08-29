@@ -121,25 +121,25 @@ def generate_hirearchy(context):
     # lvl 3
     # 1
     try:
-        context['lvl3_1'] = Pedigree.objects.get(name=context['lvl2_1'].parent_mother)
+        context['lvl3_1'] = Pedigree.objects.get(reg_no=context['lvl2_1'].parent_mother)
     except:
         context['lvl3_1'] = ''
 
     # 2
     try:
-        context['lvl3_2'] = Pedigree.objects.get(name=context['lvl2_1'].parent_father)
+        context['lvl3_2'] = Pedigree.objects.get(reg_no=context['lvl2_1'].parent_father)
     except:
         context['lvl3_2'] = ''
 
     # 3
     try:
-        context['lvl3_3'] = Pedigree.objects.get(name=context['lvl2_2'].parent_mother)
+        context['lvl3_3'] = Pedigree.objects.get(reg_no=context['lvl2_2'].parent_mother)
     except:
         context['lvl3_3'] = ''
 
     # 4
     try:
-        context['lvl3_4'] = Pedigree.objects.get(name=context['lvl2_2'].parent_father)
+        context['lvl3_4'] = Pedigree.objects.get(reg_no=context['lvl2_2'].parent_father)
     except:
         context['lvl3_4'] = ''
 
