@@ -24,18 +24,25 @@
         .feeds li span {
             font-size: 14px;
         }
-        table {
+        main-table {
             font-family: arial, sans-serif;
             width:100% !important;
             border-collapse: collapse;
         }
-        td, th {
+        .top-td, th {
+          text-align: center;
+          padding: 2px;
+        }
+        .main-td, th {
           border: 1px solid #dddddd;
           text-align: center;
-          padding: 8px;
+          padding: 2px;
         }
-        tr:nth-child(even) {
-          background-color: #dddddd;
+        .img {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            width: 200px;
         }
     </style>
 </head>
@@ -61,19 +68,12 @@
 
     <div class="page-wrapper">
         <div class="container-fluid">
-            <table class="table responsive" style="width:100%">
+            <table class="responsive" style="width:100%">
                 <tbody>
                     <tr>
                         <!--## col1 ##-->
-                        <td>
-                            {% if lvl1.images.first %}
-                                <img src="{% for image in lvl1.images.all %}
-                                            {% if forloop.first %}
-                                                {{ image.image.url }}
-                                            {% endif %}
-                                        {% endfor %}"
-                                   class="img-responsive thumbnail mr-3">
-                            {% endif %}
+                        <td class="top-td">
+                            <img class="img" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo.png">
                         </td>
                         <!--## col2 ##-->
                         <td>
@@ -81,8 +81,14 @@
                               <li><strong>Breeder:</strong> {{ lvl1.breeder.prefix }}</li>
                               <li><strong>Owner:</strong> {{ lvl1.current_owner.prefix }}</li>
                             </ul>
-                            <p></p>
-                            <p></p>
+                            {% if lvl1.images.first %}
+                                <img src="{% for image in lvl1.images.all %}
+                                            {% if forloop.first %}
+                                                {{ image.image.url }}
+                                            {% endif %}
+                                        {% endfor %}"
+                                   class="img">
+                            {% endif %}
                         </td>
                         <!--## col3 ##-->
                         <td>
@@ -110,7 +116,7 @@
                 </tbody>
             </table>
 
-            <table class="table responsive" style="width:100%">
+            <table class="main-table responsive" style="width:100%">
                 <thead>
                     <tr>
                         <th>Parents</th>
@@ -121,7 +127,7 @@
                 <tbody>
                     <tr>
                         <!--## col1 ##-->
-                        <td rowspan="4">
+                        <td class="main-td" rowspan="4">
                             <!--cell text-->
                             {% if lvl2_1 %}
                                 {{ attached_service.mother_title }}
@@ -131,7 +137,7 @@
                             {% endif %}
                         </td>
                         <!--## col2 ##-->
-                        <td rowspan="2">
+                        <td class="main-td" rowspan="2">
                             {% if lvl3_1 %}
                                 {{ attached_service.mother_title }}
                                 {{ lvl3_1.reg_no }}
@@ -140,7 +146,7 @@
                             {% endif %}
                         </td>
                         <!--## col3 ##-->
-                        <td>
+                        <td class="main-td">
                             {% if lvl4_1 %}
                                 {{ attached_service.mother_title }}
                                 {{ lvl3_1.reg_no }}
@@ -151,7 +157,7 @@
                     </tr>
                     <tr>
                         <!--## col3 ##-->
-                        <td>
+                        <td class="main-td">
                             {% if lvl4_2 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl4_2.reg_no }}
@@ -162,7 +168,7 @@
                     </tr>
                     <tr>
                         <!--## col2 ##-->
-                        <td rowspan="2">
+                        <td class="main-td" rowspan="2">
                             {% if lvl3_2 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl3_2.reg_no }}
@@ -171,7 +177,7 @@
                             {% endif %}
                         </td>
                         <!--## col3 ##-->
-                        <td>
+                        <td class="main-td">
                             {% if lvl4_3 %}
                                 {{ attached_service.mother_title }}
                                 {{ lvl4_3.reg_no }}
@@ -182,7 +188,7 @@
                     </tr>
                     <tr>
                         <!--## col3 ##-->
-                        <td>
+                        <td class="main-td">
                             {% if lvl4_4 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl4_4.reg_no }}
@@ -193,7 +199,7 @@
                     </tr>
                     <tr>
                         <!--## col1 ##-->
-                        <td rowspan="4">
+                        <td class="main-td" rowspan="4">
                             <!--cell text-->
                             {% if lvl2_2 %}
                                 {{ attached_service.father_title }}
@@ -203,7 +209,7 @@
                             {% endif %}
                         </td>
                         <!--## col2 ##-->
-                        <td rowspan="2">
+                        <td class="main-td" rowspan="2">
                             {% if lvl3_3 %}
                                 {{ attached_service.mother_title }}
                                 {{ lvl3_3.reg_no }}
@@ -212,7 +218,7 @@
                             {% endif %}
                         </td>
                         <!--## col3 ##-->
-                        <td>
+                        <td class="main-td">
                             {% if lvl4_5 %}
                                 {{ attached_service.mother_title }}
                                 {{ lvl4_5.reg_no }}
@@ -223,7 +229,7 @@
                     </tr>
                     <tr>
                         <!--## col3 ##-->
-                        <td>
+                        <td class="main-td">
                             {% if lvl4_6 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl4_6.reg_no }}
@@ -234,7 +240,7 @@
                     </tr>
                     <tr>
                         <!--## col2 ##-->
-                        <td rowspan="2">
+                        <td class="main-td" rowspan="2">
                             {% if lvl3_4 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl3_4.reg_no }}
@@ -243,7 +249,7 @@
                             {% endif %}
                         </td>
                         <!--## col3 ##-->
-                        <td>
+                        <td class="main-td">
                             {% if lvl4_7 %}
                                 {{ attached_service.mother_title }}
                                 {{ lvl4_7.reg_no }}
@@ -254,7 +260,7 @@
                     </tr>
                     <tr>
                         <!--## col3 ##-->
-                        <td>
+                        <td class="main-td">
                             {% if lvl4_8 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl4_8.reg_no }}
