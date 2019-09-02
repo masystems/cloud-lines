@@ -57,6 +57,7 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
             context['custom_fields'] = {}
 
         context = generate_hirearchy(context)
+        inbreeding_calc(context['lvl1'])
 
         return context
 
@@ -531,3 +532,27 @@ def add_existing(request, pedigree_id):
         child.save()
 
     return redirect('pedigree', pedigree_id)
+
+
+# def inbreeding_calc(pedigree):
+#     parents = []
+#     unsorted_parents = [get_parents(pedigree)]
+#     while True:
+#         tmp_parents = unsorted_parents
+#         for parent in tmp_parents:
+#             parents.append(get_parents(parent))
+#             tmp_parents = []
+#
+#
+# def get_parents(pedigree):
+#     try:
+#         a = Pedigree.objects.get(id=pedigree.parent_mother.id)
+#     except AttributeError:
+#         a = None
+#
+#     try:
+#         b = Pedigree.objects.get(id=pedigree.parent_father.id)
+#     except AttributeError:
+#         b = None
+#
+#     return a, b

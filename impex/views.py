@@ -23,7 +23,7 @@ def export(request):
         elif request.POST['submit'] == 'csv':
             # Create the HttpResponse object with the appropriate CSV header.
             response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="pedigree_db{}.csv"'.format(date.strftime("%Y-%m-%d"))
+            response['Content-Disposition'] = 'attachment; filename="pedigree_db-{}.csv"'.format(date.strftime("%Y-%m-%d"))
 
             writer = csv.writer(response)
             header = False
