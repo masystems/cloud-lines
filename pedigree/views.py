@@ -246,6 +246,9 @@ def new_pedigree_form(request):
 
     if request.method == 'POST':
         # check whether it's valid:
+        if not Pedigree.objects.filter(account=attached_service, breeding_prefix=pedigree_form['reg_no'].value()).exists():
+            pedigree_form.add_error('reg_no', 'Selected reg number does not exist')
+            pre_checks = False
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
             pedigree_form.add_error('breeder', 'Selected breeder does not exist')
             pre_checks = False
