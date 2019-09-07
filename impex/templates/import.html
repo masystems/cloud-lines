@@ -44,7 +44,7 @@
                         <div class="tab-pane" id="images" role="tabpanel">
                             <div class="card-body">
                                 <h4 class="card-title">Upload your images</h4>
-                                <h6>Browse or grag and drop images. It's recommended to limit the amount of images to 500 per import.</h6>
+                                <h6>Browse or grag and drop images. The total size of images cannot exceed 6MB.</h6>
                                 {% if error %}
                                     <div class="alert alert-danger">{{ error }} </div>
                                 {% endif %}
@@ -64,7 +64,8 @@
         </div>
     </div>
 </div>
-
+<!-- Dropzone Plugin JavaScript -->
+<script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
 <!-- jQuery file upload -->
 <script src="{% static 'assets/plugins/dropify/dist/js/dropify.min.js' %}"></script>
 <script>
