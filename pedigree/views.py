@@ -534,7 +534,8 @@ def add_existing(request, pedigree_id):
     return redirect('pedigree', pedigree_id)
 
 
-# def inbreeding_calc(pedigree):
+def inbreeding_calc(pedigree):
+    pass
 #     parents = []
 #     unsorted_parents = [get_parents(pedigree)]
 #     while True:
