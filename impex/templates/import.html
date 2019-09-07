@@ -22,18 +22,41 @@
             </div>
             <div class="col-lg-8">
                 <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Upload your existing database file</h4>
-                        <h6>Please upload one .CSV file at a time. It's recommended to limit the amount of pedigrees to 500 per import.</h6>
-                        {% if error %}
-                            <div class="alert alert-danger">{{ error }} </div>
-                        {% endif %}
-                        <form action="{% url 'import' %}" method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <input type="file" id="uploadDatabase" name="uploadDatabase" class="dropify" />
-                            <button id="uploadDatabaseButton" class="btn btn-block btn-outline-info">Analyse File</button>
-                        </form>
+                    <ul class="nav nav-tabs profile-tab" role="tablist">
+                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#csv" role="tab">CSV</a> </li>
+                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#images" role="tab">Images</a> </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="csv" role="tabpanel">
+                            <div class="card-body">
+                                <h4 class="card-title">Upload your existing database file</h4>
+                                <h6>Please upload one .CSV file at a time. It's recommended to limit the amount of pedigrees to 500 per import.</h6>
+                                {% if error %}
+                                    <div class="alert alert-danger">{{ error }} </div>
+                                {% endif %}
+                                <form action="{% url 'import' %}" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="file" id="uploadDatabase" name="uploadDatabase" class="dropify" />
+                                    <button id="uploadDatabaseButton" class="btn btn-block btn-outline-info">Analyse File</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="images" role="tabpanel">
+                            <div class="card-body">
+                                <h4 class="card-title">Upload your images</h4>
+                                <h6>Browse or grag and drop images. It's recommended to limit the amount of images to 500 per import.</h6>
+                                {% if error %}
+                                    <div class="alert alert-danger">{{ error }} </div>
+                                {% endif %}
+                                <form action="{% url 'image_import' %}" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <input type="file" id="uploadImages" name="uploadImages" class="dropzone" multiple/>
+                                    <button id="uploadImagesButton" class="btn btn-block btn-outline-info">Upload Images</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
             <div class="col-lg-2">

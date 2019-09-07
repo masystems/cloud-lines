@@ -386,3 +386,23 @@ def import_breeder_data(request):
 
             breeder.save()
     return redirect('breeders')
+
+
+@login_required(login_url="/account/login")
+@user_passes_test(is_editor)
+def image_import(request):
+    if request.method == 'POST':
+        attached_service = get_main_account(request.user)
+        images = request.FILES.getlist('uploadImages')
+        failed_images = []
+        for image in images:
+            filename, file_extension = splitext(str(image))
+            try:
+                pedigree = Pedigree.objects.get(account=attached_service, reg_no=filename)
+                upload = PedigreeImage(account=attached_service, image=image, reg_no=pedigree)
+                upload.save()
+            except Pedigree.DoesNotExist:
+                failed_images.append(str(image))
+
+        return render(request, 'image_upload_results.html', {'failed_images': failed_images})
+    return redirect('import')
