@@ -45,6 +45,7 @@
                             <div class="card-body">
                                 <h4 class="card-title">Upload your images</h4>
                                 <h6>Browse or grag and drop images. The total size of images cannot exceed 6MB.</h6>
+                                <p>Ensure your images are labeled with the registration number e.g. REG12345.jpg</p>
                                 {% if error %}
                                     <div class="alert alert-danger">{{ error }} </div>
                                 {% endif %}
@@ -53,8 +54,8 @@
                                     <div class="fallback">
                                         <input type="file" id="uploadImages" name="uploadImages" class="dropzone" multiple/>
                                     </div>
-                                    <button id="uploadImagesButton" class="btn btn-block btn-outline-info">Upload Images</button>
                                 </form>
+<!--                                <button id="uploadImagesButton" class="btn btn-block btn-outline-info">Upload Images</button>-->
                             </div>
                         </div>
                     </div>
@@ -76,6 +77,7 @@
       return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;
     },
   };
+
 </script>
 <!-- jQuery file upload -->
 <script src="{% static 'assets/plugins/dropify/dist/js/dropify.min.js' %}"></script>

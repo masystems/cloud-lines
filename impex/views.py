@@ -394,7 +394,6 @@ def image_import(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
         images = request.FILES.getlist('uploadImages')
-        failed_images = []
         for image in images:
             filename, file_extension = splitext(str(image))
             try:
@@ -402,7 +401,7 @@ def image_import(request):
                 upload = PedigreeImage(account=attached_service, image=image, reg_no=pedigree)
                 upload.save()
             except Pedigree.DoesNotExist:
-                failed_images.append(str(image))
+                pass
 
-        return render(request, 'image_upload_results.html', {'failed_images': failed_images})
+        return HttpResponse('')
     return redirect('import')
