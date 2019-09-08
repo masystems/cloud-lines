@@ -87,3 +87,14 @@ class LargeTierQueue(models.Model):
 
     def __str__(self):
         return str(self.subdomain)
+
+
+class Update(models.Model):
+    date = models.DateField(auto_now_add=True)
+    body = models.TextField()
+
+    def __str__(self):
+        return str(self.date)
+
+    class Meta:
+        ordering = ['date']
