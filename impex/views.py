@@ -393,7 +393,7 @@ def import_breeder_data(request):
 def image_import(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
-        images = request.FILES.getlist('uploadImages')
+        images = request.FILES.getlist('file')
         for image in images:
             filename, file_extension = splitext(str(image))
             try:
