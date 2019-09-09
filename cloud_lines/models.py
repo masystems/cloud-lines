@@ -90,8 +90,16 @@ class LargeTierQueue(models.Model):
 
 
 class Update(models.Model):
-    date = models.DateField(auto_now_add=True)
-    body = models.TextField()
+    date = models.DateField(auto_now_add=False)
+    body = models.TextField(default="""<strong>Features</strong>
+    <br>
+        <ul class="list-icons">
+            <li><i class="fa fa-check text-info"></i> </li>
+        </ul>
+<strong>Bug Fixes</strong>
+        <ul class="list-icons">
+            <li><i class="fa fa-check text-info"></i> </li>
+        </ul>""")
 
     def __str__(self):
         return str(self.date)

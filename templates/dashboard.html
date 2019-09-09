@@ -213,6 +213,32 @@
                             });
                         </script>
                     </div>
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Latest updates</h4>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div id="list-example" class="list-group">
+                                            {% for update in updates reversed %}
+                                                <a class="list-group-item list-group-item-action" href="#{{ update.date }}">{{ update.date }}</a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div data-spy="scroll" data-target="#list-example" data-offset="0" class="position-relative mt-2" style="height: 200px; overflow: auto;">
+                                            {% for update in updates reversed %}
+                                                <h4 id="{{ update.date }}">{{ update.date }}</h4>
+                                                {% autoescape off %}
+                                                    {{ update.body }}
+                                                {% endautoescape %}
+                                            {% endfor %}
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

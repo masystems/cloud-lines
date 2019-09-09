@@ -14,6 +14,7 @@ from breeder.models import Breeder
 from breed_group.models import BreedGroup
 from django.db.models import Q
 from re import match
+import requests
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -52,10 +53,10 @@ def dashboard(request):
 
     else:
         return redirect('setup')
-    # breeders_totals = {}
-    # for breeder in top_breeders:
-    #     breeders_totals[breeder]['pedigree_count'] = Pedigree.objects.filter(breeder__prefix__exact=breeder).count()
-    #     breeders_totals[breeder]['owned_count'] = Pedigree.objects.filter(current_owner__prefix__exact=breeder).count()
+
+    ## updates
+    get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
+    updates = get_updates_json.json()
 
     return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
                                               #'total_breeders': total_breeders,
@@ -63,7 +64,9 @@ def dashboard(request):
                                               'latest_breeders': latest_breeders,
                                               'breed_groups': breed_groups,
                                               'breed_chart': breed_chart,
-                                              'pedigree_chart': pedigree_chart})
+                                              'pedigree_chart': pedigree_chart,
+                                              'updates': updates,
+                                              })
 
 
 def home(request):
