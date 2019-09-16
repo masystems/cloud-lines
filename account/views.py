@@ -170,7 +170,7 @@ def user_edit(request):
 
             # send email to new user
 
-            if attached_service.current_service.domain:
+            if main_account.domain:
                 domain = main_account.domain
             else:
                 domain = 'https://cloud-lines.com'
