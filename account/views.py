@@ -20,6 +20,7 @@ from breeder.forms import BreederForm
 from pedigree.forms import PedigreeForm, AttributeForm, ImagesForm
 from money import Money
 from re import match
+from urllib.parse import urljoin
 import random
 import string
 import stripe
@@ -159,6 +160,7 @@ def user_edit(request):
                                                     )
             attached_service = AttachedService.objects.filter(user=new_user_detail).update(animal_type='Pedigrees',
                                                                                            install_available=False,
+                                                                                           domain=main_account.current_service.domain,
                                                                                            active=True)
             new_user_detail.current_service_id = user_detail.current_service_id
             new_user_detail.save()
@@ -166,6 +168,26 @@ def user_edit(request):
                 main_account.admin_users.add(new_user)
             else:
                 main_account.read_only_users.add(new_user)
+
+            # send email to new user
+
+            if attached_service.current_service.domain:
+                domain = attached_service.current_service.domain
+            else:
+                domain = 'https://cloud-lines.com'
+            email_body = """
+                        <p><strong>You have been registered on Cloud-lines by {}!</strong></p>
+
+                        <p>Now that you have been registered you will need to set your own secure password.</p>
+
+                        <p><a href="{}">Click here</a> to reset your password.</p>
+                        
+                        <p><a href="{}">Or Click here</a> to to login.</p>
+
+                        <p>Feel free to contact us about anything and enjoy!</p>""".format(request.user.get_full_name(),
+                                                                                           urljoin(domain, 'accounts/password_reset/'),
+                                                                                           domain)
+            send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
 
             return HttpResponse(True)
 
@@ -496,14 +518,14 @@ def register(request):
             login(request, user)
 
             email_body = """
-            <p><strong>Thank you for registering with Cloudlines!</strong></p>
+            <p><strong>Thank you for registering with Cloud-lines!</strong></p>
             
             <p>Now that you have registered you have access to our Free service.</p>
             
             <p><a href="https://cloud-lines.com/dashboard">Click here</a> to go to your new dashboard.</p>
             
             <p>Feel free to contact us about anything and enjoy!</p>"""
-            send_mail('Welcome to Cloudlines!', user.get_full_name(), email_body, send_to=user.email)
+            send_mail('Welcome to Cloud-lines!', user.get_full_name(), email_body, send_to=user.email)
 
             send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
 
