@@ -165,6 +165,7 @@ def user_edit(request):
             new_user_detail.save()
             if request.POST.get('status') == 'Editor':
                 main_account.admin_users.add(new_user)
+
             else:
                 main_account.read_only_users.add(new_user)
 
@@ -210,6 +211,7 @@ def user_edit(request):
             return HttpResponse(True)
 
         elif request.POST.get('formType') == 'delete':
+            print('delete user')
             User.objects.get(username=request.POST.get('register-form-username'),
                              email=request.POST.get('register-form-email')).delete()
 
