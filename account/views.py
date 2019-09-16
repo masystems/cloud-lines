@@ -160,7 +160,6 @@ def user_edit(request):
                                                     )
             attached_service = AttachedService.objects.filter(user=new_user_detail).update(animal_type='Pedigrees',
                                                                                            install_available=False,
-                                                                                           domain=main_account.domain,
                                                                                            active=True)
             new_user_detail.current_service_id = user_detail.current_service_id
             new_user_detail.save()
