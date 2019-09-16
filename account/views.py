@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib import auth
 from django.db.models import Q
-from django.conf import settings
+from django.conf import settings as django_settings
 from .models import UserDetail, AttachedService
 from cloud_lines.models import Service, Page
 from pedigree.models import Pedigree
@@ -25,6 +25,7 @@ import string
 import stripe
 import time
 import json
+import requests
 
 
 def site_mode(request):
@@ -459,47 +460,58 @@ def setup(request):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST.get('register-form-username')
-        raw_password = request.POST.get('register-form-password')
-        email = request.POST.get('register-form-email')
-        User.objects.create_user(username=username,
-                                 email=email,
-                                 password=raw_password,
-                                 first_name=request.POST.get('register-form-first-name'),
-                                 last_name=request.POST.get('register-form-last-name'))
-        user = authenticate(username=username, password=raw_password)
+        # validate 'i am a robot'
+        google_post_url = 'https://www.google.com/recaptcha/api/siteverify'
+        params = {'secret': django_settings.IANAR_SECRET_KEY,
+                  'response': request.POST.get('g-recaptcha-response')}
+        google_response = requests.get(url=google_post_url, params=params)
+        google_response_json = google_response.json()
 
-        # update user details
-        user_detail = UserDetail.objects.create(user=user,
-                                                phone=request.POST.get('register-form-phone')
-                                                )
-        # login
-        login(request, user)
+        # if google response good!
+        if google_response_json['success']:
+            username = request.POST.get('register-form-username')
+            raw_password = request.POST.get('register-form-password')
+            email = request.POST.get('register-form-email')
+            User.objects.create_user(username=username,
+                                     email=email,
+                                     password=raw_password,
+                                     first_name=request.POST.get('register-form-first-name'),
+                                     last_name=request.POST.get('register-form-last-name'))
+            user = authenticate(username=username, password=raw_password)
 
-        UserDetail.objects.filter(user=user).update(current_service=AttachedService.objects.create(animal_type='Pedigrees',
-                                                                                                   site_mode='mammal',
-                                                                                                   install_available=False,
-                                                                                                   user=user_detail,
-                                                                                                   service=Service.objects.get(service_name='Free'),
-                                                                                                   active=True))
-        # login
-        login(request, user)
+            # update user details
+            user_detail = UserDetail.objects.create(user=user,
+                                                    phone=request.POST.get('register-form-phone')
+                                                    )
+            # login
+            login(request, user)
 
-        email_body = """
-        <p><strong>Thank you for registering with Cloudlines!</strong></p>
-        
-        <p>Now that you have registered you have access to our Free service.</p>
-        
-        <p><a href="https://cloud-lines.com/dashboard">Click here</a> to go to your new dashboard.</p>
-        
-        <p>Feel free to contact us about anything and enjoy!</p>"""
-        send_mail('Welcome to Cloudlines!', user.get_full_name(), email_body, send_to=user.email)
+            UserDetail.objects.filter(user=user).update(current_service=AttachedService.objects.create(animal_type='Pedigrees',
+                                                                                                       site_mode='mammal',
+                                                                                                       install_available=False,
+                                                                                                       user=user_detail,
+                                                                                                       service=Service.objects.get(service_name='Free'),
+                                                                                                       active=True))
+            # login
+            login(request, user)
 
-        send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
+            email_body = """
+            <p><strong>Thank you for registering with Cloudlines!</strong></p>
+            
+            <p>Now that you have registered you have access to our Free service.</p>
+            
+            <p><a href="https://cloud-lines.com/dashboard">Click here</a> to go to your new dashboard.</p>
+            
+            <p>Feel free to contact us about anything and enjoy!</p>"""
+            send_mail('Welcome to Cloudlines!', user.get_full_name(), email_body, send_to=user.email)
 
-        return redirect('order')
+            send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
+
+            return redirect('order')
+        else:
+            return redirect('cl_login')
     else:
-        return render(request, 'login.html')
+        return redirect('cl_login')
 
 
 @csrf_exempt
