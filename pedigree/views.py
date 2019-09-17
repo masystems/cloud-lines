@@ -545,23 +545,23 @@ def add_existing(request, pedigree_id):
 #
 
 def inbreeding_calc(pedigree):
-    #pass
-    sorted = []
-    unchecked_parents = [get_parents(pedigree)]
-    tree = {}
-    while True:
-        tree['parents'] = {}
-
-
-def get_parents(pedigree):
-    try:
-        a = Pedigree.objects.get(id=pedigree.parent_mother.id)
-    except AttributeError:
-        a = None
-
-    try:
-        b = Pedigree.objects.get(id=pedigree.parent_father.id)
-    except AttributeError:
-        b = None
-
-    return a, b
+    pass
+#     sorted = []
+#     unchecked_parents = [get_parents(pedigree)]
+#     tree = {}
+#     while True:
+#         tree['parents'] = {}
+#
+#
+# def get_parents(pedigree):
+#     try:
+#         a = Pedigree.objects.get(id=pedigree.parent_mother.id)
+#     except AttributeError:
+#         a = None
+#
+#     try:
+#         b = Pedigree.objects.get(id=pedigree.parent_father.id)
+#     except AttributeError:
+#         b = None
+#
+#     return a, b
