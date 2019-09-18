@@ -181,169 +181,153 @@
                     <!--second tab-->
                     <div class="tab-pane" id="users" role="tabpanel">
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="{% if editor %}true{% else %}false{% endif %}" data-state="true"></table>
-                            </div>
-                            <!-- Start Popup Model -->
-                            <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
-                                <div class="modal-dialog" role="document">
-                                    {% if editor %}
-                                    <form class="modal-content form-horizontal" id="editor">
-                                        {% csrf_token %}
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                                            <h4 class="modal-title" id="editor-title">Add User</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="form-group required">
-                                                <label for="firstName" class="col-sm-3 control-label">First Name</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group required">
-                                                <label for="lastName" class="col-sm-3 control-label">Last Name</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group required">
-                                                <label for="register-form-username" class="col-sm-3 control-label">Username</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control" id="register-form-username" name="register-form-username" placeholder="Username" required>
-                                                    <span id='username_message'></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="register-form-email" class="col-sm-3 control-label">Email</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email" required>
-                                                    <span id='email_message'></span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="status" class="col-sm-3 control-label">Status</label>
-                                                <div class="col-sm-9">
-                                                    <select class="form-control" id="status" name="status" required>
-                                                    <option value="Read Only">Read Only</option>
-                                                    <option value="Editor">Editor</option>
-                                                </select>
-                                                </div>
+                            <table id="userTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Stats</th>
+                                        {% if editor %}<th scope="col" class="d-none d-sm-table-cell">Edit</th>{% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for user in service.admin_users.all %}
+                                    <tr>
+                                        <td>{{ user.first_name }}</td>
+                                        <td>{{ user.last_name }}</td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td><span class="label label-light-info"> Editor</span></td>
+                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDelete">Delete</button></td>{% endif %}
+                                    </tr>
+                                {% endfor %}
+                                {% for user in service.read_only_users.all %}
+                                    <tr>
+                                        <td>{{ user.first_name }}</td>
+                                        <td>{{ user.last_name }}</td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td><span class="label label-light-warning"> Read Only</span></td>
+                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDelete">Delete</button></td>{% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+                            {% if editor %}
+                                <form class="form-horizontal" id="editor">
+                                    {% csrf_token %}
+                                        <h4 class="modal-title" id="editor-title">Add User</h4>
+                                    <div class="modal-body">
+                                        <div class="form-group required">
+                                            <label for="firstName" class="col-sm-3 control-label">First Name</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
                                             </div>
                                         </div>
-                                        <div class="modal-footer">
-                                            <input type="hidden" id="formType" name="formType">
-                                            <button type="submit" id="userFormBtn" class="btn btn-primary">Save changes</button>
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                        <div class="form-group required">
+                                            <label for="lastName" class="col-sm-3 control-label">Last Name</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
+                                            </div>
                                         </div>
-                                    </form>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <!-- End Popup Model -->
+                                        <div class="form-group required">
+                                            <label for="register-form-username" class="col-sm-3 control-label">Username</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="register-form-username" name="register-form-username" placeholder="Username" required>
+                                                <span id='username_message'></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="register-form-email" class="col-sm-3 control-label">Email</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email" required>
+                                                <span id='email_message'></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="status" class="col-sm-3 control-label">Status</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control" id="status" name="status" required>
+                                                <option value="Read Only">Read Only</option>
+                                                <option value="Editor">Editor</option>
+                                            </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="hidden" id="formType" name="formType" value="new">
+                                        <button type="submit" id="userFormBtn" class="btn btn-success">Save changes</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            {% endif %}
+
                             <script>
-                                $(window).on('load', function() {
 
-                                    // Add & Remove Row
-                                    // -----------------------------------------------------------------
-                                    var $modal = $('#editor-modal'),
-                                        $editor = $('#editor'),
-                                        $editorTitle = $('#editor-title'),
-                                        ft = FooTable.init('#footable-addrow', {
-                                            columns: [
-                                              {"name":"id","title":"ID","breakpoints":"xs sm","type":"number","style":{"width":80,"maxWidth":80}},
-                                              {"name":"firstName","title":"First Name"},
-                                              {"name":"lastName","title":"Last Name"},
-                                              {"name":"username","title":"Username"},
-                                              {"name":"email","title":"Email","breakpoints":"xs sm","style":{"maxWidth":200,"overflow":"hidden","textOverflow":"ellipsis","wordBreak":"keep-all","whiteSpace":"nowrap"}},
-                                              {"name":"status","title":"Status"}
-                                            ],
-                                            rows: [
-                                                    {% for user in service.admin_users.all %}
-                                                        {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","username":"{{ user.username }}","email":"{{ user.email }}","status":"Editor"},
-                                                    {% endfor %}
-                                                    {% for user in service.read_only_users.all %}
-                                                        {"id":{{ user.id }},"firstName":"{{ user.first_name }}","lastName":"{{ user.last_name }}","username":"{{ user.username }}","email":"{{ user.email }}","status":"Read Only"},
-                                                    {% endfor %}
-                                                  ],
-                                            editing: {
-                                                addRow: function(){
-                                                    $modal.removeData('row');
-                                                    $editor[0].reset();
-                                                    $editorTitle.text('Add a new user');
-                                                    $('#formType').val('new');
-                                                    $modal.modal('show');
-                                                },
-                                                editRow: function(row){
-                                                    var values = row.val();
-                                                    $editor.find('#firstName').val(values.firstName);
-                                                    $editor.find('#lastName').val(values.lastName);
-                                                    $editor.find('#register-form-username').val(values.username);
-                                                    $("#register-form-username").prop("readonly", true);
-                                                    $editor.find('#register-form-email').val(values.email);
-                                                    $("#register-form-email").prop("readonly", true);
-                                                    $editor.find('#status').val(values.status);
-                                                    $modal.data('row', row);
-                                                    $editorTitle.text('Edit user #' + values.id);
-                                                    $('#formType').val('edit');
-                                                    $modal.modal('show');
-                                                },
-                                                deleteRow: function(row){
-                                                    if (confirm('Are you sure you want to delete this user?')){
-                                                        var values = row.val();
-                                                        $editor.find('#register-form-username').val(values.username);
-                                                        $editor.find('#register-form-email').val(values.email);
-                                                        $('#formType').val('delete');
-                                                        $('#userFormBtn').click();
-                                                        row.delete();
-                                                        //location.reload();
-                                                    }
-                                                }
-                                            }
-                                        }),
-                                        uid = 01;
+                            $("#userTable").on('click','#userEdit',function(){
+                                var currentRow=$(this).closest("tr");
 
-                                        $editor.on('submit', function(e){
-                                            if (this.checkValidity && !this.checkValidity()) return;
-                                            e.preventDefault();
-                                            var row = $modal.data('row'),
-                                                values = {
-                                                    firstName: $editor.find('#firstName').val(),
-                                                    lastName: $editor.find('#lastName').val(),
-                                                    username: $editor.find('#register-form-username').val(),
-                                                    email: $editor.find('#register-form-email').val(),
-                                                    status: $editor.find('#status').val()
-                                                };
+                                $('#firstName').val(currentRow.find("td:eq(0)").text())
+                                $('#lastName').val(currentRow.find("td:eq(1)").text())
+                                $('#register-form-username').val(currentRow.find("td:eq(2)").text())
+                                $('#register-form-email').val(currentRow.find("td:eq(3)").text())
+                                // check if editor
+                                var status = currentRow.find("td:eq(4)").text();
+                                var editor = status.includes('Editor');
+                                if (editor) {
+                                   $('#status').val('Editor');
+                                } else {
+                                   $('#status').val('Read Only');
+                                }
+                                // edit form type
+                                $('#formType').val('edit');
 
-                                            if (row instanceof FooTable.Row){
-                                                row.val(values);
-                                            } else {
-                                                values.id = uid++;
-                                                ft.rows.add(values);
-                                            }
+                            });
 
-                                            $.ajax({
-                                                url: '{% url 'user_edit' %}',
-                                                type: 'post',
-                                                dataType: 'text',
-                                                data: $('#editor').serialize(),
-                                                success: function(data) {
-                                                    console.log(data)
-                                                 },
-                                                error: function(jqXHR, textStatus, errorThrown){
-                                                    console.log('jqXHR:');
-                                                    console.log(jqXHR);
-                                                    console.log('textStatus:');
-                                                    console.log(textStatus);
-                                                    console.log('errorThrown:');
-                                                    console.log(errorThrown);
-                                                }
-                                            });
+                            $("#userTable").on('click','#userDelete',function(){
+                                var currentRow=$(this).closest("tr");
 
-                                            $modal.modal('hide');
-                                        });
+                                $('#firstName').val(currentRow.find("td:eq(0)").text())
+                                $('#lastName').val(currentRow.find("td:eq(1)").text())
+                                $('#register-form-username').val(currentRow.find("td:eq(2)").text())
+                                $('#register-form-email').val(currentRow.find("td:eq(3)").text())
+                                // check if editor
+                                var status = currentRow.find("td:eq(4)").text();
+                                var editor = status.includes('Editor');
+                                if (editor) {
+                                   $('#status').val('Editor');
+                                } else {
+                                   $('#status').val('Read Only');
+                                }
+                                // edit form type
+                                $('#formType').val('delete');
+                                // auto click submit
+                                $('#userFormBtn').click();
+                            });
 
+                                $("#userFormBtn").click(function(){
+                                    $.ajax({
+                                        url: '{% url 'user_edit' %}',
+                                        type: 'post',
+                                        dataType: 'text',
+                                        data: $('#editor').serialize(),
+                                        success: function(data) {
+                                            console.log(data)
+                                         },
+                                        error: function(jqXHR, textStatus, errorThrown){
+                                            console.log('jqXHR:');
+                                            console.log(jqXHR);
+                                            console.log('textStatus:');
+                                            console.log(textStatus);
+                                            console.log('errorThrown:');
+                                            console.log(errorThrown);
+                                        }
+                                    });
                                 });
+
 
                                 var fadeout = 100;
                                 $('#register-form-username').keyup( function() {
