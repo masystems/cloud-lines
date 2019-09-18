@@ -189,7 +189,7 @@ def user_edit(request):
                                                                                            domain)
             send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
 
-            return HttpResponse(True)
+            return redirect('profile')
 
         elif request.POST.get('formType') == 'edit':
             # find user and update name fields
@@ -208,14 +208,16 @@ def user_edit(request):
             else:
                 main_account.read_only_users.add(new_user)
 
-            return HttpResponse(True)
+            return redirect('profile')
 
         elif request.POST.get('formType') == 'delete':
             print('delete user')
             User.objects.get(username=request.POST.get('register-form-username'),
                              email=request.POST.get('register-form-email')).delete()
 
-            return HttpResponse(True)
+            return redirect('profile')
+    # else
+    return redirect('profile')
 
 
 @login_required(login_url="/account/login")
