@@ -193,120 +193,154 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {% for user in service.admin_users.all %}
-                                    <tr>
+                                <tr>
+                                    {% for user in service.admin_users.all %}
                                         <td>{{ user.first_name }}</td>
                                         <td>{{ user.last_name }}</td>
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td><span class="label label-light-info"> Editor</span></td>
                                         {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDelete">Delete</button></td>{% endif %}
-                                    </tr>
-                                {% endfor %}
-                                {% for user in service.read_only_users.all %}
-                                    <tr>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    {% for user in service.read_only_users.all %}
                                         <td>{{ user.first_name }}</td>
                                         <td>{{ user.last_name }}</td>
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td><span class="label label-light-warning"> Read Only</span></td>
                                         {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDelete">Delete</button></td>{% endif %}
-                                    </tr>
-                                {% endfor %}
+                                    {% endfor %}
+                                </tr>
                                 </tbody>
                             </table>
-
                             {% if editor %}
-                                <form class="form-horizontal" id="editor">
-                                    {% csrf_token %}
-                                        <h4 class="modal-title" id="editor-title">Add User</h4>
-                                    <div class="modal-body">
-                                        <div class="form-group required">
-                                            <label for="firstName" class="col-sm-3 control-label">First Name</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
+                                <a type="hidden" id="openUserModal" data-toggle="modal" data-target="#verticalcenter"></a>
+                                <button class="btn btn-success" id="createNew">Create New User</button>
+
+                                <div id="verticalcenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="vcenter" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="vcenter">New/Edit User</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                             </div>
-                                        </div>
-                                        <div class="form-group required">
-                                            <label for="lastName" class="col-sm-3 control-label">Last Name</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
-                                            </div>
-                                        </div>
-                                        <div class="form-group required">
-                                            <label for="register-form-username" class="col-sm-3 control-label">Username</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="register-form-username" name="register-form-username" placeholder="Username" required>
-                                                <span id='username_message'></span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="register-form-email" class="col-sm-3 control-label">Email</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email" required>
-                                                <span id='email_message'></span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="status" class="col-sm-3 control-label">Status</label>
-                                            <div class="col-sm-9">
-                                                <select class="form-control" id="status" name="status" required>
-                                                <option value="Read Only">Read Only</option>
-                                                <option value="Editor">Editor</option>
-                                            </select>
+                                            <div class="modal-body">
+                                                <form class="form-horizontal" id="editor">
+                                                    {% csrf_token %}
+                                                    <div class="modal-body">
+                                                        <div class="form-group required">
+                                                            <label for="firstName" class="control-label">First Name</label>
+                                                            <div class="col-sm-9">
+                                                                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First Name" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group required">
+                                                            <label for="lastName" class="control-label">Last Name</label>
+                                                            <div class="col-sm-9">
+                                                                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last Name" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group required">
+                                                            <label for="register-form-username" class="control-label">Username</label>
+                                                            <div class="col-sm-9">
+                                                                <input type="text" class="form-control" id="register-form-username" name="register-form-username" placeholder="Username" required>
+                                                                <span id='username_message'></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="register-form-email" class="control-label">Email</label>
+                                                            <div class="col-sm-9">
+                                                                <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email" required>
+                                                                <span id='email_message'></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="status" class="control-label">Status</label>
+                                                            <div class="col-sm-9">
+                                                                <select class="form-control" id="status" name="status" required>
+                                                                <option value="Read Only">Read Only</option>
+                                                                <option value="Editor">Editor</option>
+                                                            </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <input type="hidden" id="formType" name="formType" value="new">
+                                                        <button type="submit" id="userFormBtn" class="btn btn-success">Save changes</button>
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <input type="hidden" id="formType" name="formType" value="new">
-                                        <button type="submit" id="userFormBtn" class="btn btn-success">Save changes</button>
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                    </div>
-                                </form>
+                                </div>
                             {% endif %}
 
                             <script>
+                                $('#createNew').click(function() {
+                                    var currentRow=$(this).closest("tr");
 
-                            $("#userTable").on('click','#userEdit',function(){
-                                var currentRow=$(this).closest("tr");
+                                    $('#firstName').val('');
+                                    $('#lastName').val('');
+                                    $('#register-form-username').val('');
+                                    $("#register-form-username").prop("readonly", false);
+                                    $('#register-form-email').val('');
+                                    $("#register-form-email").prop("readonly", false);
 
-                                $('#firstName').val(currentRow.find("td:eq(0)").text())
-                                $('#lastName').val(currentRow.find("td:eq(1)").text())
-                                $('#register-form-username').val(currentRow.find("td:eq(2)").text())
-                                $('#register-form-email').val(currentRow.find("td:eq(3)").text())
-                                // check if editor
-                                var status = currentRow.find("td:eq(4)").text();
-                                var editor = status.includes('Editor');
-                                if (editor) {
-                                   $('#status').val('Editor');
-                                } else {
-                                   $('#status').val('Read Only');
-                                }
-                                // edit form type
-                                $('#formType').val('edit');
+                                    // edit form type
+                                    $('#formType').val('new');
+                                    // open modal
+                                    $('#openUserModal').click();
+                                });
 
-                            });
+                                $("#userTable").on('click','#userEdit',function(){
+                                    var currentRow=$(this).closest("tr");
 
-                            $("#userTable").on('click','#userDelete',function(){
-                                var currentRow=$(this).closest("tr");
+                                    $('#firstName').val(currentRow.find("td:eq(0)").text());
+                                    $('#lastName').val(currentRow.find("td:eq(1)").text());
+                                    $('#register-form-username').val(currentRow.find("td:eq(2)").text());
+                                    $("#register-form-username").prop("readonly", true);
+                                    $('#register-form-email').val(currentRow.find("td:eq(3)").text());
+                                    $("#register-form-email").prop("readonly", true);
+                                    // check if editor
+                                    var status = currentRow.find("td:eq(4)").text();
+                                    var editor = status.includes('Editor');
+                                    if (editor) {
+                                       $('#status').val('Editor');
+                                    } else {
+                                       $('#status').val('Read Only');
+                                    }
+                                    // edit form type
+                                    $('#formType').val('edit');
+                                    // open modal
+                                    $('#openUserModal').click();
 
-                                $('#firstName').val(currentRow.find("td:eq(0)").text())
-                                $('#lastName').val(currentRow.find("td:eq(1)").text())
-                                $('#register-form-username').val(currentRow.find("td:eq(2)").text())
-                                $('#register-form-email').val(currentRow.find("td:eq(3)").text())
-                                // check if editor
-                                var status = currentRow.find("td:eq(4)").text();
-                                var editor = status.includes('Editor');
-                                if (editor) {
-                                   $('#status').val('Editor');
-                                } else {
-                                   $('#status').val('Read Only');
-                                }
-                                // edit form type
-                                $('#formType').val('delete');
-                                // auto click submit
-                                $('#userFormBtn').click();
-                            });
+                                });
+
+                                $("#userTable").on('click','#userDelete',function(){
+                                    var currentRow=$(this).closest("tr");
+
+                                    $('#firstName').val(currentRow.find("td:eq(0)").text());
+                                    $('#lastName').val(currentRow.find("td:eq(1)").text());
+                                    $('#register-form-username').val(currentRow.find("td:eq(2)").text());
+                                    $("#register-form-username").prop("readonly", true);
+                                    $('#register-form-email').val(currentRow.find("td:eq(3)").text());
+                                    $("#register-form-email").prop("readonly", true);
+                                    // check if editor
+                                    var status = currentRow.find("td:eq(4)").text();
+                                    var editor = status.includes('Editor');
+                                    if (editor) {
+                                       $('#status').val('Editor');
+                                    } else {
+                                       $('#status').val('Read Only');
+                                    }
+                                    // edit form type
+                                    $('#formType').val('delete');
+                                    // auto click submit
+                                    $('#userFormBtn').click();
+                                });
 
                                 $("#userFormBtn").click(function(){
                                     $.ajax({
