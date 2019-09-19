@@ -7,14 +7,19 @@
     </div>
     <div class="form-group">
         <div class="col-xs-12">
-            <input class="form-control" type="password" required="" name="password" placeholder="Password"> </div>
+            <input class="form-control" id="passwordInput" type="password" required="" name="password" placeholder="Password"> </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-12">
+            <input type="checkbox" onclick="showPassword()">Show Password
+        </div>
     </div>
     <div class="form-group">
         <div class="col-md-12">
             <div class="checkbox checkbox-primary float-left pt-0">
                 <input id="checkbox-signup" type="checkbox">
                 <label for="checkbox-signup"> Remember me </label>
-            </div> <a href="{% url 'password_reset' %}" id="to-recover" class="text-dark float-right"><i class="fa fa-lock mr-1"></i> Forgot pwd?</a> </div>
+            </div> <a href="{% url 'password_reset' %}" id="to-recover" class="text-dark float-right"><i class="fa fa-lock mr-1"></i> Forgot password?</a> </div>
     </div>
     {% if error %}
         <div class="style-msg errormsg">
@@ -33,3 +38,14 @@
         </div>
     </div>
 </form>
+
+<script>
+function showPassword() {
+  var x = document.getElementById("passwordInput");
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}
+</script>
