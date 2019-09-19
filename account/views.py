@@ -142,6 +142,7 @@ def user_edit(request):
     if request.method == 'POST':
         main_account = get_main_account(request.user)
         user_detail = UserDetail.objects.get(user=request.user)
+        print(request.POST)
         if request.POST.get('formType') == 'new':
             # generate password
             password = ''.join(
@@ -149,15 +150,15 @@ def user_edit(request):
 
             # create new user
             new_user = User.objects.create_user(username=request.POST.get('register-form-username').lower(),
-                                            email=request.POST.get('register-form-email'),
-                                            password=password,
-                                            first_name=request.POST.get('firstName'),
-                                            last_name=request.POST.get('lastName'))
+                                                email=request.POST.get('register-form-email'),
+                                                password=password,
+                                                first_name=request.POST.get('firstName'),
+                                                last_name=request.POST.get('lastName'))
 
             # update user details
             new_user_detail = UserDetail.objects.create(user=new_user,
-                                                    phone='',
-                                                    )
+                                                        phone='',
+                                                        )
             attached_service = AttachedService.objects.filter(user=new_user_detail).update(animal_type='Pedigrees',
                                                                                            install_available=False,
                                                                                            active=True)
@@ -179,17 +180,20 @@ def user_edit(request):
                         <p><strong>You have been registered on Cloud-lines by {}!</strong></p>
 
                         <p>Now that you have been registered you will need to set your own secure password.</p>
+                        
+                        <p><strong>Username: </strong>{}</p>
 
                         <p><a href="{}">Click here</a> to reset your password.</p>
                         
                         <p><a href="{}">Or Click here</a> to to login.</p>
 
                         <p>Feel free to contact us about anything and enjoy!</p>""".format(request.user.get_full_name(),
+                                                                                           new_user.username,
                                                                                            urljoin(domain, 'accounts/password_reset/'),
                                                                                            domain)
             send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
-
-            return redirect('profile')
+            print('new user!!')
+            return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'edit':
             # find user and update name fields
@@ -207,17 +211,17 @@ def user_edit(request):
                 main_account.admin_users.add(new_user)
             else:
                 main_account.read_only_users.add(new_user)
-
-            return HttpResponse(True)
+            print('edit user!!')
+            return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'delete':
             print('delete user')
             User.objects.get(username=request.POST.get('register-form-username'),
                              email=request.POST.get('register-form-email')).delete()
 
-            return redirect('profile')
-    # else
-    return redirect('profile')
+            return HttpResponse(json.dumps({'success': True}))
+
+    return HttpResponse(json.dumps({'success': False}))
 
 
 @login_required(login_url="/account/login")

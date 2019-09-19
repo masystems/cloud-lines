@@ -228,7 +228,6 @@
                                             </div>
                                             <div class="modal-body">
                                                 <form class="form-horizontal" id="editor">
-                                                    {% csrf_token %}
                                                     <div class="modal-body">
                                                         <div class="form-group required">
                                                             <label for="firstName" class="control-label">First Name</label>
@@ -265,13 +264,14 @@
                                                             </select>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="modal-footer">
                                                         <input type="hidden" id="formType" name="formType" value="new">
-                                                        <button id="userFormBtn" class="btn btn-success">Save changes</button>
-                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                                     </div>
                                                 </form>
+                                                <div class="modal-footer">
+
+                                                    <button id="userFormBtn" class="btn btn-success">Save changes</button>
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -342,22 +342,22 @@
                                     $('#userFormBtn').click();
                                 });
 
-                                $("#userFormBtn").click(function(){
+                                $("#userFormBtn").click( function(){
                                     $.ajax({
-                                        url: '{% url 'user_edit' %}',
+                                        url: "{% url 'user_edit' %}",
                                         type: 'POST',
+                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
                                         dataType: 'text',
                                         data: $('#editor').serialize(),
                                         success: function(data) {
-                                            console.log(data)
-                                         },
-                                        error: function(jqXHR, textStatus, errorThrown){
-                                            console.log('jqXHR:');
-                                            console.log(jqXHR);
-                                            console.log('textStatus:');
-                                            console.log(textStatus);
-                                            console.log('errorThrown:');
-                                            console.log(errorThrown);
+                                            console.log(data);
+                                            var result = JSON.parse(data);
+                                            if (result.success){
+                                                $('#verticalcenter').modal('toggle');
+                                                location.reload();
+                                            } else {
+                                                console.log('something went wrong!');
+                                            }
                                         }
                                     });
                                 });
