@@ -208,7 +208,7 @@ def user_edit(request):
             else:
                 main_account.read_only_users.add(new_user)
 
-            return redirect('profile')
+            return HttpResponse(True)
 
         elif request.POST.get('formType') == 'delete':
             print('delete user')

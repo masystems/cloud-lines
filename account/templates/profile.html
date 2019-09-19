@@ -193,26 +193,26 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    {% for user in service.admin_users.all %}
+                                {% for user in service.admin_users.all %}
+                                    <tr>
                                         <td>{{ user.first_name }}</td>
                                         <td>{{ user.last_name }}</td>
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td><span class="label label-light-info"> Editor</span></td>
                                         {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDelete">Delete</button></td>{% endif %}
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    {% for user in service.read_only_users.all %}
+                                    </tr>
+                                {% endfor %}
+                                {% for user in service.read_only_users.all %}
+                                    <tr>
                                         <td>{{ user.first_name }}</td>
                                         <td>{{ user.last_name }}</td>
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td><span class="label label-light-warning"> Read Only</span></td>
                                         {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDelete">Delete</button></td>{% endif %}
-                                    {% endfor %}
-                                </tr>
+                                    </tr>
+                                {% endfor %}
                                 </tbody>
                             </table>
                             {% if editor %}
@@ -268,7 +268,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <input type="hidden" id="formType" name="formType" value="new">
-                                                        <button type="submit" id="userFormBtn" class="btn btn-success">Save changes</button>
+                                                        <button id="userFormBtn" class="btn btn-success">Save changes</button>
                                                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                                     </div>
                                                 </form>
@@ -345,7 +345,7 @@
                                 $("#userFormBtn").click(function(){
                                     $.ajax({
                                         url: '{% url 'user_edit' %}',
-                                        type: 'post',
+                                        type: 'POST',
                                         dataType: 'text',
                                         data: $('#editor').serialize(),
                                         success: function(data) {
