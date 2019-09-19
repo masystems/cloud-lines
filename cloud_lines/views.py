@@ -40,7 +40,7 @@ def dashboard(request):
             and Breeder.objects.filter(account=main_account).exists():
         pedigree_chart = {}
         for month in range(0, 12):
-            month_count = Pedigree.objects.filter(account=main_account, date_added__month=current_month-month).count()
+            month_count = Pedigree.objects.filter(account=main_account, date_of_registration__month=current_month-month).count()
             if month != 0:
                 date = date.replace(day=1)
                 date = date - timedelta(days=1)
