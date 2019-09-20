@@ -83,8 +83,8 @@
                         <!--## col2 ##-->
                         <td>
                             <ul style="list-style-type:none;">
-                              <li><strong>Breeder:</strong> {{ lvl1.breeder.prefix }}</li>
-                              <li><strong>Owner:</strong> {{ lvl1.current_owner.prefix }}</li>
+                              <li><strong>Breeder:</strong> {{ lvl1.breeder.breeding_prefix }}</li>
+                              <li><strong>Owner:</strong> {{ lvl1.current_owner.breeding_prefix }}</li>
                             </ul>
                             {% if lvl1.images.first %}
                                 <img src="{% for image in lvl1.images.all %}
