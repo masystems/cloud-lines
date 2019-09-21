@@ -62,6 +62,8 @@ def site_mode(request):
                 pedigrees = True
             else:
                 pedigrees = False
+        else:
+            pedigrees = False
 
         if attached_service.admin_users.all().count() < service.admin_users:
             admins = True
