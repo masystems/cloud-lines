@@ -212,7 +212,7 @@
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td><span class="label label-light-warning"> Read Only</span></td>
-                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDelete">Delete</button></td>{% endif %}
+                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -278,6 +278,27 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- delete user modal content -->
+                             <a type="hidden" id="deleteUserModal" data-toggle="modal" data-target="#delete"></a>
+                                <div id="delete" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="vcenter" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="vcenter">Deletion Confirmation</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete this user?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
+                                                <button type="submit" id="userDelete" name="delete" value="delete" class="btn btn-danger float-right">Yes, delete it!</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             {% endif %}
 
                             <script>
@@ -321,7 +342,7 @@
 
                                 });
 
-                                $("#userTable").on('click','#userDelete',function(){
+                                $("#userTable").on('click','#userDeleteBtn',function(){
                                     var currentRow=$(this).closest("tr");
 
                                     $('#firstName').val(currentRow.find("td:eq(0)").text());
@@ -340,6 +361,12 @@
                                     }
                                     // edit form type
                                     $('#formType').val('delete');
+                                    // open modal
+                                    $('#deleteUserModal').click();
+
+                                });
+
+                                $("#userDelete").click( function(){
                                     // auto click submit
                                     $('#userFormBtn').click();
                                 });
