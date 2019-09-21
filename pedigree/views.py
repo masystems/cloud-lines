@@ -537,6 +537,23 @@ def add_existing(request, pedigree_id):
     return redirect('pedigree', pedigree_id)
 
 
+def add_existing_parent(request, pedigree_id):
+    attached_service = get_main_account(request.user)
+    pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
+
+    if request.method == 'POST':
+        parent_reg = request.POST.get('reg_no')
+        parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
+        if parent.sex == 'male':
+            pedigree.parent_father = parent
+        elif pedigree.sex == 'female':
+            pedigree.parent_mother = parent
+
+        pedigree.save()
+
+    return redirect('pedigree', pedigree_id)
+
+
 # start with one pedigree
 # get pedigrees parents
 # add one to node counter

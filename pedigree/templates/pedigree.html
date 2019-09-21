@@ -132,12 +132,12 @@ vertical-align: middle;
                         {% else %}
                         <h4>No children for this {% if service.site_mode == 'mammal' %}pedigree{% else %}bird{% endif %}, add one?</h4>
                         {% endif %}
-
+                        <!-- Add existing Child-->
                         <div id="existing" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="existing" aria-hidden="true" style="display: none;">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h4 class="modal-title float-left">Choose existing {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %}</h4>
+                                        <h4 class="modal-title float-left">Choose existing {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %} (Child)</h4>
                                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                     </div>
                                     <div class="modal-body">
@@ -160,6 +160,7 @@ vertical-align: middle;
                                 </div>
                             </div>
                         </div>
+
                         {% if editor %}
                             {% include 'add_new_pedigree.html' %}
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
@@ -170,6 +171,66 @@ vertical-align: middle;
                     </div>
 
                     <div class="tab-pane p-3" id="cert" role="tabpanel">
+                        {% if not lvl2_1 %}
+                            <!--Add existing Parent Mother-->
+                            <div id="addExistingParentMother" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addExistingParentMother" aria-hidden="true" style="display: none;">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title float-left">Choose existing {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %} ({{ service.mother_title }})</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{% url 'add_existing_parent' lvl1.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <div class="form-body">
+                                                    <div class="form-group row">
+                                                        <div class="col-8">
+                                                            <div id="mothers">
+                                                                <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter registration number">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <button type="submit" class="btn btn-success">Submit</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if not lvl2_2 %}
+                            <!--Add existing Parent Father-->
+                            <div id="addExistingParentFather" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addExistingParentFarther" aria-hidden="true" style="display: none;">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title float-left">Choose existing {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %} ({{ service.father_title }})</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{% url 'add_existing_parent' lvl1.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                                                {% csrf_token %}
+                                                <div class="form-body">
+                                                    <div class="form-group row">
+                                                        <div class="col-8">
+                                                            <div id="fathers">
+                                                                <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter registration number">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <button type="submit" class="btn btn-success">Submit</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         <div id="certificate">
                             <table class="table responsive">
                                 <thead>
@@ -189,6 +250,7 @@ vertical-align: middle;
                                             {% else %}
                                             <p>{{ no_pedigree_text }}</p>
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
+                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentMother">Add existing</button>
                                             {% endif %}
 
                                         </td>
@@ -253,6 +315,7 @@ vertical-align: middle;
                                                 {% include 'relative.html' with pedigree=lvl2_2 %}
                                             {% else %}
                                             {% include 'add_new_pedigree.html' with pedigree=lvl2_2 %}
+                                            <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentFather">Add existing</button>
                                             {% endif %}
                                         </td>
                                         <!--## col2 ##-->

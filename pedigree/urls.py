@@ -9,5 +9,6 @@ urlpatterns = [
     path('new_pedigree/', views.new_pedigree_form, name='new_pedigree_form'),
     path('<int:id>/edit_pedigree/', views.edit_pedigree_form, name='edit_pedigree_form'),
     path('<int:pedigree_id>/add_existing', views.add_existing, name='add_existing'),
+    path('<int:pedigree_id>/add_existing_parent', views.add_existing_parent, name='add_existing_parent'),
     path('<int:pedigree_id>/certificate', views.GeneratePDF.as_view(), name='cert'),
 ]
