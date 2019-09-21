@@ -17,7 +17,7 @@ from breed.forms import BreedForm
 from breed_group.models import BreedGroup
 from .forms import PedigreeForm, AttributeForm, ImagesForm
 from django.db.models import Q
-
+import re
 import json
 from account.views import is_editor, get_main_account
 
@@ -348,6 +348,15 @@ def new_pedigree_form(request):
     else:
         pedigree_form = PedigreeForm()
 
+    # get next available reg number
+    try:
+        latest_added = Pedigree.objects.filter(account=attached_service).latest('reg_no')
+        latest_reg = latest_added.reg_no
+        reg_ints_re = re.search("[0-9]+", latest_reg)
+        suggested_reg = latest_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1))
+    except Pedigree.DoesNotExist:
+        suggested_reg = 'REG12345'
+
     return render(request, 'new_pedigree_form_base.html', {'pedigree_form': pedigree_form,
                                                            'attributes_form': attributes_form,
                                                            'image_form': image_form,
@@ -357,7 +366,8 @@ def new_pedigree_form(request):
                                                            'breed_groups': BreedGroup.objects.filter(account=attached_service),
                                                            'custom_fields': custom_fields,
                                                            'breeder_form': BreederForm(),
-                                                           'breed_form': BreedForm()})
+                                                           'breed_form': BreedForm(),
+                                                           'suggested_reg': suggested_reg})
 
 
 @login_required(login_url="/account/login")

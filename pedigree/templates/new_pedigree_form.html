@@ -70,6 +70,8 @@
                     {% if 'setup' not in request.get_full_path %}
                         <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Owner</button>
                     {% endif %}
+                {% elif field.label == 'Registration Number' %}
+                        <input class="form-control" name='{{ field.name }}' type="text" value="{{ suggested_reg }}">
                 {% elif field.label == 'Mother' %}
                     <div id="mothers">
                         <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}">
