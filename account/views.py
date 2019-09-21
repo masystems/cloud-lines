@@ -57,10 +57,11 @@ def site_mode(request):
         else:
             editor = False
 
-        if Pedigree.objects.filter(account=attached_service).count() < service.number_of_animals:
-            pedigrees = True
-        else:
-            pedigrees = False
+        if attached_service.service.service_name != 'Organisation':
+            if Pedigree.objects.filter(account=attached_service).count() < service.number_of_animals:
+                pedigrees = True
+            else:
+                pedigrees = False
 
         if attached_service.admin_users.all().count() < service.admin_users:
             admins = True
