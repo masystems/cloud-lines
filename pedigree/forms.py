@@ -31,7 +31,7 @@ class PedigreeForm(forms.Form):
         ('unknown', 'Unknown'),
     )
 
-    status = forms.ChoiceField(choices=STATUSES,  widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='alive', required=True)
+    status = forms.ChoiceField(choices=STATUSES,  widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='unknown', required=True)
 
     GENDERS = [
         ('male', 'Male'),

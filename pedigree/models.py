@@ -27,7 +27,7 @@ class Pedigree(models.Model):
         ('unknown', 'Unknown'),
     )
 
-    status = models.CharField(max_length=10, choices=STATUSES, null=True, default='alive',
+    status = models.CharField(max_length=10, choices=STATUSES, null=True, default='unknown',
                            help_text="Accepted formats: dead, alive, unknown")
 
     GENDERS = (
