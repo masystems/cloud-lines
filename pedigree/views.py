@@ -290,6 +290,7 @@ def new_pedigree_form(request):
                 new_pedigree.dob = pedigree_form['date_of_birth'].value() or None
             except:
                 pass
+            new_pedigree.status = pedigree_form['status'].value()
             new_pedigree.sex = pedigree_form['sex'].value()
             try:
                 new_pedigree.dod = pedigree_form['date_of_death'].value() or None
@@ -449,7 +450,7 @@ def edit_pedigree_form(request, id):
                 pedigree.dob = pedigree_form['date_of_birth'].value() or None
             except:
                 pass
-
+            pedigree.status = pedigree_form['status'].value()
             pedigree.sex = pedigree_form['sex'].value()
 
             try:

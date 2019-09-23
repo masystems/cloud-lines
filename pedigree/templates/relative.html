@@ -17,7 +17,7 @@
             <ul class="list-icons">
                 <li class="text-muted"><i class="ti-angle-right"></i> <strong>Reg #:</strong> {{ pedigree.reg_no }}</li>
                 <li class="text-muted"><i class="ti-angle-right"></i> <strong>Name:</strong> {{ pedigree.name }}</li>
-                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Status:</strong> {{ pedigree.name }}</li>
+                <li class="text-muted"><i class="{% if lvl1.status == 'alive' %}far fa-heart{% elif lvl1.status == 'dead' %}fas fa-skull{% else %}far fa-question-circle{% endif %}"></i> <strong>Status:</strong> {{ pedigree.status }}</li>
             </ul>
         </span>
     </span>

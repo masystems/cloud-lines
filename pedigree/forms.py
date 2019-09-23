@@ -25,6 +25,14 @@ class PedigreeForm(forms.Form):
     date_of_birth = forms.DateField(required=False, widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     date_of_birth.widget.attrs['class'] = 'form-control'
 
+    STATUSES = (
+        ('dead', 'Dead'),
+        ('alive', 'Alive'),
+        ('unknown', 'Unknown'),
+    )
+
+    status = forms.ChoiceField(choices=STATUSES,  widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='alive', required=True)
+
     GENDERS = [
         ('male', 'Male'),
         ('female', 'Female'),

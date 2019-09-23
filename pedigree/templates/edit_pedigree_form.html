@@ -171,6 +171,13 @@
                                         {% render_field field class="form-control" type="date" value=pedigree.dob %}
                                     {% elif field.label == 'Dod' %}
                                         {% render_field field class="form-control" type="date" value=pedigree.dod%}
+                                    {% elif field.label == 'Status' %}
+                                        <div class="radio radio-info pt-2">
+                                            {% for option in field %}
+                                                <input type="radio" name="status" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if pedigree.status == option.choice_label|lower %}checked{% endif %}>
+                                                    <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }} </label>
+                                            {% endfor %}
+                                    </div>
                                     {% elif field.label == 'Sex' %}
                                         <div class="radio radio-info pt-2">
                                             {% for option in field %}

@@ -21,6 +21,15 @@ class Pedigree(models.Model):
     dob = models.DateField(blank=True, null=True, verbose_name='date of birth', help_text="Date formats: 1984/09/31, 84/09/31, 31/09/1984, 31/09/84, 1984-09-31, 84-09-31, 31-09-1984, 31-09-84")
     dod = models.DateField(blank=True, null=True, verbose_name='date of death', help_text="Date formats: 1984/09/31, 84/09/31, 31/09/1984, 31/09/84, 1984-09-31, 84-09-31, 31-09-1984, 31-09-84")
 
+    STATUSES = (
+        ('dead', 'Dead'),
+        ('alive', 'Alive'),
+        ('unknown', 'Unknown'),
+    )
+
+    status = models.CharField(max_length=10, choices=STATUSES, null=True, default='alive',
+                           help_text="Accepted formats: dead, alive, unknown")
+
     GENDERS = (
         ('male', 'Male'),
         ('female', 'Female'),

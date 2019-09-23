@@ -86,6 +86,13 @@
                             <input id="id_breed_group" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                         </div>
                     {% endif %}
+                {% elif field.label == 'Status' %}
+                    <div class="radio radio-info pt-2">
+                        {% for option in field %}
+                            <input type="radio" name="status" class="radio radio-info" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if option.choice_label == 'Alive' %}checked{% endif %}>
+                            <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
+                        {% endfor %}
+                    </div>
                 {% elif field.label == 'Sex' %}
                     <div class="radio radio-info pt-2">
                         {% for option in field %}
