@@ -14,7 +14,11 @@
             <a href="{% url 'pedigree' pedigree.id %}"
                class="btn btn-outline-{% if pedigree.sex == 'male' %}info{% else %}primary{% endif %} waves-effect waves-light" role="button">
                 <span class="btn-label"><i class="{% if pedigree.sex == 'female' %}fas fas fa-venus{% else %}fas fas fa-mars{% endif %}"></i></span> <strong>Profile</strong></a>
-            <p><strong>{{ pedigree.reg_no }}:</strong> {{ pedigree.note }}</p>
+            <ul class="list-icons">
+                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Reg #:</strong> {{ pedigree.reg_no }}</li>
+                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Name:</strong> {{ pedigree.name }}</li>
+                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Status:</strong> {{ pedigree.name }}</li>
+            </ul>
         </span>
     </span>
 </span>
