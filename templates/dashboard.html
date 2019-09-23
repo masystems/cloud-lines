@@ -256,7 +256,7 @@
                                         <th colspan="2">Reg No.</th>
 
                                         <th>Sex</th>
-                                        <th>DoB</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -279,7 +279,7 @@
                                                 <h6>{{ pedigree.reg_no|truncatechars:10 }}</h6><small class="text-muted">{% if pedigree.breed.breed_name %}Breed: {{ pedigree.breed.breed_name }}{% endif %}</small></td>
 
                                             <td><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
-                                            <td>{{ pedigree.dob|date:'M-Y' }}</td>
+                                            <td>{{ pedigree.status|title }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>

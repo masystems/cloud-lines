@@ -70,7 +70,7 @@
                 <th scope="col">Reg No.</th>
                 <th scope="col">Name</th>
                 <th scope="col">DOB</th>
-                <th scope="col">DOD</th>
+                <th scope="col">Status</th>
                 <th scope="col">Sex</th>
                 <th scope="col">Notes</th>
             </tr>
@@ -82,7 +82,7 @@
                     <th scope="row">{{ pedigree.reg_no }}</th>
                     <td>{{ pedigree.name }}</td>
                     <td>{{ pedigree.dob }}</td>
-                    <td>{{ pedigree.dod }}</td>
+                    <td>{{ pedigree.status|title }}</td>
                     <td><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
                     <td>{{ pedigree.notes }}</td>
                 </tr>
@@ -98,7 +98,7 @@
                 <th scope="col">Reg No.</th>
                 <th scope="col">Name</th>
                 <th scope="col">DOB</th>
-                <th scope="col">DOD</th>
+                <th scope="col">Status</th>
                 <th scope="col">Sex</th>
                 <th scope="col">Notes</th>
             </tr>
@@ -110,7 +110,7 @@
                     <th scope="row">{{ pedigree.reg_no }}</th>
                     <td>{{ pedigree.name }}</td>
                     <td>{{ pedigree.dob }}</td>
-                    <td>{{ pedigree.dod }}</td>
+                    <td>{{ pedigree.status|title }}</td>
                     <td><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
                     <td>{{ pedigree.notes }}</td>
                 </tr>
