@@ -237,7 +237,8 @@ def update_user(request):
         user.last_name = request.POST.get('user-settings-last-name')
         user.email = request.POST.get('user-settings-email')
         # set users password
-        user.set_password(request.POST.get('user-settings-password'))
+        if request.POST.get('user-settings-password') != "":
+            user.set_password(request.POST.get('user-settings-password'))
         user.save()
 
         # update user details
