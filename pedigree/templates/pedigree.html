@@ -260,6 +260,8 @@ vertical-align: middle;
                                         <td rowspan="2">
                                             {% if lvl3_1 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_1 %}
+                                            {% elif lvl3_1_grp %}
+                                                {% include 'relative-breed_group.html' with breed_group=lvl3_1_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl3_1 %}
                                             {% endif %}
@@ -268,6 +270,8 @@ vertical-align: middle;
                                         <td>
                                             {% if lvl4_1 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_1 %}
+                                            {% elif lvl4_1_grp %}
+                                                {% include 'relative-breed_group.html' with breed_group=lvl4_1_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_1 %}
                                             {% endif %}
@@ -296,6 +300,8 @@ vertical-align: middle;
                                         <td>
                                             {% if lvl4_3 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_3 %}
+                                            {% elif lvl4_3_grp %}
+                                                {% include 'relative-breed_group.html' with breed_group=lvl4_3_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_3 %}
                                             {% endif %}
@@ -334,6 +340,8 @@ vertical-align: middle;
                                         <td>
                                             {% if lvl4_5 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_5 %}
+                                            {% elif lvl4_5_grp %}
+                                                {% include 'relative-breed_group.html' with breed_group=lvl4_5_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_5 %}
                                             {% endif %}
