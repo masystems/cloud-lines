@@ -157,7 +157,7 @@
                     <label class="col-sm-2 text-right col-form-label">{{ field.label }}</label>
                     <div class="col-lg-10 col-md-10">
                         {% if field.label == 'Breed' %}
-                            {% if service.multi_breed %}
+                            {% if add_breed %}
                                 <div id="breeds">
                                     <input id="id_breed" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                                 </div>
