@@ -17,9 +17,6 @@ from re import match
 import requests
 
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
-
 @login_required(login_url="/account/login")
 def dashboard(request):
     main_account = get_main_account(request.user)
@@ -165,7 +162,10 @@ def privacy_policy(request):
 def order(request):
     context = {}
     # import stripe key
-    context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
+    if request.user.is_superuser:
+        context['public_api_key'] = settings.STRIPE_TEST_PUBLIC_KEY
+    else:
+        context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
 
     # get user detail object
     context['user_detail'] = UserDetail.objects.get(user=request.user)
@@ -235,7 +235,10 @@ def order_billing(request):
 
         if not user_detail.stripe_id:
             # create stripe user
-            stripe.api_key = settings.STRIPE_SECRET_KEY
+            if request.user.is_superuser:
+                stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+            else:
+                stripe.api_key = settings.STRIPE_SECRET_KEY
             customer = stripe.Customer.create(
                 name=request.POST.get('checkout-form-billing-name'),
                 email=request.POST.get('checkout-form-billing-email'),
@@ -342,7 +345,6 @@ def order_subscribe(request):
     # update existing subscription if it exists
     if attached_service.subscription_id:
         subscription = stripe.Subscription.retrieve(attached_service.subscription_id)
-        #stripe.Subscription.delete(attached_service.subscription_id)
         stripe.Subscription.modify(
             attached_service.subscription_id,
             cancel_at_period_end=False,
