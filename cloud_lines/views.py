@@ -193,6 +193,12 @@ def order(request):
 @login_required(login_url="/account/login")
 def order_service(request):
     if request.POST:
+        # import stripe key
+        if request.user.is_superuser:
+            stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+        else:
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+
         user_detail = UserDetail.objects.get(user=request.user)
         service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
 
@@ -231,6 +237,11 @@ def order_service(request):
 @login_required(login_url="/account/login")
 def order_billing(request):
     if request.POST:
+        if request.user.is_superuser:
+            stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+        else:
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+
         user_detail = UserDetail.objects.get(user=request.user)
 
         if not user_detail.stripe_id:

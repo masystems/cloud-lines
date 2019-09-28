@@ -23,6 +23,10 @@ class Service(models.Model):
     monthly_id = models.CharField(max_length=100, blank=True)
     yearly_id = models.CharField(max_length=100, blank=True)
 
+    service_test_id = models.CharField(max_length=100, blank=True)
+    monthly_test_id = models.CharField(max_length=100, blank=True)
+    yearly_test_id = models.CharField(max_length=100, blank=True)
+
     def __str__(self):
         return self.service_name
 
