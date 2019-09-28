@@ -102,40 +102,23 @@
                     <h4 class="modal-title"></h4>
                 </div>
                 <div class="modal-body">
-                    <form id="breedForm">
+                    <form id="breedForm" action="{% url 'new_breed_form' %}" method="POST" target="dummyframe" class="form-horizontal" enctype="multipart/form-data">
+                        {% csrf_token %}
                         {% include 'new_breed_form.html' %}
                     </form>
+                    <iframe width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                    <button id="closeBreed" type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
                     <button id="saveBreed" type="button" class="btn btn-success waves-effect waves-light">Save breed</button>
                 </div>
                 <script>
                     $('#saveBreed').click(function () {
-                        if (typeof image_array !== 'undefined' && image_array.length > 0) {
-                            // the array is defined and has at least one element
-                            var local = breeds;
-                        } else {
-                            var breeds = [];
-                        }
-                        var data = $('#breedForm').serialize();
-                        $.ajax({
-                            url: '{% url 'new_breed_form' %}',
-                            type: 'post',
-                            dataType: 'text',
-                            headers: {'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value},
-                            data: data,
-                            beforeSend: function() {
-
-                            },
-                            success: function(data) {
-                                breeds.push($('#id_breed_name').val());
-                                $('id_breed').val($('#id_breed_name').val());
-                                $('#showNewBreedModal').click();
-                            },
-                            error: function(jqXHR, textStatus, errorThrown){
-                            }
-                        });
+                        var local = breeds;
+                        breeds.push($('#id_breed_name').val());
+                        $("#breedForm").submit();
+                        $('#closeBreed').click();
+                        $('#id_breed').val($('#id_breed_name').val());
                     });
                 </script>
             </div>

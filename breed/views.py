@@ -33,6 +33,7 @@ def new_breed_form(request):
                                          breed_name=breed_form['breed_name'].value(),
                                          breed_description=breed_form['breed_description'].value())
             breed.save()
+            print(request.FILES)
             breed.image = request.FILES['image']
 
             try:
