@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils.datastructures import MultiValueDictKeyError
 from .models import Breed
 from .forms import BreedForm
 from account.views import is_editor, get_main_account
@@ -33,8 +34,10 @@ def new_breed_form(request):
                                          breed_name=breed_form['breed_name'].value(),
                                          breed_description=breed_form['breed_description'].value())
             breed.save()
-            print(request.FILES)
-            breed.image = request.FILES['image']
+            try:
+                breed.image = request.FILES['image']
+            except MultiValueDictKeyError:
+                pass
 
             try:
                 custom_fields = json.loads(attached_service.custom_fields)
