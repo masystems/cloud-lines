@@ -348,10 +348,16 @@ def order_subscribe(request):
     # update the users attached service to be active
     attached_service.active = True
 
-    if attached_service.increment == 'yearly':
-        plan = attached_service.service.yearly_id
+    if request.user.is_superuser:
+        if attached_service.increment == 'yearly':
+            plan = attached_service.service.yearly_test_id
+        else:
+            plan = attached_service.service.monthly_test_id
     else:
-        plan = attached_service.service.monthly_id
+        if attached_service.increment == 'yearly':
+            plan = attached_service.service.yearly_id
+        else:
+            plan = attached_service.service.monthly_id
 
     # update existing subscription if it exists
     if attached_service.subscription_id:
