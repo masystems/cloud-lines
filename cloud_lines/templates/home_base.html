@@ -144,7 +144,7 @@
 									<li><a href="#"><div>Account</div></a>
 										<ul>
 											{% if user.is_superuser %}
-												<li><a href="/admin"><div>Backend</div></a></li>
+												<li><a href="/admin" target="_blank"><div>Backend</div></a></li>
 											{% endif %}
 											<li><a href="{% url 'cl_logout' %}"><div>Logout</div></a></li>
 										</ul>
