@@ -185,13 +185,10 @@
 											<a href="{% url 'dashboard' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Dashboard!</a>
 									{% elif not request.user.is_authenticated %}
 										<div class="col-md-8">
-											<h2 class="t700 text-white mb-3">Try the demo or start your free instance now!</h2>
+											<h2 class="t700 text-white mb-3">Start your free instance now!</h2>
 										</div>
 										<div class="col-md-8">
-											<a href="https://demo.cloud-lines.com" target="_blank" class="button button-border button-rounded button-light button-large ml-0">Demo</a>
-
 											<a href="{% url 'login' %}" class="button center bg-white color button-light button-rounded button-large ml-0">Try now!</a>
-											<p>For demo use - Username: demo, Password: demo</p>
 									{% endif %}
 										</div>
 								</div>

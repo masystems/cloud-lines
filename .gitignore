@@ -14,3 +14,4 @@ pango-1.0
 pangocairo-1.0
 zappa_settings.json
 */migrations/*
+chromedriver
