@@ -473,3 +473,7 @@ def get_build_status(request):
 
         status['percent'] = queue_item.percentage_complete
         return HttpResponse(json.dumps(status))
+
+
+def robots(request):
+    return render(request, 'robots.txt')
