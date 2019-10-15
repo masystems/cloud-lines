@@ -334,6 +334,7 @@ def settings(request):
 @login_required(login_url="/account/login")
 def custom_field_edit(request):
     # this is the additional user customers can add/remove from their service.
+    print(request)
     if request.method == 'POST':
         user_detail = UserDetail.objects.get(user=request.user)
         attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
@@ -384,7 +385,7 @@ def custom_field_edit(request):
                 else:
                     object.custom_fields = json.dumps(object_custom_fields)
                     object.save()
-            return HttpResponse(True)
+            return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'edit':
             custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
@@ -421,7 +422,7 @@ def custom_field_edit(request):
                 else:
                     object.custom_fields = json.dumps(custom_fields)
                     object.save()
-            return HttpResponse(True)
+            return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'delete':
             custom_fields.pop(request.POST.get('id'), None)
@@ -456,7 +457,7 @@ def custom_field_edit(request):
                     object.custom_fields = json.dumps(custom_fields_updated)
                     object.save()
 
-            return HttpResponse(True)
+            return HttpResponse(json.dumps({'success': True}))
 
 
 @user_passes_test(is_editor)

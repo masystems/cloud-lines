@@ -355,159 +355,167 @@
                     <div class="tab-pane" id="customFields" role="tabpanel">
                         <div class="card-body">
                             <p class="text-left">You can add your own custom fields below! Start by clicking Edit rows, then click add new.</p>
-                            <div class="table-responsive">
-                                <table id="footable-addrow" class="table" data-paging="true" data-filtering="true" data-sorting="true" data-editing="{% if editor %}true{% else %}false{% endif %}" data-state="true"></table>
-                            </div>
-                            <!-- Start Popup Model -->
-                            <div class="modal fade" id="editor-modal" tabindex="-1" role="dialog" aria-labelledby="editor-title">
-                                <style scoped>
-                                    /* provides a red astrix to denote required fields - this should be included in common stylesheet */
-                                    .form-group.required .control-label:after {
-                                        content:"*";
-                                        color:red;
-                                        margin-left: 4px;
-                                    }
-                                </style>
-                                <div class="modal-dialog" role="document">
-                                    {% if editor %}
-                                    <form class="modal-content form-horizontal" id="editor">
-                                        {% csrf_token %}
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                                            <h4 class="modal-title" id="editor-title">Add Field</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="form-group">
-                                                <label for="location" class="col-sm-3 control-label">Location</label>
-                                                <div class="col-sm-9">
-                                                    <select class="form-control" id="location" name="location" required>
-                                                    <option value="pedigree">Pedigree</option>
-                                                    <option value="breeder">Breeder</option>
-                                                    <option value="breed">Breed</option>
-                                                </select>
+                            <table id="cfTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Localtion</th>
+                                        <th>Field Name</th>
+                                        <th>Field Type</th>
+                                        {% if editor %}<th scope="col" class="d-none d-sm-table-cell">Edit</th>{% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for field_key, field_vals in custom_fields.items %}
+                                    <tr>
+                                        <td>{{ field_vals.id }}</td>
+                                        <td>{{ field_vals.location }}</td>
+                                        <td>{{ field_vals.fieldName }}</td>
+                                        <td>{{ field_vals.fieldType }}</td>
+                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="cfEdit">Edit</button> <button class="btn btn-sm btn-danger" id="cfDeleteBtn">Delete</button></td>{% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            {% if editor %}
+                                <a type="hidden" id="openCfModal" data-toggle="modal" data-target="#cfverticalcenter"></a>
+                                <button class="btn btn-success" id="createNewCf">Create New Custom Field</button>
+
+                                <div id="cfverticalcenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="cfvcenter" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="cfvcenter">New/Edit Custom Field</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form class="form-horizontal" id="cfEditor">
+                                                    <div class="form-group">
+                                                        <label for="cfLocation" class="col-sm-3 control-label">Location</label>
+                                                        <div class="col-sm-9">
+                                                            <select class="form-control" id="cfLocation" name="location" required>
+                                                            <option value="pedigree">Pedigree</option>
+                                                            <option value="breeder">Breeder</option>
+                                                            <option value="breed">Breed</option>
+                                                        </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group required">
+                                                        <label for="cfFieldName" class="col-sm-4 control-label">Field Name</label>
+                                                        <div class="col-sm-9">
+                                                            <input type="text" class="form-control" id="cfFieldName" name="fieldName" placeholder="Field Name" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="cfFieldType" class="col-sm-3 control-label">Field Type</label>
+                                                        <div class="col-sm-9">
+                                                            <select class="form-control" id="cfFieldType" name="fieldType" required>
+                                                            <option value="textField">Text Field</option>
+                                                            <option value="textBox">Text Box</option>
+                                                        </select>
+                                                        </div>
+                                                    </div>
+                                                    <input type="hidden" id="cfID" name="id">
+                                                    <input type="hidden" id="cfFormType" name="formType">
+                                                </form>
+                                                <div class="modal-footer">
+
+                                                    <button type="submit" id="cfFormBtn" class="btn btn-success">Save changes</button>
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                                 </div>
                                             </div>
-                                            <div class="form-group required">
-                                                <label for="fieldName" class="col-sm-4 control-label">Field Name</label>
-                                                <div class="col-sm-9">
-                                                    <input type="text" class="form-control" id="fieldName" name="fieldName" placeholder="Field Name" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="fieldType" class="col-sm-3 control-label">Field Type</label>
-                                                <div class="col-sm-9">
-                                                    <select class="form-control" id="fieldType" name="fieldType" required>
-                                                    <option value="textField">Text Field</option>
-                                                    <option value="textBox">Text Box</option>
-                                                </select>
-                                                </div>
-                                            </div>
                                         </div>
-                                        <div class="modal-footer">
-                                            <input type="hidden" id="formType" name="formType">
-                                            <input type="hidden" id="id" name="id">
-                                            <button type="submit" id="userFormBtn" class="btn btn-success">Save changes</button>
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                        </div>
-                                    </form>
-                                    {% endif %}
-                                    <script>
-                                        $(window).on('load', function() {
-
-                                            // Add & Remove Row
-                                            // -----------------------------------------------------------------
-                                            var $modal = $('#editor-modal'),
-                                            $editor = $('#editor'),
-                                            $editorTitle = $('#editor-title'),
-                                            ft = FooTable.init('#footable-addrow', {
-                                                columns: [
-                                                  {"name":"id","title":"ID"},
-                                                  {"name":"location","title":"Location"},
-                                                  {"name":"fieldName","title":"Field Name"},
-                                                  {"name":"fieldType","title":"Field Type"},
-                                                ],
-                                                rows: [{% for field_key, field_vals in custom_fields.items %}
-                                                           {{ field_vals|safe }},
-                                                       {% endfor %}],
-                                                editing: {
-                                                    addRow: function(){
-                                                        $modal.removeData('row');
-                                                        $editor[0].reset();
-                                                        $editorTitle.text('Add a new field');
-                                                        $('#formType').val('new');
-                                                        $modal.modal('show');
-                                                    },
-                                                    editRow: function(row){
-                                                        var values = row.val();
-                                                        $editor.find('#id').val(values.id);
-                                                        $editor.find('#location').val(values.location);
-                                                        $editor.find('#fieldName').val(values.fieldName);
-                                                        $editor.find('#fieldType').val(values.fieldType);
-                                                        $modal.data('row', row);
-                                                        $editorTitle.text('Edit user #' + values.id);
-                                                        $('#formType').val('edit');
-                                                        $modal.modal('show');
-                                                    },
-                                                    deleteRow: function(row){
-                                                        var values = row.val();
-                                                        $editor.find('#id').val(values.id);
-                                                        $editor.find('#fieldName').val(values.fieldName);
-                                                        $('#formType').val('delete');
-                                                        if (confirm('Are you sure you want to delete this field?')){
-
-                                                            $('#userFormBtn').click();
-                                                            //row.delete();
-                                                            location.reload();
-                                                        }
-                                                    }
-                                                }
-                                            }),
-                                            uid = 01;
-
-                                            $editor.on('submit', function(e){
-                                                if (this.checkValidity && !this.checkValidity()) return;
-                                                e.preventDefault();
-                                                var row = $modal.data('row'),
-                                                    values = {
-                                                        id: $editor.find('#id').val(),
-                                                        location: $editor.find('#location').val(),
-                                                        fieldName: $editor.find('#fieldName').val(),
-                                                        fieldType: $editor.find('#fieldType').val(),
-                                                    };
-
-                                                if (row instanceof FooTable.Row){
-                                                    row.val(values);
-                                                } else {
-                                                    values.id = uid++;
-                                                    ft.rows.add(values);
-                                                }
-
-                                                $.ajax({
-                                                    url: '{% url 'custom_field_edit' %}',
-                                                    type: 'post',
-                                                    dataType: 'text',
-                                                    async: false,
-                                                    data: $('#editor').serialize(),
-                                                    success: function(data) {
-                                                     },
-                                                    error: function(jqXHR, textStatus, errorThrown){
-                                                        console.log('jqXHR:');
-                                                        console.log(jqXHR);
-                                                        console.log('textStatus:');
-                                                        console.log(textStatus);
-                                                        console.log('errorThrown:');
-                                                        console.log(errorThrown);
-                                                    }
-                                                });
-
-                                                $modal.modal('hide');
-                                            });
-                                        });
-                                    </script>
-
+                                    </div>
                                 </div>
 
-                            </div>
+                                <!-- delete user modal content -->
+                             <a type="hidden" id="deleteCfModal" data-toggle="modal" data-target="#deleteCf"></a>
+                                <div id="deleteCf" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="vcenter" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title" id="cfDelvcenter">Deletion Confirmation</h4>
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete custom field?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
+                                                <button type="submit" id="cfDelete" name="delete" value="delete" class="btn btn-danger float-right">Yes, delete it!</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {% endif %}
+                            <script>
+                                $('#createNewCf').click(function() {
+                                    var currentRow=$(this).closest("tr");
+
+                                    $('#cfLocaltion').val('Pedigree');
+                                    $('#cfFieldName').val('');
+                                    $('#cfFieldType').val('textField');
+
+                                    // edit form type
+                                    $('#cfFormType').val('new');
+                                    // open modal
+                                    $('#openCfModal').click();
+                                });
+
+                                $("#cfTable").on('click','#cfEdit',function(){
+                                    var currentRow=$(this).closest("tr");
+                                    $('#cfID').val(currentRow.find("td:eq(0)").text());
+                                    $('#cfLocation').val(currentRow.find("td:eq(1)").text());
+                                    $('#cfFieldName').val(currentRow.find("td:eq(2)").text());
+                                    $('#cfFieldType').val(currentRow.find("td:eq(3)").text());
+                                    // edit form type
+                                    $('#cfFormType').val('edit');
+                                    // open modal
+                                    $('#openCfModal').click();
+
+                                });
+
+                                $("#cfTable").on('click','#cfDeleteBtn',function(){
+                                    var currentRow=$(this).closest("tr");
+                                    $('#cfID').val(currentRow.find("td:eq(0)").text());
+                                    $('#cfLocation').val(currentRow.find("td:eq(1)").text());
+                                    $('#cfFieldName').val(currentRow.find("td:eq(2)").text());
+                                    $('#cfFieldType').val(currentRow.find("td:eq(3)").text());
+                                    // edit form type
+                                    $('#cfFormType').val('delete');
+                                    // open modal
+                                    $('#deleteCfModal').click();
+
+                                });
+
+                                $("#cfDelete").click( function(){
+                                    // auto click submit
+                                    $('#cfFormBtn').click();
+                                });
+
+                                $("#cfFormBtn").click( function(){
+                                    $.ajax({
+                                        url: "{% url 'custom_field_edit' %}",
+                                        type: 'POST',
+                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                        dataType: 'text',
+                                        data: $('#cfEditor').serialize(),
+                                        success: function(data) {
+                                            console.log(data);
+                                            var result = JSON.parse(data);
+                                            if (result.success){
+                                                $('#cfverticalcenter').modal('toggle');
+                                                location.reload();
+                                            } else {
+                                                console.log('something went wrong!');
+                                            }
+                                        }
+                                    });
+                                });
+                            </script>
+
+
                             <!-- End Popup Model -->
                             <hr>
                             <h4>Parent Titles</h4>
