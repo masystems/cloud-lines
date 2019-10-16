@@ -28,12 +28,14 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label>Select infomation to export</label>
-                                    <div class="input-group text-right">
+                                    <div class="input-group">
                                         <ul class="icheck-list">
                                             {% for field in fields %}
-                                                {% if 'mother' != field.name and 'father' != field.name %}
+                                                {% if field.verbose_name %}
                                                     <li>
-                                                        <input type="checkbox" checked class="check" data-checkbox="icheckbox_line-green" name="fields" value='{{ field.name }}' data-label="{{ field.name }}"> </li>
+                                                        <input type="checkbox" checked class="check" data-checkbox="icheckbox_flat-green" name="fields" value='{{ field.name }}' id="{{ field.name }}">
+                                                        <label for="{{ field.name }}">{{ field.verbose_name|title }}</label>
+                                                    </li>
                                                 {% endif %}
                                             {% endfor %}
                                         </ul>
