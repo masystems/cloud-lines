@@ -54,6 +54,7 @@ def dashboard(request):
     ## updates
     get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
     updates = get_updates_json.json()
+    update_card_size = 44 * len(updates)
 
     return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
                                               #'total_breeders': total_breeders,
@@ -63,6 +64,7 @@ def dashboard(request):
                                               'breed_chart': breed_chart,
                                               'pedigree_chart': pedigree_chart,
                                               'updates': updates,
+                                              'update_card_size': update_card_size,
                                               })
 
 
