@@ -23,24 +23,24 @@ def export(request):
         elif request.POST['submit'] == 'csv':
             # Create the HttpResponse object with the appropriate CSV header.
             response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="pedigree_db-{}.csv"'.format(date.strftime("%Y-%m-%d"))
+            response['Content-Disposition'] = 'attachment; filename="cloud-lines-pedigrees-{}.csv"'.format(date.strftime("%Y-%m-%d"))
 
             writer = csv.writer(response)
             header = False
 
             for pedigree in Pedigree.objects.filter(account=attached_service):
-                head = ''
-                row = ''
+                head = []
+                row = []
                 for key, val in pedigree.__dict__.items():
                     if not header:
                         if key != '_state':
-                            head += '{},'.format(key)
+                            head.append('{},'.format(key))
                     if key in fields:
-                        row += '{},'.format(val)
+                        row.append('{},'.format(val))
                 if not header:
-                    writer.writerow([head])
+                    writer.writerow(head)
                     header = True
-                writer.writerow([row])
+                writer.writerow(row)
 
             return response
         elif request.POST['submit'] == 'pdf':
