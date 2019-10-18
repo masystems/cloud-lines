@@ -102,8 +102,8 @@
 					<!-- Logo
 					============================================= -->
 					<div class="d-flex flex-wrap align-items-center" id="logo">
-						<span><a href="https://cloud-lines.com" class="standard-logo" data-dark-logo="{% static 'assets/images/cloud-lines-logo-white.png' %}"><img src="{% static 'assets/images/cloud-lines-logo.png' %}" alt="Cloudlines" style="max-height:85px"></a></span>
-						<a href="https://cloud-lines.com" class="retina-logo" data-dark-logo="{% static 'assets/images/cloud-lines-logo-white.png' %}"><img src="{% static 'assets/images/cloud-lines-logo.png' %}" alt="Cloudlines" style="max-height:85px"></a>
+						<span><a href="https://cloud-lines.com" class="standard-logo" data-dark-logo="{% static 'assets/images/cloud-lines-logo-white.png' %}"><img src="{% static 'assets/images/cloud-lines-logo.png' %}" alt="Cloud-Lines logo" style="max-height:85px"></a></span>
+						<a href="https://cloud-lines.com" class="retina-logo" data-dark-logo="{% static 'assets/images/cloud-lines-logo-white.png' %}"><img src="{% static 'assets/images/cloud-lines-logo.png' %}" alt="Cloud-Lines Logo" style="max-height:85px"></a>
 					</div><!-- #logo end -->
 
 					<!-- Primary Navigation
@@ -121,7 +121,7 @@
 											<li>
 												<div class="feature-box not-dark fbox-small fbox-center nobottommargin">
 													<div class="fbox-icon">
-														<a href="{% url 'services' %}#{{ service.service_name }}"><img src="{% static service.icon %}" class="noradius nobg tleft" alt="" style="max-height: 50px;"></a>
+														<a href="{% url 'services' %}#{{ service.service_name }}"><img src="{% static service.icon %}" class="noradius nobg tleft" alt="cloud-lines services" style="max-height: 50px;"></a>
 													</div>
 													<h3 class="t500"><a href="{% url 'services' %}#{{ service.service_name }}">{{ service.service_name }}</a></h3>
 													<p class="d-none d-lg-block mb-0 t300">{{ service.service_description|truncatechars:150 }}</p>
