@@ -11,8 +11,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
-SITE_ID = 1
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -31,11 +29,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'zappa_django_utils',
     'rest_framework.authtoken',
-    'django.contrib.sites',
-    'cms',
-    'menus',
-    'treebeard',
-    'djangocms_admin_style',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -107,11 +100,6 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-gb'
-
-LANGUAGES = [
-    ('en', 'English'),
-    ('de', 'German'),
-]
 
 TIME_ZONE = 'UTC'
 
