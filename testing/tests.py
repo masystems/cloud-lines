@@ -9,7 +9,7 @@ class cloudlinesTest():
         self.username = 'dev'
         self.password = 'pedigree'
 
-        self.browser = webdriver.Chrome('/home/marco/projects/masys-pedigree/cloudlines/cloud-lines/chromedriver')
+        self.browser = webdriver.Chrome('/home/marco/projects/masys-pedigree/cloudlines/cloud-lines/testing/chromedriver')
         self.browser.get('https://dev.cloud-lines.com')
 
         self.pedigree = {'breeder': 'Test Breeder',
