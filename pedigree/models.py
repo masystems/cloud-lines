@@ -9,6 +9,7 @@ class Pedigree(models.Model):
     class Meta:
         get_latest_by = "order_date"
 
+    approved = models.BooleanField(default=True)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Creator")
     account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Account")
     breeder = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Breeder", help_text="Often the same as Current Owner")
