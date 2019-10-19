@@ -5,6 +5,7 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 router.register('updates', views.UpdateViews)
 router.register('pedigrees', views.PedigreeViews, basename='Pedigree')
+router.register('breeders', views.BreederViews, basename='Breeder')
 router.register('authenticate', views.Authenticate)
 
 urlpatterns = [
