@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .serializers import ApiUpdatesSerializer, ApiPedigreeSerializer, ApiBreederSerializer, ApiAuthentication
+from .serializers import ApiUpdatesSerializer, ApiPedigreeSerializer, ApiBreederSerializer, ApiBreedSerializer, ApiAuthentication
 from cloud_lines.models import Update
 from pedigree.models import Pedigree
 from breeder.models import Breeder
+from breed.models import Breed
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import authentication_classes, permission_classes
@@ -38,6 +39,18 @@ class BreederViews(viewsets.ModelViewSet):
         user = self.request.user
         main_account = get_main_account(user)
         return Breeder.objects.filter(account=main_account)
+
+
+class BreedViews(viewsets.ModelViewSet):
+    serializer_class = ApiBreedSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        main_account = get_main_account(user)
+        return Breed.objects.filter(account=main_account)
+
 
 
 class Authenticate(viewsets.ModelViewSet):

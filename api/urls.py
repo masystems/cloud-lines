@@ -6,6 +6,7 @@ router = routers.DefaultRouter()
 router.register('updates', views.UpdateViews)
 router.register('pedigrees', views.PedigreeViews, basename='Pedigree')
 router.register('breeders', views.BreederViews, basename='Breeder')
+router.register('breeds', views.BreedViews, basename='Breed')
 router.register('authenticate', views.Authenticate)
 
 urlpatterns = [
