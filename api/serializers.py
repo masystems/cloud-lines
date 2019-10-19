@@ -3,6 +3,7 @@ from cloud_lines.models import Update
 from pedigree.models import Pedigree
 from breeder.models import Breeder
 from breed.models import Breed
+from breed_group.models import BreedGroup
 from django.contrib.auth.models import User
 
 
@@ -27,6 +28,12 @@ class ApiBreederSerializer(serializers.ModelSerializer):
 class ApiBreedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Breed
+        fields = '__all__'
+
+
+class ApiBreedGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BreedGroup
         fields = '__all__'
 
 
