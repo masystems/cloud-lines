@@ -45,8 +45,8 @@ def dashboard(request):
 
         breed_chart = {}
         for breed in Breed.objects.filter(account=main_account):
-            breed_chart[breed] = {'male': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=main_account) & Q(sex='male')).count(),
-                                   'female': Pedigree.objects.filter(Q(attribute__breed__breed_name=breed, account=main_account) & Q(sex='female')).count()}
+            breed_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).count(),
+                                   'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).count()}
 
     else:
         return redirect('setup')

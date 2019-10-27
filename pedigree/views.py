@@ -5,27 +5,30 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
 from django.views.decorators.cache import never_cache
 from django.utils.text import slugify
+from django.core import serializers
 from io import BytesIO
 from django.template.loader import get_template
 from django.views.generic import View
 from xhtml2pdf import pisa
-from .models import Pedigree, PedigreeAttributes, PedigreeImage
+from .models import Pedigree, PedigreeImage
 from breed.models import Breed
 from breeder.models import Breeder
 from breeder.forms import BreederForm
 from breed.forms import BreedForm
 from breed_group.models import BreedGroup
-from .forms import PedigreeForm, AttributeForm, ImagesForm
+from .forms import PedigreeForm, ImagesForm
 from django.db.models import Q
 import re
 import json
 from account.views import is_editor, get_main_account
+from approvals.models import Approval
+import dateutil.parser
 
 
 @login_required(login_url="/account/login")
 def search(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service)[0:1000]
+    pedigrees = Pedigree.objects.filter(Q(account=attached_service, state='approved') | Q(account=attached_service, state='edited'))[0:1000]
     return render(request, 'search.html', {'pedigrees': pedigrees})
 
 
@@ -46,11 +49,11 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
         context['groups'] = BreedGroup.objects.filter(group_members=context['lvl1'].id)
 
         # get all pedigrees for typeahead fields
-        context['pedigrees'] = Pedigree.objects.filter(account=context['attached_service'])
+        context['pedigrees'] = Pedigree.objects.filter(account=context['attached_service'], state='approved')
 
         # get custom fields
         try:
-            context['custom_fields'] = json.loads(context['lvl1'].attribute.custom_fields)
+            context['custom_fields'] = json.loads(context['lvl1'].custom_fields)
         except json.decoder.JSONDecodeError:
             context['custom_fields'] = {}
         except ObjectDoesNotExist:
@@ -84,7 +87,7 @@ class GeneratePDF(View):
     def get(self, request, *args, **kwargs):
         context = {}
         context['attached_service'] = get_main_account(request.user)
-        context['lvl1'] = Pedigree.objects.get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
+        context['lvl1'] = Pedigree.objects.get(account=context['attached_service'], id=self.kwargs['pedigree_id'], state='approved')
         context = generate_hirearchy(context)
 
         pdf_filename = "{date}-{name}{pedigree}-certificate".format(
@@ -111,7 +114,7 @@ def generate_hirearchy(context):
     # 1
     try:
         if context['lvl1'].parent_mother:
-            context['lvl2_1'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl1'].parent_mother)
+            context['lvl2_1'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl1'].parent_mother, state='approved')
         elif context['lvl1'].breed_group:
             context['lvl2_1_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl1'].breed_group)
     except:
@@ -119,7 +122,7 @@ def generate_hirearchy(context):
 
     # 2
     try:
-        context['lvl2_2'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl1'].parent_father)
+        context['lvl2_2'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl1'].parent_father, state='approved')
     except:
         context['lvl2_2'] = ''
 
@@ -127,7 +130,7 @@ def generate_hirearchy(context):
     # 1
     try:
         if context['lvl2_1'].parent_mother:
-            context['lvl3_1'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_mother)
+            context['lvl3_1'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_mother, state='approved')
         elif context['lvl2_1'].breed_group:
             context['lvl3_1_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl2_1'].breed_group)
     except:
@@ -135,14 +138,14 @@ def generate_hirearchy(context):
 
     # 2
     try:
-        context['lvl3_2'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_father)
+        context['lvl3_2'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_father, state='approved')
     except:
         context['lvl3_2'] = ''
 
     # 3
     try:
         if context['lvl2_2'].parent_mother:
-            context['lvl3_3'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl2_2'].parent_mother)
+            context['lvl3_3'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl2_2'].parent_mother, state='approved')
         elif context['lvl2_2'].breed_group:
             context['lvl3_3_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl2_2'].breed_group)
     except:
@@ -150,7 +153,7 @@ def generate_hirearchy(context):
 
     # 4
     try:
-        context['lvl3_4'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl2_2'].parent_father)
+        context['lvl3_4'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl2_2'].parent_father, state='approved')
     except:
         context['lvl3_4'] = ''
 
@@ -158,7 +161,7 @@ def generate_hirearchy(context):
     # 1
     try:
         if context['lvl3_1'].parent_mother:
-            context['lvl4_1'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_1'].parent_mother)
+            context['lvl4_1'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_1'].parent_mother, state='approved')
         elif context['lvl3_1'].breed_group:
             context['lvl4_1_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_1'].breed_group)
     except:
@@ -166,14 +169,14 @@ def generate_hirearchy(context):
 
     # 2
     try:
-        context['lvl4_2'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_1'].parent_father)
+        context['lvl4_2'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_1'].parent_father, state='approved')
     except:
         context['lvl4_2'] = ''
 
     # 3
     try:
         if context['lvl3_2'].parent_mother:
-            context['lvl4_3'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_2'].parent_mother)
+            context['lvl4_3'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_2'].parent_mother, state='approved')
         elif context['lvl3_2'].breed_group:
             context['lvl4_3_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_2'].breed_group)
     except:
@@ -181,13 +184,13 @@ def generate_hirearchy(context):
 
     # 4
     try:
-        context['lvl4_4'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_2'].parent_father)
+        context['lvl4_4'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_2'].parent_father, state='approved')
     except:
         context['lvl4_4'] = ''
     # 5
     try:
         if context['lvl3_3'].parent_mother:
-            context['lvl4_5'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_3'].parent_mother)
+            context['lvl4_5'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_3'].parent_mother, state='approved')
         elif context['lvl3_3'].breed_group:
             context['lvl4_5_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_3'].breed_group)
     except:
@@ -195,14 +198,14 @@ def generate_hirearchy(context):
 
     # 6
     try:
-        context['lvl4_6'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_3'].parent_father)
+        context['lvl4_6'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_3'].parent_father, state='approved')
     except:
         context['lvl4_6'] = ''
 
     # 7
     try:
         if context['lvl3_4'].parent_mother:
-            context['lvl4_7'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_4'].parent_mother)
+            context['lvl4_7'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_4'].parent_mother, state='approved')
         elif context['lvl3_4'].breed_group:
             context['lvl4_7_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_4'].breed_group)
     except:
@@ -210,7 +213,7 @@ def generate_hirearchy(context):
 
     # 8
     try:
-        context['lvl4_8'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_4'].parent_father)
+        context['lvl4_8'] = Pedigree.objects.get(account=context['attached_service'], reg_no=context['lvl3_4'].parent_father, state='approved')
     except:
         context['lvl4_8'] = ''
 
@@ -226,8 +229,10 @@ def search_results(request):
         # lvl 1
         try:
             results = Pedigree.objects.filter(Q(account=attached_service,
-                                                reg_no__icontains=search_string.upper()) | Q(account=attached_service,
-                                                                                             name__icontains=search_string))[0:1000]
+                                                reg_no__icontains=search_string.upper(),
+                                                state='approved') | Q(account=attached_service,
+                                                                      name__icontains=search_string,
+                                                                      state='approved'))[0:1000],
         except ObjectDoesNotExist:
             breeders = Breeder.objects
             error = "No pedigrees found using: "
@@ -241,7 +246,7 @@ def search_results(request):
                                                              'results': results})
         else:
             try:
-                lvl1 = Pedigree.objects.get(Q(account=attached_service, reg_no__icontains=search_string.upper()) | Q(account=attached_service, name__icontains=search_string))
+                lvl1 = Pedigree.objects.get(Q(account=attached_service, reg_no__icontains=search_string.upper(), state='approved') | Q(account=attached_service, name__icontains=search_string), state='approved')
             except ObjectDoesNotExist:
                 breeders = Breeder.objects
                 error = "No pedigrees found using: "
@@ -257,7 +262,6 @@ def search_results(request):
 @never_cache
 def new_pedigree_form(request):
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
-    attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
     attached_service = get_main_account(request.user)
@@ -286,11 +290,11 @@ def new_pedigree_form(request):
         if not BreedGroup.objects.filter(account=attached_service, group_name=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
             pedigree_form.add_error('breed_group', 'Selected breed group does not exist')
             pre_checks = False
-        if not Breed.objects.filter(account=attached_service, breed_name=attributes_form['breed'].value()).exists() and attributes_form['breed'].value() not in ['Breed', '', 'None', None]:
-            attributes_form.add_error('breed', 'Selected breed does not exist')
+        if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
+            pedigree_form.add_error('breed', 'Selected breed does not exist')
             pre_checks = False
 
-        if pedigree_form.is_valid() and attributes_form.is_valid() and image_form.is_valid() and pre_checks:
+        if pedigree_form.is_valid() and image_form.is_valid() and pre_checks:
             new_pedigree = Pedigree()
             new_pedigree.creator = request.user
             try:
@@ -341,13 +345,9 @@ def new_pedigree_form(request):
 
             new_pedigree.description = pedigree_form['description'].value()
             new_pedigree.account = attached_service
-            new_pedigree.save()
-
-            new_pedigree_attributes = PedigreeAttributes()
-            new_pedigree_attributes.reg_no = Pedigree.objects.get(account=attached_service, reg_no=new_pedigree.reg_no)
 
             breed = Breed.objects.get(account=attached_service, breed_name=request.POST.get('breed'))
-            new_pedigree_attributes.breed = breed
+            new_pedigree.breed = breed
 
             try:
                 custom_fields = json.loads(attached_service.custom_fields)
@@ -357,8 +357,33 @@ def new_pedigree_form(request):
             except json.decoder.JSONDecodeError:
                 pass
 
-            new_pedigree_attributes.custom_fields = json.dumps(custom_fields)
-            new_pedigree_attributes.save()
+            new_pedigree.custom_fields = json.dumps(custom_fields)
+
+            if request.user in attached_service.contributors.all():
+                new_pedigree.state = 'unapproved'
+                new_pedigree.save()
+                try:
+                    new_pedigree.dob = dateutil.parser.parse(new_pedigree.dob)
+                except TypeError:
+                    pass
+                try:
+                    new_pedigree.dod = dateutil.parser.parse(new_pedigree.dod)
+                except TypeError:
+                    pass
+                try:
+                    new_pedigree.date_of_registration = dateutil.parser.parse(new_pedigree.date_of_registration)
+                except TypeError:
+                    pass
+                data = serializers.serialize('yaml', [new_pedigree])
+                Approval.objects.create(account=attached_service,
+                                        user=request.user,
+                                        type='new',
+                                        pedigree=new_pedigree,
+                                        approved=None,
+                                        data=data)
+
+            else:
+                new_pedigree.save()
 
             files = request.FILES.getlist('upload_images')
 
@@ -381,7 +406,6 @@ def new_pedigree_form(request):
         suggested_reg = 'REG12345'
 
     return render(request, 'new_pedigree_form_base.html', {'pedigree_form': pedigree_form,
-                                                           'attributes_form': attributes_form,
                                                            'image_form': image_form,
                                                            'pedigrees': Pedigree.objects.filter(account=attached_service),
                                                            'breeders': Breeder.objects.filter(account=attached_service),
@@ -401,13 +425,12 @@ def edit_pedigree_form(request, id):
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
-    attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
 
     try:
         # get custom fields
-        custom_fields = json.loads(pedigree.attribute.custom_fields)
+        custom_fields = json.loads(pedigree.custom_fields)
     except json.decoder.JSONDecodeError:
         try:
             # get custom fields template
@@ -438,11 +461,11 @@ def edit_pedigree_form(request, id):
         if not BreedGroup.objects.filter(account=attached_service, group_name=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
             pedigree_form.add_error('breed_group', 'Selected breed group does not exist')
             pre_checks = False
-        if not Breed.objects.filter(account=attached_service, breed_name=attributes_form['breed'].value()).exists() and attributes_form['breed'].value() not in ['Breed', '', 'None', None]:
-            attributes_form.add_error('breed', 'Selected breed does not exist')
+        if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
+            pedigree_form.add_error('breed', 'Selected breed does not exist')
             pre_checks = False
 
-        if pedigree_form.is_valid() and attributes_form.is_valid() and image_form.is_valid() and pre_checks:
+        if pedigree_form.is_valid() and image_form.is_valid() and pre_checks:
             try:
                 if pedigree_form['breeder'].value() == '':
                     pedigree.breeder = None
@@ -508,20 +531,41 @@ def edit_pedigree_form(request, id):
 
             pedigree.description = pedigree_form['description'].value()
 
-            pedigree.save()
-
-            pedigree_attributes, created = PedigreeAttributes.objects.get_or_create(reg_no=pedigree)
-
-            pedigree_attributes.breed = Breed.objects.get(account=attached_service, breed_name=attributes_form['breed'].value())
+            pedigree.breed = Breed.objects.get(account=attached_service, breed_name=pedigree_form['breed'].value())
 
             try:
-                custom_fields = json.loads(pedigree_attributes.custom_fields)
+                custom_fields = json.loads(pedigree.custom_fields)
             except json.decoder.JSONDecodeError:
                 custom_fields = {}
             for id, field in custom_fields.items():
                 custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
 
-            pedigree_attributes.custom_fields = json.dumps(custom_fields)
+            pedigree.custom_fields = json.dumps(custom_fields)
+
+            if request.user in attached_service.contributors.all():
+                Pedigree.objects.filter(id=pedigree.id).update(state='edited')
+                try:
+                    pedigree.dob = dateutil.parser.parse(pedigree.dob)
+                except TypeError:
+                    pass
+                try:
+                    pedigree.dod = dateutil.parser.parse(pedigree.dod)
+                except TypeError:
+                    pass
+                try:
+                    pedigree.date_of_registration = dateutil.parser.parse(pedigree.date_of_registration)
+                except TypeError:
+                    pass
+                data = serializers.serialize('yaml', [pedigree])
+                Approval.objects.create(account=attached_service,
+                                        user=request.user,
+                                        type='edit',
+                                        pedigree=pedigree,
+                                        approved=None,
+                                        data=data)
+
+            else:
+                pedigree.save()
 
             files = request.FILES.getlist('upload_images')
             #fs = FileSystemStorage()
@@ -535,15 +579,11 @@ def edit_pedigree_form(request, id):
                 upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
                 upload.save()
 
-            pedigree.save()
-            pedigree_attributes.save()
-
             return redirect('pedigree', pedigree.id)
     else:
         pedigree_form = PedigreeForm()
 
     return render(request, 'edit_pedigree_form.html', {'pedigree_form': pedigree_form,
-                                                       'attributes_form': attributes_form,
                                                        'image_form': image_form,
                                                        'pedigree': pedigree,
                                                        'pedigrees': Pedigree.objects.filter(account=attached_service),

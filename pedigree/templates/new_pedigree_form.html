@@ -100,6 +100,38 @@
                             <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
                         {% endfor %}
                     </div>
+                {% elif field.label == 'Breed' %}
+                    {% if add_breed %}
+                        <div id="breeds">
+                            <input id="id_breed" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                        </div>
+                    {% else %}
+                            <input id="hid_breed" class="typeahead form-control" name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
+                            <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
+                    {% endif %}
+                    {% if 'setup' not in request.get_full_path %}
+                        <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="{% if add_breed %}#newBreedModal{% else %}#upgrade{% endif %}" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Breed</button>
+                    {% endif %}
+                {% elif field.label == 'Custom fields' %}
+                    {% if custom_fields %}
+                        {% for field_key, field_vals in custom_fields.items %}
+                            {% if field_vals.location == 'pedigree' %}
+                                {% if field_vals.fieldType == 'textField' %}
+                                    <label class="col-form-label">{{ field_vals.fieldName }}</label>
+                                    <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' type="text">
+                                {% elif field_vals.fieldType == 'textBox' %}
+                                    <label class="col-form-label">{{ field_vals.fieldName }}</label>
+                                    <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control"></textarea>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% if 'account/setup' not in request.path %}
+                            <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
+                        {% else %}
+                            <small>Make sure you add some custom fields in the 'Site Settings' section after this!</small>
+                        {% endif %}
+                    {% endif %}
                 {% else %}
                     {{ field }}
                 {% endif %}
@@ -128,79 +160,7 @@
     </script>
 
 </div>
-<h3 class="box-title">Attributes</h3>
-<hr class="mt-0 mb-5">
-<!--/row-->
-{% if attributes_form.errors %}
-    {% for field in attributes_form %}
-        {% for error in field.errors %}
-            <div class="alert alert-danger">
-                <strong>{{ field.label }}: {{ error }}</strong>
-            </div>
-        {% endfor %}
-    {% endfor %}
-    {% for error in attributes_form.non_field_errors %}
-        <div class="alert alert-danger">
-            <strong>{{ error|escape }}</strong>
-        </div>
-    {% endfor %}
-{% endif %}
-<div class="row">
-    {% for hidden in attributes_form.hidden_fields %}
-        {{ hidden }}
-    {% endfor %}
 
-    {% for field in attributes_form.visible_fields %}
-        {% if field.name != 'reg_no'%}
-            <div class="col-lg-12 col-md-12">
-                <div class="form-group row">
-                    <label class="col-sm-2 text-right col-form-label">{{ field.label }}</label>
-                    <div class="col-lg-10 col-md-10">
-                        {% if field.label == 'Breed' %}
-                            {% if add_breed %}
-                                <div id="breeds">
-                                    <input id="id_breed" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
-                                </div>
-                            {% else %}
-                                    <input id="hid_breed" class="typeahead form-control" name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
-                                    <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
-                            {% endif %}
-                            {% if 'setup' not in request.get_full_path %}
-                                <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="{% if add_breed %}#newBreedModal{% else %}#upgrade{% endif %}" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fas fa-plus-square"></i> Add New Breed</button>
-                            {% endif %}
-                        {% elif field.label == 'Custom fields' %}
-                            {% if custom_fields %}
-                                {% for field_key, field_vals in custom_fields.items %}
-                                    {% if field_vals.location == 'pedigree' %}
-                                        {% if field_vals.fieldType == 'textField' %}
-                                            <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
-                                            <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' type="text">
-                                        {% elif field_vals.fieldType == 'textBox' %}
-                                            <label class="col-sm-2 col-form-label">{{ field_vals.fieldName }}</label>
-                                            <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control"></textarea>
-                                        {% endif %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                {% if 'account/setup' not in request.path %}
-                                    <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
-                                {% else %}
-                                    <small>Make sure you add some custom fields in the 'Site Settings' section after this!</small>
-                                {% endif %}
-                            {% endif %}
-                        {% else %}
-                            {{ field }}
-                        {% endif %}
-                        {% for error in field.errors %}
-                          <span class="help-block text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    {% endfor %}
-</div>
-<!--/row-->
 <h3 class="box-title">Images</h3>
 <hr class="mt-0 mb-5">
 <!--/row-->

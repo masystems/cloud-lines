@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ValidationError
-from pedigree.models import Pedigree, PedigreeAttributes, PedigreeImage
+from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
 from account.views import is_editor, get_main_account
@@ -76,8 +76,6 @@ def importx(request):
         forbidden_pedigree_fields = ['id', 'creator', 'account', 'date_added']
         forbidden_pedigree_att_fields = ['id', 'account', 'custom_fields', 'reg_no']
         pedigree_headings = [field for field in Pedigree._meta.get_fields(include_parents=False, include_hidden=False) if field.name not in forbidden_pedigree_fields]
-        pedigree_att_headings = [field for field in PedigreeAttributes._meta.get_fields(include_parents=False, include_hidden=False) if field.name not in forbidden_pedigree_att_fields]
-        pedigree_headings = pedigree_headings + pedigree_att_headings
 
         # get breeder model headings
         forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
@@ -294,8 +292,6 @@ def import_pedigree_data(request):
                 pass
             #############################
 
-            pedigree.save()
-
             # create breed if it doesn't exist ###################
             if attached_service.service.service_name != 'Organisation':
                 breed_obj = Breed.objects.filter(account=attached_service).first()
@@ -307,13 +303,15 @@ def import_pedigree_data(request):
             else:
                 breed_obj = None
 
-            attributes, created = PedigreeAttributes.objects.get_or_create(reg_no=pedigree)
             try:
-                attributes.breed = breed_obj
+                pedigree.breed = breed_obj
             except KeyError:
                 pass
-            attributes.custom_fields = attached_service.custom_fields
-            attributes.save()
+            pedigree.custom_fields = attached_service.custom_fields
+            pedigree.save()
+
+
+
     return redirect('pedigree_search')
 
 

@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Approvals</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Approvals</li>
+            </ol>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Approvals</h4>
+                    <div class="table-responsive m-t-40">
+                        <table id="demo-foo-row-toggler" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Edited By</th>
+                                    <th>Section</th>
+                                    <th>Change Type</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                    <th data-breakpoints="all" data-title="Info"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for approval in approvals.all %}
+                                <tr>
+                                    {% if approval.pedigree %}
+                                        <td>{{ approval.pedigree.reg_no }}</td>
+                                    {% elif approval.breed_group %}
+                                        <td>{{ approval.breed_group.group_name }}</td>
+                                    {% else %}
+                                        <td></td>
+                                    {% endif %}
+                                    <td>{{ approval.user.get_full_name }}</td>
+
+                                    {% if approval.pedigree %}
+                                        <td>Pedigree</td>
+                                    {% elif approval.breed_group %}
+                                        <td>Breed Group</td>
+                                    {% else %}
+                                        <td></td>
+                                    {% endif %}
+
+                                    <td>{{ approval.type|title }}</td>
+
+                                    {% if approval.approved == True %}
+                                        <td>Approved</td>
+                                    {% elif approval.approved == False %}
+                                        <td>Declined</td>
+                                    {% else %}
+                                        <td>Pending</td>
+                                    {% endif %}
+
+                                    <td>
+                                        <a href="{% url 'approve' approval.id %}"><button class="btn btn-sm btn-success mr-1">Approve</button></a>
+                                        <button class="btn btn-sm btn-outline-info mr-1">Edit</button>
+                                        <a href="{% url 'declined' approval.id %}"><button class="btn btn-sm btn-danger">Decline</button></a>
+                                    </td>
+                                    {% if approval.type == 'new' %}
+                                        <td>
+                                            <div class="row">
+                                                {% for new_item in data %}
+                                                    {% if new_item.reg_no == approval.pedigree.reg_no %}
+                                                        <table>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>Reg Number</td>
+                                                                    <td>{{ new_item.reg_no }}</td>
+                                                                </tr>
+
+                                                                {% if new_item.breeder %}
+                                                                    <tr>
+                                                                        <td>Breeder</td>
+                                                                        <td>{{ new_item.breeder }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.current_owner %}
+                                                                    <tr>
+                                                                        <td>Current Owner</td>
+                                                                        <td>{{ new_item.current_owner }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.tag_no %}
+                                                                <tr>
+                                                                    <td>Tag Number</td>
+                                                                    <td>{{ new_item.tag_no }}</td>
+                                                                </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.name %}}
+                                                                    <tr>
+                                                                        <td>Name</td>
+                                                                        <td>{{ new_item.name }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.description %}
+                                                                    <tr>
+                                                                        <td>Description</td>
+                                                                        <td>{{ new_item.description }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.date_of_registration %}
+                                                                    <tr>
+                                                                        <td>Date of Registration</td>
+                                                                        <td>{{ new_item.date_of_registration }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.dob %}
+                                                                    <tr>
+                                                                        <td>Date of Birth</td>
+                                                                        <td>{{ new_item.dob }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.status %}
+                                                                    <tr>
+                                                                        <td>Status</td>
+                                                                        <td>{{ new_item.status }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.sex %}
+                                                                    <tr>
+                                                                        <td>Sex</td>
+                                                                        <td>{{ new_item.sex }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.parent_father %}
+                                                                    <tr>
+                                                                        <td>Father</td>
+                                                                        <td>{{ new_item.parent_father }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.parent_father_notes %}
+                                                                    <tr>
+                                                                        <td>Fathers Notes</td>
+                                                                        <td>{{ new_item.parent_father_notes }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.parent_mother %}
+                                                                    <tr>
+                                                                        <td>Mother</td>
+                                                                        <td>{{ new_item.parent_mother }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.parent_mother_notes %}
+                                                                    <tr>
+                                                                        <td>Mothers Notes</td>
+                                                                        <td>{{ new_item.parent_mother_notes }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.breed_group %}
+                                                                    <tr>
+                                                                        <td>Breed Group</td>
+                                                                        <td>{{ new_item.breed_group }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if new_item.breed %}
+                                                                    <tr>
+                                                                        <td>Breed</td>
+                                                                        <td>{{ new_item.breed }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                <tr>
+                                                                    <td>Custom Fields</td>
+                                                                    <td>{{ new_item.custom_fields }}
+                                                                        {% for field_key, field_vals in custom_fields %}
+                                                                            {% if field_vals.location == 'pedigree' %}
+                                                                                {% if field_vals.fieldType == 'textField' %}
+                                                                                    {{ field_vals.fieldName }}: {{ field_vals.field_value }}
+                                                                                {% endif %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            <div class="row">
+                                                {% for item in data %}
+                                                    {% if item.reg_no == approval.pedigree.reg_no %}
+                                                        <table>
+                                                            <tbody>
+                                                                {% if item.reg_no != approval.pedigree.reg_no %}
+                                                                    <tr>
+                                                                        <td>Reg Number</td>
+                                                                        <td>{{ item.reg_no }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.breeder != approval.pedigree.breeder %}
+                                                                    <tr>
+                                                                        <td>Breeder</td>
+                                                                        <td>{{ item.breeder }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.current_owner != approval.pedigree.current_owner %}
+                                                                    <tr>
+                                                                        <td>Current Owner</td>
+                                                                        <td>{{ item.current_owner }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.tag_no != approval.pedigree.tag_no %}
+                                                                <tr>
+                                                                    <td>Tag Number</td>
+                                                                    <td>{{ item.tag_no }}</td>
+                                                                </tr>
+                                                                {% endif %}
+
+                                                                {% if item.name != approval.pedigree.name %}
+                                                                    <tr>
+                                                                        <td>Name</td>
+                                                                        <td>{{ item.name }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.description != approval.pedigree.description %}
+                                                                    <tr>
+                                                                        <td>Description</td>
+                                                                        <td>{{ item.description }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.date_of_registration != approval.pedigree.date_of_registration %}
+                                                                    <tr>
+                                                                        <td>Date of Registration</td>
+                                                                        <td>{{ item.date_of_registration }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.dob != approval.pedigree.dob %}
+                                                                    <tr>
+                                                                        <td>Date of Birth</td>
+                                                                        <td>{{ item.dob }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.status != approval.pedigree.status %}
+                                                                    <tr>
+                                                                        <td>Status</td>
+                                                                        <td>{{ item.status }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.sex != approval.pedigree.sex %}
+                                                                    <tr>
+                                                                        <td>Sex</td>
+                                                                        <td>{{ item.sex }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.parent_father != approval.pedigree.parent_farther%}
+                                                                    <tr>
+                                                                        <td>Father</td>
+                                                                        <td>{{ item.parent_father }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.parent_father_notes != approval.pedigree.parent_father_notes %}
+                                                                    <tr>
+                                                                        <td>Fathers Notes</td>
+                                                                        <td>{{ item.parent_father_notes }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.parent_mother != approval.pedigree.parent_mother %}
+                                                                    <tr>
+                                                                        <td>Mother</td>
+                                                                        <td>{{ item.parent_mother }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.parent_mother_notes != approval.pedigree.parent_mother_notes %}
+                                                                    <tr>
+                                                                        <td>Mothers Notes</td>
+                                                                        <td>{{ item.parent_mother_notes }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.breed_group != approval.pedigree.breed_group %}
+                                                                    <tr>
+                                                                        <td>Breed Group</td>
+                                                                        <td>{{ item.breed_group }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                {% if item.breed != approval.pedigree.breed %}
+                                                                    <tr>
+                                                                        <td>Breed</td>
+                                                                        <td>{{ item.breed }}</td>
+                                                                    </tr>
+                                                                {% endif %}
+
+                                                                <tr>
+                                                                    <td>Custom Fields</td>
+                                                                    <td>{{ item.custom_fields }}
+                                                                        {% for field_key, field_vals in custom_fields %}
+                                                                            {% if field_vals.location == 'pedigree' %}
+                                                                                {% if field_vals.fieldType == 'textField' %}
+                                                                                    {{ field_vals.fieldName }}: {{ field_vals.field_value }}
+                                                                                {% endif %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<script src="{% static 'assets/plugins/footable/js/footable.min.js' %}"></script>
+<script src="{% static 'js/footable-init.js' %}"></script>
+
+{% endblock %}

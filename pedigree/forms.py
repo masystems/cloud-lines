@@ -48,18 +48,15 @@ class PedigreeForm(forms.Form):
     mother_notes = forms.CharField(required=False)
     mother_notes.widget.attrs['class'] = 'form-control'
 
-    breed_group = forms.CharField(required=False)
-
 
     father = forms.CharField(required=False)
     father_notes = forms.CharField(required=False)
     father_notes.widget.attrs['class'] = 'form-control'
 
+    breed_group = forms.CharField(required=False)
+
     description = forms.CharField(widget=forms.Textarea, required=False)
     description.widget.attrs['class'] = 'form-control'
-
-
-class AttributeForm(forms.Form):
 
     breed = forms.CharField(required=True)
     custom_fields = forms.CharField(widget=forms.Textarea, required=False)

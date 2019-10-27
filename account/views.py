@@ -17,7 +17,7 @@ from breed.models import Breed
 from breed.forms import BreedForm
 from breeder.models import Breeder
 from breeder.forms import BreederForm
-from pedigree.forms import PedigreeForm, AttributeForm, ImagesForm
+from pedigree.forms import PedigreeForm, ImagesForm
 from money import Money
 from re import match
 from urllib.parse import urljoin
@@ -51,6 +51,8 @@ def site_mode(request):
         if str(request.user.username) == str(user.user.username):
             editor = True
         elif request.user in attached_service.admin_users.all():
+            editor = True
+        elif request.user in attached_service.contributors.all():
             editor = True
         elif request.user in attached_service.read_only_users.all():
             editor = False
@@ -100,11 +102,18 @@ def is_editor(user):
     try:
         main_account = get_main_account(user)
         try:
-            admins = main_account.admin_users.all()
+            editors = main_account.admin_users.all()
         except AttributeError:
             # no admin users!
-            admins = []
-        if user in admins:
+            editors = []
+
+        try:
+            editors = main_account.contributors.all()
+        except AttributeError:
+            # no admin users!
+            editors = []
+
+        if user in editors:
             return True
         elif user == main_account.user.user:
             return True
@@ -170,6 +179,9 @@ def user_edit(request):
             if request.POST.get('status') == 'Editor':
                 main_account.admin_users.add(new_user)
 
+            if request.POST.get('status') == 'Contributor':
+                main_account.contributors.add(new_user)
+
             else:
                 main_account.read_only_users.add(new_user)
 
@@ -195,7 +207,6 @@ def user_edit(request):
                                                                                            urljoin(domain, 'accounts/password_reset/'),
                                                                                            domain)
             send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
-            print('new user!!')
             return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'edit':
@@ -212,6 +223,8 @@ def user_edit(request):
             # add user to the request group
             if request.POST.get('status') == 'Editor':
                 main_account.admin_users.add(new_user)
+            if request.POST.get('status') == 'Contributor':
+                main_account.contributors.add(new_user)
             else:
                 main_account.read_only_users.add(new_user)
             print('edit user!!')
@@ -367,10 +380,7 @@ def custom_field_edit(request):
 
             for object in objects.all():
                 try:
-                    if request.POST.get('location') == 'pedigree':
-                        object_custom_fields = json.loads(object.attribute.custom_fields)
-                    else:
-                        object_custom_fields = json.loads(object.custom_fields)
+                    object_custom_fields = json.loads(object.custom_fields)
                 except json.decoder.JSONDecodeError:
                     object_custom_fields = {}
 
@@ -379,12 +389,8 @@ def custom_field_edit(request):
                                                    'fieldName': request.POST.get('fieldName'),
                                                    'fieldType': request.POST.get('fieldType')}
 
-                if request.POST.get('location') == 'pedigree':
-                    object.attribute.custom_fields = json.dumps(object_custom_fields)
-                    object.attribute.save()
-                else:
-                    object.custom_fields = json.dumps(object_custom_fields)
-                    object.save()
+                object.custom_fields = json.dumps(object_custom_fields)
+                object.save()
             return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'edit':
@@ -405,10 +411,7 @@ def custom_field_edit(request):
 
             for object in objects.all():
                 try:
-                    if request.POST.get('location') == 'pedigree':
-                        custom_fields = json.loads(object.attribute.custom_fields)
-                    else:
-                        custom_fields = json.loads(object.custom_fields)
+                    custom_fields = json.loads(object.custom_fields)
                 except json.decoder.JSONDecodeError:
                     custom_fields = {}
 
@@ -416,12 +419,9 @@ def custom_field_edit(request):
                                                          'location': request.POST.get('location'),
                                                          'fieldName': request.POST.get('fieldName'),
                                                          'fieldType': request.POST.get('fieldType')}
-                if request.POST.get('location') == 'pedigree':
-                    object.attribute.custom_fields = json.dumps(custom_fields)
-                    object.attribute.save()
-                else:
-                    object.custom_fields = json.dumps(custom_fields)
-                    object.save()
+
+                object.custom_fields = json.dumps(custom_fields)
+                object.save()
             return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'delete':
@@ -440,22 +440,13 @@ def custom_field_edit(request):
 
             for object in objects.all():
                 custom_fields_updated = {}
-                if request.POST.get('location') == 'pedigree':
-                    if object.attribute.custom_fields:
-                        for key, val in json.loads(object.attribute.custom_fields).items():
-                            if key in custom_fields:
-                                custom_fields_updated[key] = val
+                if object.custom_fields:
+                    for key, val in json.loads(object.custom_fields).items():
+                        if key in custom_fields:
+                            custom_fields_updated[key] = val
 
-                    object.attribute.custom_fields = json.dumps(custom_fields_updated)
-                    object.attribute.save()
-                else:
-                    if object.custom_fields:
-                        for key, val in json.loads(object.custom_fields).items():
-                            if key in custom_fields:
-                                custom_fields_updated[key] = val
-
-                    object.custom_fields = json.dumps(custom_fields_updated)
-                    object.save()
+                object.custom_fields = json.dumps(custom_fields_updated)
+                object.save()
 
             return HttpResponse(json.dumps({'success': True}))
 
@@ -478,7 +469,6 @@ def update_titles(request):
 @login_required(login_url="/account/login")
 def setup(request):
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
-    attributes_form = AttributeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
 
     breed_form = BreedForm()
@@ -488,7 +478,6 @@ def setup(request):
     return render(request, 'setup_form.html', {'breed_form': breed_form,
                                                'breeder_form': breeder_form,
                                                'pedigree_form': pedigree_form,
-                                               'attributes_form': attributes_form,
                                                'image_form': image_form})
 
 

@@ -16,6 +16,7 @@ class UserDetail(models.Model):
 class AttachedService(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name='attached_service', null=True, blank=True)
     admin_users = models.ManyToManyField(User, related_name='admin_users', blank=True)
+    contributors = models.ManyToManyField(User, related_name='contributors', blank=True)
     read_only_users = models.ManyToManyField(User, related_name='read_only_users', blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
     domain = models.CharField(max_length=250, blank=True)

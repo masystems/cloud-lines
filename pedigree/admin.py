@@ -1,9 +1,5 @@
 from django.contrib import admin
-from .models import Pedigree, PedigreeImage, PedigreeAttributes
-
-
-class PedigreeAttributesInline(admin.StackedInline):
-    model = PedigreeAttributes
+from .models import Pedigree, PedigreeImage
 
 
 class PedigreeImagesInline(admin.TabularInline):
@@ -19,7 +15,7 @@ class PedigreeAdmin(admin.ModelAdmin):
     empty_value_display = '-empty-'
 
     save_on_top = True
-    inlines = [PedigreeAttributesInline, PedigreeImagesInline]
+    inlines = [PedigreeImagesInline]
 
 
 admin.site.register(Pedigree, PedigreeAdmin)

@@ -9,7 +9,12 @@ class Pedigree(models.Model):
     class Meta:
         get_latest_by = "order_date"
 
-    approved = models.BooleanField(default=True)
+    STATES = (
+        ('edited', 'Edited'),
+        ('unapproved', 'Unapproved'),
+        ('approved', 'Approved'),
+    )
+    state = models.CharField(max_length=10, choices=STATES, null=True, default='approved')
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Creator")
     account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Account")
     breeder = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Breeder", help_text="Often the same as Current Owner")
@@ -43,6 +48,8 @@ class Pedigree(models.Model):
     parent_mother = models.ForeignKey('self', related_name='mother', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='mother', help_text="This should be the parents registration number.")
     parent_mother_notes = models.CharField(max_length=500, blank=True, null=True, verbose_name='Mother Notes', help_text="Max 500 characters")
     breed_group = models.CharField(max_length=255, blank=True, null=True, verbose_name='Breed group name')
+    breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed')
+    custom_fields = models.TextField(blank=True)
 
     # hidden
     date_added = models.DateTimeField(auto_now_add=True)
@@ -61,15 +68,6 @@ class PedigreeImage(models.Model):
     image = models.ImageField(upload_to=user_directory_path)
     title = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=500, blank=True)
-
-    def __str__(self):
-        return str(self.reg_no)
-
-
-class PedigreeAttributes(models.Model):
-    reg_no = models.OneToOneField(Pedigree, on_delete=models.CASCADE, primary_key=True, related_name='attribute')
-    breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed')
-    custom_fields = models.TextField(blank=True)
 
     def __str__(self):
         return str(self.reg_no)

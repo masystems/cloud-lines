@@ -103,7 +103,17 @@
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td><span class="label label-light-info"> Editor</span></td>
-                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDelete">Delete</button></td>{% endif %}
+                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
+                                    </tr>
+                                {% endfor %}
+                                {% for user in service.contributors.all %}
+                                    <tr>
+                                        <td>{{ user.first_name }}</td>
+                                        <td>{{ user.last_name }}</td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td><span class="label label-light-success"> Contributor</span></td>
+                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
                                 {% for user in service.read_only_users.all %}
@@ -163,6 +173,7 @@
                                                             <div class="col-sm-9">
                                                                 <select class="form-control" id="status" name="status" required>
                                                                 <option value="Read Only">Read Only</option>
+                                                                <option value="Contributor">Contributor</option>
                                                                 <option value="Editor">Editor</option>
                                                             </select>
                                                             </div>
