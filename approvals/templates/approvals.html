@@ -72,7 +72,7 @@
                                     <td>
                                         {% if editor %}
                                             <a href="{% url 'approve' approval.id %}"><button class="btn btn-sm btn-success mr-1">Approve</button></a>
-                                            <button class="btn btn-sm btn-outline-info mr-1">Edit</button>
+                                            <a href="{% url 'edit_pedigree_form' approval.pedigree.id %}"><button class="btn btn-sm btn-outline-info mr-1">Edit</button></a>
                                             <a href="{% url 'declined' approval.id %}"><button class="btn btn-sm btn-danger">Decline</button></a>
                                         {% endif %}
                                     </td>

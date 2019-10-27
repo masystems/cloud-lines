@@ -421,6 +421,13 @@ def edit_pedigree_form(request, id):
     attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
+    # if state is edited make sure to show edited information
+    if pedigree.state == 'edited':
+        approval = Approval.objects.get(pedigree=pedigree)
+        for obj in serializers.deserialize("yaml", approval.data):
+            obj.object.state = 'edited'
+            pedigree = obj.object
+
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
@@ -561,6 +568,11 @@ def edit_pedigree_form(request, id):
                                         data=data)
 
             else:
+                # delete any existed approvals
+                approvals = Approval.objects.filter(pedigree=pedigree)
+                for approval in approvals:
+                    approval.delete()
+                pedigree.state = 'approved'
                 pedigree.save()
 
             files = request.FILES.getlist('upload_images')

@@ -30,7 +30,7 @@ vertical-align: middle;
         </div>
         <div class="col-md-6 col-4 align-self-center">
             {% if editor or contributor %}
-                {% if editor %}
+                {% if lvl1.state == 'approved' or editor %}
                     <a href="{% url 'edit_pedigree_form' lvl1.id %}" id="editPedigree" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fas fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
                 {% endif %}
