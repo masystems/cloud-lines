@@ -66,13 +66,8 @@
 
                                     <td>{{ approval.type|title }}</td>
 
-                                    {% if approval.approved == True %}
-                                        <td><strong class="text-success">Approved</strong></td>
-                                    {% elif approval.approved == False %}
-                                        <td><strong class="text-danger">Declined</strong></td>
-                                    {% else %}
-                                        <td><strong class="text-info">Pending</strong></td>
-                                    {% endif %}
+                                    <td><strong class="text-info">Pending</strong></td>
+
 
                                     <td>
                                         {% if editor %}
@@ -293,7 +288,7 @@
                                                                 </tr>
                                                             {% endif %}
 
-                                                            {% if item.parent_father != approval.pedigree.parent_farther%}
+                                                            {% if item.parent_father != approval.pedigree.parent_farther %}
                                                                 <tr>
                                                                     <td>Father</td>
                                                                     <td>{{ item.parent_father }}</td>

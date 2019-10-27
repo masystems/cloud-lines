@@ -18,7 +18,6 @@ class Approval(models.Model):
     pedigree = models.ForeignKey(Pedigree, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="pedigree")
     breed_group = models.ForeignKey(BreedGroup, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="breed_group")
 
-    approved = models.NullBooleanField(default=None)
     message = models.TextField(blank=True)
     data = models.TextField(blank=True)
 

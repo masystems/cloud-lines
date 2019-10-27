@@ -327,7 +327,7 @@ def new_pedigree_form(request):
             except ObjectDoesNotExist:
                 new_pedigree.breed_group = pedigree_form['breed_group'].value() or None
             try:
-                new_pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or None
+                new_pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or ''
             except:
                 pass
 
@@ -337,7 +337,7 @@ def new_pedigree_form(request):
             except ObjectDoesNotExist:
                 pass
             try:
-                new_pedigree.parent_father_notes = pedigree_form['father_notes'].value() or None
+                new_pedigree.parent_father_notes = pedigree_form['father_notes'].value() or ''
             except:
                 pass
 
@@ -377,7 +377,6 @@ def new_pedigree_form(request):
                                         user=request.user,
                                         type='new',
                                         pedigree=new_pedigree,
-                                        approved=None,
                                         data=data)
 
             else:
@@ -509,7 +508,7 @@ def edit_pedigree_form(request, id):
             except ObjectDoesNotExist:
                 pedigree.breed_group = pedigree_form['breed_group'].value() or None
             try:
-                pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or None
+                pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or ''
             except:
                 pass
 
@@ -521,7 +520,7 @@ def edit_pedigree_form(request, id):
             except ObjectDoesNotExist:
                 pass
             try:
-                pedigree.parent_father_notes = pedigree_form['father_notes'].value() or None
+                pedigree.parent_father_notes = pedigree_form['father_notes'].value() or ''
             except:
                 pass
 
@@ -559,7 +558,6 @@ def edit_pedigree_form(request, id):
                                         user=request.user,
                                         type='edit',
                                         pedigree=pedigree,
-                                        approved=None,
                                         data=data)
 
             else:
