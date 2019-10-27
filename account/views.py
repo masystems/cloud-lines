@@ -46,33 +46,37 @@ def site_mode(request):
 
         attached_services = AttachedService.objects.filter(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(user=user_detail, active=True))
 
-        service = Service.objects.get(id=attached_service.service.id)
-
+        # get user permission level
+        editor = False
+        contributor = False
+        read_only = False
         if str(request.user.username) == str(user.user.username):
             editor = True
         elif request.user in attached_service.admin_users.all():
             editor = True
         elif request.user in attached_service.contributors.all():
-            editor = True
+            contributor = True
         elif request.user in attached_service.read_only_users.all():
-            editor = False
+            read_only = False
         else:
             editor = False
+            contributor = False
+            read_only = False
 
         if attached_service.service.service_name != 'Organisation':
-            if Pedigree.objects.filter(account=attached_service).count() < service.number_of_animals:
+            if Pedigree.objects.filter(account=attached_service).count() < attached_service.service.number_of_animals:
                 pedigrees = True
             else:
                 pedigrees = False
         else:
             pedigrees = True
 
-        if attached_service.admin_users.all().count() < service.admin_users:
+        if attached_service.admin_users.all().count() < attached_service.service.admin_users:
             admins = True
         else:
             admins = False
 
-        if attached_service.read_only_users.all().count() < service.read_only_users:
+        if attached_service.read_only_users.all().count() < attached_service.service.read_only_users:
             users = True
         else:
             users = False
@@ -92,6 +96,8 @@ def site_mode(request):
                 'users': users,
                 'add_breed': add_breed,
                 'editor': editor,
+                'contributor': contributor,
+                'read_only': read_only,
                 'gdpr': gdpr}
 
     return {'authenticated': 'no',

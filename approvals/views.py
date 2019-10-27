@@ -5,7 +5,7 @@ from account.views import is_editor, get_main_account
 from .models import Approval
 from pedigree.models import Pedigree
 from breed_group.models import BreedGroup
-from json import loads
+
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
@@ -37,11 +37,24 @@ def approve(request, id):
 @user_passes_test(is_editor)
 def declined(request, id):
     approval = Approval.objects.get(id=id)
-    if approval.pedigree:
-        Pedigree.objects.filter(id=approval.pedigree.id).update(state='approved')
-    elif approval.breed_group:
-        BreedGroup.objects.filter(id=approval.breed_group.id).update(state='approved')
-
+    for obj in serializers.deserialize("yaml", approval.data):
+        if approval.pedigree:
+            if approval.type == 'new':
+                # delete new entry
+                approval.pedigree.delete()
+            else:
+                # mark edited items as approved but do not save yaml data from approval object
+                Pedigree.objects.filter(id=approval.pedigree.id).update(state='approved')
+                approval.approved = False
+                approval.save()
+        elif approval.breed_group:
+            if approval.type == 'new':
+                # delete new entry
+                approval.pedigree.delete()
+            else:
+                # mark edited items as approved but do not save yaml data from approval object
+                BreedGroup.objects.filter(id=approval.breed_group.id).update(state='approved')
     approval.approved = False
     approval.save()
+
     return redirect('approvals')

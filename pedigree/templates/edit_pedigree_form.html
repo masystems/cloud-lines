@@ -190,7 +190,7 @@
                                     {% elif field.label == 'Breed' %}
                                         {% if service.service.multi_breed %}
                                             <div id="breeds">
-                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ pedigree.attribute.breed.breed_name }}" value="{{ pedigree.attribute.breed.breed_name }}">
+                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ pedigree.breed.breed_name }}" value="{{ pedigree.breed.breed_name }}">
                                             </div>
                                         {% else %}
                                             <input name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">

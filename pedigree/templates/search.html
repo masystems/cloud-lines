@@ -17,10 +17,9 @@
 
         <div class="col-md-6 col-4 align-self-center">
             {% if add_pedigree %}
-                {% if editor %}
+                {% if editor or contributor %}
                     <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
-
                 {% else %}
                     {% include 'login_modal.html' %}
                     <!-- /.modal -->
@@ -89,7 +88,7 @@
                         <td>{{ pedigree.name }}</td>
                         <td class="d-none d-sm-table-cell">{{ pedigree.dob }}</td>
                         <td class="d-none d-sm-table-cell">{{ pedigree.status|title }}</td>
-                        <td class="d-none d-sm-table-cell">{{ pedigree.attribute.breed.breed_name }}</td>
+                        <td class="d-none d-sm-table-cell">{{ pedigree.breed.breed_name }}</td>
                         <td class="d-none d-sm-table-cell"><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
                     </tr>
                     {% endfor %}
