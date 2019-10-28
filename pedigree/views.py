@@ -447,6 +447,10 @@ def edit_pedigree_form(request, id):
     if request.method == 'POST':
         if 'delete' in request.POST:
             pedigree.delete()
+            # delete any existed approvals
+            approvals = Approval.objects.filter(pedigree=pedigree)
+            for approval in approvals:
+                approval.delete()
             return redirect('pedigree_search')
 
         # check whether it's valid:
@@ -513,7 +517,7 @@ def edit_pedigree_form(request, id):
                 else:
                     pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
             except ObjectDoesNotExist:
-                pedigree.breed_group = pedigree_form['breed_group'].value() or None
+                pedigree.breed_group = pedigree_form['breed_group'].value() or ''
             try:
                 pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or ''
             except:

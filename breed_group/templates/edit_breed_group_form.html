@@ -124,7 +124,11 @@
                                 <div class="col-12">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="submit" class="btn btn-success">Submit</button>
+                                            {% if pedigree.state != 'approved' %}
+                                                <button type="submit" class="btn btn-success">Approve</button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-success">Submit</button>
+                                            {% endif %}
                                             <a href="{% url 'breed_groups' %}"><button type="button" name="submit" class="btn btn-inverse">Cancel</button></a>
                                             <button type="button" data-toggle="modal" data-target="#delete" class="model_img img-fluid btn btn-danger float-right">Delete</button>
                                         </div>

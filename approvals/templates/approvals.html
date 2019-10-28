@@ -414,7 +414,7 @@
                                                                         <td><code>From</code> {{ approval.breed_group.group_name }} <code>to</code> {{ item.group_name }}</td>
                                                                     </tr>
                                                                 {% endif %}
-                                                                {% if item.group_members != approval.breed_group.group_members %}
+                                                                {% if item.group_members %}
                                                                     <tr>
                                                                         <td>Group Members</td>
                                                                         <td>{% for pedigree in item.group_members.all %}{{ pedigree }} {% endfor %}</td>

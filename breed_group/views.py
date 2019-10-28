@@ -13,7 +13,7 @@ from approvals.models import Approval
 @login_required(login_url="/account/login")
 def breed_groups(request):
     attached_service = get_main_account(request.user)
-    return render(request, 'breed_groups.html', {'groups': BreedGroup.objects.filter(account=attached_service).exclude(state='unapproved')})
+    return render(request, 'breed_groups.html', {'groups': BreedGroup.objects.filter(account=attached_service)})
 
 
 @login_required(login_url="/account/login")
@@ -65,12 +65,22 @@ def new_breed_group_form(request):
 @user_passes_test(is_editor)
 def edit_breed_group_form(request, breed_group_id):
     breed_group = get_object_or_404(BreedGroup, id=breed_group_id)
+    if breed_group.state == 'edited':
+        approval = Approval.objects.get(breed_group=breed_group)
+        for obj in serializers.deserialize("yaml", approval.data):
+            obj.object.state = 'edited'
+            breed_group = obj.object
+
     breed_group_form = BreedGroupForm(request.POST or None, request.FILES or None, instance=breed_group)
     attached_service = get_main_account(request.user)
     members = []
     if request.method == 'POST':
         if 'delete' in request.POST:
             breed_group.delete()
+            # delete any existed approvals
+            approvals = Approval.objects.filter(breed_group=breed_group)
+            for approval in approvals:
+                approval.delete()
             return redirect('breed_groups')
         try:
             breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
@@ -96,6 +106,11 @@ def edit_breed_group_form(request, breed_group_id):
                                     breed_group=breed_group,
                                     data=data)
         else:
+            # delete any existed approvals
+            approvals = Approval.objects.filter(breed_group=breed_group)
+            for approval in approvals:
+                approval.delete()
+            breed_group.state = 'approved'
             breed_group.save()
 
         return redirect('breed_groups')
