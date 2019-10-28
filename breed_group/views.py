@@ -1,17 +1,19 @@
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core import serializers
 from .models import BreedGroup
 from pedigree.models import Pedigree
 from breeder.models import Breeder
 from breed.models import Breed
 from account.views import is_editor, get_main_account
 from .forms import BreedGroupForm
+from approvals.models import Approval
 
 
 @login_required(login_url="/account/login")
 def breed_groups(request):
     attached_service = get_main_account(request.user)
-    return render(request, 'breed_groups.html', {'groups': BreedGroup.objects.filter(account=attached_service)})
+    return render(request, 'breed_groups.html', {'groups': BreedGroup.objects.filter(account=attached_service).exclude(state='unapproved')})
 
 
 @login_required(login_url="/account/login")
@@ -34,7 +36,19 @@ def new_breed_group_form(request):
             id = id[4:]
             pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
             new_breed_group.group_members.add(pedigree)
-        new_breed_group.save()
+
+        if request.user in attached_service.contributors.all():
+            new_breed_group.state = 'unapproved'
+            new_breed_group.save()
+
+            data = serializers.serialize('yaml', [new_breed_group])
+            Approval.objects.create(account=attached_service,
+                                    user=request.user,
+                                    type='new',
+                                    breed_group=new_breed_group,
+                                    data=data)
+        else:
+            new_breed_group.save()
 
         return redirect('breed_groups')
 
@@ -71,7 +85,18 @@ def edit_breed_group_form(request, breed_group_id):
             id = id[4:]
             pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
             breed_group.group_members.add(pedigree)
-        breed_group.save()
+
+        if request.user in attached_service.contributors.all():
+            BreedGroup.objects.filter(id=breed_group.id).update(state='edited')
+
+            data = serializers.serialize('yaml', [breed_group])
+            Approval.objects.create(account=attached_service,
+                                    user=request.user,
+                                    type='edit',
+                                    breed_group=breed_group,
+                                    data=data)
+        else:
+            breed_group.save()
 
         return redirect('breed_groups')
     else:
