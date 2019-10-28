@@ -18,6 +18,7 @@ from breed.forms import BreedForm
 from breeder.models import Breeder
 from breeder.forms import BreederForm
 from pedigree.forms import PedigreeForm, ImagesForm
+from approvals.models import Approval
 from money import Money
 from re import match
 from urllib.parse import urljoin
@@ -63,6 +64,15 @@ def site_mode(request):
             contributor = False
             read_only = False
 
+        # check for approvals
+        if editor:
+            if Approval.objects.all().count() > 0:
+                pending_approvals = True
+            else:
+                pending_approvals = False
+        else:
+            pending_approvals = False
+
         if attached_service.service.service_name != 'Organisation':
             if Pedigree.objects.filter(account=attached_service).count() < attached_service.service.number_of_animals:
                 pedigrees = True
@@ -98,7 +108,8 @@ def site_mode(request):
                 'editor': editor,
                 'contributor': contributor,
                 'read_only': read_only,
-                'gdpr': gdpr}
+                'gdpr': gdpr,
+                'pending_approvals': pending_approvals}
 
     return {'authenticated': 'no',
             'gdpr': gdpr}
