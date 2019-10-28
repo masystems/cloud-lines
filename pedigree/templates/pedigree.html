@@ -55,7 +55,7 @@ vertical-align: middle;
 <div class="row">
     <div class="col-md-8 col-lg-8 col-xlg-8">
         {% if lvl1.state == 'edited' %}
-        <div class="alert alert-warning alert-rounded"> <i class="ti-alert"></i> This pedigree has an edit pending approval. <a href="{% url 'approvals' %}">View approvals</a>
+            <div class="alert alert-warning alert-rounded"> <i class="ti-alert"></i> This pedigree has an edit pending approval. <a href="{% url 'approvals' %}">View approvals</a>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
             </div>
         {% elif lvl1.state == 'unapproved' %}
