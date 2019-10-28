@@ -24,7 +24,7 @@
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-info">
                             {% if add_pedigree %}
-                                {% if editor %}
+                                {% if editor or contributor %}
                                     <a href="{% url 'new_pedigree_form' %}">
                                         <div class="box text-center">
                                             <h1 class="font-light text-white"><i class="fas fa-plus"></i> </h1>
@@ -102,7 +102,7 @@
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-primary">
                             {% if service.site_mode == 'poultry' %}
-                                {% if editor %}
+                                {% if editor or contributor %}
                                     <a href="{% url 'new_breed_group_form' %}">
                                         <div class="box text-center">
                                             <h1 class="font-light text-white"><i class="far fa-object-ungroup"></i></h1>
