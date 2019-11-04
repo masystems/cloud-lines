@@ -484,7 +484,7 @@ def edit_pedigree_form(request, id):
 
             try:
                 if pedigree_form['current_owner'] == '':
-                    pedigree.current_owner = None
+                    pedigree.current_owner = ''
                 else:
                     pedigree.current_owner = Breeder.objects.get(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value())
             except ObjectDoesNotExist:
@@ -513,7 +513,7 @@ def edit_pedigree_form(request, id):
 
             try:
                 if pedigree_form['mother'].value() == '':
-                    pedigree.parent_mother = None
+                    pedigree.parent_mother = ''
                 else:
                     pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
             except ObjectDoesNotExist:
@@ -525,7 +525,7 @@ def edit_pedigree_form(request, id):
 
             try:
                 if pedigree_form['father'].value() == '':
-                    pedigree.parent_father = None
+                    pedigree.parent_father = ''
                 else:
                     pedigree.parent_father = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['father'].value())
             except ObjectDoesNotExist:
