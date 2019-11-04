@@ -125,12 +125,12 @@ def is_editor(user):
             editors = []
 
         try:
-            editors = main_account.contributors.all()
+            contributors = main_account.contributors.all()
         except AttributeError:
             # no admin users!
-            editors = []
+            contributors = []
 
-        if user in editors:
+        if user in editors or contributors:
             return True
         elif user == main_account.user.user:
             return True
