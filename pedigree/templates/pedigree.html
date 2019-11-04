@@ -172,7 +172,7 @@ vertical-align: middle;
                             </div>
                         </div>
 
-                        {% if editor %}
+                        {% if editor or contributor %}
                             {% include 'add_new_pedigree.html' %}
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
                         {% else %}
@@ -261,7 +261,6 @@ vertical-align: middle;
                                             {% elif lvl2_1_grp %}
                                                 {% include 'relative-breed_group.html' with breed_group=lvl2_1_grp %}
                                             {% else %}
-                                            <p>{{ no_pedigree_text }}</p>
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
                                                 <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentMother">Add existing</button>
                                             {% endif %}

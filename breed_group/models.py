@@ -6,6 +6,8 @@ from account.models import AttachedService
 
 
 class BreedGroup(models.Model):
+    class Meta:
+        get_latest_by = "state"
     STATES = (
         ('edited', 'Edited'),
         ('unapproved', 'Unapproved'),

@@ -23,10 +23,10 @@ def dashboard(request):
     if main_account.domain and not match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
         return HttpResponseRedirect(main_account.domain)
 
-    total_pedigrees = Pedigree.objects.filter(account=main_account).count()
+    total_pedigrees = Pedigree.objects.filter(account=main_account).exclude(state='unapproved').count()
     #total_breeders = Breeder.objects.filter(account=main_account).count()
-    top_pedigrees = Pedigree.objects.filter(account=main_account).order_by('-date_added')[:5]
-    breed_groups = BreedGroup.objects.filter(account=main_account).order_by('-date_added')[:5]
+    top_pedigrees = Pedigree.objects.filter(account=main_account).order_by('-date_added').exclude(state='unapproved')[:5]
+    breed_groups = BreedGroup.objects.filter(account=main_account).order_by('-date_added').exclude(state='unapproved')[:5]
     latest_breeders = Breeder.objects.filter(account=main_account).order_by('-id')[:5]
 
 
@@ -45,19 +45,22 @@ def dashboard(request):
 
         breed_chart = {}
         for breed in Breed.objects.filter(account=main_account):
-            breed_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).count(),
-                                   'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).count()}
+            breed_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).exclude(state='unapproved').count(),
+                                   'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).exclude(state='unapproved').count()}
 
     else:
         return redirect('setup')
 
     ## updates
-    get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
-    updates = get_updates_json.json()
-    update_card_size = 44 * len(updates)
+    try:
+        get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
+        updates = get_updates_json.json()
+        update_card_size = 44 * len(updates)
+    except ConnectionError:
+        updates = {}
+        update_card_size = 44
 
     return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
-                                              #'total_breeders': total_breeders,
                                               'top_pedigrees': top_pedigrees,
                                               'latest_breeders': latest_breeders,
                                               'breed_groups': breed_groups,

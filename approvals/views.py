@@ -5,6 +5,9 @@ from account.views import is_editor, get_main_account
 from .models import Approval
 from pedigree.models import Pedigree
 from breed_group.models import BreedGroup
+from breeder.models import Breeder
+from breed.models import Breed
+from yaml import dump, load
 
 
 @login_required(login_url="/account/login")
@@ -13,9 +16,26 @@ def approvals(request):
     attached_service = get_main_account(request.user)
     approvals = Approval.objects.filter(account=attached_service)
     data = []
+
     for approval in approvals:
-        for obj in serializers.deserialize("yaml", approval.data):
-            data.append(obj.object)
+        if approval.pedigree:
+            for obj in serializers.deserialize("yaml", approval.data):
+                data.append(obj.object)
+        elif approval.breed_group:
+            # convert the data to a dict
+            data_dict = load(approval.data)[0]
+            # get the breeder
+            breeder = Breeder.objects.get(id=data_dict['fields']['breeder'])
+            data_dict['fields']['breeder'] = breeder.breeding_prefix
+            # get the breed
+            breed = Breed.objects.get(id=data_dict['fields']['breed'])
+            data_dict['fields']['breed'] = breed.breed_name
+            # get pedigrees
+            pedigrees = []
+            for pedigree in data_dict['fields']['group_members']:
+                pedigrees.append(Pedigree.objects.get(id=pedigree))
+            data_dict['fields']['group_members'] = pedigrees
+            data.append(data_dict)
     return render(request, 'approvals.html', {'approvals': approvals,
                                               'data': data})
 
@@ -27,6 +47,17 @@ def approve(request, id):
     for obj in serializers.deserialize("yaml", approval.data):
         obj.object.state = 'approved'
         obj.object.save()
+
+    if approval.pedigree:
+        data_dict = load(approval.data)[0]
+        approval.pedigree.parent_mother = Pedigree.objects.get(id=str(data_dict['fields']['parent_mother']))
+        approval.pedigree.parent_father = Pedigree.objects.get(id=str(data_dict['fields']['parent_father']))
+    elif approval.breed_group:
+        data_dict = load(approval.data)[0]
+        approval.breed_group.group_members.clear()
+        for pedigree in data_dict['fields']['group_members']:
+            approval.breed_group.group_members.add(Pedigree.objects.get(id=pedigree))
+
     approval.delete()
 
     return redirect('approvals')

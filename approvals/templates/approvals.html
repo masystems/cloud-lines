@@ -221,40 +221,36 @@
                                         {% elif approval.breed_group %}
                                             <td>
                                                 {% for new_item in data %}
-                                                    {% if new_item.id == approval.breed_group.id %}
-                                                        <table>
-                                                            <tbody>
-                                                                {% if new_item.breeder %}
-                                                                    <tr>
-                                                                        <td>Breeder</td>
-                                                                        <td>{{ new_item.breeder }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                                {% if new_item.breed %}
-                                                                    <tr>
-                                                                        <td>Breed</td>
-                                                                        <td>{{ new_item.breed }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                                {% if new_item.group_name %}
-                                                                    <tr>
-                                                                        <td>Group Name</td>
-                                                                        <td>{{ new_item.group_name }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                                {% if new_item.group_members %}
-                                                                    <tr>
-                                                                        <td>Group Members</td>
-                                                                        <td>{% for pedigree in new_item.group_members.all %}{{ pedigree }} {% endfor %}</td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                           </tbody>
-                                                        </table>
+                                                    {% if new_item.pk == approval.breed_group.id %}
+                                                        {% for key, val in new_item.items %}
+                                                            {% if key == 'fields' %}
+                                                                <table>
+                                                                    <tbody>
+                                                                            <tr>
+                                                                                <td>Breeder</td>
+                                                                                <td>{{ val.breeder }}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Breed</td>
+                                                                                <td>{{ val.breed }}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Group Name</td>
+                                                                                <td>{{ val.group_name }}</td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <td>Group Members</td>
+                                                                                <td>{% for pedigree in val.group_members %}{{ pedigree }} {% endfor %}</td>
+                                                                            </tr>
+                                                                   </tbody>
+                                                                </table>
+                                                            {% endif %}
+                                                        {% endfor %}
                                                     {% endif %}
                                                 {% endfor %}
                                             </td>
                                         {% endif %}
-                                    {% else %}
+                                    {% elif approval.type == 'edit' %}
                                         {% if approval.pedigree %}
                                             <td>
                                                 {% for item in data %}
@@ -331,12 +327,12 @@
                                                                     </tr>
                                                                 {% endif %}
 
-                                                                {% if item.parent_father != approval.pedigree.parent_farther %}
+                                                                {% ifnotequal item.parent_father approval.pedigree.parent_farther %}
                                                                     <tr>
                                                                         <td>Father</td>
                                                                         <td><code>From</code> {{ approval.pedigree.parent_father }} <code>to</code> {{ item.parent_father }}</td>
                                                                     </tr>
-                                                                {% endif %}
+                                                                {% endifnotequal %}
 
                                                                 {% if item.parent_father_notes != approval.pedigree.parent_father_notes %}
                                                                     <tr>
@@ -393,35 +389,43 @@
                                         {% elif approval.breed_group %}
                                             <td>
                                                 {% for item in data %}
-                                                    {% if item.id == approval.breed_group.id %}
-                                                        <table>
-                                                            <tbody>
-                                                                {% if item.breeder != approval.breed_group.breeder %}
-                                                                    <tr>
-                                                                        <td>Breeder</td>
-                                                                        <td><code>From</code> {{ approval.breed_group.breeder }} <code>to</code> {{ item.breeder }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                                {% if item.breed != approval.breed_group.breed %}
-                                                                    <tr>
-                                                                        <td>Breed</td>
-                                                                        <td><code>From</code> {{ approval.breed_group.breed }} <code>to</code> {{ item.breed }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                                {% if item.group_name != approval.breed_group.group_name %}
-                                                                    <tr>
-                                                                        <td>Group Name</td>
-                                                                        <td><code>From</code> {{ approval.breed_group.group_name }} <code>to</code> {{ item.group_name }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                                {% if item.group_members %}
-                                                                    <tr>
-                                                                        <td>Group Members</td>
-                                                                        <td>{% for pedigree in item.group_members.all %}{{ pedigree }} {% endfor %}</td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                           </tbody>
-                                                        </table>
+                                                    {% if item.pk == approval.breed_group.id %}
+                                                        {% for key, val in item.items %}
+                                                            {% if key == 'fields' %}
+                                                                <table>
+                                                                    <tbody>
+                                                                        {% if val.breeder|lower != approval.breed_group.breeder|lower %}
+                                                                            <tr>
+                                                                                <td>Breeder</td>
+                                                                                <td><code>From</code> {{ approval.breed_group.breeder }} <code>to</code> {{ val.breeder }}</td>
+                                                                            </tr>
+                                                                        {% endif %}
+                                                                        {% if val.breed != approval.breed_group.breed %}
+                                                                            <tr>
+                                                                                <td>Breed</td>
+                                                                                <td><code>From</code> {{ approval.breed_group.breed }} <code>to</code> {{ val.breed }}</td>
+                                                                            </tr>
+                                                                        {% endif %}
+                                                                        {% if val.group_name|upper != approval.breed_group.group_name|upper %}
+                                                                            <tr>
+                                                                                <td>Group Name</td>
+                                                                                <td><code>From</code> {{ approval.breed_group.group_name }} <code>to</code> {{ val.group_name }}</td>
+                                                                            </tr>
+                                                                        {% endif %}
+                                                                        {% if val.group_members %}
+                                                                            <tr>
+                                                                                <td>Group Members</td>
+                                                                                <td>
+                                                                                    {% for pedigree in val.group_members %}
+                                                                                        {% include 'relative.html' with pedigree=pedigree %}
+                                                                                    {% endfor %}
+                                                                                </td>
+                                                                            </tr>
+                                                                        {% endif %}
+                                                                   </tbody>
+                                                                </table>
+                                                            {% endif %}
+                                                        {% endfor %}
                                                     {% endif %}
                                                 {% endfor %}
                                             </td>

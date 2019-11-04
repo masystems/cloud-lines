@@ -56,7 +56,7 @@ def new_breed_group_form(request):
         breed_group_form = BreedGroupForm()
 
     return render(request, 'new_breed_group_form.html', {'breed_group_form': breed_group_form,
-                                                         'pedigree': Pedigree.objects.filter(account=attached_service),
+                                                         'pedigree': Pedigree.objects.filter(account=attached_service).exclude(state='unapproved'),
                                                          'breeders': Breeder.objects.filter(account=attached_service),
                                                          'breeds': Breed.objects.filter(account=attached_service)})
 
@@ -65,11 +65,6 @@ def new_breed_group_form(request):
 @user_passes_test(is_editor)
 def edit_breed_group_form(request, breed_group_id):
     breed_group = get_object_or_404(BreedGroup, id=breed_group_id)
-    if breed_group.state == 'edited':
-        approval = Approval.objects.get(breed_group=breed_group)
-        for obj in serializers.deserialize("yaml", approval.data):
-            obj.object.state = 'edited'
-            breed_group = obj.object
 
     breed_group_form = BreedGroupForm(request.POST or None, request.FILES or None, instance=breed_group)
     attached_service = get_main_account(request.user)
@@ -88,8 +83,12 @@ def edit_breed_group_form(request, breed_group_id):
             pass
         breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         breed_group.group_name = breed_group_form['group_name'].value()
-        # clear existing members
+
+        current_members = []
+        for member in breed_group.group_members.all():
+            current_members.append(member)
         breed_group.group_members.clear()
+
         # update group members
         for id in breed_group_form['group_members'].value():
             id = id[4:]
@@ -99,13 +98,27 @@ def edit_breed_group_form(request, breed_group_id):
         if request.user in attached_service.contributors.all():
             BreedGroup.objects.filter(id=breed_group.id).update(state='edited')
 
-            data = serializers.serialize('yaml', [breed_group])
+            data = serializers.serialize('yaml', [breed_group, ])
+
+            # create approval object
             Approval.objects.create(account=attached_service,
                                     user=request.user,
                                     type='edit',
                                     breed_group=breed_group,
                                     data=data)
+
+            # reset group members
+            breed_group.group_members.clear()
+            for pedigree in current_members:
+                breed_group.group_members.add(pedigree)
+
         else:
+            # update group members
+            for id in breed_group_form['group_members'].value():
+                id = id[4:]
+                pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
+                breed_group.group_members.add(pedigree)
+
             # delete any existed approvals
             approvals = Approval.objects.filter(breed_group=breed_group)
             for approval in approvals:
@@ -115,6 +128,11 @@ def edit_breed_group_form(request, breed_group_id):
 
         return redirect('breed_groups')
     else:
+        if breed_group.state == 'edited':
+            approval = Approval.objects.get(breed_group=breed_group)
+            for obj in serializers.deserialize("yaml", approval.data):
+                obj.object.state = 'edited'
+                breed_group = obj.object
         breed_group_form = BreedGroupForm()
         # get any existing members
         for pedigree in breed_group.group_members.all():
@@ -122,7 +140,7 @@ def edit_breed_group_form(request, breed_group_id):
 
     return render(request, 'edit_breed_group_form.html', {'breed_group_form': breed_group_form,
                                                           'breed_group': breed_group,
-                                                          'pedigree': Pedigree.objects.filter(account=attached_service),
+                                                          'pedigree': Pedigree.objects.filter(account=attached_service).exclude(state='unapproved'),
                                                           'members': members,
                                                           'breeders': Breeder.objects.filter(account=attached_service),
                                                           'breeds': Breed.objects.filter(account=attached_service)})

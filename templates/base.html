@@ -105,7 +105,11 @@
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" id="2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-database"></i>
+                                {% if service.site_mode == 'mammal' %}
+                                    <i class="fas fa-paw"></i>
+                                {% else %}
+                                    <i class="fas fa-feather-alt"></i>
+                                {% endif %}
                             </a>
                             <div class="dropdown-menu mailbox animated bounceInDown" aria-labelledby="2">
                                 <ul>
