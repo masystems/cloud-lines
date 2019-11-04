@@ -291,7 +291,6 @@ def new_pedigree_form(request):
         if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
             pedigree_form.add_error('breed', 'Selected breed does not exist')
             pre_checks = False
-
         if pedigree_form.is_valid() and image_form.is_valid() and pre_checks:
             new_pedigree = Pedigree()
             new_pedigree.creator = request.user

@@ -34,9 +34,9 @@ def export(request):
                 for key, val in pedigree.__dict__.items():
                     if not header:
                         if key != '_state':
-                            head.append('{},'.format(key))
+                            head.append('{}'.format(key))
                     if key in fields:
-                        row.append('{},'.format(val))
+                        row.append('{}'.format(val))
                 if not header:
                     writer.writerow(head)
                     header = True
