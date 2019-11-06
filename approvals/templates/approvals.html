@@ -25,15 +25,7 @@
                     <h4 class="card-title">Approvals</h4>
                     <p>Click the row to show more information about the approval request.</p>
                     <div class="table-responsive m-t-40">
-                        <table id="demo-foo-row-toggler"
-                               data-paging="true"
-                               data-paging-size="10"
-                               data-expand-first="true"
-                               data-sorting="true"
-                               data-show-toggle="true"
-                               data-toggle-column="first"
-                               data-get-width="getWidth"
-                               class="table table-striped">
+                        <table class="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th data-type="text">ID</th>
@@ -42,12 +34,11 @@
                                     <th data-type="text">Change Type</th>
                                     <th id="status" data-sorted="true" data-direction="DESC">Status</th>
                                     <th data-sortable="false"></th>
-                                    <th data-breakpoints="all" data-title="New/Changed Data">New/Changed Data</th>
                                 </tr>
                             </thead>
                             <tbody>
                             {% for approval in approvals.all %}
-                                <tr>
+                                <tr id="{{ approval.id }}-row">
                                     {% if approval.pedigree %}
                                         <td>{{ approval.pedigree.reg_no }}</td>
                                     {% elif approval.breed_group %}
@@ -69,7 +60,6 @@
 
                                     <td><strong class="text-info">Pending</strong></td>
 
-
                                     <td>
                                         {% if editor %}
                                             <a href="{% url 'approve' approval.id %}"><button class="btn btn-sm btn-success mr-1">Approve</button></a>
@@ -81,10 +71,11 @@
                                             <a href="{% url 'declined' approval.id %}"><button class="btn btn-sm btn-danger">Decline</button></a>
                                         {% endif %}
                                     </td>
-
+                                </tr>
+                                <tr id="{{ approval.id }}-subrow">
                                     {% if approval.type == 'new' %}
                                         {% if approval.pedigree %}
-                                            <td>
+                                            <td colspan="6">
                                                 {% for new_item in data %}
                                                     {% if new_item.reg_no == approval.pedigree.reg_no %}
                                                         <table>
@@ -219,7 +210,7 @@
                                                 {% endfor %}
                                             </td>
                                         {% elif approval.breed_group %}
-                                            <td>
+                                            <td colspan="6">
                                                 {% for new_item in data %}
                                                     {% if new_item.pk == approval.breed_group.id %}
                                                         {% for key, val in new_item.items %}
@@ -252,7 +243,7 @@
                                         {% endif %}
                                     {% elif approval.type == 'edit' %}
                                         {% if approval.pedigree %}
-                                            <td>
+                                            <td colspan="6">
                                                 {% for item in data %}
                                                     {% if item.reg_no == approval.pedigree.reg_no %}
                                                         <table>
@@ -387,7 +378,7 @@
                                                 {% endfor %}
                                             </td>
                                         {% elif approval.breed_group %}
-                                            <td>
+                                            <td colspan="6">
                                                 {% for item in data %}
                                                     {% if item.pk == approval.breed_group.id %}
                                                         {% for key, val in item.items %}
@@ -438,7 +429,20 @@
                     </div>
                 </div>
             </div>
+
         </div>
-<script src="{% static 'assets/plugins/footable/js/footable.min.js' %}"></script>
-<script src="{% static 'js/footable-init.js' %}"></script>
+
+<script>
+    $(document).ready(function(){
+        {% for approval in approvals.all %}
+            $('#{{ approval.id }}-subrow').hide();
+        {% endfor %}
+    });
+
+    {% for approval in approvals.all %}
+        $('#{{ approval.id }}-row').click( function() {
+            $('#{{ approval.id }}-subrow').toggle(500);
+        });
+    {% endfor %}
+</script>
 {% endblock %}
