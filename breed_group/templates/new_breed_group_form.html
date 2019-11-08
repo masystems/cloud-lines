@@ -66,9 +66,15 @@
                                                 <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
                                             </div>
                                         {% elif field.label == 'Breed' %}
-                                                    <div id="breeds">
-                                                        <input class="typeahead form-control" id="breed" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}" required>
-                                                    </div>
+                                            <div id="breeds" class="form-group">
+                                                <select id="breed" name='{{ field.name }}' class="form-control custom-select">
+                                                    <option>--Select Breed--</option>
+                                                    {% for breed in breeds %}
+                                                            <option value="{{ breed }}">{{ breed }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <small>Changes to the above selection will refresh the available birds in the group members field below.</small>
+                                            </div>
                                         {% elif field.label == 'Group members' %}
                                             <div class="mb-4" id="members">
                                                 <select multiple id="public-methods" name='{{ field.name }}'>
@@ -84,10 +90,10 @@
                                             </div>
                                              <script>
                                                  $(document).ready(function(){
-                                                    $("#breed").on("input propertychange paste", function(){
-                                                        var breed = document.getElementById('breed').value.toLowerCase();
-                                                        var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.attribute.breed.breed_name }}', {% endfor %} };
-                                                        console.log(breed);
+                                                    $("#breeds").change(function(){
+                                                        var breed = $( "#breeds option:selected" ).text();
+                                                        var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.breed.breed_name }}', {% endfor %} };
+                                                        console.log(options);
                                                         $('#public-methods').empty();
 
                                                         $.each(options, function(key, value) {

@@ -65,10 +65,19 @@
                                                 <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ breed_group.breeder }}" value="{{ breed_group.breeder }}" required>
                                             </div>
                                         {% elif field.label == 'Breed' %}
-                                                    <div id="breeds">
-                                                        <input class="typeahead form-control" id="breed" name='{{ field.name }}' type="text" placeholder="{{ breed_group.breed }}" value="{{ breed_group.breed }}" required>
-                                                        <small>Typing in the field will refresh the available birds in the group members field below.</small>
-                                                    </div>
+                                            <div id="breeds" class="form-group">
+                                                <select id="breed" name='{{ field.name }}' class="form-control custom-select">
+                                                    <option>--Select Breed--</option>
+                                                    {% for breed in breeds %}
+                                                        {% if breed_group.breed == breed %}
+                                                            <option value="{{ breed }}" selected>{{ breed }}</option>
+                                                        {% else %}
+                                                            <option value="{{ breed }}">{{ breed }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+                                                <small>Changes to the above selection will refresh the available birds in the group members field below.</small>
+                                            </div>
                                         {% elif field.label == 'Group name' %}
                                             {% render_field field class="form-control" value=breed_group.group_name %}
                                         {% elif field.label == 'Group members' %}
@@ -90,10 +99,9 @@
                                             </div>
                                              <script>
                                                  $(document).ready(function(){
-                                                    $("#breed").on("input propertychange paste", function(){
-                                                        var breed = document.getElementById('breed').value.toLowerCase();
-                                                        var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.attribute.breed.breed_name }}', {% endfor %} };
-                                                        console.log(breed);
+                                                    $("#breeds").change(function(){
+                                                        var breed = $( "#breeds option:selected" ).text();
+                                                        var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.breed.breed_name }}', {% endfor %} };
                                                         $('#public-methods').empty();
 
                                                         $.each(options, function(key, value) {
