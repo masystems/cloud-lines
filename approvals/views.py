@@ -50,8 +50,15 @@ def approve(request, id):
 
     if approval.pedigree:
         data_dict = load(approval.data)[0]
-        approval.pedigree.parent_mother = Pedigree.objects.get(id=str(data_dict['fields']['parent_mother']))
-        approval.pedigree.parent_father = Pedigree.objects.get(id=str(data_dict['fields']['parent_father']))
+        print(str(data_dict['fields']['parent_father']))
+        try:
+            approval.pedigree.parent_mother = Pedigree.objects.get(id=str(data_dict['fields']['parent_mother']))
+        except ValueError:
+            pass
+        try:
+            approval.pedigree.parent_father = Pedigree.objects.get(id=str(data_dict['fields']['parent_father']))
+        except ValueError:
+            pass
     elif approval.breed_group:
         data_dict = load(approval.data)[0]
         approval.breed_group.group_members.clear()
