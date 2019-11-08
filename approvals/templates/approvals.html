@@ -318,10 +318,10 @@
                                                                     </tr>
                                                                 {% endif %}
 
-                                                                {% if item.parent_father != approval.pedigree.parent_farther %}
+                                                                {% if item.parent_father != approval.pedigree.parent_father  %}
                                                                     <tr>
                                                                         <td>Father</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.parent_father}} <code>to</code> {{ item.parent_father.reg_no}}</td>
+                                                                        <td><code>From</code> {{ approval.pedigree.parent_father }} <code>to</code> {{ item.parent_father.reg_no }}</td>
                                                                     </tr>
                                                                 {% endif %}
 
