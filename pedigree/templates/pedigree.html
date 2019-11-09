@@ -108,17 +108,17 @@ vertical-align: middle;
                     <div class="tab-pane p-3" id="images" role="tabpanel">
                         <div class="card-columns el-element-overlay">
                             {% for image in lvl1.images.all %}
-                            <div class="card">
-                                <div class="el-card-item">
-                                    <div class="el-card-avatar el-overlay-1">
-                                        <a class="image-popup-vertical-fit" href="{{ image.image.url }}"> <img src="{{ image.image.url }}" alt="user" /> </a>
-                                    </div>
-                                    <div class="el-card-content">
-                                        <h3 class="box-title">{{ image.title }}</h3> <small>{{ image.description }}</small>
-                                        <br/>
+                                <div class="card">
+                                    <div class="el-card-item">
+                                        <div class="el-card-avatar el-overlay-1">
+                                            <a class="image-popup-vertical-fit" href="{{ image.image.url }}"> <img src="{{ image.image.url }}" alt="user" /> </a>
+                                        </div>
+                                        <div class="el-card-content">
+                                            <h3 class="box-title">{{ image.title }}</h3> <small>{{ image.description }}</small>
+                                            <br/>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             {% endfor %}
                         </div>
                     </div>

@@ -580,15 +580,21 @@ def edit_pedigree_form(request, id):
                 pedigree.save()
 
             files = request.FILES.getlist('upload_images')
-            #fs = FileSystemStorage()
 
             for image in PedigreeImage.objects.filter(account=attached_service):
                 img = request.POST.get('{}-{}'.format(pedigree.id, image.id))
                 if img:
-                    image.delete()
+                    if request.user in attached_service.contributors.all():
+                        image.state = 'edited'
+                        image.save()
+                    else:
+                        image.delete()
 
             for file in files:
-                upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
+                if request.user in attached_service.contributors.all():
+                    upload = PedigreeImage(account=attached_service, state='unapproved', image=file, reg_no=pedigree)
+                else:
+                    upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
                 upload.save()
 
             return redirect('pedigree', pedigree.id)

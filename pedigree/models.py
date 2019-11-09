@@ -63,6 +63,12 @@ def user_directory_path(instance, filename):
 
 
 class PedigreeImage(models.Model):
+    STATES = (
+        ('edited', 'Edited'),
+        ('unapproved', 'Unapproved'),
+        ('approved', 'Approved'),
+    )
+    state = models.CharField(max_length=10, choices=STATES, null=True, default='approved')
     reg_no = models.ForeignKey(Pedigree, related_name='images', on_delete=models.SET_NULL, blank=True, null=True)
     account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
     image = models.ImageField(upload_to=user_directory_path)
