@@ -394,14 +394,19 @@
                                                         <div class="row">
                                                             <div class="card-columns el-element-overlay">
                                                                 {% for image in new_item.images.all %}
-                                                                    {% if image.state == 'edited' %}
+                                                                    {% if image.state != 'approved' %}
                                                                         <div class="card">
                                                                             <div class="el-card-item">
                                                                                 <div class="el-card-avatar el-overlay-1">
                                                                                     <a class="image-popup-vertical-fit" href="{{ image.image.url }}"> <img src="{{ image.image.url }}" alt="user" /> </a>
                                                                                 </div>
                                                                                 <div class="el-card-content">
-                                                                                    <h3 class="box-title">{{ image.title }}</h3> <small>{{ image.description }}</small>
+                                                                                    <h3 class="box-title">{{ image.title }}</h3>
+                                                                                    {% if image.state == 'unapproved' %}
+                                                                                        <small>New</small>
+                                                                                    {% elif image.state == 'edited' %}
+                                                                                        <small>Deleted</small>
+                                                                                    {% endif %}
                                                                                     <br/>
                                                                                 </div>
                                                                             </div>
