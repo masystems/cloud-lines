@@ -17,6 +17,7 @@ def export(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
         fields = request.POST.getlist('fields')
+        print(fields)
         date = datetime.now()
         if request.POST['submit'] == 'xlsx':
             pass
@@ -33,7 +34,7 @@ def export(request):
                 row = []
                 for key, val in pedigree.__dict__.items():
                     if not header:
-                        if key != '_state':
+                        if key != '_state' and key in fields:
                             head.append('{}'.format(key))
                     if key in fields:
                         row.append('{}'.format(val))
