@@ -382,7 +382,7 @@
                                                                     <tr>
                                                                         <td>Custom Fields</td>
                                                                         <td>
-                                                                            {% for field_key, field_vals in item.custom_fields %}
+                                                                            {% for field_key, field_vals in item.custom_fields.items %}
                                                                                 {% if field_vals.location == 'pedigree' %}
                                                                                     {% if field_vals.fieldType == 'textField' %}
                                                                                         {{ field_vals.fieldName }}: {{ field_vals.field_value }}

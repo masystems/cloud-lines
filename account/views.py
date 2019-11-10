@@ -364,7 +364,6 @@ def settings(request):
 @login_required(login_url="/account/login")
 def custom_field_edit(request):
     # this is the additional user customers can add/remove from their service.
-    print(request)
     if request.method == 'POST':
         user_detail = UserDetail.objects.get(user=request.user)
         attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
