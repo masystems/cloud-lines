@@ -7,7 +7,8 @@ from pedigree.models import Pedigree
 from breed_group.models import BreedGroup
 from breeder.models import Breeder
 from breed.models import Breed
-from yaml import dump, load
+from yaml import load
+from json import loads
 
 
 @login_required(login_url="/account/login")
@@ -20,6 +21,7 @@ def approvals(request):
     for approval in approvals:
         if approval.pedigree:
             for obj in serializers.deserialize("yaml", approval.data):
+                obj.object.custom_fields_expanded = loads(obj.object.custom_fields)
                 data.append(obj.object)
         elif approval.breed_group:
             # convert the data to a dict
