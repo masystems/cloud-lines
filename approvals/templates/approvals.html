@@ -192,18 +192,20 @@
                                                                     </tr>
                                                                 {% endif %}
 
-                                                                <tr>
-                                                                    <td>Custom Fields</td>
-                                                                    <td>
-                                                                        {% for field_key, field_vals in custom_fields %}
-                                                                            {% if field_vals.location == 'pedigree' %}
-                                                                                {% if field_vals.fieldType == 'textField' %}
-                                                                                    {{ field_vals.fieldName }}: {{ field_vals.field_value }}
+                                                                {% if new_item.custom_fields != approval.pedigree.custom_fields %}
+                                                                    <tr>
+                                                                        <td>Custom Fields</td>
+                                                                        <td>
+                                                                            {% for field_key, field_vals in new_item.custom_fields %}
+                                                                                {% if field_vals.location == 'pedigree' %}
+                                                                                    {% if field_vals.fieldType == 'textField' %}
+                                                                                        {{ field_vals.fieldName }}: {{ field_vals.field_value }}
+                                                                                    {% endif %}
                                                                                 {% endif %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                    </td>
-                                                                </tr>
+                                                                            {% endfor %}
+                                                                        </td>
+                                                                    </tr>
+                                                                {% endif %}
                                                             </tbody>
                                                         </table>
                                                         <hr>
@@ -376,18 +378,20 @@
                                                                     </tr>
                                                                 {% endif %}
 
-                                                                <tr>
-                                                                    <td>Custom Fields</td>
-                                                                    <td>
-                                                                        {% for field_key, field_vals in custom_fields %}
-                                                                            {% if field_vals.location == 'pedigree' %}
-                                                                                {% if field_vals.fieldType == 'textField' %}
-                                                                                    {{ field_vals.fieldName }}: {{ field_vals.field_value }}
+                                                                {% if item.custom_fields != approval.pedigree.custom_fields %}
+                                                                    <tr>
+                                                                        <td>Custom Fields</td>
+                                                                        <td>
+                                                                            {% for field_key, field_vals in item.custom_fields %}
+                                                                                {% if field_vals.location == 'pedigree' %}
+                                                                                    {% if field_vals.fieldType == 'textField' %}
+                                                                                        {{ field_vals.fieldName }}: {{ field_vals.field_value }}
+                                                                                    {% endif %}
                                                                                 {% endif %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                    </td>
-                                                                </tr>
+                                                                            {% endfor %}
+                                                                        </td>
+                                                                    </tr>
+                                                                {% endif %}
                                                             </tbody>
                                                         </table>
                                                         <hr>
