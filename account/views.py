@@ -547,7 +547,7 @@ def register(request):
 
             send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
 
-            return redirect('order')
+            return redirect('dashboard')
         else:
             return redirect('cl_login')
     else:
