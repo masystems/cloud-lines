@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
 from account.views import is_editor, get_main_account
 from .models import Approval
-from pedigree.models import Pedigree
+from pedigree.models import Pedigree, PedigreeImage
 from breed_group.models import BreedGroup
 from breeder.models import Breeder
 from breed.models import Breed
@@ -52,7 +52,6 @@ def approve(request, id):
 
     if approval.pedigree:
         data_dict = load(approval.data)[0]
-        print(str(data_dict['fields']['parent_father']))
         try:
             approval.pedigree.parent_mother = Pedigree.objects.get(id=str(data_dict['fields']['parent_mother']))
         except ValueError:
@@ -61,6 +60,13 @@ def approve(request, id):
             approval.pedigree.parent_father = Pedigree.objects.get(id=str(data_dict['fields']['parent_father']))
         except ValueError:
             pass
+
+        # approve images
+        images = PedigreeImage.objects.filter(reg_no=approval.pedigree)
+        for image in images:
+            image.state = 'approved'
+            image.save()
+
     elif approval.breed_group:
         data_dict = load(approval.data)[0]
         approval.breed_group.group_members.clear()
@@ -83,6 +89,12 @@ def declined(request, id):
         else:
             # mark edited items as approved but do not save yaml data from approval object
             Pedigree.objects.filter(id=approval.pedigree.id).update(state='approved')
+
+        # un-approve images
+        images = PedigreeImage.objects.filter(reg_no=approval.pedigree)
+        for image in images:
+            image.delete()
+
     elif approval.breed_group:
         if approval.type == 'new':
             # delete new entry
