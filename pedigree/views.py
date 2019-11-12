@@ -360,24 +360,7 @@ def new_pedigree_form(request):
             if request.user in attached_service.contributors.all():
                 new_pedigree.state = 'unapproved'
                 new_pedigree.save()
-                try:
-                    new_pedigree.dob = dateutil.parser.parse(new_pedigree.dob)
-                except TypeError:
-                    pass
-                try:
-                    new_pedigree.dod = dateutil.parser.parse(new_pedigree.dod)
-                except TypeError:
-                    pass
-                try:
-                    new_pedigree.date_of_registration = dateutil.parser.parse(new_pedigree.date_of_registration)
-                except TypeError:
-                    pass
-                data = serializers.serialize('yaml', [new_pedigree])
-                Approval.objects.create(account=attached_service,
-                                        user=request.user,
-                                        type='new',
-                                        pedigree=new_pedigree,
-                                        data=data)
+                create_approval(request, new_pedigree, attached_service, state='unapproved', type='new')
 
             else:
                 new_pedigree.save()
@@ -551,26 +534,7 @@ def edit_pedigree_form(request, id):
             pedigree.custom_fields = json.dumps(custom_fields)
 
             if request.user in attached_service.contributors.all():
-                Pedigree.objects.filter(id=pedigree.id).update(state='edited')
-                try:
-                    pedigree.dob = dateutil.parser.parse(pedigree.dob)
-                except TypeError:
-                    pass
-                try:
-                    pedigree.dod = dateutil.parser.parse(pedigree.dod)
-                except TypeError:
-                    pass
-                try:
-                    pedigree.date_of_registration = dateutil.parser.parse(pedigree.date_of_registration)
-                except TypeError:
-                    pass
-                data = serializers.serialize('yaml', [pedigree])
-                Approval.objects.create(account=attached_service,
-                                        user=request.user,
-                                        type='edit',
-                                        pedigree=pedigree,
-                                        data=data)
-
+                create_approval(request, pedigree, attached_service, state='edited', type='edit')
             else:
                 # delete any existed approvals
                 approvals = Approval.objects.filter(pedigree=pedigree)
@@ -623,7 +587,10 @@ def add_existing(request, pedigree_id):
         elif pedigree.sex == 'female':
             child.parent_mother = pedigree
 
-        child.save()
+        if request.user in attached_service.contributors.all():
+            create_approval(request, child, attached_service, state='edited', type='edit')
+        else:
+            child.save()
 
     return redirect('pedigree', pedigree_id)
 
@@ -640,9 +607,36 @@ def add_existing_parent(request, pedigree_id):
         elif pedigree.sex == 'female':
             pedigree.parent_mother = parent
 
-        pedigree.save()
+        if request.user in attached_service.contributors.all():
+            create_approval(request, pedigree, attached_service, state='edited', type='edit')
+        else:
+            pedigree.save()
 
     return redirect('pedigree', pedigree_id)
+
+
+def create_approval(request, pedigree, attached_service, state, type):
+    if state == 'edited':
+        Pedigree.objects.filter(id=pedigree.id).update(state=state)
+
+    try:
+        pedigree.dob = dateutil.parser.parse(pedigree.dob)
+    except TypeError:
+        pass
+    try:
+        pedigree.dod = dateutil.parser.parse(pedigree.dod)
+    except TypeError:
+        pass
+    try:
+        pedigree.date_of_registration = dateutil.parser.parse(pedigree.date_of_registration)
+    except TypeError:
+        pass
+    data = serializers.serialize('yaml', [pedigree])
+    Approval.objects.create(account=attached_service,
+                            user=request.user,
+                            type=type,
+                            pedigree=pedigree,
+                            data=data)
 
 
 # start with one pedigree
