@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from account.views import is_editor, get_main_account
 from .models import Approval
 from pedigree.models import Pedigree, PedigreeImage
@@ -27,8 +28,11 @@ def approvals(request):
             # convert the data to a dict
             data_dict = load(approval.data)[0]
             # get the breeder
-            breeder = Breeder.objects.get(id=data_dict['fields']['breeder'])
-            data_dict['fields']['breeder'] = breeder.breeding_prefix
+            try:
+                breeder = Breeder.objects.get(id=data_dict['fields']['breeder'])
+                data_dict['fields']['breeder'] = breeder.breeding_prefix
+            except ObjectDoesNotExist:
+                data_dict['fields']['breeder'] = None
             # get the breed
             breed = Breed.objects.get(id=data_dict['fields']['breed'])
             data_dict['fields']['breed'] = breed.breed_name
