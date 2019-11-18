@@ -93,11 +93,10 @@
                                                     $("#breeds").change(function(){
                                                         var breed = $( "#breeds option:selected" ).text();
                                                         var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.breed.breed_name }}', {% endfor %} };
-                                                        console.log(options);
                                                         $('#public-methods').empty();
 
                                                         $.each(options, function(key, value) {
-                                                            if (value.toLowerCase().includes(breed)) {
+                                                            if (value.includes(breed)) {
                                                                 var option = document.createElement('option');
                                                                     option.setAttribute("value", key);
                                                                 var val = document.createTextNode(key);

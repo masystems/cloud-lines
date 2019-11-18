@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
@@ -33,10 +33,32 @@ def export(request):
                 head = []
                 row = []
                 for key, val in pedigree.__dict__.items():
+                    print(key)
                     if not header:
-                        if key != '_state' and key in fields:
-                            head.append('{}'.format(key))
-                    if key in fields:
+                        head.append('{}'.format(key))
+
+                    if key == 'parent_mother_id' or key == 'parent_father_id':
+                        try:
+                            parent = Pedigree.objects.get(id=val)
+                            reg_no = parent.reg_no
+                        except ObjectDoesNotExist:
+                            reg_no = ""
+                        row.append('{}'.format(reg_no))
+                    elif key == 'breeder_id':
+                        try:
+                            breeder = Breeder.objects.get(id=val)
+                            breed_prefix = breeder.breeding_prefix
+                        except ObjectDoesNotExist:
+                            breed_prefix = ""
+                        row.append('{}'.format(breed_prefix))
+                    elif key == 'breed_id':
+                        try:
+                            breed = Breed.objects.get(id=val)
+                            breed_name = breed.breed_name
+                        except ObjectDoesNotExist:
+                            breed_name = ""
+                        row.append('{}'.format(breed_name))
+                    else:
                         row.append('{}'.format(val))
                 if not header:
                     writer.writerow(head)
