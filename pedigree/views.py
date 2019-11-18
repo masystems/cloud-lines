@@ -428,11 +428,15 @@ def edit_pedigree_form(request, id):
 
     if request.method == 'POST':
         if 'delete' in request.POST:
-            pedigree.delete()
-            # delete any existed approvals
-            approvals = Approval.objects.filter(pedigree=pedigree)
-            for approval in approvals:
-                approval.delete()
+            if request.user in attached_service.contributors.all():
+                # contributors are not allowed to delete pedigrees!
+                pass
+            else:
+                pedigree.delete()
+                # delete any existed approvals
+                approvals = Approval.objects.filter(pedigree=pedigree)
+                for approval in approvals:
+                    approval.delete()
             return redirect('pedigree_search')
 
         # check whether it's valid:

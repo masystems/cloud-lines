@@ -71,11 +71,15 @@ def edit_breed_group_form(request, breed_group_id):
     members = []
     if request.method == 'POST':
         if 'delete' in request.POST:
-            breed_group.delete()
-            # delete any existed approvals
-            approvals = Approval.objects.filter(breed_group=breed_group)
-            for approval in approvals:
-                approval.delete()
+            if request.user in attached_service.contributors.all():
+                # contributors are not allowed to delete pedigrees!
+                pass
+            else:
+                breed_group.delete()
+                # delete any existed approvals
+                approvals = Approval.objects.filter(breed_group=breed_group)
+                for approval in approvals:
+                    approval.delete()
             return redirect('breed_groups')
         try:
             breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
