@@ -152,28 +152,28 @@
 
                                                                 {% if new_item.parent_father %}
                                                                     <tr>
-                                                                        <td>Father</td>
+                                                                        <td>{{ attached_service.father_title }}</td>
                                                                         <td>{{ new_item.parent_father }}</td>
                                                                     </tr>
                                                                 {% endif %}
 
                                                                 {% if new_item.parent_father_notes %}
                                                                     <tr>
-                                                                        <td>Fathers Notes</td>
+                                                                        <td>{{ attached_service.father_title }} Notes</td>
                                                                         <td>{{ new_item.parent_father_notes }}</td>
                                                                     </tr>
                                                                 {% endif %}
 
                                                                 {% if new_item.parent_mother %}
                                                                     <tr>
-                                                                        <td>Mother</td>
+                                                                        <td>{{ attached_service.mother_title }}</td>
                                                                         <td>{{ new_item.parent_mother }}</td>
                                                                     </tr>
                                                                 {% endif %}
 
                                                                 {% if new_item.parent_mother_notes %}
                                                                     <tr>
-                                                                        <td>Mothers Notes</td>
+                                                                        <td>{{ attached_service.mother_title }} Notes</td>
                                                                         <td>{{ new_item.parent_mother_notes }}</td>
                                                                     </tr>
                                                                 {% endif %}
@@ -338,28 +338,28 @@
 
                                                                 {% if item.parent_father != approval.pedigree.parent_father  %}
                                                                     <tr>
-                                                                        <td>Father</td>
+                                                                        <td>{{ attached_service.father_title }}</td>
                                                                         <td><code>From</code> {{ approval.pedigree.parent_father }} <code>to</code> {{ item.parent_father.reg_no }}</td>
                                                                     </tr>
                                                                 {% endif %}
 
                                                                 {% if item.parent_father_notes != approval.pedigree.parent_father_notes %}
                                                                     <tr>
-                                                                        <td>Fathers Notes</td>
+                                                                        <td>{{ attached_service.father_title }} Notes</td>
                                                                         <td><code>From</code> {{ approval.pedigree.parent_father_notes }} <code>to</code> {{ item.parent_father_notes }}</td>
                                                                     </tr>
                                                                 {% endif %}
 
                                                                 {% if item.parent_mother != approval.pedigree.parent_mother %}
                                                                     <tr>
-                                                                        <td>Mother</td>
+                                                                        <td>{{ attached_service.mother_title }}</td>
                                                                         <td><code>From</code> {{ approval.pedigree.parent_mother }} <code>to</code> {{ item.parent_mother }}</td>
                                                                     </tr>
                                                                 {% endif %}
 
                                                                 {% if item.parent_mother_notes != approval.pedigree.parent_mother_notes %}
                                                                     <tr>
-                                                                        <td>Mothers Notes</td>
+                                                                        <td>{{ attached_service.mother_title }} Notes</td>
                                                                         <td><code>From</code> {{ approval.pedigree.parent_mother_notes }} <code>to</code> {{ item.parent_mother_notes }}</td>
                                                                     </tr>
                                                                 {% endif %}

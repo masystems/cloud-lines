@@ -60,7 +60,6 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
             context['custom_fields'] = {}
 
         context = generate_hirearchy(context)
-        inbreeding_calc(context['lvl1'])
 
         return context
 
@@ -638,32 +637,3 @@ def create_approval(request, pedigree, attached_service, state, type):
                             pedigree=pedigree,
                             data=data)
 
-
-# start with one pedigree
-# get pedigrees parents
-# add one to node counter
-# get grandparents
-# add one to none counter
-#
-
-def inbreeding_calc(pedigree):
-    pass
-#     sorted = []
-#     unchecked_parents = [get_parents(pedigree)]
-#     tree = {}
-#     while True:
-#         tree['parents'] = {}
-#
-#
-# def get_parents(pedigree):
-#     try:
-#         a = Pedigree.objects.get(id=pedigree.parent_mother.id)
-#     except AttributeError:
-#         a = None
-#
-#     try:
-#         b = Pedigree.objects.get(id=pedigree.parent_father.id)
-#     except AttributeError:
-#         b = None
-#
-#     return a, b
