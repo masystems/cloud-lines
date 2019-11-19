@@ -88,6 +88,7 @@ def declined(request):
     if request.method == 'POST':
         approval = Approval.objects.get(id=request.POST.get('decline-id'))
         if approval.pedigree:
+            message_approval_id = approval.pedigree.reg_no
             if approval.type == 'new':
                 # delete new entry
                 approval.pedigree.delete()
@@ -101,6 +102,7 @@ def declined(request):
                 image.delete()
 
         elif approval.breed_group:
+            message_approval_id = approval.breed_group.group_name
             if approval.type == 'new':
                 # delete new entry
                 approval.breed_group.delete()
@@ -109,7 +111,12 @@ def declined(request):
                 BreedGroup.objects.filter(id=approval.breed_group.id).update(state='approved')
         approval.delete()
 
-        send_mail('Cloud-Lines approval declined', approval.user.get_full_name(), request.POST.get('message'),
+        message = """{} has decline your change approval request for {} with the following message:
+        
+        {}
+        """.format(request.user.get_full_name(), message_approval_id, request.POST.get('message'))
+
+        send_mail('Cloud-Lines approval declined for {}'.format(message_approval_id), approval.user.get_full_name(), message,
                   send_to=approval.user.email,
                   send_from='contact@masys.co.uk',
                   reply_to=request.user.email)
