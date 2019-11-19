@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, send_mail
 from .models import Approval
 from pedigree.models import Pedigree, PedigreeImage
 from breed_group.models import BreedGroup
@@ -84,28 +84,34 @@ def approve(request, id):
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
-def declined(request, id):
-    approval = Approval.objects.get(id=id)
-    if approval.pedigree:
-        if approval.type == 'new':
-            # delete new entry
-            approval.pedigree.delete()
-        else:
-            # mark edited items as approved but do not save yaml data from approval object
-            Pedigree.objects.filter(id=approval.pedigree.id).update(state='approved')
+def declined(request):
+    if request.method == 'POST':
+        approval = Approval.objects.get(id=request.POST.get('decline-id'))
+        if approval.pedigree:
+            if approval.type == 'new':
+                # delete new entry
+                approval.pedigree.delete()
+            else:
+                # mark edited items as approved but do not save yaml data from approval object
+                Pedigree.objects.filter(id=approval.pedigree.id).update(state='approved')
 
-        # un-approve images
-        images = PedigreeImage.objects.filter(reg_no=approval.pedigree)
-        for image in images:
-            image.delete()
+            # un-approve images
+            images = PedigreeImage.objects.filter(reg_no=approval.pedigree)
+            for image in images:
+                image.delete()
 
-    elif approval.breed_group:
-        if approval.type == 'new':
-            # delete new entry
-            approval.breed_group.delete()
-        else:
-            # mark edited items as approved but do not save yaml data from approval object
-            BreedGroup.objects.filter(id=approval.breed_group.id).update(state='approved')
-    approval.delete()
+        elif approval.breed_group:
+            if approval.type == 'new':
+                # delete new entry
+                approval.breed_group.delete()
+            else:
+                # mark edited items as approved but do not save yaml data from approval object
+                BreedGroup.objects.filter(id=approval.breed_group.id).update(state='approved')
+        approval.delete()
+
+        send_mail('Cloud-Lines approval declined', approval.user.get_full_name(), request.POST.get('message'),
+                  send_to=approval.user.email,
+                  send_from='contact@masys.co.uk',
+                  reply_to=request.user.email)
 
     return redirect('approvals')

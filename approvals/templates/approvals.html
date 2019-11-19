@@ -19,461 +19,492 @@
     <!-- End Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
 
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Approvals</h4>
-                    <p>Click the row to show more information about the approval request.</p>
-                    <div class="table-responsive m-t-40">
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th data-type="text">ID</th>
-                                    <th data-type="text">Edited By</th>
-                                    <th data-type="text">Section</th>
-                                    <th data-type="text">Change Type</th>
-                                    <th id="status" data-sorted="true" data-direction="DESC">Status</th>
-                                    <th data-sortable="false"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for approval in approvals.all %}
-                                <tr id="{{ approval.id }}-row">
-                                    {% if approval.pedigree %}
-                                        <td>{{ approval.pedigree.reg_no }}</td>
-                                    {% elif approval.breed_group %}
-                                        <td>{{ approval.breed_group.group_name }}</td>
-                                    {% else %}
-                                        <td></td>
-                                    {% endif %}
-                                    <td>{{ approval.user.get_full_name }}</td>
+    {% if editor %}
+        <div id="decline-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="decline-modal" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title">Decline Message</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="declineForm" method="POST" action="{% url 'declined' %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="message-text" class="control-label">Message:</label>
+                                <textarea class="form-control" name="message" id="message-text"></textarea>
+                                <input id="decline-id" type="hidden" name="decline-id" value="">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                        <button id="declineFormSubmit" type="button" class="btn btn-danger waves-effect waves-light">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $( "#declineFormSubmit" ).click(function() {
+                $( "#declineForm" ).submit();
+            });
+        </script>
+    {% endif %}
 
-                                    {% if approval.pedigree %}
-                                        <td>Pedigree</td>
-                                    {% elif approval.breed_group %}
-                                        <td>Breed Group</td>
-                                    {% else %}
-                                        <td></td>
-                                    {% endif %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Approvals</h4>
+                <p>Click the row to show more information about the approval request.</p>
+                <div class="table-responsive m-t-40">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th data-type="text">ID</th>
+                                <th data-type="text">Edited By</th>
+                                <th data-type="text">Section</th>
+                                <th data-type="text">Change Type</th>
+                                <th id="status" data-sorted="true" data-direction="DESC">Status</th>
+                                <th data-sortable="false"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for approval in approvals.all %}
+                            <tr id="{{ approval.id }}-row">
+                                {% if approval.pedigree %}
+                                    <td>{{ approval.pedigree.reg_no }}</td>
+                                {% elif approval.breed_group %}
+                                    <td>{{ approval.breed_group.group_name }}</td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                <td>{{ approval.user.get_full_name }}</td>
 
-                                    <td>{{ approval.type|title }}</td>
+                                {% if approval.pedigree %}
+                                    <td>Pedigree</td>
+                                {% elif approval.breed_group %}
+                                    <td>Breed Group</td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
 
-                                    <td><strong class="text-info">Pending</strong></td>
+                                <td>{{ approval.type|title }}</td>
 
-                                    <td>
-                                        {% if editor %}
-                                            <a href="{% url 'approve' approval.id %}"><button class="btn btn-sm btn-success mr-1">Approve</button></a>
-                                            {% if approval.pedigree %}
-                                                <a href="{% url 'edit_pedigree_form' approval.pedigree.id %}"><button class="btn btn-sm btn-outline-info mr-1">Edit</button></a>
-                                            {% elif approval.breed_group %}
-                                                <a href="{% url 'edit_breed_group_form' approval.breed_group.id %}"><button class="btn btn-sm btn-outline-info mr-1">Edit</button></a>
-                                            {% endif %}
-                                            <a href="{% url 'declined' approval.id %}"><button class="btn btn-sm btn-danger">Decline</button></a>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr id="{{ approval.id }}-subrow">
-                                    {% if approval.type == 'new' %}
+                                <td><strong class="text-info">Pending</strong></td>
+
+                                <td>
+                                    {% if editor %}
+                                        <a href="{% url 'approve' approval.id %}"><button class="btn btn-sm btn-success mr-1">Approve</button></a>
                                         {% if approval.pedigree %}
-                                            <td colspan="6">
-                                                {% for new_item in data %}
-                                                    {% if new_item.reg_no == approval.pedigree.reg_no %}
-                                                        <table>
-                                                            <tbody>
-                                                                {% if new_item.reg_no %}
-                                                                    <tr>
-                                                                        <td>Reg Number</td>
-                                                                        <td>{{ new_item.reg_no }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if new_item.breeder %}
-                                                                    <tr>
-                                                                        <td>Breeder</td>
-                                                                        <td>{{ new_item.breeder }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if new_item.current_owner %}
-                                                                    <tr>
-                                                                        <td>Current Owner</td>
-                                                                        <td>{{ new_item.current_owner }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if new_item.tag_no %}
+                                            <a href="{% url 'edit_pedigree_form' approval.pedigree.id %}"><button class="btn btn-sm btn-outline-info mr-1">Edit</button></a>
+                                        {% elif approval.breed_group %}
+                                            <a href="{% url 'edit_breed_group_form' approval.breed_group.id %}"><button class="btn btn-sm btn-outline-info mr-1">Edit</button></a>
+                                        {% endif %}
+                                        <button id="{{ approval.id }}-decline" class="btn btn-sm btn-danger" data-internalid="{{ approval.id }}" data-toggle="modal" data-target="#decline-modal">Decline</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr id="{{ approval.id }}-subrow">
+                                {% if approval.type == 'new' %}
+                                    {% if approval.pedigree %}
+                                        <td colspan="6">
+                                            {% for new_item in data %}
+                                                {% if new_item.reg_no == approval.pedigree.reg_no %}
+                                                    <table>
+                                                        <tbody>
+                                                            {% if new_item.reg_no %}
                                                                 <tr>
-                                                                    <td>Tag Number</td>
-                                                                    <td>{{ new_item.tag_no }}</td>
+                                                                    <td>Reg Number</td>
+                                                                    <td>{{ new_item.reg_no }}</td>
                                                                 </tr>
-                                                                {% endif %}
+                                                            {% endif %}
 
-                                                                {% if new_item.name %}
-                                                                    <tr>
-                                                                        <td>Name</td>
-                                                                        <td>{{ new_item.name }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.breeder %}
+                                                                <tr>
+                                                                    <td>Breeder</td>
+                                                                    <td>{{ new_item.breeder }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.description %}
-                                                                    <tr>
-                                                                        <td>Description</td>
-                                                                        <td>{{ new_item.description }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.current_owner %}
+                                                                <tr>
+                                                                    <td>Current Owner</td>
+                                                                    <td>{{ new_item.current_owner }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.date_of_registration %}
-                                                                    <tr>
-                                                                        <td>Date of Registration</td>
-                                                                        <td>{{ new_item.date_of_registration }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.tag_no %}
+                                                            <tr>
+                                                                <td>Tag Number</td>
+                                                                <td>{{ new_item.tag_no }}</td>
+                                                            </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.dob %}
-                                                                    <tr>
-                                                                        <td>Date of Birth</td>
-                                                                        <td>{{ new_item.dob }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.name %}
+                                                                <tr>
+                                                                    <td>Name</td>
+                                                                    <td>{{ new_item.name }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.status %}
-                                                                    <tr>
-                                                                        <td>Status</td>
-                                                                        <td>{{ new_item.status }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.description %}
+                                                                <tr>
+                                                                    <td>Description</td>
+                                                                    <td>{{ new_item.description }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.sex %}
-                                                                    <tr>
-                                                                        <td>Sex</td>
-                                                                        <td>{{ new_item.sex }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.date_of_registration %}
+                                                                <tr>
+                                                                    <td>Date of Registration</td>
+                                                                    <td>{{ new_item.date_of_registration }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.parent_father %}
-                                                                    <tr>
-                                                                        <td>{{ attached_service.father_title }}</td>
-                                                                        <td>{{ new_item.parent_father }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.dob %}
+                                                                <tr>
+                                                                    <td>Date of Birth</td>
+                                                                    <td>{{ new_item.dob }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.parent_father_notes %}
-                                                                    <tr>
-                                                                        <td>{{ attached_service.father_title }} Notes</td>
-                                                                        <td>{{ new_item.parent_father_notes }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.status %}
+                                                                <tr>
+                                                                    <td>Status</td>
+                                                                    <td>{{ new_item.status }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.parent_mother %}
-                                                                    <tr>
-                                                                        <td>{{ attached_service.mother_title }}</td>
-                                                                        <td>{{ new_item.parent_mother }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.sex %}
+                                                                <tr>
+                                                                    <td>Sex</td>
+                                                                    <td>{{ new_item.sex }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.parent_mother_notes %}
-                                                                    <tr>
-                                                                        <td>{{ attached_service.mother_title }} Notes</td>
-                                                                        <td>{{ new_item.parent_mother_notes }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.parent_father %}
+                                                                <tr>
+                                                                    <td>{{ attached_service.father_title }}</td>
+                                                                    <td>{{ new_item.parent_father }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.breed_group %}
-                                                                    <tr>
-                                                                        <td>Breed Group</td>
-                                                                        <td>{{ new_item.breed_group }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.parent_father_notes %}
+                                                                <tr>
+                                                                    <td>{{ attached_service.father_title }} Notes</td>
+                                                                    <td>{{ new_item.parent_father_notes }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.breed %}
-                                                                    <tr>
-                                                                        <td>Breed</td>
-                                                                        <td>{{ new_item.breed }}</td>
-                                                                    </tr>
-                                                                {% endif %}
+                                                            {% if new_item.parent_mother %}
+                                                                <tr>
+                                                                    <td>{{ attached_service.mother_title }}</td>
+                                                                    <td>{{ new_item.parent_mother }}</td>
+                                                                </tr>
+                                                            {% endif %}
 
-                                                                {% if new_item.custom_fields != approval.pedigree.custom_fields %}
-                                                                    <tr>
-                                                                        <td>Custom Fields</td>
-                                                                        <td>
-                                                                            {% for field_key, field_vals in new_item.custom_fields_expanded.items %}
-                                                                                {% if field_vals.location == 'pedigree' %}
-                                                                                    {% if field_vals.fieldType == 'textField' %}
-                                                                                        {{ field_vals.fieldName }}: {{ field_vals.field_value }}
-                                                                                    {% endif %}
+                                                            {% if new_item.parent_mother_notes %}
+                                                                <tr>
+                                                                    <td>{{ attached_service.mother_title }} Notes</td>
+                                                                    <td>{{ new_item.parent_mother_notes }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if new_item.breed_group %}
+                                                                <tr>
+                                                                    <td>Breed Group</td>
+                                                                    <td>{{ new_item.breed_group }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if new_item.breed %}
+                                                                <tr>
+                                                                    <td>Breed</td>
+                                                                    <td>{{ new_item.breed }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if new_item.custom_fields != approval.pedigree.custom_fields %}
+                                                                <tr>
+                                                                    <td>Custom Fields</td>
+                                                                    <td>
+                                                                        {% for field_key, field_vals in new_item.custom_fields_expanded.items %}
+                                                                            {% if field_vals.location == 'pedigree' %}
+                                                                                {% if field_vals.fieldType == 'textField' %}
+                                                                                    {{ field_vals.fieldName }}: {{ field_vals.field_value }}
                                                                                 {% endif %}
-                                                                            {% endfor %}
-                                                                        </td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                            </tbody>
-                                                        </table>
-                                                        <hr>
-                                                        <div class="card-columns el-element-overlay">
-                                                            {% for image in new_item.images.all %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </td>
+                                                                </tr>
+                                                            {% endif %}
+                                                        </tbody>
+                                                    </table>
+                                                    <hr>
+                                                    <div class="card-columns el-element-overlay">
+                                                        {% for image in new_item.images.all %}
+                                                            <div class="card">
+                                                                <div class="el-card-item">
+                                                                    <div class="el-card-avatar el-overlay-1">
+                                                                        <a class="image-popup-vertical-fit" href="{{ image.image.url }}"> <img src="{{ image.image.url }}" alt="user" /> </a>
+                                                                    </div>
+                                                                    <div class="el-card-content">
+                                                                        <h3 class="box-title">{{ image.title }}</h3> <small>New</small>
+                                                                        <br/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    {% elif approval.breed_group %}
+                                        <td colspan="6">
+                                            {% for new_item in data %}
+                                                {% if new_item.pk == approval.breed_group.id %}
+                                                    {% for key, val in new_item.items %}
+                                                        {% if key == 'fields' %}
+                                                            <table>
+                                                                <tbody>
+                                                                        <tr>
+                                                                            <td>Breeder</td>
+                                                                            <td>{{ val.breeder }}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Breed</td>
+                                                                            <td>{{ val.breed }}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Group Name</td>
+                                                                            <td>{{ val.group_name }}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Group Members</td>
+                                                                            <td>{% for pedigree in val.group_members %}{{ pedigree }} {% endfor %}</td>
+                                                                        </tr>
+                                                               </tbody>
+                                                            </table>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    {% endif %}
+                                {% elif approval.type == 'edit' %}
+                                    {% if approval.pedigree %}
+                                        <td colspan="6">
+                                            {% for item in data %}
+                                                {% if item.reg_no == approval.pedigree.reg_no %}
+                                                    <table>
+                                                        <tbody>
+                                                            {% if item.reg_no != approval.pedigree.reg_no %}
+                                                                <tr>
+                                                                    <td>Reg Number</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.reg_no }} <code>to</code> {{ item.reg_no }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.breeder != approval.pedigree.breeder %}
+                                                                <tr>
+                                                                    <td>Breeder</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.breeder }} <code>to</code> {{ item.breeder }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.current_owner != approval.pedigree.current_owner %}
+                                                                <tr>
+                                                                    <td>Current Owner</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.current_owner }} <code>to</code> {{ item.current_owner }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.tag_no != approval.pedigree.tag_no %}
+                                                            <tr>
+                                                                <td>Tag Number</td>
+                                                                <td><code>From</code> {{ approval.pedigree.tag_no }} <code>to</code> {{ item.tag_no }}</td>
+                                                            </tr>
+                                                            {% endif %}
+
+                                                            {% if item.name != approval.pedigree.name %}
+                                                                <tr>
+                                                                    <td>Name</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.name }} <code>to</code> {{ item.name }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.description != approval.pedigree.description %}
+                                                                <tr>
+                                                                    <td>Description</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.description }} <code>to</code> {{ item.description }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.date_of_registration != approval.pedigree.date_of_registration %}
+                                                                <tr>
+                                                                    <td>Date of Registration</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.date_of_registration }} <code>to</code> {{ item.date_of_registration }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.dob != approval.pedigree.dob %}
+                                                                <tr>
+                                                                    <td>Date of Birth</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.dob }} <code>to</code> {{ item.dob }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.status != approval.pedigree.status %}
+                                                                <tr>
+                                                                    <td>Status</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.status }} <code>to</code> {{ item.status }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.sex != approval.pedigree.sex %}
+                                                                <tr>
+                                                                    <td>Sex</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.sex }} <code>to</code> {{ item.sex }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.parent_father != approval.pedigree.parent_father  %}
+                                                                <tr>
+                                                                    <td>{{ attached_service.father_title }}</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.parent_father }} <code>to</code> {{ item.parent_father.reg_no }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.parent_father_notes != approval.pedigree.parent_father_notes %}
+                                                                <tr>
+                                                                    <td>{{ attached_service.father_title }} Notes</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.parent_father_notes }} <code>to</code> {{ item.parent_father_notes }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.parent_mother != approval.pedigree.parent_mother %}
+                                                                <tr>
+                                                                    <td>{{ attached_service.mother_title }}</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.parent_mother }} <code>to</code> {{ item.parent_mother }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.parent_mother_notes != approval.pedigree.parent_mother_notes %}
+                                                                <tr>
+                                                                    <td>{{ attached_service.mother_title }} Notes</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.parent_mother_notes }} <code>to</code> {{ item.parent_mother_notes }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.breed_group != approval.pedigree.breed_group %}
+                                                                <tr>
+                                                                    <td>Breed Group</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.breed_group }} <code>to</code> {{ item.breed_group }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.breed != approval.pedigree.breed %}
+                                                                <tr>
+                                                                    <td>Breed</td>
+                                                                    <td><code>From</code> {{ approval.pedigree.breed }} <code>to</code> {{ item.breed }}</td>
+                                                                </tr>
+                                                            {% endif %}
+
+                                                            {% if item.custom_fields != approval.pedigree.custom_fields %}
+                                                                <tr>
+                                                                    <td>Custom Fields</td>
+                                                                    <td>
+                                                                        {% for field_key, field_vals in item.custom_fields_expanded.items %}
+                                                                            {% if field_vals.location == 'pedigree' %}
+                                                                                {% if field_vals.fieldType == 'textField' %}
+                                                                                    {{ field_vals.fieldName }}: {{ field_vals.field_value }}
+                                                                                {% endif %}
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </td>
+                                                                </tr>
+                                                            {% endif %}
+                                                        </tbody>
+                                                    </table>
+                                                    <hr>
+                                                    <div class="card-columns el-element-overlay">
+                                                        {% for image in item.images.all %}
+                                                            {% if image.state != 'approved' %}
                                                                 <div class="card">
                                                                     <div class="el-card-item">
                                                                         <div class="el-card-avatar el-overlay-1">
                                                                             <a class="image-popup-vertical-fit" href="{{ image.image.url }}"> <img src="{{ image.image.url }}" alt="user" /> </a>
                                                                         </div>
                                                                         <div class="el-card-content">
-                                                                            <h3 class="box-title">{{ image.title }}</h3> <small>New</small>
+                                                                            <h3 class="box-title">{{ image.title }}</h3>
+                                                                            {% if image.state == 'unapproved' %}
+                                                                                <small>New</small>
+                                                                            {% elif image.state == 'edited' %}
+                                                                                <small>To be removed</small>
+                                                                            {% endif %}
                                                                             <br/>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            {% endfor %}
-                                                        </div>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </td>
-                                        {% elif approval.breed_group %}
-                                            <td colspan="6">
-                                                {% for new_item in data %}
-                                                    {% if new_item.pk == approval.breed_group.id %}
-                                                        {% for key, val in new_item.items %}
-                                                            {% if key == 'fields' %}
-                                                                <table>
-                                                                    <tbody>
-                                                                            <tr>
-                                                                                <td>Breeder</td>
-                                                                                <td>{{ val.breeder }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td>Breed</td>
-                                                                                <td>{{ val.breed }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td>Group Name</td>
-                                                                                <td>{{ val.group_name }}</td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <td>Group Members</td>
-                                                                                <td>{% for pedigree in val.group_members %}{{ pedigree }} {% endfor %}</td>
-                                                                            </tr>
-                                                                   </tbody>
-                                                                </table>
                                                             {% endif %}
                                                         {% endfor %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </td>
-                                        {% endif %}
-                                    {% elif approval.type == 'edit' %}
-                                        {% if approval.pedigree %}
-                                            <td colspan="6">
-                                                {% for item in data %}
-                                                    {% if item.reg_no == approval.pedigree.reg_no %}
-                                                        <table>
-                                                            <tbody>
-                                                                {% if item.reg_no != approval.pedigree.reg_no %}
-                                                                    <tr>
-                                                                        <td>Reg Number</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.reg_no }} <code>to</code> {{ item.reg_no }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.breeder != approval.pedigree.breeder %}
-                                                                    <tr>
-                                                                        <td>Breeder</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.breeder }} <code>to</code> {{ item.breeder }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.current_owner != approval.pedigree.current_owner %}
-                                                                    <tr>
-                                                                        <td>Current Owner</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.current_owner }} <code>to</code> {{ item.current_owner }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.tag_no != approval.pedigree.tag_no %}
-                                                                <tr>
-                                                                    <td>Tag Number</td>
-                                                                    <td><code>From</code> {{ approval.pedigree.tag_no }} <code>to</code> {{ item.tag_no }}</td>
-                                                                </tr>
-                                                                {% endif %}
-
-                                                                {% if item.name != approval.pedigree.name %}
-                                                                    <tr>
-                                                                        <td>Name</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.name }} <code>to</code> {{ item.name }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.description != approval.pedigree.description %}
-                                                                    <tr>
-                                                                        <td>Description</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.description }} <code>to</code> {{ item.description }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.date_of_registration != approval.pedigree.date_of_registration %}
-                                                                    <tr>
-                                                                        <td>Date of Registration</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.date_of_registration }} <code>to</code> {{ item.date_of_registration }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.dob != approval.pedigree.dob %}
-                                                                    <tr>
-                                                                        <td>Date of Birth</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.dob }} <code>to</code> {{ item.dob }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.status != approval.pedigree.status %}
-                                                                    <tr>
-                                                                        <td>Status</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.status }} <code>to</code> {{ item.status }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.sex != approval.pedigree.sex %}
-                                                                    <tr>
-                                                                        <td>Sex</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.sex }} <code>to</code> {{ item.sex }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.parent_father != approval.pedigree.parent_father  %}
-                                                                    <tr>
-                                                                        <td>{{ attached_service.father_title }}</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.parent_father }} <code>to</code> {{ item.parent_father.reg_no }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.parent_father_notes != approval.pedigree.parent_father_notes %}
-                                                                    <tr>
-                                                                        <td>{{ attached_service.father_title }} Notes</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.parent_father_notes }} <code>to</code> {{ item.parent_father_notes }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.parent_mother != approval.pedigree.parent_mother %}
-                                                                    <tr>
-                                                                        <td>{{ attached_service.mother_title }}</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.parent_mother }} <code>to</code> {{ item.parent_mother }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.parent_mother_notes != approval.pedigree.parent_mother_notes %}
-                                                                    <tr>
-                                                                        <td>{{ attached_service.mother_title }} Notes</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.parent_mother_notes }} <code>to</code> {{ item.parent_mother_notes }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.breed_group != approval.pedigree.breed_group %}
-                                                                    <tr>
-                                                                        <td>Breed Group</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.breed_group }} <code>to</code> {{ item.breed_group }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.breed != approval.pedigree.breed %}
-                                                                    <tr>
-                                                                        <td>Breed</td>
-                                                                        <td><code>From</code> {{ approval.pedigree.breed }} <code>to</code> {{ item.breed }}</td>
-                                                                    </tr>
-                                                                {% endif %}
-
-                                                                {% if item.custom_fields != approval.pedigree.custom_fields %}
-                                                                    <tr>
-                                                                        <td>Custom Fields</td>
-                                                                        <td>
-                                                                            {% for field_key, field_vals in item.custom_fields_expanded.items %}
-                                                                                {% if field_vals.location == 'pedigree' %}
-                                                                                    {% if field_vals.fieldType == 'textField' %}
-                                                                                        {{ field_vals.fieldName }}: {{ field_vals.field_value }}
-                                                                                    {% endif %}
-                                                                                {% endif %}
-                                                                            {% endfor %}
-                                                                        </td>
-                                                                    </tr>
-                                                                {% endif %}
-                                                            </tbody>
-                                                        </table>
-                                                        <hr>
-                                                        <div class="card-columns el-element-overlay">
-                                                            {% for image in item.images.all %}
-                                                                {% if image.state != 'approved' %}
-                                                                    <div class="card">
-                                                                        <div class="el-card-item">
-                                                                            <div class="el-card-avatar el-overlay-1">
-                                                                                <a class="image-popup-vertical-fit" href="{{ image.image.url }}"> <img src="{{ image.image.url }}" alt="user" /> </a>
-                                                                            </div>
-                                                                            <div class="el-card-content">
-                                                                                <h3 class="box-title">{{ image.title }}</h3>
-                                                                                {% if image.state == 'unapproved' %}
-                                                                                    <small>New</small>
-                                                                                {% elif image.state == 'edited' %}
-                                                                                    <small>To be removed</small>
-                                                                                {% endif %}
-                                                                                <br/>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        </div>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </td>
-                                        {% elif approval.breed_group %}
-                                            <td colspan="6">
-                                                {% for item in data %}
-                                                    {% if item.pk == approval.breed_group.id %}
-                                                        {% for key, val in item.items %}
-                                                            {% if key == 'fields' %}
-                                                                <table>
-                                                                    <tbody>
-                                                                        {% if val.breeder|lower != approval.breed_group.breeder|lower %}
-                                                                            <tr>
-                                                                                <td>Breeder</td>
-                                                                                <td><code>From</code> {{ approval.breed_group.breeder }} <code>to</code> {{ val.breeder }}</td>
-                                                                            </tr>
-                                                                        {% endif %}
-                                                                        {% if val.breed != approval.breed_group.breed %}
-                                                                            <tr>
-                                                                                <td>Breed</td>
-                                                                                <td><code>From</code> {{ approval.breed_group.breed }} <code>to</code> {{ val.breed }}</td>
-                                                                            </tr>
-                                                                        {% endif %}
-                                                                        {% if val.group_name|upper != approval.breed_group.group_name|upper %}
-                                                                            <tr>
-                                                                                <td>Group Name</td>
-                                                                                <td><code>From</code> {{ approval.breed_group.group_name }} <code>to</code> {{ val.group_name }}</td>
-                                                                            </tr>
-                                                                        {% endif %}
-                                                                        {% if val.group_members %}
-                                                                            <tr>
-                                                                                <td>Group Members</td>
-                                                                                <td>
-                                                                                    {% for pedigree in val.group_members %}
-                                                                                        {% include 'relative.html' with pedigree=pedigree %}
-                                                                                    {% endfor %}
-                                                                                </td>
-                                                                            </tr>
-                                                                        {% endif %}
-                                                                   </tbody>
-                                                                </table>
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </td>
-                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    {% elif approval.breed_group %}
+                                        <td colspan="6">
+                                            {% for item in data %}
+                                                {% if item.pk == approval.breed_group.id %}
+                                                    {% for key, val in item.items %}
+                                                        {% if key == 'fields' %}
+                                                            <table>
+                                                                <tbody>
+                                                                    {% if val.breeder|lower != approval.breed_group.breeder|lower %}
+                                                                        <tr>
+                                                                            <td>Breeder</td>
+                                                                            <td><code>From</code> {{ approval.breed_group.breeder }} <code>to</code> {{ val.breeder }}</td>
+                                                                        </tr>
+                                                                    {% endif %}
+                                                                    {% if val.breed != approval.breed_group.breed %}
+                                                                        <tr>
+                                                                            <td>Breed</td>
+                                                                            <td><code>From</code> {{ approval.breed_group.breed }} <code>to</code> {{ val.breed }}</td>
+                                                                        </tr>
+                                                                    {% endif %}
+                                                                    {% if val.group_name|upper != approval.breed_group.group_name|upper %}
+                                                                        <tr>
+                                                                            <td>Group Name</td>
+                                                                            <td><code>From</code> {{ approval.breed_group.group_name }} <code>to</code> {{ val.group_name }}</td>
+                                                                        </tr>
+                                                                    {% endif %}
+                                                                    {% if val.group_members %}
+                                                                        <tr>
+                                                                            <td>Group Members</td>
+                                                                            <td>
+                                                                                {% for pedigree in val.group_members %}
+                                                                                    {% include 'relative.html' with pedigree=pedigree %}
+                                                                                {% endfor %}
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% endif %}
+                                                               </tbody>
+                                                            </table>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
                                     {% endif %}
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
         </div>
+    </div>
 
 <script>
     $(document).ready(function(){
@@ -485,6 +516,11 @@
     {% for approval in approvals.all %}
         $('#{{ approval.id }}-row').click( function() {
             $('#{{ approval.id }}-subrow').toggle(500);
+        });
+
+        $('#{{ approval.id }}-decline').click( function() {
+            //var did = $('#{{ approval.id }}-decline').attr('data-internalid');
+            $('#decline-id').attr('value', $('#{{ approval.id }}-decline').attr('data-internalid'));
         });
     {% endfor %}
 </script>
