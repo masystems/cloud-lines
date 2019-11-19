@@ -307,12 +307,12 @@ def import_pedigree_data(request):
             try:
                 pedigree.parent_father_notes = row[father_notes]
             except KeyError:
-                pass
+                pedigree.parent_father_notes = ''
             #############################
             try:
                 pedigree.parent_mother_notes = row[mother_notes]
             except KeyError:
-                pass
+                pedigree.parent_mother_notes = ''
             #############################
 
             # create breed if it doesn't exist ###################
