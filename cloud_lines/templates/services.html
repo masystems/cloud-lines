@@ -62,6 +62,10 @@
                                    data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
 
                                 <button class="button button-mini button-circle" data-container="body"
+                                   data-toggle="tooltip" data-placement="top" title="Max number of contributor accounts"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.contrib_users }}</button>
+
+                                <button class="button button-mini button-circle" data-container="body"
                                    data-toggle="tooltip" data-placement="top" title="Max number of read only accounts"
                                    data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-friends"></i>{% if service.read_only_users == 99 %}<i class="icon-infinity"></i>{% else %}{{ service.read_only_users }}{% endif %}</button>
 
@@ -118,6 +122,10 @@
                                 <button class="button button-mini button-circle" data-container="body"
                                    data-toggle="tooltip" data-placement="top" title="Max number of admin accounts"
                                    data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
+
+                                <button class="button button-mini button-circle" data-container="body"
+                                   data-toggle="tooltip" data-placement="top" title="Max number of contributor accounts"
+                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.contrib_users }}</button>
 
                                 <button class="button button-mini button-circle" data-container="body"
                                    data-toggle="tooltip" data-placement="top" title="Max number of read only accounts"

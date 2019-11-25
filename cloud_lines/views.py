@@ -24,17 +24,15 @@ def dashboard(request):
         return HttpResponseRedirect(main_account.domain)
 
     total_pedigrees = Pedigree.objects.filter(account=main_account).exclude(state='unapproved').count()
-    #total_breeders = Breeder.objects.filter(account=main_account).count()
     top_pedigrees = Pedigree.objects.filter(account=main_account).order_by('-date_added').exclude(state='unapproved')[:5]
     breed_groups = BreedGroup.objects.filter(account=main_account).order_by('-date_added').exclude(state='unapproved')[:5]
     latest_breeders = Breeder.objects.filter(account=main_account).order_by('-id')[:5]
-
 
     current_month = datetime.now().month
     date = datetime.now()
     if total_pedigrees > 0 \
             and Breed.objects.filter(account=main_account).exists() \
-            and Breeder.objects.filter(account=main_account).exists():
+            and len(latest_breeders) > 0:
         pedigree_chart = {}
         for month in range(0, 12):
             month_count = Pedigree.objects.filter(account=main_account, date_of_registration__month=current_month-month).count()

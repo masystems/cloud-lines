@@ -9,6 +9,7 @@ class Service(models.Model):
     image = models.FileField(blank=True)
     service_name = models.CharField(max_length=50, unique=True)
     admin_users = models.IntegerField()
+    contrib_users = models.IntegerField()
     read_only_users = models.IntegerField()
     number_of_animals = models.IntegerField()
     multi_breed = models.BooleanField()
