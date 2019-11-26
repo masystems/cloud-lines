@@ -86,7 +86,7 @@ class GeneratePDF(View):
     def get(self, request, *args, **kwargs):
         context = {}
         context['attached_service'] = get_main_account(request.user)
-        context['lvl1'] = Pedigree.objects.get(account=context['attached_service'], id=self.kwargs['pedigree_id']).exclude(state='unapproved')
+        context['lvl1'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
         context = generate_hirearchy(context)
 
         pdf_filename = "{date}-{name}{pedigree}-certificate".format(
