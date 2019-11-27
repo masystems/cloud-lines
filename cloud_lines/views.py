@@ -49,14 +49,14 @@ def dashboard(request):
     else:
         return redirect('setup')
 
-    ## updates
-    # try:
-    #     get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
-    #     updates = get_updates_json.json()
-    #     update_card_size = 44 * len(updates)
-    # except ConnectionError:
-    updates = {}
-    update_card_size = 44
+    # updates
+    try:
+        get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
+        updates = get_updates_json.json()
+        update_card_size = 44 * len(updates)
+    except ConnectionError:
+        updates = {}
+        update_card_size = 44
 
     return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
                                               'top_pedigrees': top_pedigrees,
