@@ -171,7 +171,6 @@ def user_edit(request):
     if request.method == 'POST':
         main_account = get_main_account(request.user)
         user_detail = UserDetail.objects.get(user=request.user)
-        print(request.POST)
         if request.POST.get('formType') == 'new':
             # generate password
             password = ''.join(
