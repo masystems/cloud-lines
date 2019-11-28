@@ -26,21 +26,22 @@
                         {% csrf_token %}
                         <div class="row pt-3">
                             <div class="col-6">
-                                <div class="form-group">
-                                    <label>Select infomation to export</label>
-                                    <div class="input-group">
-                                        <ul class="icheck-list">
-                                            {% for field in fields %}
-                                                {% if field.verbose_name %}
-                                                    <li>
-                                                        <input type="checkbox" checked class="check" data-checkbox="icheckbox_flat-green" name="fields" value='{{ field.name }}' id="{{ field.name }}">
-                                                        <label for="{{ field.name }}">{{ field.verbose_name|title }}</label>
-                                                    </li>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
+                                <p>Use the download button on the right to export your Pedigree data.</p>
+<!--                                <div class="form-group">-->
+<!--                                    <label>Select infomation to export</label>-->
+<!--                                    <div class="input-group">-->
+<!--                                        <ul class="icheck-list">-->
+<!--                                            {% for field in fields %}-->
+<!--                                                {% if field.verbose_name %}-->
+<!--                                                    <li>-->
+<!--                                                        <input type="checkbox" checked class="check" data-checkbox="icheckbox_flat-green" name="fields" value='{{ field.name }}' id="{{ field.name }}">-->
+<!--                                                        <label for="{{ field.name }}">{{ field.verbose_name|title }}</label>-->
+<!--                                                    </li>-->
+<!--                                                {% endif %}-->
+<!--                                            {% endfor %}-->
+<!--                                        </ul>-->
+<!--                                    </div>-->
+<!--                                </div>-->
                             </div>
                             <div class="col-6">
                                 <div class="form-group">

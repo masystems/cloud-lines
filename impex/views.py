@@ -16,8 +16,8 @@ import csv
 def export(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
-        fields = request.POST.getlist('fields')
-        print(fields)
+        #fields = request.POST.getlist('fields')
+        #print(fields)
         date = datetime.now()
         if request.POST['submit'] == 'xlsx':
             pass
@@ -33,33 +33,33 @@ def export(request):
                 head = []
                 row = []
                 for key, val in pedigree.__dict__.items():
-                    print(key)
-                    if not header:
-                        head.append('{}'.format(key))
+                    if key not in ('_state',):
+                        if not header:
+                            head.append('{}'.format(key))
 
-                    if key == 'parent_mother_id' or key == 'parent_father_id':
-                        try:
-                            parent = Pedigree.objects.get(id=val)
-                            reg_no = parent.reg_no
-                        except ObjectDoesNotExist:
-                            reg_no = ""
-                        row.append('{}'.format(reg_no))
-                    elif key == 'breeder_id':
-                        try:
-                            breeder = Breeder.objects.get(id=val)
-                            breed_prefix = breeder.breeding_prefix
-                        except ObjectDoesNotExist:
-                            breed_prefix = ""
-                        row.append('{}'.format(breed_prefix))
-                    elif key == 'breed_id':
-                        try:
-                            breed = Breed.objects.get(id=val)
-                            breed_name = breed.breed_name
-                        except ObjectDoesNotExist:
-                            breed_name = ""
-                        row.append('{}'.format(breed_name))
-                    else:
-                        row.append('{}'.format(val))
+                        if key == 'parent_mother_id' or key == 'parent_father_id':
+                            try:
+                                parent = Pedigree.objects.get(id=val)
+                                reg_no = parent.reg_no
+                            except ObjectDoesNotExist:
+                                reg_no = ""
+                            row.append('{}'.format(reg_no))
+                        elif key == 'breeder_id':
+                            try:
+                                breeder = Breeder.objects.get(id=val)
+                                breed_prefix = breeder.breeding_prefix
+                            except ObjectDoesNotExist:
+                                breed_prefix = ""
+                            row.append('{}'.format(breed_prefix))
+                        elif key == 'breed_id':
+                            try:
+                                breed = Breed.objects.get(id=val)
+                                breed_name = breed.breed_name
+                            except ObjectDoesNotExist:
+                                breed_name = ""
+                            row.append('{}'.format(breed_name))
+                        else:
+                            row.append('{}'.format(val))
                 if not header:
                     writer.writerow(head)
                     header = True
