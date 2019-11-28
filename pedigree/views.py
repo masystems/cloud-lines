@@ -323,8 +323,11 @@ def new_pedigree_form(request):
             ### mother ###
             try:
                 new_pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
+                save_breed_group = False
             except ObjectDoesNotExist:
-                new_pedigree.breed_group = pedigree_form['breed_group'].value() or None
+                new_pedigree.breed_group = pedigree_form['breed_group'].value()
+                breed_group = BreedGroup.objects.get(account=attached_service, group_name=pedigree_form['breed_group'].value())
+                save_breed_group = True
             try:
                 new_pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or ''
             except:
@@ -363,6 +366,9 @@ def new_pedigree_form(request):
 
             else:
                 new_pedigree.save()
+
+            if save_breed_group:
+                breed_group.group_members.add(new_pedigree)
 
             files = request.FILES.getlist('upload_images')
 
@@ -497,13 +503,25 @@ def edit_pedigree_form(request, id):
             except:
                 pass
 
+            # remove from breed group if needed
+            if pedigree_form['breed_group'].value() == '':
+                for group in BreedGroup.objects.all():
+                    if pedigree in group.group_members.all():
+                        group.group_members.remove(pedigree)
+
             try:
                 if pedigree_form['mother'].value() == '':
                     pedigree.parent_mother = None
                 else:
-                    pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
-            except ObjectDoesNotExist:
-                pedigree.breed_group = pedigree_form['breed_group'].value() or ''
+                    try:
+                        pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
+                    except ObjectDoesNotExist:
+                        pedigree.breed_group = pedigree_form['breed_group'].value()
+                        breed_group = BreedGroup.objects.get(account=attached_service, group_name=pedigree_form['breed_group'].value())
+                        breed_group.group_members.add(pedigree)
+            except:
+                pass
+
             try:
                 pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or ''
             except:
