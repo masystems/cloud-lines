@@ -2,15 +2,17 @@
     class="{% if pedigree.sex == 'female' %}fas fas fa-venus{% else %}fas fas fa-mars{% endif %}"></i> {{ pedigree.name }}</span>
     <span class="tooltip-content clearfix">
         <span class="tooltip-text2">
+            {% if pedigree.images.all %}
             <div class="pb-2">
-                {% if pedigree.images %}
+
                 <img src="{% for image in pedigree.images.all %}
                             {% if forloop.first %}
                                 {{ image.image.url }}
                             {% endif %}
                         {% endfor %}" class="img-thumbnail">
-                {% endif %}
+
             </div>
+            {% endif %}
             <a href="{% url 'pedigree' pedigree.id %}"
                class="btn btn-outline-{% if pedigree.sex == 'male' %}info{% else %}primary{% endif %} waves-effect waves-light mt-1 ml-1" role="button">
                 <span class="btn-label"><i class="{% if pedigree.sex == 'female' %}fas fas fa-venus{% else %}fas fas fa-mars{% endif %}"></i></span> <strong>Profile</strong></a>
