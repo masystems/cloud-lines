@@ -219,7 +219,7 @@
                             class="hide-menu"> Breed{% if service.service.multi_breed %}s{% endif %}</span></a></li>
 
                     <li class="nav-devider"></li>
-                    <li class="nav-small-cap"> Database Management</li>
+                    {% if editor %}
                     <li>
                         <a class="has-arrow " href="#" aria-expanded="false"><i class="fas fa-arrow-alt-circle-down"></i><span
                                 class="hide-menu"> Impex Database</span></a>
@@ -232,6 +232,7 @@
                             <li><a href="{% url 'export' %}">Export</a></li>
                         </ul>
                     </li>
+                    {% endif %}
 
                     <li><a href="{% url 'support' %}"><i class="fas fa-hands-helping"></i><span
                                 class="hide-menu"> Support</span></a></li>
