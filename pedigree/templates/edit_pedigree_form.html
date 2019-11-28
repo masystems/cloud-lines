@@ -148,6 +148,9 @@
                                     {% elif field.label == 'Mother' %}
                                         <div id="mothers">
                                             <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
+                                            {% if service.site_mode == 'poultry' %}
+                                                <small>Leave blank if using a breed group</small>
+                                            {% endif %}
                                         </div>
                                     {% elif field.label == 'Mother notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_mother_notes %}
@@ -305,11 +308,26 @@
             </form>
         </div>
         <script>
+            $( document ).ready(function() {
+                if ($('#id_mother').val() != '' ) {
+                    $('#id_breed_group').prop("disabled", true);
+                } else {
+                    $('#id_breed_group').prop("disabled", false);
+                    $('#id_breed_group').prop("readonly", false);
+                }
+
+                if ($('#id_breed_group').val() != '' ) {
+                    $('#id_mother').prop("disabled", true);
+                } else {
+                    $('#id_mother').prop("disabled", false);
+                }
+            });
             $('#id_mother').bind('keyup change', function(event) {
                 if ($('#id_mother').val() != '' ) {
                     $('#id_breed_group').prop("disabled", true);
                 } else {
                     $('#id_breed_group').prop("disabled", false);
+                    $('#id_breed_group').prop("readonly", false);
                 }
             });
             $('#id_breed_group').bind('keyup change', function(event) {
