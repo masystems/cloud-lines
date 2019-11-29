@@ -504,10 +504,12 @@ def edit_pedigree_form(request, id):
                 pass
 
             # remove from breed group if needed
-            if pedigree_form['breed_group'].value() == '':
-                for group in BreedGroup.objects.all():
-                    if pedigree in group.group_members.all():
-                        group.group_members.remove(pedigree)
+            if pedigree_form['breed_group'].value() == '' and pedigree.breed_group not in ('', None):
+                try:
+                    breed_group = BreedGroup.objects.get(group_name=pedigree.breed_group)
+                    breed_group.group_members.remove(pedigree)
+                except ObjectDoesNotExist:
+                    pass
 
             try:
                 if pedigree_form['mother'].value() == '':
