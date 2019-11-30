@@ -3,15 +3,15 @@
     <span class="tooltip-content clearfix">
         <span class="tooltip-text2">
             {% if pedigree.images.all %}
-            <div class="pb-2">
+                <div class="pb-2">
 
-                <img src="{% for image in pedigree.images.all %}
-                            {% if forloop.first %}
-                                {{ image.image.url }}
-                            {% endif %}
-                        {% endfor %}" class="img-thumbnail">
+                    <img src="{% for image in pedigree.images.all %}
+                                {% if forloop.first %}
+                                    {{ image.image.url }}
+                                {% endif %}
+                            {% endfor %}" class="img-thumbnail">
 
-            </div>
+                </div>
             {% endif %}
             <a href="{% url 'pedigree' pedigree.id %}"
                class="btn btn-outline-{% if pedigree.sex == 'male' %}info{% else %}primary{% endif %} waves-effect waves-light mt-1 ml-1" role="button">

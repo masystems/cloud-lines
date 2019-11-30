@@ -504,7 +504,7 @@ def edit_pedigree_form(request, id):
                 pass
 
             try:
-                if pedigree_form['mother'].value() == '':
+                if pedigree_form['mother'].value() in ('', None):
                     pedigree.parent_mother = None
                 else:
                     try:
@@ -521,7 +521,7 @@ def edit_pedigree_form(request, id):
                 pass
 
             try:
-                if pedigree_form['father'].value() == '':
+                if pedigree_form['father'].value() in ('', None):
                     pedigree.parent_father = None
                 else:
                     pedigree.parent_father = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['father'].value())
