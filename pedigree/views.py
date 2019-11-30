@@ -503,14 +503,6 @@ def edit_pedigree_form(request, id):
             except:
                 pass
 
-            # remove from breed group if needed
-            if pedigree_form['breed_group'].value() == '' and pedigree.breed_group not in ('', None):
-                try:
-                    breed_group = BreedGroup.objects.get(group_name=pedigree.breed_group)
-                    breed_group.group_members.remove(pedigree)
-                except ObjectDoesNotExist:
-                    pass
-
             try:
                 if pedigree_form['mother'].value() == '':
                     pedigree.parent_mother = None
@@ -519,8 +511,7 @@ def edit_pedigree_form(request, id):
                         pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
                     except ObjectDoesNotExist:
                         pedigree.breed_group = pedigree_form['breed_group'].value()
-                        breed_group = BreedGroup.objects.get(account=attached_service, group_name=pedigree_form['breed_group'].value())
-                        breed_group.group_members.add(pedigree)
+
             except:
                 pass
 
