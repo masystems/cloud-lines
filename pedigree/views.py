@@ -335,7 +335,7 @@ def new_pedigree_form(request):
             ### mother ###
             try:
                 new_pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value())
-                save_breed_group = False
+
             except ObjectDoesNotExist:
                 new_pedigree.breed_group = pedigree_form['breed_group'].value()
 
@@ -378,8 +378,6 @@ def new_pedigree_form(request):
             else:
                 new_pedigree.save()
 
-            if save_breed_group:
-                breed_group.group_members.add(new_pedigree)
 
             files = request.FILES.getlist('upload_images')
 
