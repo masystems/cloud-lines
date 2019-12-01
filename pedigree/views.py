@@ -338,8 +338,7 @@ def new_pedigree_form(request):
                 save_breed_group = False
             except ObjectDoesNotExist:
                 new_pedigree.breed_group = pedigree_form['breed_group'].value()
-                breed_group = BreedGroup.objects.get(account=attached_service, group_name=pedigree_form['breed_group'].value())
-                save_breed_group = True
+
             try:
                 new_pedigree.parent_mother_notes = pedigree_form['mother_notes'].value() or ''
             except:
