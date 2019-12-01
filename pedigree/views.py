@@ -122,7 +122,7 @@ def generate_hirearchy(context):
     # 2
     try:
         context['lvl2_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl1'].parent_father)
-    except:
+    except ObjectDoesNotExist:
         context['lvl2_2'] = ''
 
     # lvl 3
@@ -137,8 +137,20 @@ def generate_hirearchy(context):
 
     # 2
     try:
-        context['lvl3_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_father)
-    except:
+        if context['lvl2_1'].parent_mother:
+            context['lvl3_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_father)
+    except KeyError:
+        print('key er')
+        try:
+            if context['lvl2_1_grp']:
+                for pedigree in context['lvl2_1_grp'].group_members.all():
+                    if pedigree.sex == 'male':
+                        context['lvl3_2'] = pedigree
+            else:
+                context['lvl3_2'] = ''
+        except KeyError:
+            context['lvl3_2'] = ''
+    except ObjectDoesNotExist:
         context['lvl3_2'] = ''
 
     # 3
@@ -532,7 +544,10 @@ def edit_pedigree_form(request, id):
             except:
                 pass
 
-            pedigree.breed_group = pedigree_form['breed_group'].value()
+            try:
+                pedigree.breed_group = pedigree_form['breed_group'].value()
+            except ObjectDoesNotExist:
+                pass
 
             pedigree.description = pedigree_form['description'].value()
 
