@@ -220,14 +220,14 @@
                                 <div class="row">
                                     <div class="col-4">
                                         <div id="list-example" class="list-group">
-                                            {% for update in updates reversed %}
+                                            {% for update in updates %}
                                                 <a class="list-group-item list-group-item-action" href="#{{ update.date }}">{{ update.date }}</a>
                                             {% endfor %}
                                         </div>
                                     </div>
                                     <div class="col-8">
                                         <div data-spy="scroll" data-target="#list-example" data-offset="0" class="position-relative mt-2" style="min-height: 200px; height: {{ update_card_size }}px; overflow: auto;">
-                                            {% for update in updates reversed %}
+                                            {% for update in updates %}
                                                 <h4 id="{{ update.date }}">{{ update.date }}</h4>
                                                 {% autoescape off %}
                                                     {{ update.body }}
