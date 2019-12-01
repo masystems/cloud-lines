@@ -546,7 +546,7 @@ def edit_pedigree_form(request, id):
 
             try:
                 pedigree.breed_group = pedigree_form['breed_group'].value()
-            except ObjectDoesNotExist:
+            except:
                 pass
 
             pedigree.description = pedigree_form['description'].value()
