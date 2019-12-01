@@ -57,6 +57,9 @@ def dashboard(request):
     except ConnectionError:
         updates = {}
         update_card_size = 44
+    except:
+        updates = {}
+        update_card_size = 44
 
     return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
                                               'top_pedigrees': top_pedigrees,
