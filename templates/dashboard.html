@@ -268,7 +268,7 @@
                                                                                     <img class="card-img-top"
                                                                                      src="{% for image in pedigree.images.all %}
                                                                                             {% if forloop.first %}
-                                                                                                {{ image.image.url }}
+                                                                                                {{ image.image.url|default_if_none:'#' }}
                                                                                             {% endif %}
                                                                                           {% endfor %}" height="45" width="50">
                                                                                 {% else %}
