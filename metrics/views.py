@@ -21,4 +21,4 @@ def coi(request):
     for pedigree in coi_dict:
         Pedigree.objects.filter(account=attached_service, reg_no=pedigree['Indiv']).update(coi=int(pedigree['Inbr'])*100)
 
-    return HttpResponse('done')
+    return HttpResponse(coi_dict)
