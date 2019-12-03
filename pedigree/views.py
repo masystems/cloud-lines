@@ -254,9 +254,9 @@ def search_results(request):
                                                              'results': results})
         else:
             try:
-                lvl1 = Pedigree.objects.get(Q(account=attached_service,
-                                              reg_no__icontains=search_string.upper()) | Q(account=attached_service,
-                                                                                          name__icontains=search_string)).exclude(state='unapproved')
+                lvl1 = Pedigree.objects.exclude(state='unapproved').get(Q(account=attached_service,
+                                                                          reg_no__icontains=search_string.upper()) | Q(account=attached_service,
+                                                                                                                      name__icontains=search_string))
             except ObjectDoesNotExist:
                 breeders = Breeder.objects
                 error = "No pedigrees found using: "
