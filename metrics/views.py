@@ -19,6 +19,6 @@ def coi(request):
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/', json=dumps(list(pedigrees), cls=DjangoJSONEncoder))
     coi_dict = loads(coi_raw.json())
     for pedigree in coi_dict:
-        Pedigree.objects.filter(account=attached_service, reg_no=pedigree['Indiv']).update(coi=int(pedigree['Inbr'])*100)
+        Pedigree.objects.filter(account=attached_service, reg_no=pedigree['Indiv']).update(coi=pedigree['Inbr'])
 
     return HttpResponse(coi_dict)
