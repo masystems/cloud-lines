@@ -249,13 +249,14 @@ def search_results(request):
                                                    'error': error,
                                                    'search_string': search_string})
 
-
         if len(results) > 1:
             return render(request, 'multiple_results.html', {'search_string': search_string,
                                                              'results': results})
         else:
             try:
-                lvl1 = Pedigree.objects.get(Q(account=attached_service, reg_no__icontains=search_string.upper() | Q(account=attached_service, name__icontains=search_string))).exclude(state='unapproved')
+                lvl1 = Pedigree.objects.get(Q(account=attached_service,
+                                              reg_no__icontains=search_string.upper()) | Q(account=attached_service,
+                                                                                          name__icontains=search_string)).exclude(state='unapproved')
             except ObjectDoesNotExist:
                 breeders = Breeder.objects
                 error = "No pedigrees found using: "
