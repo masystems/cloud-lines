@@ -50,7 +50,8 @@ class Pedigree(models.Model):
     breed_group = models.CharField(max_length=255, blank=True, null=True, verbose_name='Breed group name')
     breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='breed')
     custom_fields = models.TextField(blank=True)
-    coi = models.DecimalField(decimal_places=3, max_digits=5, default=0, blank=True)
+    coi = models.DecimalField(decimal_places=4, max_digits=5, default=0, blank=True)
+    mean_kinship = models.DecimalField(decimal_places=4, max_digits=5, default=0, blank=True)
     # hidden
     date_added = models.DateTimeField(auto_now_add=True)
 
