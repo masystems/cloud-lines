@@ -482,18 +482,8 @@ def update_titles(request):
 
 @user_passes_test(is_editor)
 @login_required(login_url="/account/login")
-def setup(request):
-    pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
-    image_form = ImagesForm(request.POST or None, request.FILES or None)
-
-    breed_form = BreedForm()
-    breeder_form = BreederForm()
-    pedigree_form = PedigreeForm()
-
-    return render(request, 'setup_form.html', {'breed_form': breed_form,
-                                               'breeder_form': breeder_form,
-                                               'pedigree_form': pedigree_form,
-                                               'image_form': image_form})
+def welcome(request):
+    return render(request, 'welcome.html')
 
 
 def register(request):

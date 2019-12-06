@@ -47,7 +47,7 @@ def dashboard(request):
                                    'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).exclude(state='unapproved').count()}
 
     else:
-        return redirect('setup')
+        return redirect('welcome')
 
     # updates
     try:
