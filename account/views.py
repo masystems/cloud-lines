@@ -317,8 +317,8 @@ def profile(request):
     context = {'public_api_key': stripe_pk, 'user_detail': UserDetail.objects.get(user=request.user)}
 
     main_account = get_main_account(request.user)
+
     if request.user == main_account.user.user and context['user_detail'].current_service.service.service_name != 'Free':
-        print('tits')
         context['services'] = Service.objects.exclude(service_name='Free')
         if main_account.service.service_name != 'Organisation':
             context['recommended'] = Service.objects.filter(id=main_account.service.id+1)

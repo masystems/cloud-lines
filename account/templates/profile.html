@@ -128,7 +128,7 @@
                                 <p class="mt-4">As a read only user you cannot add/delete any {{ service.animal_type }}, however you're free to browse all the data on this site.</p>
                             {% endif %}
 
-                            {% if request.user == service.user.user %}
+                            {% if request.user == service.user.user and service.service.service_name != 'Organisation' %}
                                 <h4 class="font-medium mt-4">Available Services</h4>
                                 <div class="row pricing-plan pt-2">
                                     {% for plan in services.all %}
@@ -146,8 +146,16 @@
                                                         </div>
                                                         <div class="price-table-content">
                                                             <div class="price-row"><i class="fas fa-pencil-alt"></i> {{ plan.admin_users }} Editors</div>
-                                                            <div class="price-row"><i class="fas fa-pencil-ruler"></i> {{ plan.contrib_users }} Contributors</div>
-                                                            <div class="price-row"><i class="fas fa-book-reader"></i> {{ plan.read_only_users }} Read only Users</div>
+                                                            <div class="price-row"><i class="fas fa-pencil-ruler"></i> {% if plan.contrib_users == 99 %}
+                                                                                                                        Unlimited
+                                                                                                                      {% else %}
+                                                                                                                        {{ plan.contrib_users }}
+                                                                                                                       {% endif %} Contributors</div>
+                                                            <div class="price-row"><i class="fas fa-book-reader"></i> {% if plan.read_only_users == 99 %}
+                                                                                                                        Unlimited
+                                                                                                                      {% else %}
+                                                                                                                       {{ plan.read_only_users }}
+                                                                                                                      {% endif %} Read only Users</div>
                                                             <div class="price-row"><i class="fas fa-paw"></i> {% if plan.number_of_animals == 99 %}
                                                                                                                     Unlimited
                                                                                                                 {% else %}
