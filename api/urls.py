@@ -8,6 +8,7 @@ router.register('pedigrees', views.PedigreeViews, basename='Pedigree')
 router.register('breeders', views.BreederViews, basename='Breeder')
 router.register('breeds', views.BreedViews, basename='Breed')
 router.register('breed-groups', views.BreedGroupViews, basename='BreedGroup')
+router.register('services', views.ServicesViews, basename='services')
 router.register('authenticate', views.Authenticate)
 
 urlpatterns = [
