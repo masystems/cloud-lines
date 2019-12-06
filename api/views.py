@@ -27,6 +27,13 @@ class UpdateViews(viewsets.ModelViewSet):
     search_fields = ['date', 'body']
 
 
+@permission_classes((AllowAny, ))
+class ServicesViews(viewsets.ModelViewSet):
+    serializer_class = ApiServiceSerializer
+    queryset = Service.objects.all()
+    filter_backends = [SearchFilter]
+
+
 class PedigreeViews(viewsets.ModelViewSet):
     serializer_class = ApiPedigreeSerializer
     filter_backends = [SearchFilter]
@@ -69,13 +76,6 @@ class BreedGroupViews(viewsets.ModelViewSet):
         user = self.request.user
         main_account = get_main_account(user)
         return BreedGroup.objects.filter(account=main_account)
-
-
-class ServicesViews(viewsets.ModelViewSet):
-    serializer_class = ApiServiceSerializer
-    queryset = Service.objects.all()
-    filter_backends = [SearchFilter]
-    permission_classes = [IsAuthenticated]
 
 
 class Authenticate(viewsets.ModelViewSet):
