@@ -131,7 +131,7 @@
                             {% if request.user == service.user.user %}
                                 <h4 class="font-medium mt-4">Available Services</h4>
                                 <div class="row pricing-plan pt-2">
-                                    {% for plan in services %}
+                                    {% for plan in services.all %}
                                         {% if plan.service_name != service.service.service_name %}
                                             <div class="col-md-3 col-xs-12 col-sm-6 no-padding">
                                                 <div class="pricing-box {% if plan.id == recommended.first.id %}featured-plan{% endif %}">
