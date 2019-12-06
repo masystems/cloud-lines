@@ -129,9 +129,9 @@
                             {% endif %}
 
                             {% if request.user == service.user.user %}
-                                <h4 class="font-medium mt-4">Available Services {{ services }}</h4>
+                                <h4 class="font-medium mt-4">Available Services</h4>
                                 <div class="row pricing-plan pt-2">
-                                    {% for plan in services.all %}
+                                    {% for plan in services %}
                                         {% if plan.service_name != service.service.service_name %}
                                             <div class="col-md-3 col-xs-12 col-sm-6 no-padding">
                                                 <div class="pricing-box {% if plan.id == recommended.first.id %}featured-plan{% endif %}">
@@ -141,11 +141,12 @@
                                                                 <h4 class="price-lable text-white bg-warning"> Suggested</h4>
                                                             {% endif %}
                                                             <h4 class="text-center">{{ plan.service_name }}</h4>
-                                                            <h2 class="text-center"><span class="price-sign">£</span>{{ plan.price_per_month|add:"0" }}</h2>
+                                                            <h3 class="text-center"><span class="price-sign">£</span>{{ plan.price_per_month|add:"0" }}</h3>
                                                             <p class="uppercase">per month</p>
                                                         </div>
                                                         <div class="price-table-content">
                                                             <div class="price-row"><i class="fas fa-pencil-alt"></i> {{ plan.admin_users }} Editors</div>
+                                                            <div class="price-row"><i class="fas fa-pencil-ruler"></i> {{ plan.contrib_users }} Contributors</div>
                                                             <div class="price-row"><i class="fas fa-book-reader"></i> {{ plan.read_only_users }} Read only Users</div>
                                                             <div class="price-row"><i class="fas fa-paw"></i> {% if plan.number_of_animals == 99 %}
                                                                                                                     Unlimited

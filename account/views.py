@@ -317,32 +317,39 @@ def profile(request):
     context = {'public_api_key': stripe_pk, 'user_detail': UserDetail.objects.get(user=request.user)}
 
     main_account = get_main_account(request.user)
-
-    if request.user == main_account.user and context['user_detail'].current_service.service.service_name != 'Free':
-        context['services'] = Service.objects.all().exclude(service_name='Free')
+    if request.user == main_account.user.user and context['user_detail'].current_service.service.service_name != 'Free':
+        print('tits')
+        context['services'] = Service.objects.exclude(service_name='Free')
         if main_account.service.service_name != 'Organisation':
             context['recommended'] = Service.objects.filter(id=main_account.service.id+1)
         else:
             context['recommended'] = None
 
         # billing
-        charges = stripe.Charge.list(customer=main_account.user.stripe_id)
-        for charge in charges:
-            # convert to readable format
-            charge_obj = Money(amount=str(charge['amount'] / 100), currency=str(charge['currency']).upper())
-            charge['amount'] = charge_obj.format(
-                'en_{}'.format(charge['payment_method_details']['card']['country']))
-            # convert data to readable format
-            date = time.strftime('%d-%m-%Y', time.localtime(charge.created))
-            charge['created'] = date
-            # get invoice pdf
-            invoice = stripe.Invoice.retrieve(charge['invoice'])
-            charge['invoice'] = invoice.invoice_pdf
+        try:
+            charges = stripe.Charge.list(customer=main_account.user.stripe_id)
 
-        context['charges'] = charges
+            for charge in charges:
+                # convert to readable format
+                charge_obj = Money(amount=str(charge['amount'] / 100), currency=str(charge['currency']).upper())
+                charge['amount'] = charge_obj.format(
+                    'en_{}'.format(charge['payment_method_details']['card']['country']))
+                # convert data to readable format
+                date = time.strftime('%d-%m-%Y', time.localtime(charge.created))
+                charge['created'] = date
+                # get invoice pdf
+                invoice = stripe.Invoice.retrieve(charge['invoice'])
+                charge['invoice'] = invoice.invoice_pdf
+
+            context['charges'] = charges
+        except stripe.error.AuthenticationError:
+            pass
 
         # payment methods
-        context['cards'] = stripe.Customer.list_sources(main_account.user.stripe_id, object='card')
+        try:
+            context['cards'] = stripe.Customer.list_sources(main_account.user.stripe_id, object='card')
+        except stripe.error.AuthenticationError:
+            pass
 
     return render(request, 'profile.html', context)
 
