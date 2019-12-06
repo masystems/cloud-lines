@@ -30,6 +30,24 @@ def coi(request):
     return HttpResponse(coi_dict)
 
 
+def kinship(request):
+    attached_service = get_main_account(request.user)
+    pedigrees = Pedigree.objects.filter(account=attached_service).values('reg_no',
+                                                                         'parent_father__reg_no',
+                                                                         'parent_mother__reg_no',
+                                                                         'sex',
+                                                                         'breed',
+                                                                         'status')
+
+    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
+                            json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
+    coi_dict = loads(coi_raw.json())
+    # for pedigree, value in coi_dict.items():
+    #     Pedigree.objects.filter(account=attached_service, reg_no=pedigree['Indiv']).update(coi=pedigree['Inbr'])
+    print(coi_dict)
+    return HttpResponse(coi_raw.json())
+
+
 def mean_kinship(request):
     attached_service = get_main_account(request.user)
     pedigrees = Pedigree.objects.filter(account=attached_service).values('reg_no',
@@ -41,6 +59,7 @@ def mean_kinship(request):
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
                             json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
+
     coi_dict = loads(coi_raw.json())
     for pedigree, value in coi_dict.items():
         Pedigree.objects.filter(account=attached_service, reg_no=pedigree.replace('.', '-')).update(mean_kinship=value['1'])

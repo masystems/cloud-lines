@@ -28,7 +28,7 @@ import dateutil.parser
 @login_required(login_url="/account/login")
 def search(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(Q(account=attached_service) | Q(account=attached_service)).exclude(state='unapproved').values('id', 'reg_no', 'tag_no', 'name', 'dob', 'status', 'breed', 'sex')
+    pedigrees = Pedigree.objects.filter(Q(account=attached_service) | Q(account=attached_service)).exclude(state='unapproved').values('id', 'reg_no', 'mean_kinship', 'name', 'dob', 'status', 'breed', 'sex')
     return render(request, 'search.html', {'pedigrees': pedigrees})
 
 
