@@ -168,8 +168,10 @@ def order(request):
     # import stripe key
     if request.user.is_superuser:
         context['public_api_key'] = settings.STRIPE_TEST_PUBLIC_KEY
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
     else:
         context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
+        stripe.api_key = settings.STRIPE_SECRET_KEY
 
     # get user detail object
     context['user_detail'] = UserDetail.objects.get(user=request.user)

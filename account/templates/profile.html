@@ -128,7 +128,7 @@
                                 <p class="mt-4">As a read only user you cannot add/delete any {{ service.animal_type }}, however you're free to browse all the data on this site.</p>
                             {% endif %}
 
-                            {% if request.user == service.user.user and service.service.service_name != 'Organisation' %}
+                            {% if request.user == service.user.user and service.service.service_name != 'Organisation' and services%}
                                 <h4 class="font-medium mt-4">Available Services</h4>
                                 <div class="row pricing-plan pt-2">
                                     {% for plan in services.all %}
