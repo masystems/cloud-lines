@@ -26,7 +26,7 @@
                 <div class="card-body">
                     <h4 class="card-title">Kinship</h4>
                     <form id="ksForm">
-                        <div class="form-row">
+                        <div class="form-row align-items-center">
                             <div class="col-md-4">
                                 <div id="mothers">
                                     <input id="id_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
@@ -70,12 +70,8 @@
                                     $('#ksBtn').attr("disabled", false);
                                  },
                                 error: function(jqXHR, textStatus, errorThrown){
-                                    console.log('jqXHR:');
-                                    console.log(jqXHR);
-                                    console.log('textStatus:');
-                                    console.log(textStatus);
-                                    console.log('errorThrown:');
-                                    console.log(errorThrown);
+                                    $('#ksResults').html('<p class="text-danger">Error! Check the parent fields are correct.</p>')
+                                    $('#ksBtn').attr("disabled", false);
                                 }
                             });
                         });
