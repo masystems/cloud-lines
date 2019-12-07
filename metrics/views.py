@@ -43,7 +43,7 @@ def kinship(request):
     father = request.POST['father']
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/'.format(mother, father),
-                            json=dumps(data, cls=DjangoJSONEncoder), stream=True)
+                            json=dumps(data, cls=DjangoJSONEncoder))
 
     return HttpResponse(coi_raw.json())
 
