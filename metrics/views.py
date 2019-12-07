@@ -9,7 +9,7 @@ import requests
 def metrics(request):
     attached_service = get_main_account(request.user)
     pedigrees = Pedigree.objects.filter(account=attached_service).values('reg_no', 'coi')
-    return render(request, 'metrics.html')
+    return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service)})
 
 
 def coi(request):
@@ -39,15 +39,12 @@ def kinship(request):
                                                                          'breed',
                                                                          'status')
     data = list(pedigrees)
-    data.append({'mother': 'OE000008',
-                 'father': 'OE000263'})
+    mother = request.POST['mother']
+    father = request.POST['father']
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/kinship/',
+    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/'.format(mother, father),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-    coi_dict = loads(coi_raw.json())
-    # for pedigree, value in coi_dict.items():
-    #     Pedigree.objects.filter(account=attached_service, reg_no=pedigree['Indiv']).update(coi=pedigree['Inbr'])
-    print(coi_dict)
+
     return HttpResponse(coi_raw.json())
 
 

@@ -13,7 +13,7 @@
             </ol>
         </div>
         <div class="col-md-6 col-4 align-self-center">
-            <button type="button" class="btn float-right hidden-sm-down btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>
+<!--            <button type="button" class="btn float-right hidden-sm-down btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>-->
         </div>
     </div>
     <!-- ============================================================== -->
@@ -24,9 +24,62 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Metrics</h4>
-                    <div class="table-responsive m-t-40">
+                    <h4 class="card-title">Kinship</h4>
+                    <form id="ksForm">
+                        <div class="form-row">
+                            <div class="col-md-4">
+                                <div id="mothers">
+                                    <input id="id_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="fathers">
+                                    <input id="id_father" class="typeahead form-control" name='father' type="text" placeholder="{{ service.father_title }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button id="ksBtn" class="btn btn-info" name='Submit' type="button" >Calculate Kinship</button>
+                            </div>
+                        </div>
+                    </form>
+                    <p id="ksResults" class="mt-2 d-none text-center"></p>
 
+                    <script>
+                        $('#ksBtn').click( function() {
+                            $.ajax({
+                                url: '{% url 'kinship' %}',
+                                type: 'post',
+                                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                dataType: 'text',
+                                data: $('#ksForm').serialize(),
+                                beforeSend: function() {
+                                    $('#ksBtn').attr("disabled", true);
+                                    $('#ksResults').html('<i class="fa fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                                    $('#ksResults').removeClass('d-none');
+                                },
+                                success: function(data) {
+                                    try {
+                                            var result = JSON.parse(data);
+                                        }
+                                    catch(err) {
+                                              // not returned anything
+                                              var result = '';
+                                            }
+                                    var coi = result.coi.replace('[1] ', '');
+                                    $('#ksResults').html('<h4>Kinship results:</h4><p class="text-info">' + coi + '</p>')
+                                    $('#ksBtn').attr("disabled", false);
+                                 },
+                                error: function(jqXHR, textStatus, errorThrown){
+                                    console.log('jqXHR:');
+                                    console.log(jqXHR);
+                                    console.log('textStatus:');
+                                    console.log(textStatus);
+                                    console.log('errorThrown:');
+                                    console.log(errorThrown);
+                                }
+                            });
+                        });
+                    </script>
                 </div>
             </div>
         </div>
