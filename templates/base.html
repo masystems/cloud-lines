@@ -475,9 +475,21 @@ $(document).ready(function() {
 
     var reg_numbers = [{% for pedigree in pedigrees.all %}'{{ pedigree.reg_no }}', {% endfor %}];
     var mothers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
-    var mothersAlive = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' and pedigree.status == 'alive' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
+    var mothersAlive = [{% for pedigree in pedigrees.all %}
+                            {% if pedigree.sex == 'female' %}
+                                {% if pedigree.status == 'alive' %}
+                                    '{{ pedigree.reg_no }}',
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}];
     var fathers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'male' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
-    var fathersAlive = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' and pedigree.status == 'alive' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
+    var fathersAlive = [{% for pedigree in pedigrees.all %}
+                            {% if pedigree.sex == 'female' %}
+                                {% if pedigree.status == 'alive' %}
+                                    '{{ pedigree.reg_no }}',
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}];
     breeders = [{% for breeder in breeders.all %}'{{ breeder.breeding_prefix }}', {% endfor %}];
     breeds = [{% for breed in breeds.all %}'{{ breed.breed_name }}', {% endfor %}];
     var breed_groups = [{% for group in breed_groups.all %}'{{ group.group_name }}', {% endfor %}];
@@ -502,14 +514,14 @@ $(document).ready(function() {
       source: substringMatcher(mothers)
     });
 
-    $('#mothersAlive .typeahead').typeahead({
+    $('#mothers-alive .typeahead').typeahead({
       hint: true,
       highlight: true,
       minLength: 1
     },
     {
-      name: 'mothersAlive',
-      source: substringMatcher(mothers)
+      name: 'mother',
+      source: substringMatcher(mothersAlive)
     });
 
     $('#fathers .typeahead').typeahead({
@@ -522,14 +534,14 @@ $(document).ready(function() {
       source: substringMatcher(fathers)
     });
 
-    $('#fathersAlive .typeahead').typeahead({
+    $('#fathers-alive .typeahead').typeahead({
       hint: true,
       highlight: true,
       minLength: 1
     },
     {
-      name: 'fathersAlive',
-      source: substringMatcher(mothers)
+      name: 'father',
+      source: substringMatcher(fathersAlive)
     });
 
     $('#breeders .typeahead').typeahead({
