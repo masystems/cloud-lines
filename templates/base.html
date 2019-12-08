@@ -475,7 +475,9 @@ $(document).ready(function() {
 
     var reg_numbers = [{% for pedigree in pedigrees.all %}'{{ pedigree.reg_no }}', {% endfor %}];
     var mothers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
+    var mothers_alive = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' and pedigree.status == 'alive' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
     var fathers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'male' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
+    var fathers_alive = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' and pedigree.status == 'alive' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
     breeders = [{% for breeder in breeders.all %}'{{ breeder.breeding_prefix }}', {% endfor %}];
     breeds = [{% for breed in breeds.all %}'{{ breed.breed_name }}', {% endfor %}];
     var breed_groups = [{% for group in breed_groups.all %}'{{ group.group_name }}', {% endfor %}];
@@ -500,6 +502,16 @@ $(document).ready(function() {
       source: substringMatcher(mothers)
     });
 
+    $('#mothersAlive .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'mothers_alive',
+      source: substringMatcher(mothers)
+    });
+
     $('#fathers .typeahead').typeahead({
       hint: true,
       highlight: true,
@@ -508,6 +520,16 @@ $(document).ready(function() {
     {
       name: 'fathers',
       source: substringMatcher(fathers)
+    });
+
+    $('#fathersAlive .typeahead').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'fathers_alive',
+      source: substringMatcher(mothers)
     });
 
     $('#breeders .typeahead').typeahead({
