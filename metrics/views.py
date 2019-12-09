@@ -68,12 +68,12 @@ def coi(request):
 
 def kinship(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service).values('reg_no',
-                                                                         'parent_father__reg_no',
-                                                                         'parent_mother__reg_no',
-                                                                         'sex',
-                                                                         'breed',
-                                                                         'status')
+    pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
+                                                                                         'parent_father__reg_no',
+                                                                                         'parent_mother__reg_no',
+                                                                                         'sex',
+                                                                                         'breed',
+                                                                                         'status')
     data = list(pedigrees)
     mother = request.POST['mother']
     father = request.POST['father']
@@ -98,12 +98,12 @@ def run_mean_kinship(request):
 
 def mean_kinship(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service).values('reg_no',
-                                                                         'parent_father__reg_no',
-                                                                         'parent_mother__reg_no',
-                                                                         'sex',
-                                                                         'breed',
-                                                                         'status')
+    pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
+                                                                                         'parent_father__reg_no',
+                                                                                         'parent_mother__reg_no',
+                                                                                         'sex',
+                                                                                         'breed',
+                                                                                         'status')
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
                             json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
