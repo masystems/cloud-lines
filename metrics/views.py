@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
 from django.core.serializers.json import DjangoJSONEncoder
-from .models import CoiLastRun
+from .models import CoiLastRun, MeanKinshipLastRun
 from json import dumps, loads
 from threading import Thread
 from datetime import datetime, timedelta
@@ -23,9 +23,18 @@ def metrics(request):
         date = datetime.now()
         coi_date = date.strftime("%b %d, %Y %H:%M:%S")
 
+    try:
+        obj = MeanKinshipLastRun.objects.get(account=attached_service)
+        obj.last_run += timedelta(minutes=attached_service.coi_timeout)
+        mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
+    except ObjectDoesNotExist:
+        date = datetime.now()
+        mean_kinship_date = date.strftime("%b %d, %Y %H:%M:%S")
+
 
     return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
-                                            'coi_date': coi_date})
+                                            'coi_date': coi_date,
+                                            'mean_kinship_date': mean_kinship_date})
 
 
 def run_coi(request):
@@ -73,6 +82,18 @@ def kinship(request):
                             json=dumps(data, cls=DjangoJSONEncoder))
 
     return HttpResponse(coi_raw.json())
+
+
+def run_mean_kinship(request):
+    attached_service = get_main_account(request.user)
+    obj, created = MeanKinshipLastRun.objects.get_or_create(account=attached_service)
+    print(created)
+    obj.last_run = datetime.now()
+    obj.save()
+    Thread(target=mean_kinship, args=(request,))
+    obj.last_run += timedelta(minutes=attached_service.mean_kinship_timeout)
+    mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
+    return HttpResponse(dumps({'mean_kinship_date': mean_kinship_date}))
 
 
 def mean_kinship(request):
