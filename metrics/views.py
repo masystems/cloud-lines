@@ -16,7 +16,7 @@ def metrics(request):
     # now = datetime.now() + timedelta(seconds=10)
     # date = now.strftime("%b %d, %Y %H:%M:%S")
     try:
-        obj = CoiLastRun.objects.get(account=attached_service).first()
+        obj = CoiLastRun.objects.get(account=attached_service)
         obj.last_run += timedelta(minutes=attached_service.coi_timeout)
         coi_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     except ObjectDoesNotExist:
