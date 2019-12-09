@@ -12,27 +12,26 @@
                 <li class="breadcrumb-item active">Metrics</li>
             </ol>
         </div>
-        <div class="col-md-6 col-4 align-self-center">
-<!--            <button type="button" class="btn float-right hidden-sm-down btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>-->
-        </div>
     </div>
+
     <!-- ============================================================== -->
     <!-- End Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
 
 
-        <div class="col-12">
+    <div class="row">
+        <div class="col-9">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Kinship</h4>
                     <form id="ksForm">
                         <div class="form-row align-items-center">
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <div id="mothers-alive">
                                     <input id="id_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <div id="fathers-alive">
                                     <input id="id_father" class="typeahead form-control" name='father' type="text" placeholder="{{ service.father_title }}">
                                 </div>
@@ -79,5 +78,111 @@
                 </div>
             </div>
         </div>
+        <div class="col-3">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Calculations</h4>
+                    <p id="coiTimer" class="text-center"></p>
+                    <button id="coiBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>
+                </div>
+            </div>
+        </div>
+        <script>
+        $('#coiBtn').click( function() {
+            $.ajax({
+                url: '{% url 'run_coi' %}',
+                type: 'post',
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                dataType: 'text',
+                data: [],
+                beforeSend: function() {
+                    $('#coiTimer').html('<i class="fa fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                },
+                success: function(data) {
+                    try {
+                            var result = JSON.parse(data);
+                            var countDownDate = new Date(result.coi_date).getTime();
+                            var countDownInterval = setInterval(function() { countDown(countDownDate); }, 1000);
+                        }
+                    catch(err) {
+                              // not returned anything
+                              var result = '';
+                            }
+                 },
+                error: function(jqXHR, textStatus, errorThrown){
+                }
+            });
+        });
+
+        // Set the date we're counting down to and start loop interval
+        var countDownDate = new Date("{{ coi_date }}").getTime();
+        var countDownInterval = setInterval(function() { countDown(countDownDate); }, 1000);
+
+        // Update the count down every 1 second
+        function countDown(countDownDate) {
+          // Get today's date and time
+          var now = new Date().getTime();
+
+          // Find the distance between now and the count down date
+          var distance = countDownDate - now;
+
+          // Time calculations for days, hours, minutes and seconds
+          var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+          // Output the result in an element with id="demo"
+          document.getElementById("coiTimer").innerHTML = 'Run COI again in:<br/>' + days + "d " + hours + "h "
+          + minutes + "m " + seconds + "s ";
+
+          // If the count down is over, write some text
+          if (distance < 0) {
+            clearInterval(countDownInterval);
+            document.getElementById("coiTimer").innerHTML = "COI ready!";
+            $('#coiBtn').attr("disabled", false);
+          } else {
+            $('#coiBtn').attr("disabled", true);
+          }
+        }
+    </script>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Mean Kinship Overview</h4>
+                    <table id="table" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Reg No.</th>
+                                <th scope="col" class="d-none d-sm-table-cell">Mean Kinship</th>
+                                <th scope="col">Name</th>
+                                <th scope="col" class="d-none d-sm-table-cell">DOB</th>
+                                <th scope="col" class="d-none d-sm-table-cell">Status</th>
+                                <th scope="col" class="d-none d-sm-table-cell">Breed</th>
+                                <th scope="col" class="d-none d-sm-table-cell">Sex</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                    {% for pedigree in pedigrees.all %}
+                    <tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
+                        style="cursor: pointer;">
+                        <th scope="row">{{ pedigree.reg_no }}</th>
+                        <th scope="row" class="d-none d-sm-table-cell">{{ pedigree.mean_kinship }}</th>
+                        <td>{{ pedigree.name }}</td>
+                        <td class="d-none d-sm-table-cell">{{ pedigree.dob }}</td>
+                        <td class="d-none d-sm-table-cell">{{ pedigree.status|title }}</td>
+                        <td class="d-none d-sm-table-cell">{{ pedigree.breed.breed_name }}</td>
+                        <td class="d-none d-sm-table-cell"><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

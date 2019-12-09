@@ -2,14 +2,35 @@ from django.shortcuts import render, HttpResponse
 from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
 from django.core.serializers.json import DjangoJSONEncoder
+from .models import CoiLastRun
 from json import dumps, loads
+from threading import Thread
+from datetime import datetime, timedelta
 import requests
 
 
 def metrics(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service).values('reg_no', 'coi')
-    return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service)})
+    # Jan 5, 2021 15:37:25
+    # now = datetime.now() + timedelta(seconds=10)
+    # date = now.strftime("%b %d, %Y %H:%M:%S")
+    obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
+    obj.save()
+    obj.last_run += timedelta(minutes=attached_service.coi_timeout)
+    coi_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
+    return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
+                                            'coi_date': coi_date})
+
+
+def run_coi(request):
+    attached_service = get_main_account(request.user)
+    obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
+    obj.last_run = datetime.now()
+    obj.save()
+    Thread(target=coi, args=(request,))
+    obj.last_run += timedelta(minutes=attached_service.coi_timeout)
+    coi_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
+    return HttpResponse(dumps({'coi_date': coi_date}))
 
 
 def coi(request):

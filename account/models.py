@@ -24,6 +24,8 @@ class AttachedService(models.Model):
     custom_fields = models.TextField(blank=True)
     mother_title = models.CharField(max_length=250, default='Mother')
     father_title = models.CharField(max_length=250, default='Father')
+    coi_timeout = models.IntegerField(default=60)
+    mean_kinship_timeout = models.IntegerField(default=60)
 
     SITE_MODES = (
         ('mammal', 'Mammal'),
