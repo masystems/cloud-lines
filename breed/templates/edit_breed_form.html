@@ -72,6 +72,14 @@
                                             {% else %}
                                                 <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
                                             {% endif %}
+                                        {% elif 'Group A' in field.label %}
+                                            {% render_field field class="form-control" value=breed.mk_a %}
+                                        {% elif 'Group B' in field.label %}
+                                            {% render_field field class="form-control" value=breed.mk_b %}
+                                        {% elif 'Group C' in field.label %}
+                                            {% render_field field class="form-control" value=breed.mk_c %}
+                                        {% elif 'Group D' in field.label %}
+                                            {% render_field field class="form-control" value=breed.mk_d %}
                                         {% else %}
                                             {% render_field field class="form-control" value=breed.breed_name %}
                                         {% endif %}

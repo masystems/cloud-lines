@@ -90,6 +90,8 @@ def edit_breed_form(request, breed_id):
             breed.save()
 
             return redirect('breeds')
+        else:
+            print('tits')
 
     else:
         breed_form = BreedForm()
