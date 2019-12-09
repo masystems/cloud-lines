@@ -1,4 +1,5 @@
 from django.shortcuts import render, HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
 from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
 from django.core.serializers.json import DjangoJSONEncoder
@@ -14,10 +15,15 @@ def metrics(request):
     # Jan 5, 2021 15:37:25
     # now = datetime.now() + timedelta(seconds=10)
     # date = now.strftime("%b %d, %Y %H:%M:%S")
-    obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
-    obj.save()
-    obj.last_run += timedelta(minutes=attached_service.coi_timeout)
-    coi_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
+    try:
+        obj = CoiLastRun.objects.get(account=attached_service).first()
+        obj.last_run += timedelta(minutes=attached_service.coi_timeout)
+        coi_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
+    except ObjectDoesNotExist:
+        date = datetime.now()
+        coi_date = date.strftime("%b %d, %Y %H:%M:%S")
+
+
     return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
                                             'coi_date': coi_date})
 
