@@ -24,6 +24,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Kinship</h4>
+                    <p>Select a {{ service.mother_title }} and {{ service.father_title }} to predict what the COI of their offspring will be.</p>
                     <form id="ksForm">
                         <div class="form-row align-items-center">
                             <div class="col-md-5">
@@ -214,7 +215,20 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Mean Kinship Overview</h4>
+                    <h4 class="card-title">Predictive Kinship</h4>
+                    <p>Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
+                    <form id="ksForm" class="pb-4">
+                        <div class="form-row align-items-center">
+                            <div class="col-md-3">
+                                <div id="mothers-alive">
+                                    <input id="pk_mother" class="typeahead form-control" name='pkMother' type="text" placeholder="{{ service.mother_title }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button id="pkBtn" class="btn btn-info" name='Submit' type="button" >Predict Kinship</button>
+                            </div>
+                        </div>
+                    </form>
                     <table id="table" class="table table-bordered table-striped">
                         <thead>
                             <tr>
