@@ -215,49 +215,65 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Predictive Kinship</h4>
+                    <h4 class="card-title">Stud Advisor</h4>
                     <p>Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
-                    <form id="ksForm" class="pb-4">
+                    <form id="saForm" class="pb-4">
                         <div class="form-row align-items-center">
                             <div class="col-md-3">
                                 <div id="mothers-alive">
-                                    <input id="pk_mother" class="typeahead form-control" name='pkMother' type="text" placeholder="{{ service.mother_title }}">
+                                    <input id="sa_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
                                 </div>
                             </div>
                             <div class="col-md-2">
-                                <button id="pkBtn" class="btn btn-info" name='Submit' type="button" >Predict Kinship</button>
+                                <button id="saBtn" class="btn btn-info" name='Submit' type="button" >Run Advisor</button>
                             </div>
                         </div>
                     </form>
-                    <table id="table" class="table table-bordered table-striped">
+                    <table id="table" class="table table-bordered table-striped" data-show-refresh="true">
                         <thead>
                             <tr>
                                 <th scope="col">Reg No.</th>
-                                <th scope="col" class="d-none d-sm-table-cell">Mean Kinship</th>
                                 <th scope="col">Name</th>
-                                <th scope="col" class="d-none d-sm-table-cell">DOB</th>
-                                <th scope="col" class="d-none d-sm-table-cell">Status</th>
-                                <th scope="col" class="d-none d-sm-table-cell">Breed</th>
-                                <th scope="col" class="d-none d-sm-table-cell">Sex</th>
+                                <th scope="col" class="d-none d-sm-table-cell">Kinship Band</th>
+                                <th scope="col" class="d-none d-sm-table-cell">Kinship</th>
                             </tr>
                         </thead>
-                    <tbody>
-                    {% for pedigree in pedigrees.all %}
-                    <tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
-                        style="cursor: pointer;">
-                        <th scope="row">{{ pedigree.reg_no }}</th>
-                        <th scope="row" class="d-none d-sm-table-cell">{{ pedigree.mean_kinship }}</th>
-                        <td>{{ pedigree.name }}</td>
-                        <td class="d-none d-sm-table-cell">{{ pedigree.dob }}</td>
-                        <td class="d-none d-sm-table-cell">{{ pedigree.status|title }}</td>
-                        <td class="d-none d-sm-table-cell">{{ pedigree.breed.breed_name }}</td>
-                        <td class="d-none d-sm-table-cell"><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
+                        <tbody id="saTbody">
+<!--                        <tr><td>1</td><td>1</td><td>1</td><td>1</td></tr>-->
+                        </tbody>
                     </table>
                 </div>
             </div>
+            <script>
+                $('#saBtn').click( function() {
+                $.ajax({
+                    url: '{% url 'stud_advisor' %}',
+                    type: 'post',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    dataType: 'text',
+                    data: $('#saForm').serialize(),
+                    beforeSend: function() {
+
+                    },
+                    success: function(data) {
+                        try {
+                                var result = JSON.parse(data);
+                                $("#table tbody").empty();
+                                $.each(result, function(index, element) {
+                                    var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship_band + "</td><td>" + element.kinship + "</td></tr>";
+                                    $('#table tbody').append(tr);
+                                });
+                                $('#table').bootstrapTable('load');
+                            }
+                        catch(err) {
+                                  // not returned anything
+                                }
+                     },
+                    error: function(jqXHR, textStatus, errorThrown){
+                    }
+                });
+            });
+            </script>
         </div>
     </div>
 

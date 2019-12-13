@@ -87,7 +87,7 @@ def kinship(request):
 def run_mean_kinship(request):
     attached_service = get_main_account(request.user)
     obj, created = MeanKinshipLastRun.objects.get_or_create(account=attached_service)
-    print(created)
+
     obj.last_run = datetime.now()
     obj.save()
     Thread(target=mean_kinship, args=(request,))
@@ -113,3 +113,48 @@ def mean_kinship(request):
         Pedigree.objects.filter(account=attached_service, reg_no=pedigree.replace('.', '-')).update(mean_kinship=value['1'])
 
     return HttpResponse(coi_raw.json())
+
+
+def stud_advisor(request):
+    attached_service = get_main_account(request.user)
+    pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
+                                                                                         'parent_father__reg_no',
+                                                                                         'parent_mother__reg_no',
+                                                                                         'sex',
+                                                                                         'breed',
+                                                                                         'status')
+
+    mother = request.POST['mother']
+
+    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother),
+                            json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
+
+    mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
+    band = get_band(mother)
+
+    studs = loads(coi_raw.json())
+    studs_copy = studs
+    for stud, kinship in studs_copy.items():
+        male = Pedigree.objects.get(account=attached_service, reg_no=stud)
+        stud_band = get_band(male)
+        studs[stud] = {'reg_no': male.reg_no,
+                       'name': male.name,
+                       'mean_kinship': float(male.mean_kinship),
+                       'kinship': kinship,
+                       'kinship_band': stud_band}
+    print(studs)
+    return HttpResponse(dumps(studs))
+
+
+def get_band(pedigree):
+    if pedigree.mean_kinship < pedigree.breed.mk_a:
+        return 'A'
+    elif pedigree.breed.mk_a <= pedigree.mean_kinship < pedigree.breed.mk_b:
+        return 'B'
+    elif pedigree.breed.mk_b <= pedigree.mean_kinship < pedigree.breed.mk_c:
+        return 'C'
+    elif pedigree.breed.mk_c <= pedigree.mean_kinship < pedigree.breed.mk_d:
+        return 'D'
+    else:
+        return 'E'
+
