@@ -115,6 +115,21 @@ def mean_kinship(request):
     return HttpResponse(coi_raw.json())
 
 
+def stud_advisor_mother_details(request):
+    attached_service = get_main_account(request.user)
+    cois = Pedigree.objects.filter(account=attached_service).values('coi')
+    total = 0
+    for coi in cois.all():
+        total += coi['coi']
+    breed_mean_coi = total / Pedigree.objects.filter(account=attached_service).count()
+    mother = Pedigree.objects.get(account=attached_service, reg_no=request.POST['mother'])
+    mother_details = {'reg_no': mother.reg_no,
+                      'mk': str(mother.mean_kinship),
+                      'band': get_band(mother),
+                      'breed_mean_coi': str(breed_mean_coi)}
+    return HttpResponse(dumps(mother_details))
+
+
 def stud_advisor(request):
     attached_service = get_main_account(request.user)
     pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
@@ -142,7 +157,6 @@ def stud_advisor(request):
                        'mean_kinship': float(male.mean_kinship),
                        'kinship': kinship,
                        'kinship_band': stud_band}
-    print(studs)
     return HttpResponse(dumps(studs))
 
 

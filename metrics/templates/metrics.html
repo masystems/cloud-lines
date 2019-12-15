@@ -227,6 +227,24 @@
                             <div class="col-md-2">
                                 <button id="saBtn" class="btn btn-info" name='Submit' type="button" >Run Advisor</button>
                             </div>
+                            <div class="col-md-3">
+                                <div id="motherDetails" class="d-none">
+                                    <h3 class="card-title">{{ service.mother_title }} Details</h3>
+                                    <ul class="list-icons">
+                                        <li id="mdRegID"><i class="ti-angle-right"></i></li>
+                                        <li id="mdMeanKinship"><i class="ti-angle-right"></i></li>
+                                        <li id="mdBand"><i class="ti-angle-right"></i></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div id="breedDetails" class="d-none">
+                                    <h3 class="card-title">Breed Details</h3>
+                                    <ul class="list-icons">
+                                        <li id="breedMeanCoi"><i class="ti-angle-right"></i></li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </form>
                     <table id="saTable" class="table table-bordered table-striped" data-show-refresh="true">
@@ -246,31 +264,59 @@
             </div>
             <script>
                 $('#saBtn').click( function() {
-                $.ajax({
-                    url: '{% url 'stud_advisor' %}',
-                    type: 'post',
-                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                    dataType: 'text',
-                    data: $('#saForm').serialize(),
-                    beforeSend: function() {
+                    $.ajax({
+                        url: '{% url 'stud_advisor' %}',
+                        type: 'post',
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        dataType: 'text',
+                        data: $('#saForm').serialize(),
+                        beforeSend: function() {
+                            $.ajax({
+                                url: '{% url 'stud_advisor_mother_details' %}',
+                                type: 'post',
+                                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                dataType: 'text',
+                                data: $('#saForm').serialize(),
+                                beforeSend: function() {
+                                },
+                                success: function(data) {
+                                    try {
+                                            var result = JSON.parse(data);
+                                            console.log(result);
+                                            var fade = 1000
+                                            $('#motherDetails').removeClass('d-none');
+                                            $('#mdRegID').hide().html('<i class="ti-angle-right"></i> {{ service.mother_title }}: ' + result.reg_no).fadeIn(fade);
+                                            $('#mdMeanKinship').hide().html('<i class="ti-angle-right"></i> Mean Kinship: ' + result.mk).fadeIn(fade);
+                                            $('#mdBand').hide().html('<i class="ti-angle-right"></i> Breed Band: ' + result.band).fadeIn(fade);
 
-                    },
-                    success: function(data) {
-                        try {
-                                var result = JSON.parse(data);
-                                $("#saTable tbody").empty();
-                                $.each(result, function(index, element) {
-                                    var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship_band + "</td><td>" + element.kinship + "</td></tr>";
-                                    $('#saTable tbody').append(tr);
-                                });
-                            }
-                        catch(err) {
-                                  // not returned anything
+                                            $('#breedDetails').removeClass('d-none');
+                                            $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Breed Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
+                                        }
+                                    catch(err) {
+                                              // not returned anything
+                                            }
+                                 },
+                                error: function(jqXHR, textStatus, errorThrown){
                                 }
-                     },
-                    error: function(jqXHR, textStatus, errorThrown){
-                    }
-                });
+                            });
+
+                        },
+                        success: function(data) {
+                            try {
+                                    var result = JSON.parse(data);
+                                    $("#saTable tbody").empty();
+                                    $.each(result, function(index, element) {
+                                        var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship_band + "</td><td>" + element.kinship + "</td></tr>";
+                                        $('#saTable tbody').append(tr);
+                                    });
+                                }
+                            catch(err) {
+                                      // not returned anything
+                                    }
+                         },
+                        error: function(jqXHR, textStatus, errorThrown){
+                        }
+                    });
             });
             </script>
         </div>
