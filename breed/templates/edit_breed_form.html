@@ -171,24 +171,24 @@
                                         $(document).on('click change keyup mouseup', '#id_mk_a', function() {
                                             $('#grpBmin').html($('#id_mk_a').val());
 
-                                            if (parseFloat($('#grpBmin').text()) > parseFloat($('#id_mk_b').val())) {
-                                                $('#id_mk_b').val(parseFloat($('#grpBmin').text()));
+                                            if (parseFloat($('#grpBmin').text()) >= parseFloat($('#id_mk_b').val())) {
+                                                $('#id_mk_b').val(parseFloat($('#grpBmin').text()) + 0.0001);
                                                 $('#id_mk_b').trigger('click');
                                             }
                                         });
                                         $(document).on('click change keyup mouseup', '#id_mk_b', function() {
                                             $('#grpCmin').html($('#id_mk_b').val());
 
-                                            if (parseFloat($('#grpCmin').text()) > parseFloat($('#id_mk_c').val())) {
-                                                $('#id_mk_c').val(parseFloat($('#grpCmin').text()));
+                                            if (parseFloat($('#grpCmin').text()) >= parseFloat($('#id_mk_c').val())) {
+                                                $('#id_mk_c').val(parseFloat($('#grpCmin').text()) + 0.0001);
                                                 $('#id_mk_c').trigger('click');
                                             }
                                         });
                                         $(document).on('click change keyup mouseup', '#id_mk_c', function() {
                                             $('#grpDmin').html($('#id_mk_c').val());
 
-                                            if (parseFloat($('#grpDmin').text()) > parseFloat($('#id_mk_d').val())) {
-                                                $('#id_mk_d').val(parseFloat($('#grpDmin').text()));
+                                            if (parseFloat($('#grpDmin').text()) >= parseFloat($('#id_mk_d').val())) {
+                                                $('#id_mk_d').val(parseFloat($('#grpDmin').text()) + 0.0001);
                                             }
                                         });
 
