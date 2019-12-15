@@ -52,7 +52,7 @@
                             {% for field in breed_form.visible_fields %}
                             <div class="col-lg-6 col-md-12">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                    <label class="col-sm-3 text-right col-form-label">{% if 'Group' not in field.label %}{{ field.label|title }}{% endif %}</label>
                                     <div class="col-md-9">
                                         {% if field.label == 'Breed description' %}
                                             <textarea name="breed_description" id="id_description" class="form-control" cols="40" rows="10">{{ breed.breed_description }}</textarea>
@@ -72,16 +72,10 @@
                                             {% else %}
                                                 <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
                                             {% endif %}
-                                        {% elif 'Group A' in field.label %}
-                                            {% render_field field class="form-control" value=breed.mk_a %}
-                                        {% elif 'Group B' in field.label %}
-                                            {% render_field field class="form-control" value=breed.mk_b %}
-                                        {% elif 'Group C' in field.label %}
-                                            {% render_field field class="form-control" value=breed.mk_c %}
-                                        {% elif 'Group D' in field.label %}
-                                            {% render_field field class="form-control" value=breed.mk_d %}
-                                        {% else %}
+                                        {% elif field.label == 'Breed name' %}
                                             {% render_field field class="form-control" value=breed.breed_name %}
+                                        {% elif field.label == 'Image' %}
+                                            {% render_field field class="form-control" %}
                                         {% endif %}
                                         {% for error in field.errors %}
                                           <span class="help-block">{{ error }}</span>
@@ -90,6 +84,117 @@
                                 </div>
                             </div>
                             {% endfor %}
+                            <hr>
+                            <div class="col-lg-8 col-md-12">
+                                <div class="form-group row">
+                                    <h3>Kinship Bands</h3>
+
+                                    <table class="table table-striped">
+                                        <tbody>
+                                            <!--Group A-->
+                                            <tr>
+                                                <td>
+                                                    Group <strong>A</strong> Minimum
+                                                </td>
+                                                <td>
+                                                    0
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Group <strong>A</strong> Maximim
+                                                </td>
+                                                <td>
+                                                    {% render_field breed_form.mk_a class="form-control" value=breed.mk_a %}
+                                                </td>
+                                            </tr>
+                                            <!--Group B-->
+                                            <tr>
+                                                <td>
+                                                    Group <strong>B</strong> Minimum
+                                                </td>
+                                                <td id="grpBmin">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Group <strong>B</strong> Maximim
+                                                </td>
+                                                <td>
+                                                    {% render_field breed_form.mk_b class="form-control" value=breed.mk_b %}
+                                                </td>
+                                            </tr>
+
+                                            <!--Group C-->
+                                            <tr>
+                                                <td>
+                                                    Group <strong>C</strong> Minimum
+                                                </td>
+                                                <td id="grpCmin">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Group <strong>C</strong> Maximim
+                                                </td>
+                                                <td>
+                                                    {% render_field breed_form.mk_c class="form-control" value=breed.mk_c %}
+                                                </td>
+                                            </tr>
+
+                                            <!--Group D-->
+                                            <tr>
+                                                <td>
+                                                    Group <strong>D</strong> Minimum
+                                                </td>
+                                                <td id="grpDmin">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Group <strong>D</strong> Maximim
+                                                </td>
+                                                <td>
+                                                    {% render_field breed_form.mk_d class="form-control" value=breed.mk_d %}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <script>
+                                        $("document").ready(function() {
+                                            $('#id_mk_a').trigger('click');
+                                            $('#id_mk_b').trigger('click');
+                                            $('#id_mk_c').trigger('click');
+                                        });
+
+
+                                        $(document).on('click change keyup mouseup', '#id_mk_a', function() {
+                                            $('#grpBmin').html($('#id_mk_a').val());
+
+                                            if (parseFloat($('#grpBmin').text()) > parseFloat($('#id_mk_b').val())) {
+                                                $('#id_mk_b').val(parseFloat($('#grpBmin').text()));
+                                                $('#id_mk_b').trigger('click');
+                                            }
+                                        });
+                                        $(document).on('click change keyup mouseup', '#id_mk_b', function() {
+                                            $('#grpCmin').html($('#id_mk_b').val());
+
+                                            if (parseFloat($('#grpCmin').text()) > parseFloat($('#id_mk_c').val())) {
+                                                $('#id_mk_c').val(parseFloat($('#grpCmin').text()));
+                                                $('#id_mk_c').trigger('click');
+                                            }
+                                        });
+                                        $(document).on('click change keyup mouseup', '#id_mk_c', function() {
+                                            $('#grpDmin').html($('#id_mk_c').val());
+
+                                            if (parseFloat($('#grpDmin').text()) > parseFloat($('#id_mk_d').val())) {
+                                                $('#id_mk_d').val(parseFloat($('#grpDmin').text()));
+                                            }
+                                        });
+
+                                    </script>
+                                </div>
+                            </div>
                         </div>
                     <hr>
                     <div class="form-actions">
