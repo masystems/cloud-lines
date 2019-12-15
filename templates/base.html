@@ -484,7 +484,7 @@ $(document).ready(function() {
                         {% endfor %}];
     var fathers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'male' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
     var fathersAlive = [{% for pedigree in pedigrees.all %}
-                            {% if pedigree.sex == 'female' %}
+                            {% if pedigree.sex == 'male' %}
                                 {% if pedigree.status == 'alive' %}
                                     '{{ pedigree.reg_no }}',
                                 {% endif %}

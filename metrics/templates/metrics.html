@@ -229,7 +229,7 @@
                             </div>
                         </div>
                     </form>
-                    <table id="table" class="table table-bordered table-striped" data-show-refresh="true">
+                    <table id="saTable" class="table table-bordered table-striped" data-show-refresh="true">
                         <thead>
                             <tr>
                                 <th scope="col">Reg No.</th>
@@ -258,12 +258,11 @@
                     success: function(data) {
                         try {
                                 var result = JSON.parse(data);
-                                $("#table tbody").empty();
+                                $("#saTable tbody").empty();
                                 $.each(result, function(index, element) {
                                     var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship_band + "</td><td>" + element.kinship + "</td></tr>";
-                                    $('#table tbody').append(tr);
+                                    $('#saTable tbody').append(tr);
                                 });
-                                $('#table').bootstrapTable('load');
                             }
                         catch(err) {
                                   // not returned anything
