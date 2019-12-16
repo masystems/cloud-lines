@@ -146,7 +146,7 @@ def stud_advisor(request):
 
     mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
     band = get_band(mother)
-
+    print(coi_raw.json())
     studs = loads(coi_raw.json())
     studs_copy = studs
     for stud, kinship in studs_copy.items():
