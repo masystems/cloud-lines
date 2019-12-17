@@ -78,6 +78,7 @@ def importx(request):
     allowed_file_types = ('.csv')
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
+        print(request.FILES)
         database_file = request.FILES['uploadDatabase']
         imported_headings = []
 
@@ -142,6 +143,7 @@ def import_pedigree_data(request):
         dob = post_data['dob'] or ''
         dod = post_data['dod'] or ''
         sex = post_data['sex'] or ''
+        status = post_data['status'] or ''
         father = post_data['parent_father'] or ''
         father_notes = post_data['parent_father_notes'] or ''
         mother = post_data['parent_mother'] or ''
@@ -291,6 +293,11 @@ def import_pedigree_data(request):
             #############################
             try:
                 pedigree.sex = row[sex]
+            except KeyError:
+                pass
+            #############################
+            try:
+                pedigree.status = row[status]
             except KeyError:
                 pass
             #############################
