@@ -151,16 +151,22 @@ def import_pedigree_data(request):
 
         for row in database_items:
             # create breeder if it doesn't exist ###################
-            if row[breeder] not in ('', None):
-                breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder].rstrip())
-            else:
+            try:
+                if row[breeder] not in ('', None):
+                    breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                else:
+                    breeder_obj = None
+            except KeyError:
                 breeder_obj = None
 
             # create current owner if it doesn't exist ###################
-            if row[current_owner] not in ('', None):
-                current_owner_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[current_owner].rstrip())
-            else:
-                current_owner_obj = None
+            try:
+                if row[current_owner] not in ('', None):
+                    current_owner_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[current_owner].rstrip())
+                else:
+                    current_owner_obj = None
+            except KeyError:
+                breeder_obj = None
 
             # get or create parents ###################
             def get_or_create_parent(parent):
@@ -323,15 +329,22 @@ def import_pedigree_data(request):
             #############################
 
             # create breed if it doesn't exist ###################
+
             if attached_service.service.service_name != 'Organisation':
-                breed_obj = Breed.objects.filter(account=attached_service).first()
+                if Breed.objects.filter(account=attached_service).count() == 0:
+                    breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
+                else:
+                    breed_obj = Breed.objects.filter(account=attached_service).first()
+
             elif breed != '---':
                 try:
                     breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
+                    print(created)
                 except KeyError:
                     breed_obj = None
             else:
                 breed_obj = None
+
 
             try:
                 pedigree.breed = breed_obj
@@ -339,8 +352,6 @@ def import_pedigree_data(request):
                 pass
             pedigree.custom_fields = attached_service.custom_fields
             pedigree.save()
-
-
 
     return redirect('pedigree_search')
 
