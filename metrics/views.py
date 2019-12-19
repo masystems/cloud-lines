@@ -151,8 +151,8 @@ def stud_advisor(request):
         male = Pedigree.objects.get(account=attached_service, reg_no=stud)
         stud_band = get_band(male)
         if stud_band == mother_band or \
-                group_letters.index(mother) == group_letters.index(stud_band)-1 or \
-                group_letters.index(mother) == group_letters.index(stud_band)+1:
+                group_letters.index(mother_band) == group_letters.index(stud_band)-1 or \
+                group_letters.index(mother_band) == group_letters.index(stud_band)+1:
             studs[stud] = {'id': male.id,
                            'reg_no': male.reg_no,
                            'name': male.name,
