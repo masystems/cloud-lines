@@ -145,21 +145,21 @@ def stud_advisor(request):
     mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
     mother_band = get_band(mother)
 
-    studs = loads(coi_raw.json())
-    studs_copy = studs
-    for stud, kinship in studs_copy.items():
+    studs_raw = loads(coi_raw.json())
+    studs_data = {}
+    for stud, kinship in studs_raw.items():
         male = Pedigree.objects.get(account=attached_service, reg_no=stud)
         stud_band = get_band(male)
         if stud_band == mother_band or \
                 group_letters.index(mother_band) == group_letters.index(stud_band)-1 or \
                 group_letters.index(mother_band) == group_letters.index(stud_band)+1:
-            studs[stud] = {'id': male.id,
+            studs_data[stud] = {'id': male.id,
                            'reg_no': male.reg_no,
                            'name': male.name,
                            'mean_kinship': float(male.mean_kinship),
                            'kinship': kinship,
                            'kinship_band': stud_band}
-    return HttpResponse(dumps(studs))
+    return HttpResponse(dumps(studs_data))
 
 
 def get_band(pedigree):
