@@ -12,9 +12,7 @@ import requests
 
 def metrics(request):
     attached_service = get_main_account(request.user)
-    # Jan 5, 2021 15:37:25
-    # now = datetime.now() + timedelta(seconds=10)
-    # date = now.strftime("%b %d, %Y %H:%M:%S")
+
     try:
         obj = CoiLastRun.objects.get(account=attached_service)
         obj.last_run += timedelta(minutes=attached_service.coi_timeout)
@@ -30,7 +28,6 @@ def metrics(request):
     except ObjectDoesNotExist:
         date = datetime.now()
         mean_kinship_date = date.strftime("%b %d, %Y %H:%M:%S")
-
 
     return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
                                             'coi_date': coi_date,
@@ -54,7 +51,7 @@ def coi(request):
                                                                          'parent_father__reg_no',
                                                                          'parent_mother__reg_no',
                                                                          'sex',
-                                                                         'breed',
+                                                                         'breed__breed_name',
                                                                          'status')
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
@@ -72,7 +69,7 @@ def kinship(request):
                                                                                          'parent_father__reg_no',
                                                                                          'parent_mother__reg_no',
                                                                                          'sex',
-                                                                                         'breed',
+                                                                                         'breed__breed_name',
                                                                                          'status')
     data = list(pedigrees)
     mother = request.POST['mother']
@@ -80,7 +77,7 @@ def kinship(request):
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/'.format(mother, father),
                             json=dumps(data, cls=DjangoJSONEncoder))
-
+    print(coi_raw.status_code)
     return HttpResponse(coi_raw.json())
 
 
@@ -102,7 +99,7 @@ def mean_kinship(request):
                                                                                          'parent_father__reg_no',
                                                                                          'parent_mother__reg_no',
                                                                                          'sex',
-                                                                                         'breed',
+                                                                                         'breed__breed_name',
                                                                                          'status')
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
@@ -131,12 +128,13 @@ def stud_advisor_mother_details(request):
 
 
 def stud_advisor(request):
+    group_letters = ['A', 'B', 'C', 'D', 'E', 'F']
     attached_service = get_main_account(request.user)
     pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
                                                                                          'parent_father__reg_no',
                                                                                          'parent_mother__reg_no',
                                                                                          'sex',
-                                                                                         'breed',
+                                                                                         'breed__breed_name',
                                                                                          'status')
 
     mother = request.POST['mother']
@@ -145,18 +143,22 @@ def stud_advisor(request):
                             json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
 
     mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
-    band = get_band(mother)
-    print(coi_raw.json())
+    mother_band = get_band(mother)
+
     studs = loads(coi_raw.json())
     studs_copy = studs
     for stud, kinship in studs_copy.items():
         male = Pedigree.objects.get(account=attached_service, reg_no=stud)
         stud_band = get_band(male)
-        studs[stud] = {'reg_no': male.reg_no,
-                       'name': male.name,
-                       'mean_kinship': float(male.mean_kinship),
-                       'kinship': kinship,
-                       'kinship_band': stud_band}
+        if stud_band == mother_band or \
+                group_letters.index(mother) == group_letters.index(stud_band)-1 or \
+                group_letters.index(mother) == group_letters.index(stud_band)+1:
+            studs[stud] = {'id': male.id,
+                           'reg_no': male.reg_no,
+                           'name': male.name,
+                           'mean_kinship': float(male.mean_kinship),
+                           'kinship': kinship,
+                           'kinship_band': stud_band}
     return HttpResponse(dumps(studs))
 
 
