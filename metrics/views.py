@@ -156,10 +156,13 @@ def stud_advisor(request):
             studs_data[stud] = {'id': male.id,
                            'reg_no': male.reg_no,
                            'name': male.name,
-                           'mean_kinship': float(male.mean_kinship),
                            'kinship': kinship,
                            'kinship_band': stud_band}
-    return HttpResponse(dumps(studs_data))
+
+    # sort data
+    studs_sorted = {k: v for k, v in sorted(studs_data.items(), key=lambda item: item[0][4])}
+
+    return HttpResponse(dumps(studs_sorted))
 
 
 def get_band(pedigree):
