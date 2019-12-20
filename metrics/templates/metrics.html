@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
+{% load static %}
 {% block content %}
+<style>
+                table th {
+                    font-weight: bold;
+                    cursor: pointer;
+                }
+            </style>
     <!-- ============================================================== -->
     <!-- Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
@@ -248,13 +255,14 @@
                             </div>
                         </div>
                     </form>
-                    <table id="saTable" class="table table-bordered table-striped" data-show-refresh="true">
-                        <thead>
+                    <table id="saTable" class="table table-bordered table-striped">
+                        <thead id="saHeadings">
                             <tr>
-                                <th scope="col">Reg No.</th>
-                                <th scope="col">Name</th>
-                                <th scope="col" class="d-none d-sm-table-cell">Kinship Band</th>
-                                <th scope="col" class="d-none d-sm-table-cell">Kinship</th>
+                                <th scope="col" id="regNo">Reg No.</th>
+                                <th scope="col" id="name">Name</th>
+                                <th scope="col" id="kinshipBand">Kinship Band</th>
+                                <th scope="col" id="kinship">Kinship</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="saTbody">
@@ -262,6 +270,7 @@
                     </table>
                 </div>
             </div>
+
             <script>
                 $('#saBtn').click( function() {
                     $.ajax({
@@ -283,7 +292,6 @@
                                 success: function(data) {
                                     try {
                                             var result = JSON.parse(data);
-                                            console.log(result);
                                             var fade = 1000
                                             $('#motherDetails').removeClass('d-none');
                                             $('#mdRegID').hide().html('<i class="ti-angle-right"></i> {{ service.mother_title }}: ' + result.reg_no).fadeIn(fade);
@@ -302,12 +310,12 @@
                             });
 
                         },
-                        success: function(data) {
+                        success: function(data, global) {
                             $('#saTbody').html('');
                             try {
-                                    var result = JSON.parse(data);
+                                    var saResults = JSON.parse(data);
                                     $("#saTable tbody").empty();
-                                    $.each(result, function(index, element) {
+                                    $.each(saResults, function(index, element) {
                                         var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship_band + "</td><td>" + element.kinship + "</td><td><a href='/pedigree/" + element.id + "'><button class='btn btn-outline-info'>View</button></a></td></tr>";
                                         $('#saTable tbody').append(tr);
                                     });
@@ -319,8 +327,45 @@
                         error: function(jqXHR, textStatus, errorThrown){
                         }
                     });
-            });
+                });
+
+                var table = $('#saTable');
+
+                $('#regNo, #name, #kinshipBand, #kinship')
+                    .wrapInner('<span title="sort this column"/>')
+                    .each(function(){
+
+                        var th = $(this),
+                            thIndex = th.index(),
+                            inverse = false;
+
+                        th.click(function(){
+
+                            table.find('td').filter(function(){
+
+                                return $(this).index() === thIndex;
+
+                            }).sortElements(function(a, b){
+                                console.log(this);
+                                return $.text([a]) > $.text([b]) ?
+                                    inverse ? -1 : 1
+                                    : inverse ? 1 : -1;
+
+                            }, function(){
+
+                                // parentNode is the element we want to move
+                                return this.parentNode;
+
+                            });
+
+                            inverse = !inverse;
+
+                        });
+
+                    });
+
             </script>
+            <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
         </div>
     </div>
 

@@ -154,15 +154,12 @@ def stud_advisor(request):
                 group_letters.index(mother_band) == group_letters.index(stud_band)-1 or \
                 group_letters.index(mother_band) == group_letters.index(stud_band)+1:
             studs_data[stud] = {'id': male.id,
-                           'reg_no': male.reg_no,
-                           'name': male.name,
-                           'kinship': kinship,
-                           'kinship_band': stud_band}
+                                'reg_no': male.reg_no,
+                                'name': male.name,
+                                'kinship': kinship,
+                                'kinship_band': stud_band}
 
-    # sort data
-    studs_sorted = {k: v for k, v in sorted(studs_data.items(), key=lambda item: item[0][4])}
-
-    return HttpResponse(dumps(studs_sorted))
+    return HttpResponse(dumps(studs_data))
 
 
 def get_band(pedigree):
@@ -176,4 +173,3 @@ def get_band(pedigree):
         return 'D'
     else:
         return 'E'
-
