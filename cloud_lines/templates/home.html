@@ -199,7 +199,7 @@
 						<div class="masonry-thumbs grid-6" data-big="3" data-lightbox="gallery">
 
 							{% for image in images.all %}
-								<a href="{{ image.url }}" data-lightbox="gallery-item"><img class="image_fade" src="{{ image.url }}" alt="Cloud-Lines"></a>
+								<a href="{{ image.image.url }}" data-lightbox="gallery-item"><img class="image_fade" src="{{ image.image.url }}" alt="Cloud-Lines"></a>
 							{% endfor %}
 						</div>
 					</div>
