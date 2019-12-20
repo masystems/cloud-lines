@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from .models import Service, Page, Faq, Testimonial, LargeTierQueue
+from .models import Service, Page, Gallery, Faq, Testimonial, LargeTierQueue
 from .forms import ContactForm
 from account.models import UserDetail, AttachedService
 from account.views import get_main_account, send_mail
@@ -66,15 +66,15 @@ def dashboard(request):
                                               'breed_chart': breed_chart,
                                               'pedigree_chart': pedigree_chart,
                                               'updates': updates,
-                                              'update_card_size': update_card_size,
-                                              })
+                                              'update_card_size': update_card_size})
 
 
 def home(request):
     if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
         return redirect('dashboard')
     return render(request, 'home.html', {'services': Service.objects.all(),
-                                         'testimonials': Testimonial.objects.all()})
+                                         'testimonials': Testimonial.objects.all(),
+                                         'images': Gallery.objects.all()})
 
 
 def about(request):

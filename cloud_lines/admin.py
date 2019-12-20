@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Service, Page, Faq, Contact, Testimonial, LargeTierQueue, Update
+from .models import Service, Page, Gallery, Faq, Contact, Testimonial, LargeTierQueue, Update
 
 
 class ServicesAdmin(admin.ModelAdmin):
@@ -13,6 +13,7 @@ class ServicesAdmin(admin.ModelAdmin):
 
 admin.site.register(LargeTierQueue)
 admin.site.register(Service, ServicesAdmin)
+admin.site.register(Gallery)
 admin.site.register(Page)
 admin.site.register(Faq)
 admin.site.register(Contact)

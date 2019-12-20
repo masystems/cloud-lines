@@ -190,26 +190,24 @@
 			</div>
 		</div>
 
-		<!-- Addition Service Section
-		============================================= -->
-<!--		<div class="container clearfix">-->
-<!--			<div class="container">-->
-<!--				<div class="row justify-content-between align-items-center">-->
-<!--					<div class="col-md-6 mt-4 mt-lg-0">-->
-<!--						<div class="input-group input-group-lg">-->
-<!--							<a href="https://demo.cloud-lines.com" target="_blank" class="button button-desc"><div>Go to the Demo site</div><span>Login with - Username: demo, Password: demo</span></a>-->
-<!--						</div>-->
-<!--					</div>-->
-<!--					<div class="col-md-5">-->
-<!--						<div class="heading-block mb-0 nobottomborder clearfix">-->
-<!--							<h3 class="ls0 nott">Try out our demo!</h3>-->
-<!--							<p class="mb-0">Feel free to checkout our demo and add pedigrees, breeders, breed groups and breeds to give it a full test drive.</p>-->
-<!--						</div>-->
-<!--					</div>-->
-<!--				</div>-->
-<!--			</div>-->
-<!--		</div>-->
-<!--		<div class="clear"></div>-->
+		<div class="container clearfix">
+			<div class="row clearfix">
+				<div class="d-none d-lg-block">
+					<div class="row">
+						<div class="heading-block center">
+							<h2>Screenshots</h2>
+						</div>
+
+						<div class="masonry-thumbs grid-6" data-big="3" data-lightbox="gallery">
+							{{ images.all }}
+							{% for image in images.all %}
+								<a href="{{ image.image.url }}" data-lightbox="gallery-item"><img class="image_fade" src="{{ image.image.url }}" alt="Gallery Thumb 1"></a>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<!-- Testimonials Section
 		============================================= -->

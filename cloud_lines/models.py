@@ -35,6 +35,11 @@ class Service(models.Model):
         ordering = ['ordering']
 
 
+class Gallery(models.Model):
+    image = models.ImageField(blank=True)
+    body = models.TextField(blank=True)
+
+
 class Page(models.Model):
     title = models.CharField(max_length=50, unique=True,)
     sub_title = models.CharField(max_length=150, blank=True)
