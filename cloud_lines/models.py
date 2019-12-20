@@ -36,6 +36,7 @@ class Service(models.Model):
 
 
 class Gallery(models.Model):
+    title = models.CharField(max_length=100, blank=True)
     image = models.ImageField(blank=True)
     body = models.TextField(blank=True)
 
