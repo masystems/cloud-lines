@@ -92,10 +92,14 @@
                 <div class="card-body">
                     <h4 class="card-title">Calculations</h4>
                     <p id="coiTimer" class="text-center"></p>
-                    <button id="coiBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>
+                    {% if not read_only %}
+                        <button id="coiBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>
+                    {% endif %}
                     <hr>
                     <p id="meanKinshipTimer" class="text-center"></p>
-                    <button id="meanKinshipBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run Mean Kinship</button>
+                    {% if not read_only %}
+                        <button id="meanKinshipBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run Mean Kinship</button>
+                    {% endif %}
                 </div>
             </div>
         </div>
