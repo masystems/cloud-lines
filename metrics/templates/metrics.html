@@ -258,10 +258,10 @@
                     <table id="saTable" class="table table-bordered table-striped">
                         <thead id="saHeadings">
                             <tr>
-                                <th scope="col" id="regNo">Reg No.</th>
-                                <th scope="col" id="name">Name</th>
-                                <th scope="col" id="kinshipBand">Kinship Band</th>
-                                <th scope="col" id="kinship">Kinship</th>
+                                <th scope="col" id="regNo">Reg No. <i class="fas fa-sort text-muted"></i></th>
+                                <th scope="col" id="name">Name <i class="fas fa-sort text-muted"></i></th>
+                                <th scope="col" id="kinshipBand">Kinship Band <i class="fas fa-sort text-muted"></i></th>
+                                <th scope="col" id="kinship">Kinship <i class="fas fa-sort text-muted"></i></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -319,6 +319,7 @@
                                         var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship_band + "</td><td>" + element.kinship + "</td><td><a href='/pedigree/" + element.id + "'><button class='btn btn-outline-info'>View</button></a></td></tr>";
                                         $('#saTable tbody').append(tr);
                                     });
+                                    $('#kinshipBand').click();
                                 }
                             catch(err) {
                                       // not returned anything
@@ -346,7 +347,7 @@
                                 return $(this).index() === thIndex;
 
                             }).sortElements(function(a, b){
-                                console.log(this);
+
                                 return $.text([a]) > $.text([b]) ?
                                     inverse ? -1 : 1
                                     : inverse ? 1 : -1;
