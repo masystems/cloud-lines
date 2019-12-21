@@ -148,17 +148,20 @@ def stud_advisor(request):
     studs_raw = loads(coi_raw.json())
     studs_data = {}
     for stud, kinship in studs_raw.items():
-        male = Pedigree.objects.get(account=attached_service, reg_no=stud)
-        stud_band = get_band(male)
+        try:
+            male = Pedigree.objects.get(account=attached_service, reg_no=stud, sex='male')
+            stud_band = get_band(male)
 
-        if stud_band == mother_band or \
-                group_letters.index(mother_band) == group_letters.index(stud_band)-1 or \
-                group_letters.index(mother_band) == group_letters.index(stud_band)+1:
-            studs_data[stud] = {'id': male.id,
-                                'reg_no': male.reg_no,
-                                'name': male.name,
-                                'kinship': kinship,
-                                'kinship_band': stud_band}
+            if stud_band == mother_band or \
+                    group_letters.index(mother_band) == group_letters.index(stud_band)-1 or \
+                    group_letters.index(mother_band) == group_letters.index(stud_band)+1:
+                studs_data[stud] = {'id': male.id,
+                                    'reg_no': male.reg_no,
+                                    'name': male.name,
+                                    'kinship': kinship,
+                                    'kinship_band': stud_band}
+        except ObjectDoesNotExist:
+            continue
 
     return HttpResponse(dumps(studs_data))
 
