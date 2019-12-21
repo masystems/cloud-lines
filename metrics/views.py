@@ -150,6 +150,7 @@ def stud_advisor(request):
     for stud, kinship in studs_raw.items():
         male = Pedigree.objects.get(account=attached_service, reg_no=stud)
         stud_band = get_band(male)
+
         if stud_band == mother_band or \
                 group_letters.index(mother_band) == group_letters.index(stud_band)-1 or \
                 group_letters.index(mother_band) == group_letters.index(stud_band)+1:
