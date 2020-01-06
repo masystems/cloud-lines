@@ -531,13 +531,14 @@ def register(request):
             login(request, user)
 
             email_body = """
+            <p>Dear {}({}),
             <p><strong>Thank you for registering with Cloud-lines!</strong></p>
             
             <p>Now that you have registered you have access to our Free service.</p>
             
             <p><a href="https://cloud-lines.com/dashboard">Click here</a> to go to your new dashboard.</p>
             
-            <p>Feel free to contact us about anything and enjoy!</p>"""
+            <p>Feel free to contact us about anything and enjoy!</p>""".format(user.get_full_name(), user.username)
             send_mail('Welcome to Cloud-lines!', user.get_full_name(), email_body, send_to=user.email)
 
             send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
