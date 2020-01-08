@@ -432,7 +432,6 @@ vertical-align: middle;
                     {% endif %}
                     {% if lvl1.current_owner.breeding_prefix %}
                     <li>
-                        <h2>{{ lvl1.current_owner.breeding_prefix }}</h2>
                         <div class="bg-light-success"><i class="fas fa-user"></i></div> Owner <span class=""><a href="{% url 'breeder' lvl1.current_owner.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.current_owner.breeding_prefix }}</button></a></span></li>
                     {% endif %}
                     {% if lvl1.reg_no %}
