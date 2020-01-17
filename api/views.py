@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from .serializers import ApiUpdatesSerializer, \
+    ApiAttachedServiceSerializer, \
     ApiPedigreeSerializer, \
     ApiBreederSerializer, \
     ApiBreedSerializer, \
@@ -13,10 +14,12 @@ from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
 from cloud_lines.models import Service
+from account.models import UserDetail, AttachedService
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import authentication_classes, permission_classes
 from account.views import get_main_account
+from django.db.models import Q
 
 
 @permission_classes((AllowAny, ))
@@ -32,6 +35,20 @@ class ServicesViews(viewsets.ModelViewSet):
     serializer_class = ApiServiceSerializer
     queryset = Service.objects.all()
     filter_backends = [SearchFilter]
+
+
+class AttachedServiceViews(viewsets.ModelViewSet):
+    serializer_class = ApiAttachedServiceSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        user_detail = UserDetail.objects.get(user=user)
+        return AttachedService.objects.filter(Q(admin_users=user, active=True) |
+                                              Q(contributors=user, active=True) |
+                                              Q(read_only_users=user, active=True) |
+                                              Q(user=user_detail, active=True))
 
 
 class PedigreeViews(viewsets.ModelViewSet):

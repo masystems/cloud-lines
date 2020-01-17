@@ -14,10 +14,7 @@ from .models import UserDetail, AttachedService
 from cloud_lines.models import Service, Page
 from pedigree.models import Pedigree
 from breed.models import Breed
-from breed.forms import BreedForm
 from breeder.models import Breeder
-from breeder.forms import BreederForm
-from pedigree.forms import PedigreeForm, ImagesForm
 from approvals.models import Approval
 from money import Money
 from re import match
@@ -45,7 +42,10 @@ def site_mode(request):
         user = UserDetail.objects.get(user=attached_service.user.user)
         user_detail = UserDetail.objects.get(user=request.user)
 
-        attached_services = AttachedService.objects.filter(Q(admin_users=request.user, active=True) | Q(read_only_users=request.user, active=True) | Q(user=user_detail, active=True))
+        attached_services = AttachedService.objects.filter(Q(admin_users=request.user, active=True) |
+                                                           Q(contributors=request.user, active=True) |
+                                                           Q(read_only_users=request.user, active=True)|
+                                                           Q(user=user_detail, active=True))
 
         # get user permission level
         editor = False

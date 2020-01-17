@@ -5,12 +5,19 @@ from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
 from cloud_lines.models import Service
+from account.models import AttachedService
 from django.contrib.auth.models import User
 
 
 class ApiUpdatesSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Update
+        fields = '__all__'
+
+
+class ApiAttachedServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttachedService
         fields = '__all__'
 
 
