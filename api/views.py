@@ -48,7 +48,7 @@ class AttachedServiceViews(viewsets.ModelViewSet):
         return AttachedService.objects.filter(Q(admin_users=user, active=True) |
                                               Q(contributors=user, active=True) |
                                               Q(read_only_users=user, active=True) |
-                                              Q(user=user_detail, active=True))
+                                              Q(user=user_detail, active=True)).distinct().distinct()
 
 
 class PedigreeViews(viewsets.ModelViewSet):

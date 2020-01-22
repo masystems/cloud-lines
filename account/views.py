@@ -45,7 +45,7 @@ def site_mode(request):
         attached_services = AttachedService.objects.filter(Q(admin_users=request.user, active=True) |
                                                            Q(contributors=request.user, active=True) |
                                                            Q(read_only_users=request.user, active=True)|
-                                                           Q(user=user_detail, active=True))
+                                                           Q(user=user_detail, active=True)).distinct()
 
         # get user permission level
         editor = False
