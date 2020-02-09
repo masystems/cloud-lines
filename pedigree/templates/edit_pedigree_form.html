@@ -307,37 +307,39 @@
                 </div>
             </form>
         </div>
-        <script>
-            $( document ).ready(function() {
-                if ($('#id_mother').val() != '' ) {
-                    $('#id_breed_group').prop("disabled", true);
-                } else {
-                    $('#id_breed_group').prop("disabled", false);
-                    $('#id_breed_group').prop("readonly", false);
-                }
+        {% if service.site_mode == 'poultry' %}
+            <script>
+                $( document ).ready(function() {
+                    if ($('#id_mother').val() != '' ) {
+                        $('#id_breed_group').prop("disabled", true);
+                    } else {
+                        $('#id_breed_group').prop("disabled", false);
+                        $('#id_breed_group').prop("readonly", false);
+                    }
 
-                if ($('#id_breed_group').val() != '' ) {
-                    $('#id_mother').prop("disabled", true);
-                } else {
-                    $('#id_mother').prop("disabled", false);
-                }
-            });
-            $('#id_mother').bind('keyup change', function(event) {
-                if ($('#id_mother').val() != '' ) {
-                    $('#id_breed_group').prop("disabled", true);
-                } else {
-                    $('#id_breed_group').prop("disabled", false);
-                    $('#id_breed_group').prop("readonly", false);
-                }
-            });
-            $('#id_breed_group').bind('keyup change', function(event) {
-                if ($('#id_breed_group').val() != '' ) {
-                    $('#id_mother').prop("disabled", true);
-                } else {
-                    $('#id_mother').prop("disabled", false);
-                }
-            });
-        </script>
+                    if ($('#id_breed_group').val() != '' ) {
+                        $('#id_mother').prop("disabled", true);
+                    } else {
+                        $('#id_mother').prop("disabled", false);
+                    }
+                });
+                $('#id_mother').bind('keyup change', function(event) {
+                    if ($('#id_mother').val() != '' ) {
+                        $('#id_breed_group').prop("disabled", true);
+                    } else {
+                        $('#id_breed_group').prop("disabled", false);
+                        $('#id_breed_group').prop("readonly", false);
+                    }
+                });
+                $('#id_breed_group').bind('keyup change', function(event) {
+                    if ($('#id_breed_group').val() != '' ) {
+                        $('#id_mother').prop("disabled", true);
+                    } else {
+                        $('#id_mother').prop("disabled", false);
+                    }
+                });
+            </script>
+        {% endif %}
     </div>
 </div>
 

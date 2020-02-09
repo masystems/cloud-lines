@@ -160,8 +160,6 @@ def get_main_account(user):
         user_detail.current_service = attached_service
         user_detail.save()
 
-        print('tits')
-
     return attached_service
 
 

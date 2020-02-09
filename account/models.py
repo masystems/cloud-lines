@@ -31,7 +31,7 @@ class AttachedService(models.Model):
         ('mammal', 'Mammal'),
         ('poultry', 'Poultry'),
     )
-    site_mode = models.CharField(max_length=13, choices=SITE_MODES, blank=True, null=True, default=None)
+    site_mode = models.CharField(max_length=13, choices=SITE_MODES, blank=True, null=True, default='mammal')
 
     INCREMENTS = (
         ('monthly', 'Monthly'),
