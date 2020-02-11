@@ -77,30 +77,54 @@ vertical-align: middle;
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div class="tab-pane p-3 active" id="profile" role="tabpanel">
-                        <div class="row">
-                            {% if lvl1.images.first %}
-                                <div class="col-md-4"><img src="{% for image in lvl1.images.all %}
-                                                                    {% if forloop.first %}
-                                                                        {{ image.image.url }}
-                                                                    {% endif %}
-                                                                {% endfor %}"
-                                                           class="img-responsive thumbnail mr-3">
-                                </div>
-                            {% endif %}
-                            <div class="col-md-8">
-                                {{ lvl1.description|linebreaks }}
-                            </div>
+                        <div class="container">
                             <div class="row">
-                                <dl>
-                                    {% if custom_fields %}
-                                        {% for field_key, field_vals in custom_fields.items %}
-                                            {% if field_vals.location == 'pedigree' %}
-                                                <dt>{{ field_vals.fieldName }}</dt>
-                                                <dd>{% if field_vals.field_value %}{{ field_vals.field_value }}{% else %}<br>{% endif %}</dd>
-                                            {% endif %}
-                                        {% endfor %}
+                                <div class="col-md-4">
+                                    {% if lvl1.images.first %}
+                                        <img src="{% for image in lvl1.images.all %}
+                                                                        {% if forloop.first %}
+                                                                            {{ image.image.url }}
+                                                                        {% endif %}
+                                                                    {% endfor %}"
+                                                               class="img-responsive thumbnail mr-3">
+
                                     {% endif %}
-                                </dl>
+                                </div>
+                                <div class="col-md-8">
+                                    {{ lvl1.description|linebreaks }}
+                                </div>
+                            </div>
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <strong>{{ service.mother_title }}:</strong>
+                                    </div>
+                                    <div class="col-8">
+                                    {{ lvl1.parent_mother_notes }}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <strong>{{ service.father_title }}:</strong>
+                                    </div>
+                                    <div class="col-8">
+                                    {{ lvl1.parent_father_notes }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container">
+                                <div class="row">
+                                    <dl>
+                                        {% if custom_fields %}
+                                            {% for field_key, field_vals in custom_fields.items %}
+                                                {% if field_vals.location == 'pedigree' %}
+                                                    <dt>{{ field_vals.fieldName }}</dt>
+                                                    <dd>{% if field_vals.field_value %}{{ field_vals.field_value }}{% else %}<br>{% endif %}</dd>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </dl>
+                                </div>
                             </div>
                         </div>
                     </div>
