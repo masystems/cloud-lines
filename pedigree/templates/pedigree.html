@@ -95,22 +95,26 @@ vertical-align: middle;
                                 </div>
                             </div>
                             <div class="container">
-                                <div class="row">
-                                    <div class="col-4">
-                                        <strong>{{ service.mother_title }} notes:</strong>
+                                {% if lvl1.parent_mother_notes %}
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <strong>{{ service.mother_title }} notes:</strong>
+                                        </div>
+                                        <div class="col-8">
+                                        {{ lvl1.parent_mother_notes }}
+                                        </div>
                                     </div>
-                                    <div class="col-8">
-                                    {{ lvl1.parent_mother_notes }}
+                                {% endif %}
+                                {% if lvl1.parent_father_notes %}
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <strong>{{ service.father_title }} notes:</strong>
+                                        </div>
+                                        <div class="col-8">
+                                        {{ lvl1.parent_father_notes }}
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <strong>{{ service.father_title }} notes:</strong>
-                                    </div>
-                                    <div class="col-8">
-                                    {{ lvl1.parent_father_notes }}
-                                    </div>
-                                </div>
+                                {% endif %}
                             </div>
                             <div class="container">
                                 <div class="row">

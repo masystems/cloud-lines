@@ -631,7 +631,7 @@ def add_existing_parent(request, pedigree_id):
         parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
         if parent.sex == 'male':
             pedigree.parent_father = parent
-        elif pedigree.sex == 'female':
+        elif parent.sex == 'female':
             pedigree.parent_mother = parent
 
         if request.user in attached_service.contributors.all():
