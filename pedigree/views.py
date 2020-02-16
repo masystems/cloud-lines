@@ -493,7 +493,7 @@ def edit_pedigree_form(request, id):
                 pass
 
             pedigree.reg_no = pedigree_form['reg_no'].value()
-            pedigree.tag_no = pedigree_form['tag_no'].value()
+            pedigree.tag_no = pedigree_form['tag_no'].value() or ""
             pedigree.name = pedigree_form['name'].value()
 
             try:
