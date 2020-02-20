@@ -584,9 +584,10 @@ def edit_pedigree_form(request, id):
             for file in files:
                 if request.user in attached_service.contributors.all():
                     upload = PedigreeImage(account=attached_service, state='unapproved', image=file, reg_no=pedigree)
+                    upload.save()
                 else:
                     upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
-                upload.save()
+                    upload.save()
 
             return redirect('pedigree', pedigree.id)
     else:
