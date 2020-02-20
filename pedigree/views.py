@@ -597,14 +597,14 @@ def image_upload(request, id):
     attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
-    files = request.FILES
-    for file in files:
-        if request.user in attached_service.contributors.all():
-            upload = PedigreeImage(account=attached_service, state='unapproved', image=file, reg_no=pedigree)
-            upload.save()
-        else:
-            upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
-            upload.save()
+    file = request.FILES['file[0]']
+    print(request.FILES['file[0]'])
+    if request.user in attached_service.contributors.all():
+        upload = PedigreeImage(account=attached_service, state='unapproved', image=file, reg_no=pedigree)
+        upload.save()
+    else:
+        upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
+        upload.save()
 
     return HttpResponse('')
 
