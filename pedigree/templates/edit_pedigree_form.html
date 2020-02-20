@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load widget_tweaks %}
 {% block content %}
 
@@ -258,7 +259,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 text-right col-form-label">{{ field.label }}</label>
                                     <div class="col-md-9">
-                                        {% render_field field class="dropzone" %}
+                                        <div class="dropzone" id="imageUploads"></div>
                                         {% for error in field.errors %}
                                           <span class="help-block text-danger">{{ error }}</span>
                                         {% endfor %}
@@ -266,6 +267,23 @@
                                 </div>
                             </div>
                         {% endfor %}
+                        <script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
+                        <script>
+                            Dropzone.options.imageUploads= {
+                            url: "{% url 'image_upload' pedigree.id %}",
+                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                            method: "POST",
+                            autoProcessQueue: true,
+                            uploadMultiple: true,
+                            parallelUploads: 5,
+                            maxFiles: 10,
+                            maxFilesize: 5,
+                            acceptedFiles: 'image/*',
+                            addRemoveLinks: true,
+                            ignoreHiddenFiles: true,
+                            dictDefaultMessage: "Click or drop files here to upload",
+                            }
+                        </script>
                         <hr>
                         {% if pedigree.images.first %}
                             <div class="col-lg-12 col-md-12">

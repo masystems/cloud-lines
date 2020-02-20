@@ -570,8 +570,6 @@ def edit_pedigree_form(request, id):
                 pedigree.state = 'approved'
                 pedigree.save()
 
-            files = request.FILES.getlist('upload_images')
-
             for image in PedigreeImage.objects.filter(account=attached_service):
                 img = request.POST.get('{}-{}'.format(pedigree.id, image.id))
                 if img:
@@ -580,14 +578,6 @@ def edit_pedigree_form(request, id):
                         image.save()
                     else:
                         image.delete()
-
-            for file in files:
-                if request.user in attached_service.contributors.all():
-                    upload = PedigreeImage(account=attached_service, state='unapproved', image=file, reg_no=pedigree)
-                    upload.save()
-                else:
-                    upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
-                    upload.save()
 
             return redirect('pedigree', pedigree.id)
     else:
@@ -601,6 +591,22 @@ def edit_pedigree_form(request, id):
                                                        'breeds': Breed.objects.filter(account=attached_service),
                                                        'breed_groups': BreedGroup.objects.filter(account=attached_service),
                                                        'custom_fields': custom_fields})
+
+
+def image_upload(request, id):
+    attached_service = get_main_account(request.user)
+    pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
+
+    files = request.FILES
+    for file in files:
+        if request.user in attached_service.contributors.all():
+            upload = PedigreeImage(account=attached_service, state='unapproved', image=file, reg_no=pedigree)
+            upload.save()
+        else:
+            upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
+            upload.save()
+
+    return HttpResponse('')
 
 
 def add_existing(request, pedigree_id):

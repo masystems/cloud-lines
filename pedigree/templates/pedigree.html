@@ -149,6 +149,24 @@ vertical-align: middle;
                                 </div>
                             {% endfor %}
                         </div>
+                        <form action="{% url 'image_upload' lvl1.id %}" class="dropzone" id="imageUploads"></form>
+                        <script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
+                        <script>
+                            Dropzone.options.imageUploads= {
+                            url: "{% url 'image_upload' lvl1.id %}",
+                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                            method: "POST",
+                            autoProcessQueue: true,
+                            uploadMultiple: true,
+                            parallelUploads: 5,
+                            maxFiles: 10,
+                            maxFilesize: 5,
+                            acceptedFiles: 'image/*',
+                            addRemoveLinks: true,
+                            ignoreHiddenFiles: true,
+                            dictDefaultMessage: "Click or drop files here to upload",
+                            }
+                        </script>
                     </div>
                     <div class="tab-pane p-3" id="children" role="tabpanel">
                         {% if children %}
