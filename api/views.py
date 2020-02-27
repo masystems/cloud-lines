@@ -3,13 +3,14 @@ from rest_framework import viewsets
 from .serializers import ApiUpdatesSerializer, \
     ApiAttachedServiceSerializer, \
     ApiPedigreeSerializer, \
+    ApiPedigreeImageSerializer,\
     ApiBreederSerializer, \
     ApiBreedSerializer, \
     ApiBreedGroupSerializer, \
     ApiServiceSerializer, \
     ApiAuthentication
 from cloud_lines.models import Update
-from pedigree.models import Pedigree
+from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
@@ -60,6 +61,17 @@ class PedigreeViews(viewsets.ModelViewSet):
         user = self.request.user
         main_account = get_main_account(user)
         return Pedigree.objects.filter(account=main_account)
+
+
+class PedigreeImageViews(viewsets.ModelViewSet):
+    serializer_class = ApiPedigreeImageSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        main_account = get_main_account(user)
+        return PedigreeImage.objects.filter(account=main_account)
 
 
 class BreederViews(viewsets.ModelViewSet):

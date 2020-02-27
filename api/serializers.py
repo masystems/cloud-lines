@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from cloud_lines.models import Update
-from pedigree.models import Pedigree
+from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
@@ -24,6 +24,12 @@ class ApiAttachedServiceSerializer(serializers.ModelSerializer):
 class ApiPedigreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pedigree
+        fields = '__all__'
+
+
+class ApiPedigreeImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PedigreeImage
         fields = '__all__'
 
 
