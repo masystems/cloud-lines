@@ -114,66 +114,62 @@ def mean_kinship(request):
 
 def stud_advisor_mother_details(request):
     attached_service = get_main_account(request.user)
-    cois = Pedigree.objects.filter(account=attached_service).values('coi')
+    mother = Pedigree.objects.get(account=attached_service, reg_no=request.POST['mother'])
+    cois = Pedigree.objects.filter(account=attached_service, breed=mother.breed).values('coi')
     total = 0
     for coi in cois.all():
         total += coi['coi']
-    breed_mean_coi = total / Pedigree.objects.filter(account=attached_service).count()
-    mother = Pedigree.objects.get(account=attached_service, reg_no=request.POST['mother'])
+    breed_mean_coi = total / Pedigree.objects.filter(account=attached_service, breed=mother.breed).count()
+
     mother_details = {'reg_no': mother.reg_no,
                       'mk': str(mother.mean_kinship),
-                      'band': get_band(mother),
                       'breed_mean_coi': str(breed_mean_coi)}
     return HttpResponse(dumps(mother_details))
 
 
 def stud_advisor(request):
-    group_letters = ['A', 'B', 'C', 'D', 'E', 'F']
+    mother_details = stud_advisor_mother_details(request)
+    mother_details = eval(mother_details.content.decode())
+    print(mother_details)
+
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
-                                                                                         'parent_father__reg_no',
-                                                                                         'parent_mother__reg_no',
-                                                                                         'sex',
-                                                                                         'breed__breed_name',
-                                                                                         'status')
 
     mother = request.POST['mother']
+    mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
+    pedigrees = Pedigree.objects.filter(account=attached_service,
+                                        status='alive',
+                                        breed=mother.breed).values('reg_no',
+                                                                   'parent_father__reg_no',
+                                                                   'parent_mother__reg_no',
+                                                                   'sex',
+                                                                   'breed__breed_name',
+                                                                   'status')
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother),
                             json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
 
-    mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
-    mother_band = get_band(mother)
-
     studs_raw = loads(coi_raw.json())
     studs_data = {}
+
     for stud, kinship in studs_raw.items():
         try:
             male = Pedigree.objects.get(account=attached_service, reg_no=stud, sex='male')
-            stud_band = get_band(male)
 
-            if stud_band == mother_band or \
-                    group_letters.index(mother_band) == group_letters.index(stud_band)-1 or \
-                    group_letters.index(mother_band) == group_letters.index(stud_band)+1:
-                studs_data[stud] = {'id': male.id,
-                                    'reg_no': male.reg_no,
-                                    'name': male.name,
-                                    'kinship': kinship,
-                                    'kinship_band': stud_band}
+            if (mother.mean_kinship - mother.breed.mk_threshold) <= male.mean_kinship <= (mother.mean_kinship + mother.breed.mk_threshold)\
+                    and kinship <= float(mother_details['breed_mean_coi']):
+                color = 'green'
+            elif (mother.mean_kinship - (mother.breed.mk_threshold*2)) <= male.mean_kinship <= (mother.mean_kinship + (mother.breed.mk_threshold*2))\
+                    and kinship <= float(mother_details['breed_mean_coi']):
+                color = 'orange'
+            else:
+                color = 'red'
+
+            studs_data[stud] = {'id': male.id,
+                                'reg_no': male.reg_no,
+                                'name': male.name,
+                                'kinship': kinship,
+                                'color': color}
         except ObjectDoesNotExist:
             continue
 
     return HttpResponse(dumps(studs_data))
-
-
-def get_band(pedigree):
-    if pedigree.mean_kinship < pedigree.breed.mk_a:
-        return 'A'
-    elif pedigree.breed.mk_a <= pedigree.mean_kinship < pedigree.breed.mk_b:
-        return 'B'
-    elif pedigree.breed.mk_b <= pedigree.mean_kinship < pedigree.breed.mk_c:
-        return 'C'
-    elif pedigree.breed.mk_c <= pedigree.mean_kinship < pedigree.breed.mk_d:
-        return 'D'
-    else:
-        return 'E'

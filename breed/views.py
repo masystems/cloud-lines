@@ -33,10 +33,7 @@ def new_breed_form(request):
             breed = Breed.objects.create(account=attached_service,
                                          breed_name=breed_form['breed_name'].value(),
                                          breed_description=breed_form['breed_description'].value(),
-                                         mk_a = breed_form['mk_a'].value(),
-                                         mk_b = breed_form['mk_b'].value(),
-                                         mk_c = breed_form['mk_c'].value(),
-                                         mk_d = breed_form['mk_d'].value())
+                                         mk_threshold=breed_form['mk_threshold'].value())
             breed.save()
             try:
                 breed.image = request.FILES['image']

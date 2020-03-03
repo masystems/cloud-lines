@@ -14,10 +14,12 @@ class Breed(models.Model):
     custom_fields = models.TextField(blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
-    mk_a = models.DecimalField(max_digits=6, decimal_places=4, verbose_name='Mean Kinship Group A', blank=True, null=True)
-    mk_b = models.DecimalField(max_digits=6, decimal_places=4, verbose_name='Mean Kinship Group B', blank=True, null=True)
-    mk_c = models.DecimalField(max_digits=6, decimal_places=4, verbose_name='Mean Kinship Group C', blank=True, null=True)
-    mk_d = models.DecimalField(max_digits=6, decimal_places=4, verbose_name='Mean Kinship Group D', blank=True, null=True)
+    mk_threshold = models.DecimalField(max_digits=6, decimal_places=4, verbose_name='Mean Kinship threshold',
+                                       help_text="This value dictates how potential males are selected when compared"
+                                                 "with females. The MK value of the selected female, plus or minus"
+                                                 " this figure, determines the acceptable range of MK values in the "
+                                                 "male population, for a breeding match.",
+                                       blank=True, null=True)
 
     def __str__(self):
         return self.breed_name

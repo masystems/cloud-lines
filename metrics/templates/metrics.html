@@ -245,7 +245,6 @@
                                     <ul class="list-icons">
                                         <li id="mdRegID"><i class="ti-angle-right"></i></li>
                                         <li id="mdMeanKinship"><i class="ti-angle-right"></i></li>
-                                        <li id="mdBand"><i class="ti-angle-right"></i></li>
                                     </ul>
                                 </div>
                             </div>
@@ -264,8 +263,7 @@
                             <tr>
                                 <th scope="col" id="regNo">Reg No. <i class="fas fa-sort text-muted"></i></th>
                                 <th scope="col" id="name">Name <i class="fas fa-sort text-muted"></i></th>
-                                <th scope="col" id="kinshipBand">Kinship Band <i class="fas fa-sort text-muted"></i></th>
-                                <th scope="col" id="kinship">COI of Kinship <i class="fas fa-sort text-muted"></i></th>
+                                <th scope="col" id="kinship">COI of Offspring <i class="fas fa-sort text-muted"></i></th>
                                 <th></th>
                                 <th></th>
                             </tr>
@@ -303,7 +301,6 @@
                                             $('#motherDetails').removeClass('d-none');
                                             $('#mdRegID').hide().html('<i class="ti-angle-right"></i> {{ service.mother_title }}: ' + result.reg_no).fadeIn(fade);
                                             $('#mdMeanKinship').hide().html('<i class="ti-angle-right"></i> Mean Kinship: ' + result.mk).fadeIn(fade);
-                                            $('#mdBand').hide().html('<i class="ti-angle-right"></i> Breed Band: ' + result.band).fadeIn(fade);
                                             $('#breedDetails').removeClass('d-none');
                                             $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Breed Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
                                         }
@@ -322,18 +319,10 @@
                                     var saResults = JSON.parse(data);
                                     $("#saTable tbody").empty();
                                     $.each(saResults, function(index, element) {
-                                        if (element.kinship < breed_mean_coi) {
-                                            color = 'green';
-                                        } else if (element.kinship > breed_mean_coi) {
-                                            color = 'red';
-                                        }
-                                        if (parseFloat(element.kinship).toFixed(3) == parseFloat(breed_mean_coi).toFixed(3)) {
-                                            color = 'orange';
-                                        }
-                                        var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship_band + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button class='btn btn-outline-info'>View</button></a></td></tr>";
+                                        var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button class='btn btn-outline-info'>View</button></a></td></tr>";
                                         $('#saTable tbody').append(tr);
                                     });
-                                    $('#kinshipBand').click();
+                                    $('#kinship').click();
                                 }
                             catch(err) {
                                       // not returned anything
@@ -346,7 +335,7 @@
 
                 var table = $('#saTable');
 
-                $('#regNo, #name, #kinshipBand, #kinship')
+                $('#regNo, #name, #kinship')
                     .wrapInner('<span title="sort this column"/>')
                     .each(function(){
 
