@@ -263,6 +263,7 @@
                             <tr>
                                 <th scope="col" id="regNo">Reg No. <i class="fas fa-sort text-muted"></i></th>
                                 <th scope="col" id="name">Name <i class="fas fa-sort text-muted"></i></th>
+                                <th scope="col" id="meanKinship">Mean Kinship <i class="fas fa-sort text-muted"></i></th>
                                 <th scope="col" id="kinship">COI of Offspring <i class="fas fa-sort text-muted"></i></th>
                                 <th></th>
                                 <th></th>
@@ -319,7 +320,7 @@
                                     var saResults = JSON.parse(data);
                                     $("#saTable tbody").empty();
                                     $.each(saResults, function(index, element) {
-                                        var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button class='btn btn-outline-info'>View</button></a></td></tr>";
+                                        var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button class='btn btn-outline-info'>View</button></a></td></tr>";
                                         $('#saTable tbody').append(tr);
                                     });
                                     $('#kinship').click();
@@ -335,7 +336,7 @@
 
                 var table = $('#saTable');
 
-                $('#regNo, #name, #kinship')
+                $('#regNo, #name, #meanKinship, #kinship')
                     .wrapInner('<span title="sort this column"/>')
                     .each(function(){
 

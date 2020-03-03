@@ -167,6 +167,7 @@ def stud_advisor(request):
             studs_data[stud] = {'id': male.id,
                                 'reg_no': male.reg_no,
                                 'name': male.name,
+                                'mean_kinship': str(male.mean_kinship),
                                 'kinship': kinship,
                                 'color': color}
         except ObjectDoesNotExist:
