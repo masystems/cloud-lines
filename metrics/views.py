@@ -130,7 +130,6 @@ def stud_advisor_mother_details(request):
 def stud_advisor(request):
     mother_details = stud_advisor_mother_details(request)
     mother_details = eval(mother_details.content.decode())
-    print(mother_details)
 
     attached_service = get_main_account(request.user)
 
@@ -153,7 +152,7 @@ def stud_advisor(request):
 
     for stud, kinship in studs_raw.items():
         try:
-            male = Pedigree.objects.get(account=attached_service, reg_no=stud, sex='male')
+            male = Pedigree.objects.get(account=attached_service, reg_no=stud, sex='male', status='alive')
 
             if (mother.mean_kinship - mother.breed.mk_threshold) <= male.mean_kinship <= (mother.mean_kinship + mother.breed.mk_threshold)\
                     and kinship <= float(mother_details['breed_mean_coi']):
