@@ -125,6 +125,7 @@ def stud_advisor_mother_details(request):
                       'name': mother.name,
                       'mk': str(mother.mean_kinship),
                       'breed': mother.breed.breed_name,
+                      'threshold': str(mother.breed.mk_threshold),
                       'breed_mean_coi': str(breed_mean_coi)}
     return HttpResponse(dumps(mother_details))
 
@@ -162,7 +163,8 @@ def stud_advisor(request):
             elif (mother.mean_kinship - (mother.breed.mk_threshold*2)) <= male.mean_kinship <= (mother.mean_kinship + (mother.breed.mk_threshold*2))\
                     and kinship <= float(mother_details['breed_mean_coi']):
                 color = 'orange'
-            elif male.coi > float(mother_details['breed_mean_coi']):
+            elif (mother.mean_kinship - (mother.breed.mk_threshold*2)) <= male.mean_kinship <= (mother.mean_kinship + (mother.breed.mk_threshold*2))\
+                    and male.coi > float(mother_details['breed_mean_coi']):
                 color = 'red'
             else:
                 color = None

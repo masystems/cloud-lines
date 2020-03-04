@@ -254,6 +254,7 @@
                                     <h3 class="card-title">Breed Details</h3>
                                     <ul class="list-icons">
                                         <li id="breedName"><i class="ti-angle-right"></i></li>
+                                        <li id="breedThreshold"><i class="ti-angle-right"></i></li>
                                         <li id="breedMeanCoi"><i class="ti-angle-right"></i></li>
                                     </ul>
                                 </div>
@@ -315,7 +316,13 @@
                                             $('#mdMeanKinship').hide().html('<i class="ti-angle-right"></i> Mean Kinship: ' + result.mk).fadeIn(fade);
                                             $('#breedDetails').removeClass('d-none');
                                             $('#breedName').hide().html('<i class="ti-angle-right"></i> Name: ' + result.breed).fadeIn(fade);
-                                            $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
+                                            $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Theshold: ' + result.threshold).fadeIn(fade);
+                                            console.log(result.breed_mean_coi);
+                                            if (result.breed_mean_coi != 0.0000) {
+                                                $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat("result.breed_mean_coi").toFixed(2))).fadeIn(fade);
+                                            } else {
+                                                $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
+                                            }
                                         }
                                     catch(err) {
                                               // not returned anything
