@@ -122,7 +122,9 @@ def stud_advisor_mother_details(request):
     breed_mean_coi = total / Pedigree.objects.filter(account=attached_service, breed=mother.breed).count()
 
     mother_details = {'reg_no': mother.reg_no,
+                      'name': mother.name,
                       'mk': str(mother.mean_kinship),
+                      'breed': mother.breed.breed_name,
                       'breed_mean_coi': str(breed_mean_coi)}
     return HttpResponse(dumps(mother_details))
 
@@ -160,15 +162,18 @@ def stud_advisor(request):
             elif (mother.mean_kinship - (mother.breed.mk_threshold*2)) <= male.mean_kinship <= (mother.mean_kinship + (mother.breed.mk_threshold*2))\
                     and kinship <= float(mother_details['breed_mean_coi']):
                 color = 'orange'
-            else:
+            elif male.coi > float(mother_details['breed_mean_coi']):
                 color = 'red'
+            else:
+                color = None
 
-            studs_data[stud] = {'id': male.id,
-                                'reg_no': male.reg_no,
-                                'name': male.name,
-                                'mean_kinship': str(male.mean_kinship),
-                                'kinship': kinship,
-                                'color': color}
+            if color:
+                studs_data[stud] = {'id': male.id,
+                                    'reg_no': male.reg_no,
+                                    'name': male.name,
+                                    'mean_kinship': str(male.mean_kinship),
+                                    'kinship': kinship,
+                                    'color': color}
         except ObjectDoesNotExist:
             continue
 
