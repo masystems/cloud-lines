@@ -226,14 +226,15 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body canvas_div_pdf">
                     <h4 class="card-title">Stud Selector</h4>
-                    <p>Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
+                    <p id="studIntroText">Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
                     <form id="saForm" class="pb-4">
                         <div class="form-row align-items-center">
                             <div class="col-md-3">
                                 <div id="mothers-alive">
                                     <input id="sa_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                    <div id="cloudlinesLogo"></div>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -266,8 +267,9 @@
                         <p><i class='fas fa-circle' style='color:orange'></i> This male may not be the first choice as a mate for the selected female, but it is still relatively close in terms of Mean-Kinship, and the COI of the offspring would be no higher than the breed average COI.</p>
                         <p><i class='fas fa-circle' style='color:red'></i> This male would not be an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.</p>
                     </div>
-<!--                    <div id="editor"></div>-->
-<!--                    <button id="cmd">generate PDF</button>-->
+
+                    <div><button class="btn btn-outline-info mb-2 float-right d-none" id="getPdf">Generate PDF</button></div>
+
                     <table id="saTable" class="table table-bordered table-striped">
                         <thead id="saHeadings">
                             <tr>
@@ -286,6 +288,63 @@
             </div>
         </div>
     </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script>
+    $('#getPdf').click( function() {
+        // hide elements
+        $('#studIntroText').addClass('d-none');
+        $('#sa_mother').addClass('d-none');
+        $('#saBtn').addClass('d-none');
+        $('#getPdf').addClass('d-none');
+
+        // inset logo
+        $('#cloudlinesLogo').html('<img src="https://static.cloud-lines.com/assets/images/cloud-lines-logo.png" crossorigin="anonymous" style="max-height:300px" class="img-fluid">');
+
+        getPDF();
+
+        // delete logo
+        $('#cloudlinesLogo').html('');
+
+        // unhide elements
+        $('#studIntroText').removeClass('d-none');
+        $('#sa_mother').removeClass('d-none');
+        $('#saBtn').removeClass('d-none');
+        $('#getPdf').removeClass('d-none');
+    });
+
+    function getPDF(){
+		var HTML_Width = $(".canvas_div_pdf").width();
+		var HTML_Height = $(".canvas_div_pdf").height();
+		var top_left_margin = 1;
+		var PDF_Width = HTML_Width+(top_left_margin*2);
+		var PDF_Height = (PDF_Width*1.5)+(top_left_margin*2);
+		var canvas_image_width = HTML_Width;
+		var canvas_image_height = HTML_Height;
+
+		var totalPDFPages = Math.ceil(HTML_Height/PDF_Height)-1;
+
+
+		html2canvas($(".canvas_div_pdf")[0],{allowTaint:true}).then(function(canvas) {
+			canvas.getContext('2d');
+
+			console.log(canvas.height+"  "+canvas.width);
+
+
+			var imgData = canvas.toDataURL("image/jpeg", 1.0);
+			var pdf = new jsPDF('p', 'pt',  [PDF_Width, PDF_Height]);
+		    pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin,canvas_image_width,canvas_image_height);
+
+
+			for (var i = 1; i <= totalPDFPages; i++) {
+				pdf.addPage(PDF_Width, PDF_Height);
+				pdf.addImage(imgData, 'JPG', top_left_margin, -(PDF_Height*i)+(top_left_margin*4),canvas_image_width,canvas_image_height);
+			}
+
+		    pdf.save("Cloud-Lines_Stud-Selector.pdf");
+        });
+	};
+</script>
 <script>
                 var breed_mean_coi;
                 $('#saBtn').click( function() {
@@ -318,7 +377,7 @@
                                             $('#breedName').hide().html('<i class="ti-angle-right"></i> Name: ' + result.breed).fadeIn(fade);
                                             $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Theshold: ' + result.threshold).fadeIn(fade);
                                             console.log(result.breed_mean_coi);
-                                            if (result.breed_mean_coi != 0.0000) {
+                                            if (result.breed_mean_coi != "0.0000") {
                                                 $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat("result.breed_mean_coi").toFixed(2))).fadeIn(fade);
                                             } else {
                                                 $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
@@ -334,12 +393,13 @@
 
                         },
                         success: function(data, global) {
+                            $('#getPdf').removeClass('d-none');
                             $('#saTbody').html('');
                             try {
                                     var saResults = JSON.parse(data);
                                     $("#saTable tbody").empty();
                                     $.each(saResults, function(index, element) {
-                                        var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button class='btn btn-outline-info'>View</button></a></td></tr>";
+                                        var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
                                         $('#saTable tbody').append(tr);
                                     });
                                     $('#kinship').click();
@@ -387,21 +447,6 @@
                         });
 
                     });
-
-            var doc = new jsPDF();
-            var specialElementHandlers = {
-                '#editor': function (element, renderer) {
-                    return true;
-                }
-            };
-
-            $('#cmd').click(function () {
-                doc.fromHTML($('#saTable').html(), 15, 15, {
-                    'width': 170,
-                        'elementHandlers': specialElementHandlers
-                });
-                doc.save('sample-file.pdf');
-            });
 
             </script>
             <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
