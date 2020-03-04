@@ -79,7 +79,6 @@
                                 error: function(jqXHR, textStatus, errorThrown){
                                     $('#ksResults').html('<p class="text-danger">Error! Check the parent fields are correct.</p>')
                                     $('#ksBtn').attr("disabled", false);
-                                    console.log(jqXHR, textStatus, errorThrown)
                                 }
                             });
                         });
@@ -234,7 +233,6 @@
                             <div class="col-md-3">
                                 <div id="mothers-alive">
                                     <input id="sa_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
-                                    <div id="cloudlinesLogo"></div>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -298,13 +296,7 @@
         $('#saBtn').addClass('d-none');
         $('#getPdf').addClass('d-none');
 
-        // inset logo
-        $('#cloudlinesLogo').html('<img src="https://static.cloud-lines.com/assets/images/cloud-lines-logo.png" crossorigin="anonymous" style="max-height:300px" class="img-fluid">');
-
         getPDF();
-
-        // delete logo
-        $('#cloudlinesLogo').html('');
 
         // unhide elements
         $('#studIntroText').removeClass('d-none');
@@ -327,10 +319,6 @@
 
 		html2canvas($(".canvas_div_pdf")[0],{allowTaint:true}).then(function(canvas) {
 			canvas.getContext('2d');
-
-			console.log(canvas.height+"  "+canvas.width);
-
-
 			var imgData = canvas.toDataURL("image/jpeg", 1.0);
 			var pdf = new jsPDF('p', 'pt',  [PDF_Width, PDF_Height]);
 		    pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin,canvas_image_width,canvas_image_height);
