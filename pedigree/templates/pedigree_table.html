@@ -17,7 +17,7 @@
     <th scope="row">{{ pedigree.reg_no }}</th>
     <th scope="row" class="d-none d-sm-table-cell">{{ pedigree.mean_kinship }}</th>
     <td>{{ pedigree.name }}</td>
-    <td class="d-none d-sm-table-cell">{{ pedigree.dob }}</td>
+    <td class="d-none d-sm-table-cell" data-order="{{ pedigree.dob|date:'Y-m-d' }}">{{ pedigree.dob }}</td>
     <td class="d-none d-sm-table-cell">{{ pedigree.status|title }}</td>
     <td class="d-none d-sm-table-cell">{{ pedigree.breed__breed_name }}</td>
     <td class="d-none d-sm-table-cell"><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
