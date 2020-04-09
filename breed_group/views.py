@@ -100,21 +100,22 @@ def edit_breed_group_form(request, breed_group_id):
             breed_group.group_members.add(pedigree)
 
         if request.user in attached_service.contributors.all():
-            BreedGroup.objects.filter(id=breed_group.id).update(state='edited')
+            if not Approval.objects.filter(breed_group=breed_group).exists():
+                BreedGroup.objects.filter(id=breed_group.id).update(state='edited')
 
-            data = serializers.serialize('yaml', [breed_group, ])
+                data = serializers.serialize('yaml', [breed_group, ])
 
-            # create approval object
-            Approval.objects.create(account=attached_service,
-                                    user=request.user,
-                                    type='edit',
-                                    breed_group=breed_group,
-                                    data=data)
+                # create approval object
+                Approval.objects.create(account=attached_service,
+                                        user=request.user,
+                                        type='edit',
+                                        breed_group=breed_group,
+                                        data=data)
 
-            # reset group members
-            breed_group.group_members.clear()
-            for pedigree in current_members:
-                breed_group.group_members.add(pedigree)
+                # reset group members
+                breed_group.group_members.clear()
+                for pedigree in current_members:
+                    breed_group.group_members.add(pedigree)
 
         else:
             # update group members
