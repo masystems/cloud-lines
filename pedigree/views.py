@@ -561,7 +561,8 @@ def edit_pedigree_form(request, id):
             pedigree.custom_fields = json.dumps(custom_fields)
 
             if request.user in attached_service.contributors.all():
-                create_approval(request, pedigree, attached_service, state='edited', type='edit')
+                if not Approval.objects.filter(pedigree=pedigree).exists():
+                    create_approval(request, pedigree, attached_service, state='edited', type='edit')
             else:
                 # delete any existed approvals
                 approvals = Approval.objects.filter(pedigree=pedigree)
