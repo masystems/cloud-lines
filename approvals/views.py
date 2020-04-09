@@ -22,7 +22,10 @@ def approvals(request):
     for approval in approvals:
         if approval.pedigree:
             for obj in serializers.deserialize("yaml", approval.data):
-                obj.object.custom_fields_expanded = loads(obj.object.custom_fields)
+                if obj.object.custom_fields != '':
+                    obj.object.custom_fields_expanded = loads(obj.object.custom_fields)
+                else:
+                    obj.object.custom_fields_expanded = "{}"
                 data.append(obj.object)
         elif approval.breed_group:
             # convert the data to a dict
