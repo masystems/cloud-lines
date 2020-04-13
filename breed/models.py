@@ -19,7 +19,7 @@ class Breed(models.Model):
                                                  "with females. The MK value of the selected female, plus or minus"
                                                  " this figure, determines the acceptable range of MK values in the "
                                                  "male population, for a breeding match.",
-                                       blank=True, null=True)
+                                       blank=True, null=True, default=0.0000)
 
     def __str__(self):
         return self.breed_name
