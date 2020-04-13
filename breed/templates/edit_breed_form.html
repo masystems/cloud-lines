@@ -77,8 +77,14 @@
                                         {% elif field.label == 'Image' %}
                                             {% render_field field class="form-control" %}
                                         {% elif field.label == 'Mean Kinship threshold' %}
-                                            {% render_field field class="form-control" value=breed.mk_threshold %}
-                                            {{ field.help_text }}
+                                            {% if service.metrics %}
+                                                {% render_field field class="form-control" value=breed.mk_threshold %}
+                                                {{ field.help_text }}
+                                            {% else %}
+                                                <p class="text-danger mt-3">Metrics not enabled</p>
+                                                <p class="">This feature is available for Small Society, Large Society and Organisation accounts.
+                                                    Metrics can be enabled in the <a href="{% url 'settings' %}">Site Settings</a> section.</p>
+                                            {% endif %}
                                         {% endif %}
                                         {% for error in field.errors %}
                                           <span class="help-block">{{ error }}</span>

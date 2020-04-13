@@ -46,6 +46,15 @@
                             <small>Make sure you add some custom fields in the 'Site Settings' section after this!</small>
                         {% endif %}
                     {% endif %}
+                {% elif "Mean Kinship" in field.label %}
+                    {% if service.metrics %}
+                        {{ field|attr:"class:form-control" }}
+                        {{ field.help_text }}
+                    {% else %}
+                        <p class="text-danger mt-3">Metrics not enabled</p>
+                        <p class="">This feature is available for Small Society, Large Society and Organisation accounts.
+                            Metrics can be enabled in the <a href="{% url 'settings' %}">Site Settings</a> section.</p>
+                    {% endif%}
                 {% else %}
                     {% if 'Group' not in field.label %}
                         {{ field|attr:"class:form-control" }}
