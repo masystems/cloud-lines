@@ -26,6 +26,7 @@ class AttachedService(models.Model):
     father_title = models.CharField(max_length=250, default='Father')
     coi_timeout = models.IntegerField(default=60)
     mean_kinship_timeout = models.IntegerField(default=60)
+    metrics = models.BooleanField(default=False)
 
     SITE_MODES = (
         ('mammal', 'Mammal'),

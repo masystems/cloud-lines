@@ -30,10 +30,15 @@ def new_breed_form(request):
 
     if request.method == 'POST':
         if breed_form.is_valid():
+            if isinstance(breed_form['mk_threshold'].value(), float):
+                mk = breed_form['mk_threshold'].value()
+            else:
+                mk = 0.0000
+
             breed = Breed.objects.create(account=attached_service,
                                          breed_name=breed_form['breed_name'].value(),
                                          breed_description=breed_form['breed_description'].value(),
-                                         mk_threshold=breed_form['mk_threshold'].value())
+                                         mk_threshold=mk)
             breed.save()
             try:
                 breed.image = request.FILES['image']

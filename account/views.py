@@ -487,6 +487,21 @@ def update_titles(request):
 
 @user_passes_test(is_editor)
 @login_required(login_url="/account/login")
+def metrics_switch(request):
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    if attached_service.metrics:
+        attached_service.metrics = False
+    else:
+        attached_service.metrics = True
+
+    attached_service.save()
+
+    return HttpResponse('')
+
+
+@user_passes_test(is_editor)
+@login_required(login_url="/account/login")
 def welcome(request):
     return render(request, 'welcome.html')
 

@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+{% endblock %}
 
 {% block content %}
     <!-- ============================================================== -->
@@ -51,6 +55,7 @@
                     <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#overview" role="tab">Overview</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#users" role="tab">Users</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#customFields" role="tab">Custom Fields</a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#metrics" role="tab">Metrics</a> </li>
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content">
@@ -584,10 +589,57 @@
                             {% endif %}
                         </div>
                     </div>
+                    <div class="tab-pane" id="metrics" role="tabpanel">
+                        <div class="card-body">
+
+                            {% if editor %}
+                                <p class="text-left">You can enable/disable metrics using the switch below.</p>
+                                <div class="form-group">
+                                    <div class="mb-4">
+
+                                        <button class="btn {% if service.metrics %}btn-danger{% else%}btn-success{% endif %}"
+                                                id="metricsSwitch">{% if service.metrics %}Disable Metrics{% else%}Enable Metrics{% endif %}</button>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <p>You must be an editor to enable/disable metrics.</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         <!-- Column -->
     </div>
     <!-- Row -->
+
+{% endblock %}
+
+{% block footer %}
+    <script>
+        $('#metricsSwitch').click(function() {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'metrics_switch' %}",
+                dataType: "text",
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                data: '',
+                beforeSend: function() {
+                    if ($('#metricsSwitch').hasClass('btn-danger')) {
+                        $('#metricsSwitch').removeClass('btn-danger');
+                        $('#metricsSwitch').addClass('btn-success');
+                        $('#metricsSwitch').text('Enable Metrics');
+                        } else {
+                        $('#metricsSwitch').removeClass('btn-success');
+                        $('#metricsSwitch').addClass('btn-danger');
+                        $('#metricsSwitch').text('Disable Metrics');
+                        }
+                },
+                success: function (data) {
+                },
+                error: function (xhr, textStatus, error) {
+                },
+            });
+        });
+    </script>
 {% endblock %}
