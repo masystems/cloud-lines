@@ -7,4 +7,4 @@ source ../venv/bin/activate
 mkdir -p ../backups/
 python manage.py dumpdata --exclude auth.permission --exclude contenttypes > ../backups/${now}.json
 deactivate
-popdll
+popd
