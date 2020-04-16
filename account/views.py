@@ -193,7 +193,7 @@ def user_edit(request):
             if request.POST.get('status') == 'Editor':
                 main_account.admin_users.add(new_user)
 
-            if request.POST.get('status') == 'Contributor':
+            elif request.POST.get('status') == 'Contributor':
                 main_account.contributors.add(new_user)
 
             else:
