@@ -95,16 +95,6 @@ vertical-align: middle;
                                 </div>
                             </div>
                             <div class="container">
-                                {% if lvl1.parent_mother_notes %}
-                                    <div class="row">
-                                        <div class="col-4">
-                                            <strong>{{ service.mother_title }} notes:</strong>
-                                        </div>
-                                        <div class="col-8">
-                                        {{ lvl1.parent_mother_notes }}
-                                        </div>
-                                    </div>
-                                {% endif %}
                                 {% if lvl1.parent_father_notes %}
                                     <div class="row">
                                         <div class="col-4">
@@ -112,6 +102,16 @@ vertical-align: middle;
                                         </div>
                                         <div class="col-8">
                                         {{ lvl1.parent_father_notes }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if lvl1.parent_mother_notes %}
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <strong>{{ service.mother_title }} notes:</strong>
+                                        </div>
+                                        <div class="col-8">
+                                        {{ lvl1.parent_mother_notes }}
                                         </div>
                                     </div>
                                 {% endif %}
@@ -304,35 +304,26 @@ vertical-align: middle;
                                         <!--## col1 ##-->
                                         <td rowspan="4">
                                             <!--cell text-->
-                                            {% if lvl2_1 %}{{ service.mother_title }}
+                                            {% if lvl2_1 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl2_1 %}
-                                            {% elif lvl2_1_grp %}
-                                                Group
-                                                {% include 'relative-breed_group.html' with breed_group=lvl2_1_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
-                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentMother">Add existing</button>
+                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentFather">Add existing</button>
                                             {% endif %}
 
                                         </td>
                                         <!--## col2 ##-->
                                         <td rowspan="2">
-                                            {% if lvl3_1 %}{{ service.mother_title }}
+                                            {% if lvl3_1 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_1 %}
-                                            {% elif lvl3_1_grp %}
-                                                Group
-                                                {% include 'relative-breed_group.html' with breed_group=lvl3_1_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl3_1 %}
                                             {% endif %}
                                         </td>
                                         <!--## col3 ##-->
                                         <td>
-                                            {% if lvl4_1 %}{{ service.mother_title }}
+                                            {% if lvl4_1 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_1 %}
-                                            {% elif lvl4_1_grp %}
-                                                Group
-                                                {% include 'relative-breed_group.html' with breed_group=lvl4_1_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_1 %}
                                             {% endif %}
@@ -341,8 +332,11 @@ vertical-align: middle;
                                     <tr>
                                         <!--## col3 ##-->
                                         <td>
-                                            {% if lvl4_2 %}{{ service.father_title }}
+                                            {% if lvl4_2 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_2 %}
+                                            {% elif lvl4_2_grp %}
+                                                Group
+                                                {% include 'relative-breed_group.html' with breed_group=lvl4_2_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_2 %}
                                             {% endif %}
@@ -351,19 +345,20 @@ vertical-align: middle;
                                     <tr>
                                         <!--## col2 ##-->
                                         <td rowspan="2">
-                                            {% if lvl3_2 %}{{ service.father_title }}
+                                            {% if lvl3_2 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_2 %}
+                                            {% elif lvl3_2_grp %}
+                                                Group
+                                                {% include 'relative-breed_group.html' with breed_group=lvl3_2_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl3_2 %}
                                             {% endif %}
+
                                         </td>
                                         <!--## col3 ##-->
                                         <td>
-                                            {% if lvl4_3 %}{{ service.mother_title }}
+                                            {% if lvl4_3 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_3 %}
-                                            {% elif lvl4_3_grp %}
-                                                Group
-                                                {% include 'relative-breed_group.html' with breed_group=lvl4_3_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_3 %}
                                             {% endif %}
@@ -371,41 +366,44 @@ vertical-align: middle;
                                     </tr>
                                     <tr>
                                         <!--## col3 ##-->
-                                        <td>{% if lvl4_4 %}{{ service.father_title }}
+                                        <td>
+                                            {% if lvl4_4 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_4 %}
+                                            {% elif lvl4_4_grp %}
+                                                Group
+                                                {% include 'relative-breed_group.html' with breed_group=lvl4_4_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_4 %}
-                                            {% endif %}</td>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <!--## col1 ##-->
                                         <td rowspan="4">
                                             <!--cell text-->
-                                            {% if lvl2_2 %}{{ service.father_title }}
+                                            {% if lvl2_2 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl2_2 %}
+                                            {% elif lvl2_2_grp %}
+                                                Group
+                                                {% include 'relative-breed_group.html' with breed_group=lvl2_2_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl2_2 %}
-                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentFather">Add existing</button>
+                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentMother">Add existing</button>
                                             {% endif %}
+
                                         </td>
                                         <!--## col2 ##-->
                                         <td rowspan="2">
-                                            {% if lvl3_3 %}{{ service.mother_title }}
+                                            {% if lvl3_3 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_3 %}
-                                            {% elif lvl3_3_grp %}
-                                                Group
-                                                {% include 'relative-breed_group.html' with breed_group=lvl3_3_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl3_3 %}
                                             {% endif %}
                                         </td>
                                         <!--## col3 ##-->
                                         <td>
-                                            {% if lvl4_5 %}{{ service.mother_title }}
+                                            {% if lvl4_5 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_5 %}
-                                            {% elif lvl4_5_grp %}
-                                                Group
-                                                {% include 'relative-breed_group.html' with breed_group=lvl4_5_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_5 %}
                                             {% endif %}
@@ -414,8 +412,11 @@ vertical-align: middle;
                                     <tr>
                                         <!--## col3 ##-->
                                         <td>
-                                            {% if lvl4_6 %}{{ service.father_title }}
+                                            {% if lvl4_6 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_6 %}
+                                            {% elif lvl4_6_grp %}
+                                                Group
+                                                {% include 'relative-breed_group.html' with breed_group=lvl4_6_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_6 %}
                                             {% endif %}
@@ -424,19 +425,19 @@ vertical-align: middle;
                                     <tr>
                                         <!--## col2 ##-->
                                         <td rowspan="2">
-                                            {% if lvl3_4 %}{{ service.father_title }}
+                                            {% if lvl3_4 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_4 %}
+                                            {% elif lvl3_4_grp %}
+                                                Group
+                                                {% include 'relative-breed_group.html' with breed_group=lvl3_4_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl3_4 %}
                                             {% endif %}
                                         </td>
                                         <!--## col3 ##-->
                                         <td>
-                                            {% if lvl4_7 %}{{ service.mother_title }}
+                                            {% if lvl4_7 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_7 %}
-                                            {% elif lvl4_7_grp %}
-                                                Group
-                                                {% include 'relative-breed_group.html' with breed_group=lvl4_7_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_7 %}
                                             {% endif %}
@@ -445,8 +446,11 @@ vertical-align: middle;
                                     <tr>
                                         <!--## col3 ##-->
                                         <td>
-                                            {% if lvl4_8 %}{{ service.father_title }}
+                                            {% if lvl4_8 %}{{ service.mother_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_8 %}
+                                            {% elif lvl4_8_grp %}
+                                                Group
+                                                {% include 'relative-breed_group.html' with breed_group=lvl4_8_grp %}
                                             {% else %}
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl4_8 %}
                                             {% endif %}

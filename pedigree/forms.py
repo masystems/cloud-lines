@@ -44,14 +44,13 @@ class PedigreeForm(forms.Form):
     date_of_death.widget.attrs['class'] = 'form-control'
     date_of_death.widget.attrs['placeholder'] = 'dd/mm/yyyy'
 
-    mother = forms.CharField(required=False)
-    mother_notes = forms.CharField(required=False)
-    mother_notes.widget.attrs['class'] = 'form-control'
-
-
     father = forms.CharField(required=False)
     father_notes = forms.CharField(required=False)
     father_notes.widget.attrs['class'] = 'form-control'
+
+    mother = forms.CharField(required=False)
+    mother_notes = forms.CharField(required=False)
+    mother_notes.widget.attrs['class'] = 'form-control'
 
     breed_group = forms.CharField(required=False)
 
