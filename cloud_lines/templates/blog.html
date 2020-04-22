@@ -94,7 +94,7 @@
 							{% endif %}
 						</div>
 						<div class="entry-title">
-							<h2><a href="blog-single.html">{{ article.title }}</a></h2>
+							<h2><a href="{% url 'blog_article' article.id article.title %}">{{ article.title }}</a></h2>
 						</div>
 						<ul class="entry-meta clearfix">
 							<li><i class="icon-calendar3"></i> {{ article.date_added }}</li>
