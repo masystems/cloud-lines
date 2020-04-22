@@ -100,11 +100,11 @@
 							<li><i class="icon-calendar3"></i> {{ article.date_added }}</li>
 							{% if request.user.username == 'sheepishsophie' or request.user.is_superuser %}
 								<li><a href="#" id="edit{{ article.id }}"><i class="icon-edit"></i> Edit</a></li>
-								<li><i data-toggle="modal" data-target=".deleteArticleModal" class="icon-trash text-danger"></i></li>
+								<li><i data-toggle="modal" data-target=".deleteArticleModal" class="icon-trash text-danger"> Delete</i></li>
 							{% endif %}
 						</ul>
 						<div class="entry-content">
-							<p>{{ article.content|truncatewords:75 }}</p>
+							<p>{{ article.content|truncatewords:75|linebreaks }}</p>
 							<a href="{% url 'blog_article' article.id article.title %}"class="more-link">Read More</a>
 						</div>
 					</div>

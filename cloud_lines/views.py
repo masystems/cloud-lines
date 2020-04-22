@@ -147,6 +147,7 @@ def blog_article(request, id, title):
     article = Blog.objects.get(id=id)
     return render(request, 'single_blog.html', {'article': article})
 
+
 @login_required(login_url="/account/login")
 def delete_blog(request, id):
     if request.POST:
