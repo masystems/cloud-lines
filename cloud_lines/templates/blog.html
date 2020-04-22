@@ -38,7 +38,8 @@
 <section id="content">
 	<div class="content-wrap">
 		<div class="container clearfix">
-		<button id="newEditArticleModalBtn" class="button bg-color button-rounded button-large float-right" data-toggle="modal" data-target=".newEditArticleModal">New Article</button>
+			{% if request.user.username == 'sheepishsophie' or request.user.is_superuser %}
+			<button id="newEditArticleModalBtn" class="button bg-color button-rounded button-large float-right" data-toggle="modal" data-target=".newEditArticleModal">New Article</button>
 			<div class="modal fade newEditArticleModal" tabindex="-1" role="dialog" aria-labelledby="newEditArticleModal" aria-hidden="true">
 				<div class="modal-dialog modal-lg">
 					<div class="modal-body">
@@ -79,6 +80,7 @@
 					</div>
 				</div>
 			</div>
+			{% endif %}
 			<!-- Posts
 			============================================= -->
 			<div id="posts" class="post-grid grid-container post-masonry grid-3 clearfix">
@@ -86,7 +88,7 @@
 					<div class="entry clearfix">
 						<div class="entry-image">
 							{% if article.image %}
-								<a href="{{ article.image.url }}" data-lightbox="image"><img class="image_fade" src="{{ article.image }}" alt="{{ article.title }}"></a>
+								<a href="{{ article.image.url }}" data-lightbox="image"><img class="image_fade" src="{{ article.image.url }}" alt="{{ article.title }}"></a>
 							{% else %}
 								<iframe src="{{ article.video }}" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 							{% endif %}
@@ -96,13 +98,13 @@
 						</div>
 						<ul class="entry-meta clearfix">
 							<li><i class="icon-calendar3"></i> {{ article.date_added }}</li>
-							{% if request.user.is_superuser %}
+							{% if request.user.username == 'sheepishsophie' or request.user.is_superuser %}
 								<li><a href="#" id="edit{{ article.id }}"><i class="icon-edit"></i> Edit</a></li>
 								<li><i data-toggle="modal" data-target=".deleteArticleModal" class="icon-trash text-danger"></i></li>
 							{% endif %}
 						</ul>
 						<div class="entry-content">
-							<p>{{ article.content }}</p>
+							<p>{{ article.content|truncatewords:75 }}</p>
 							<a href="{% url 'blog_article' article.id article.title %}"class="more-link">Read More</a>
 						</div>
 					</div>

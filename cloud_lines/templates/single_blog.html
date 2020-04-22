@@ -36,6 +36,7 @@
 		</ol>
 	</div>
 </section>
+{% if request.user.username == 'sheepishsophie' or request.user.is_superuser %}
 <input type="hidden" id="newEditArticleModalBtn" data-toggle="modal" data-target=".newEditArticleModal">
 <div class="modal fade newEditArticleModal" tabindex="-1" role="dialog" aria-labelledby="newEditArticleModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
@@ -77,6 +78,7 @@
 		</div>
 	</div>
 </div>
+{% endif %}
 <section id="content">
 	<div class="content-wrap">
 		<div class="container clearfix">
@@ -94,38 +96,40 @@
 				============================================= -->
 				<ul class="entry-meta clearfix">
 					<li><i class="icon-calendar3"></i> {{ article.date_added }}</li>
-					<li><a href="#" id="editArticle"><i class="icon-edit"></i> Edit</a></li>
-					<script>
-						$('#editArticle').click( function() {
-							console.log('this');
-							$('#articleID').val('{{ article.id }}');
-							$('#title').val('{{ article.title }}');
-							$('#video').val('{{ article.video }}');
-							$('#article_content').html('{{ article.content }}');
-							$('#newEditArticleModalBtn').click();
-						});
-					</script>
-					<li><i data-toggle="modal" data-target=".deleteArticleModal" class="icon-trash text-danger"> Delete</i></li>
-					<div class="modal fade deleteArticleModal" tabindex="-1" role="dialog" aria-labelledby="deleteArticleModal" aria-hidden="true">
-						<div class="modal-dialog modal-md">
-							<div class="modal-body">
-								<div class="modal-content">
-									<div class="modal-header">
-										<h4 class="modal-title" id="myModalLabel">Delete Article</h4>
-										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-									</div>
-									<div class="modal-body">
-										<form id="delBlogform" action="{% url 'delete_blog' article.id %}" method="POST">
-											{% csrf_token %}
-												<p>Are you sure you want to delete: {{ article.title }}</p>
-												<button class="button" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Discard</button>
-												<button type="submit" id="deleteArticle" class="button bg-color">Delete</button>
-										</form>
+						{% if request.user.username == 'sheepishsophie' or request.user.is_superuser %}
+						<li><a href="#" id="editArticle"><i class="icon-edit"></i> Edit</a></li>
+						<script>
+							$('#editArticle').click( function() {
+								console.log('this');
+								$('#articleID').val('{{ article.id }}');
+								$('#title').val('{{ article.title }}');
+								$('#video').val('{{ article.video }}');
+								$('#article_content').html('{{ article.content }}');
+								$('#newEditArticleModalBtn').click();
+							});
+						</script>
+						<li><i data-toggle="modal" data-target=".deleteArticleModal" class="icon-trash text-danger"> Delete</i></li>
+						<div class="modal fade deleteArticleModal" tabindex="-1" role="dialog" aria-labelledby="deleteArticleModal" aria-hidden="true">
+							<div class="modal-dialog modal-md">
+								<div class="modal-body">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h4 class="modal-title" id="myModalLabel">Delete Article</h4>
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+										</div>
+										<div class="modal-body">
+											<form id="delBlogform" action="{% url 'delete_blog' article.id %}" method="POST">
+												{% csrf_token %}
+													<p>Are you sure you want to delete: {{ article.title }}</p>
+													<button class="button" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Discard</button>
+													<button type="submit" id="deleteArticle" class="button bg-color">Delete</button>
+											</form>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+					{% endif %}
 				</ul><!-- .entry-meta end -->
 
 				<!-- Entry Image
