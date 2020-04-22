@@ -1,6 +1,15 @@
-from .models import Contact
+from .models import Contact, Blog
 from django.utils.translation import gettext_lazy as _
 from django import forms
+
+
+class BlogForm(forms.ModelForm):
+    class Meta:
+        model = Blog
+        fields = '__all__'
+        help_texts = {
+            #'service': _('If your query is not regarding a service, leave this blank.'),
+        }
 
 
 class ContactForm(forms.ModelForm):

@@ -1,0 +1,211 @@
+{% extends 'home_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+
+<style>
+    .slider-element {
+    top: -100px;
+    bottom: -100px;
+    height: 100px !important;
+    margin-bottom: -100px;
+}
+</style>
+
+<section id="slider" class="slider-element">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+</section><!-- #slider end -->
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+	<div class="container clearfix">
+		<h1>{{ article.title }}</h1>
+		<span></span>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+			<li class="breadcrumb-item" aria-current="page"><a href="{% url 'blog' %}">Blog</a></li>
+			<li class="breadcrumb-item active" aria-current="page">{{ article.title }}</li>
+		</ol>
+	</div>
+</section>
+<input type="hidden" id="newEditArticleModalBtn" data-toggle="modal" data-target=".newEditArticleModal">
+<div class="modal fade newEditArticleModal" tabindex="-1" role="dialog" aria-labelledby="newEditArticleModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-body">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="myModalLabel">New/Edit Article</h4>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				</div>
+				<div class="modal-body">
+					<form id="blogform" action="{% url 'blog' %}" method="POST" enctype="multipart/form-data">
+						{% csrf_token %}
+						<div class="form-group mb-4">
+							<label class="float-left">Title</label>
+							<input id="title" class="form-control" name="title" type="text" required value="">
+						</div>
+						<div class="form-row mb-4">
+							<div class="form-group col-md-6">
+								<label class="float-left">Embed Link</label>
+								<input id="video" class="form-control" name="video" type="text" value="">
+							</div>
+							<div class="form-group col-md-6">
+								<label class="float-left">Image</label>
+								<input id="image" class="form-control" name="image" type="file" value="">
+							</div>
+						</div>
+						<div class="form-group mb-4">
+							<label class="float-left">Content</label>
+							<textarea id="article_content" name="content" cols="40" rows="10" class="form-control" required></textarea>
+						</div>
+						<input id="articleID" class="form-control" name="articleID" type="hidden" value="0">
+						<div class="modal-footer">
+							<button class="button" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Discard</button>
+							<button type="submit" id="saveOrg" class="button bg-color">Save</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<section id="content">
+	<div class="content-wrap">
+		<div class="container clearfix">
+			<!-- Posts
+			============================================= -->
+			<div class="entry clearfix">
+
+				<!-- Entry Title
+				============================================= -->
+				<div class="entry-title">
+					<h2>{{ article.title }}</h2>
+				</div><!-- .entry-title end -->
+
+				<!-- Entry Meta
+				============================================= -->
+				<ul class="entry-meta clearfix">
+					<li><i class="icon-calendar3"></i> {{ article.date_added }}</li>
+					<li><a href="#" id="editArticle"><i class="icon-edit"></i> Edit</a></li>
+					<script>
+						$('#editArticle').click( function() {
+							console.log('this');
+							$('#articleID').val('{{ article.id }}');
+							$('#title').val('{{ article.title }}');
+							$('#video').val('{{ article.video }}');
+							$('#article_content').html('{{ article.content }}');
+							$('#newEditArticleModalBtn').click();
+						});
+					</script>
+					<li><i data-toggle="modal" data-target=".deleteArticleModal" class="icon-trash text-danger"> Delete</i></li>
+					<div class="modal fade deleteArticleModal" tabindex="-1" role="dialog" aria-labelledby="deleteArticleModal" aria-hidden="true">
+						<div class="modal-dialog modal-md">
+							<div class="modal-body">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h4 class="modal-title" id="myModalLabel">Delete Article</h4>
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+									</div>
+									<div class="modal-body">
+										<form id="delBlogform" action="{% url 'delete_blog' article.id %}" method="POST">
+											{% csrf_token %}
+												<p>Are you sure you want to delete: {{ article.title }}</p>
+												<button class="button" data-dismiss="modal"><i class="flaticon-cancel-12"></i> Discard</button>
+												<button type="submit" id="deleteArticle" class="button bg-color">Delete</button>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</ul><!-- .entry-meta end -->
+
+				<!-- Entry Image
+				============================================= -->
+				<div class="entry-image bottommargin">
+					{% if article.image %}
+						<img src="{{ article.image.url }}" alt="Blog Single">
+					{% endif %}
+				</div>
+				<div class="entry-image bottommargin">
+					{% if article.video %}
+						<iframe src="{{ article.video }}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+					{% endif %}
+				</div>
+
+				<!-- Entry Content
+				============================================= -->
+				<div class="entry-content notopmargin">
+
+					{{ article.content }}
+
+					<!-- Tag Cloud
+					============================================= -->
+<!--					<div class="tagcloud clearfix bottommargin">-->
+<!--						<a href="#">general</a>-->
+<!--						<a href="#">information</a>-->
+<!--						<a href="#">media</a>-->
+<!--						<a href="#">press</a>-->
+<!--						<a href="#">gallery</a>-->
+<!--						<a href="#">illustration</a>-->
+<!--					</div>&lt;!&ndash; .tagcloud end &ndash;&gt;-->
+
+					<div class="clear"></div>
+
+					<!-- Post Single - Share
+					============================================= -->
+					<div class="si-share noborder clearfix">
+						<span>Share this Post:</span>
+						<div>
+							<script>(function(d, s, id) {
+								var js, fjs = d.getElementsByTagName(s)[0];
+								if (d.getElementById(id)) return;
+								js = d.createElement(s); js.id = id;
+								js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
+								fjs.parentNode.insertBefore(js, fjs);
+							  }(document, 'script', 'facebook-jssdk'));</script>
+							<div class="fb-share-button" data-href="{{ request.get_full_url }}" data-layout="button" data-size="small">
+								<a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A8000%2Fblog-article%2F15%2FText%2520Article2&amp;src=sdkpreparse" class="social-icon si-borderless si-facebook fb-xfbml-parse-ignore">
+									<i class="icon-facebook"></i>
+									<i class="icon-facebook"></i>
+								</a>
+							</div>
+
+							<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" target="_blank" class="social-icon si-borderless si-twitter">
+								<i class="icon-twitter"></i>
+								<i class="icon-twitter"></i>
+							</a>
+							<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+						</div>
+					</div><!-- Post Single - Share End -->
+
+				</div>
+			</div>
+		</div>
+	</div>
+</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+	<div class="content-wrap nopadding">
+		<div class="container clearfix">
+			<div class="col-md-12 pt-4">
+				<div class="row">
+					<h3 class="color"></h3>
+					<div>
+						{% autoescape off %}
+							{{ content.body }}
+						{% endautoescape %}
+					</div>
+				</div>
+			</div>
+		</div>
+{% endblock %}

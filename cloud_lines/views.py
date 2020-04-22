@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from .models import Service, Page, Gallery, Faq, Testimonial, LargeTierQueue
-from .forms import ContactForm
+from django.utils.datastructures import MultiValueDictKeyError
+from .models import Service, Page, Gallery, Faq, Testimonial, LargeTierQueue, Blog
+from .forms import ContactForm, BlogForm
 from account.models import UserDetail, AttachedService
 from account.views import get_main_account, send_mail
 from django.conf import settings
@@ -102,6 +103,60 @@ def services(request):
     if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
         return redirect('dashboard')
     return render(request, 'services.html', {'services': Service.objects.all()})
+
+
+def blog(request):
+    if request.POST:
+        print(request.POST)
+        if request.POST['articleID'] == '0':
+            # new article
+            new_blog = Blog.objects.create(title=request.POST['title'],
+                                           content=request.POST['content'])
+            try:
+                new_blog.video = request.POST['video']
+            except MultiValueDictKeyError:
+                # no video link
+                pass
+
+            try:
+                new_blog.image = request.FILES['image']
+            except MultiValueDictKeyError:
+                # no image
+                pass
+
+            new_blog.save()
+        else:
+            blog = Blog.objects.get(id=request.POST['articleID'])
+            blog.title = request.POST['title']
+            blog.content = request.POST['content']
+            try:
+                blog.video = request.POST['video']
+            except MultiValueDictKeyError:
+                # no video link
+                pass
+
+            blog.save()
+
+    blog_form = BlogForm()
+    articles = Blog.objects.all()
+    return render(request, 'blog.html', {'articles': articles,
+                                         'blog_form': blog_form})
+
+
+def blog_article(request, id, title):
+    article = Blog.objects.get(id=id)
+    return render(request, 'single_blog.html', {'article': article})
+
+@login_required(login_url="/account/login")
+def delete_blog(request, id):
+    if request.POST:
+        if request.user.is_superuser:
+            Blog.objects.get(id=id).delete()
+
+    blog_form = BlogForm()
+    articles = Blog.objects.all()
+    return render(request, 'blog.html', {'articles': articles,
+                                         'blog_form': blog_form})
 
 
 def contact(request):

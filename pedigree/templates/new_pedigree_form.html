@@ -34,8 +34,12 @@
                                                                 {% if field.label|title == 'Breed Group' %}
                                                                 {% elif field.label|title == 'Mother' %}
                                                                     {{ service.mother_title }}
+                                                                {% elif field.label|title == 'Mother Notes' %}
+                                                                    {{ service.mother_title }}
                                                                 {% elif field.label|title == 'Father' %}
                                                                     {{ service.father_title }}
+                                                                {% elif field.label|title == 'Father Notes' %}
+                                                                    {{ service.father_title }} Notes
                                                                 {% else %}
                                                                     {{ field.label|title }}
                                                                 {% endif %}
@@ -44,8 +48,12 @@
                                                                     Ring Number
                                                                 {% elif field.label == 'Mother' %}
                                                                     {{ service.mother_title }}
+                                                                {% elif field.label|title == 'Mother Notes' %}
+                                                                    {{ service.mother_title }} Notes
                                                                 {% elif field.label|title == 'Father' %}
                                                                     {{ service.father_title }}
+                                                                {% elif field.label|title == 'Father Notes' %}
+                                                                    {{ service.father_title }} Notes
                                                                 {% else %}
                                                                     {{ field.label|title }}
                                                                 {% endif %}

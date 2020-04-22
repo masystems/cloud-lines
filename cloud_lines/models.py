@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Service(models.Model):
@@ -98,6 +99,20 @@ class LargeTierQueue(models.Model):
 
     def __str__(self):
         return str(self.subdomain)
+
+
+class Blog(models.Model):
+    date_added = models.DateTimeField(default=timezone.now)
+    image = models.FileField(blank=True, null=True)
+    video = models.CharField(max_length=250, blank=True, null=True)
+    title = models.CharField(max_length=250)
+    content = models.TextField()
+
+    def __str__(self):
+        return str(self.title)
+
+    class Meta:
+        ordering = ['-date_added']
 
 
 class Update(models.Model):

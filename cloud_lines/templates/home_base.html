@@ -9,7 +9,6 @@
 	<!-- Stylesheets
 	============================================= -->
 	<link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/images/favicon.png' %}">
-	<link href="{% static 'cloud-lines/css/google-css.css' %}" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" href="{% static 'cloud-lines/css/bootstrap.css' %}" type="text/css" />
 
 	<link rel="stylesheet" href="{% static 'cloud-lines/style.css' %}" type="text/css" />
@@ -118,6 +117,7 @@
 								</li>
 								<li class="{% if 'about' in request.path %}current{% endif %}"><a href="{% url 'about' %}"><div>About</div></a></li>
 								<li class="{% if 'extras' in request.path %}current{% endif %}"><a href="{% url 'extras' %}"><div>Extras</div></a></li>
+								<li class="{% if 'blog' in request.path %}current{% endif %}"><a href="{% url 'blog' %}"><div>Blog</div></a></li>
 								<li class="{% if 'faqs' in request.path %}current{% endif %}"><a href="{% url 'faqs' %}"><div>FAQs</div></a></li>
 								<li class="{% if 'contact' in request.path %}current{% endif %}"><a href="{% url 'contact' %}"><div>Contact</div></a></li>
 								{% if user.is_authenticated %}
