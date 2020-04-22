@@ -176,14 +176,14 @@
 								js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0";
 								fjs.parentNode.insertBefore(js, fjs);
 							  }(document, 'script', 'facebook-jssdk'));</script>
-							<div class="fb-share-button" data-href="{{ request.get_full_url }}" data-layout="button" data-size="small">
+							<div class="fb-share-button" data-href="{{ request.build_absolute_uri }}" data-layout="button" data-size="small">
 								<a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Flocalhost%3A8000%2Fblog-article%2F15%2FText%2520Article2&amp;src=sdkpreparse" class="social-icon si-borderless si-facebook fb-xfbml-parse-ignore">
 									<i class="icon-facebook"></i>
 									<i class="icon-facebook"></i>
 								</a>
 							</div>
 
-							<a href="https://twitter.com/share?url={{ request.get_full_url }}" target="_blank" class="social-icon si-borderless si-twitter">
+							<a href="https://twitter.com/share?url={{ request.build_absolute_uri }}" target="_blank" class="social-icon si-borderless si-twitter">
 								<i class="icon-twitter"></i>
 								<i class="icon-twitter"></i>
 							</a>
