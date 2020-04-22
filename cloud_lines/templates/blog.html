@@ -88,7 +88,7 @@
 					<div class="entry clearfix">
 						<div class="entry-image">
 							{% if article.image %}
-								<a href="{{ article.image.url }}" data-lightbox="image"><img class="image_fade" src="{{ article.image.url }}" alt="{{ article.title }}"></a>
+								<a href="{% url 'blog_article' article.id article.title %}" data-lightbox="image"><img class="image_fade" src="{{ article.image.url }}" alt="{{ article.title }}"></a>
 							{% else %}
 								<iframe src="{{ article.video }}" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 							{% endif %}
