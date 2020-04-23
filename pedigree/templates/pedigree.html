@@ -230,7 +230,7 @@ vertical-align: middle;
                     </div>
 
                     <div class="tab-pane p-3" id="cert" role="tabpanel">
-                        {% if not lvl2_1 %}
+                        {% if not lvl2_2 %}
                             <!--Add existing Parent Mother-->
                             <div id="addExistingParentMother" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addExistingParentMother" aria-hidden="true" style="display: none;">
                                 <div class="modal-dialog">
@@ -260,7 +260,7 @@ vertical-align: middle;
                                 </div>
                             </div>
                         {% endif %}
-                        {% if not lvl2_2 %}
+                        {% if not lvl2_1 %}
                             <!--Add existing Parent Father-->
                             <div id="addExistingParentFather" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addExistingParentFarther" aria-hidden="true" style="display: none;">
                                 <div class="modal-dialog">
@@ -310,7 +310,6 @@ vertical-align: middle;
                                                 {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
                                                 <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentFather">Add existing</button>
                                             {% endif %}
-
                                         </td>
                                         <!--## col2 ##-->
                                         <td rowspan="2">
