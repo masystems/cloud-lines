@@ -5,9 +5,9 @@ from pedigree.models import Pedigree
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import CoiLastRun, MeanKinshipLastRun
 from json import dumps, loads
-from threading import Thread
 from datetime import datetime, timedelta
 import requests
+import asyncio
 
 
 def metrics(request):
@@ -39,13 +39,17 @@ def run_coi(request):
     obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
     obj.last_run = datetime.now()
     obj.save()
-    Thread(target=coi, args=(request,))
+    #Thread(target=coi, args=(request,))
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(coi(request))
     obj.last_run += timedelta(minutes=attached_service.coi_timeout)
     coi_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
+
     return HttpResponse(dumps({'coi_date': coi_date}))
 
 
-def coi(request):
+async def coi(request):
     attached_service = get_main_account(request.user)
     pedigrees = Pedigree.objects.filter(account=attached_service).values('reg_no',
                                                                          'parent_father__reg_no',
@@ -56,7 +60,9 @@ def coi(request):
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
                             json=dumps(list(pedigrees), cls=DjangoJSONEncoder))
+    print(coi_raw.json())
     coi_dict = loads(coi_raw.json())
+
     for pedigree in coi_dict:
         Pedigree.objects.filter(account=attached_service, reg_no=pedigree['Indiv']).update(coi=pedigree['Inbr'])
 
@@ -77,7 +83,7 @@ def kinship(request):
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/'.format(mother, father),
                             json=dumps(data, cls=DjangoJSONEncoder))
-    print(coi_raw.status_code)
+
     return HttpResponse(coi_raw.json())
 
 
@@ -87,13 +93,15 @@ def run_mean_kinship(request):
 
     obj.last_run = datetime.now()
     obj.save()
-    Thread(target=mean_kinship, args=(request,))
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(mean_kinship(request))
     obj.last_run += timedelta(minutes=attached_service.mean_kinship_timeout)
     mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     return HttpResponse(dumps({'mean_kinship_date': mean_kinship_date}))
 
 
-def mean_kinship(request):
+async def mean_kinship(request):
     attached_service = get_main_account(request.user)
     pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
                                                                                          'parent_father__reg_no',
