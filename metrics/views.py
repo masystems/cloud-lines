@@ -8,6 +8,21 @@ from json import dumps, loads
 from datetime import datetime, timedelta
 import requests
 import asyncio
+import pytz
+
+
+def calc_last_run(attached_service, obj, dt=None, timezone="UTC"):
+
+    if dt is None:
+        dt = datetime.utcnow()
+    timezone = pytz.timezone(timezone)
+    timezone_aware_date = timezone.localize(dt, is_dst=None)
+
+    if timezone_aware_date.tzinfo._dst.seconds != 0:
+        obj.last_run += timedelta(minutes=attached_service.coi_timeout)
+    else:
+        obj.last_run += timedelta(minutes=attached_service.coi_timeout * 2)
+    return obj.last_run
 
 
 def metrics(request):
@@ -15,7 +30,8 @@ def metrics(request):
 
     try:
         obj = CoiLastRun.objects.get(account=attached_service)
-        obj.last_run += timedelta(minutes=attached_service.coi_timeout)
+
+        obj.last_run = calc_last_run(attached_service, obj)
         coi_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     except ObjectDoesNotExist:
         date = datetime.now()
@@ -23,7 +39,7 @@ def metrics(request):
 
     try:
         obj = MeanKinshipLastRun.objects.get(account=attached_service)
-        obj.last_run += timedelta(minutes=attached_service.coi_timeout)
+        obj.last_run = calc_last_run(attached_service, obj)
         mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     except ObjectDoesNotExist:
         date = datetime.now()
@@ -39,11 +55,13 @@ def run_coi(request):
     obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
     obj.last_run = datetime.now()
     obj.save()
-    #Thread(target=coi, args=(request,))
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     result = loop.run_until_complete(coi(request))
-    obj.last_run += timedelta(minutes=attached_service.coi_timeout)
+
+    obj.last_run = calc_last_run(attached_service, obj)
+
     coi_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
 
     return HttpResponse(dumps({'coi_date': coi_date}))
@@ -96,7 +114,7 @@ def run_mean_kinship(request):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     result = loop.run_until_complete(mean_kinship(request))
-    obj.last_run += timedelta(minutes=attached_service.mean_kinship_timeout)
+    obj.last_run = calc_last_run(attached_service, obj)
     mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     return HttpResponse(dumps({'mean_kinship_date': mean_kinship_date}))
 

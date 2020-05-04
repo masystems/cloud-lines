@@ -131,7 +131,9 @@
 
         // Set the date we're counting down to and start loop interval
         var coi_countDownDate = new Date("{{ coi_date }}").getTime();
+
         var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
+
 
         // Update the count down every 1 second
         function coi_countDown(coi_countDownDate) {
@@ -147,10 +149,6 @@
           var coi_minutes = Math.floor((coi_distance % (1000 * 60 * 60)) / (1000 * 60));
           var coi_seconds = Math.floor((coi_distance % (1000 * 60)) / 1000);
 
-          // Output the result in an element with id="demo"
-          $("#coiTimer").html('Run COI again in:<br/>' + coi_days + "d " + coi_hours + "h " + coi_minutes + "m " + coi_seconds + "s ");
-
-
           // If the count down is over, write some text
 
           if (coi_distance < 0) {
@@ -158,6 +156,8 @@
             $("#coiTimer").html("COI ready!");
             $('#coiBtn').attr("disabled", false);
           } else {
+            // Output the result in an element with id="demo"
+            $("#coiTimer").html('Run COI again in:<br/>' + coi_days + "d " + coi_hours + "h " + coi_minutes + "m " + coi_seconds + "s ");
             $('#coiBtn').attr("disabled", true);
           }
         }
