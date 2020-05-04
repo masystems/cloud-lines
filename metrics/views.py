@@ -126,7 +126,6 @@ async def mean_kinship(request):
                                                                                          'parent_mother__reg_no',
                                                                                          'sex',
                                                                                          'breed__breed_name',
-                                                                                         'dob',
                                                                                          'status')
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
