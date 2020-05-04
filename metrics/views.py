@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
+from breed.models import Breed
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import CoiLastRun, MeanKinshipLastRun
 from json import dumps, loads
@@ -121,21 +122,20 @@ def run_mean_kinship(request):
 
 async def mean_kinship(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
-                                                                                         'parent_father__reg_no',
-                                                                                         'parent_mother__reg_no',
-                                                                                         'sex',
-                                                                                         'breed__breed_name',
-                                                                                         'status')
+    breeds = Breed.objects.filter(account=attached_service)
+    for breed in breeds.all():
+        pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
+                                                                                             'parent_father__reg_no',
+                                                                                             'parent_mother__reg_no',
+                                                                                             'sex',
+                                                                                             'status')
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
-                            json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
+        coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
+                                json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
 
-    coi_dict = loads(coi_raw.json())
-    for pedigree, value in coi_dict.items():
-        Pedigree.objects.filter(account=attached_service, reg_no=pedigree.replace('.', '-')).update(mean_kinship=value['1'])
-
-    return HttpResponse(coi_raw.json())
+        coi_dict = loads(coi_raw.json())
+        for pedigree, value in coi_dict.items():
+            Pedigree.objects.filter(account=attached_service, reg_no=pedigree.replace('.', '-')).update(mean_kinship=value['1'])
 
 
 def stud_advisor_mother_details(request):
