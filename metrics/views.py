@@ -124,7 +124,7 @@ async def mean_kinship(request):
     attached_service = get_main_account(request.user)
     breeds = Breed.objects.filter(account=attached_service)
     for breed in breeds.all():
-        pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('reg_no',
+        pedigrees = Pedigree.objects.filter(account=attached_service, status='alive', breed=breed).values('reg_no',
                                                                                              'parent_father__reg_no',
                                                                                              'parent_mother__reg_no',
                                                                                              'sex',
