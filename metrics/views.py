@@ -124,11 +124,11 @@ async def mean_kinship(request):
     attached_service = get_main_account(request.user)
     breeds = Breed.objects.filter(account=attached_service)
     for breed in breeds.all():
-        pedigrees = Pedigree.objects.filter(account=attached_service, status='alive', breed=breed).values('reg_no',
-                                                                                             'parent_father__reg_no',
-                                                                                             'parent_mother__reg_no',
-                                                                                             'sex',
-                                                                                             'status')
+        pedigrees = Pedigree.objects.filter(account=attached_service, breed=breed).values('reg_no',
+                                                                                          'parent_father__reg_no',
+                                                                                          'parent_mother__reg_no',
+                                                                                          'sex',
+                                                                                          'status')
 
         coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
                                 json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
