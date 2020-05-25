@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 <!-- STRIPE-->
-<script src="https://js.stripe.com/v3/"></script>
+{% block header %}
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
 <style>
     .slider-element {
     top: -100px;
