@@ -922,7 +922,6 @@
 		var url_string = window.location.href;
 		var url = new URL(url_string);
 		var service_from_url = url.searchParams.get("service");
-		console.log(service_from_url);
 		$("#checkout-form-service option[name='" + service_from_url + "']").attr('selected', 'selected');
 	</script>
 {% endblock %}
