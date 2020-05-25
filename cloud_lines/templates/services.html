@@ -97,7 +97,7 @@
                                 {% if service.service_name == 'Free' %}
                                     <a href="{% url 'dashboard' %}" class="button button-large button-dark button-rounded">Start now!</a>
                                 {% else %}
-                                    <a href="{% url 'order' %}" class="button button-large button-dark button-rounded">Buy Now!</a>
+                                    <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Buy Now!</a>
                                 {% endif %}
                             {% else %}
                                 <a href="{% url 'cl_login' %}" class="button button-large button-dark button-rounded">Login/Register</a>
@@ -160,7 +160,7 @@
                                 {% if service.service_name == 'Free' %}
                                     <a href="{% url 'dashboard' %}" class="button button-large button-dark button-rounded">Start now!</a>
                                 {% else %}
-                                    <a href="{% url 'order' %}" class="button button-large button-dark button-rounded">Buy Now!</a>
+                                    <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Buy Now!</a>
                                 {% endif %}
                             {% else %}
                                 <a href="{% url 'cl_login' %}" class="button button-large button-dark button-rounded">Login/Register</a>

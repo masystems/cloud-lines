@@ -543,6 +543,7 @@ def register(request):
             # login
             login(request, user)
 
+
             email_body = """
             <p>Dear {}({}),
             <p><strong>Thank you for registering with Cloud-lines!</strong></p>
@@ -552,11 +553,12 @@ def register(request):
             <p><a href="https://cloud-lines.com/dashboard">Click here</a> to go to your new dashboard.</p>
             
             <p>Feel free to contact us about anything and enjoy!</p>""".format(user.get_full_name(), user.username)
-            send_mail('Welcome to Cloud-lines!', user.get_full_name(), email_body, send_to=user.email)
 
-            send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
+            if 'localhost' not in request.build_absolute_uri():
+                send_mail('Welcome to Cloud-lines!', user.get_full_name(), email_body, send_to=user.email)
+                send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
 
-            return redirect('dashboard')
+            return redirect('order')
         else:
             return redirect('cl_login')
     else:
