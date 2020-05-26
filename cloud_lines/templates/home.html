@@ -111,7 +111,7 @@
 			============================================= -->
 			<div class="heading-block center topmargin-lg divcenter nobottomborder clearfix" style="max-width: 700px">
 				<h2>All you’ll ever need to track your pedigree breeding programme</h2>
-				<p>Cloud Lines is an innovative new product from <a href="#">MA Systems Ltd</a>,
+				<p>Cloud Lines is an innovative new product from <a href="https://masys.co.uk" target="_blank">MA Systems Ltd</a>,
 					which enables our valued customers to keep accurate fully-featured records of their breeding programmes.
 				<a href="{% url 'about' %}" class="btn btn-link mt-2 color">Learn More &#8250;</a></p>
 
@@ -203,7 +203,7 @@
 				{% for image in images.all %}
 				<article class="portfolio-item pf-media pf-icons">
 					<div class="portfolio-image">
-						<a href="portfolio-single.html">
+						<a href="#">
 							<img src="{{ image.image.url }}" alt="Open Imagination">
 						</a>
 						<div class="portfolio-overlay">
@@ -211,7 +211,7 @@
 						</div>
 					</div>
 					<div class="portfolio-desc">
-						<h3><a href="{{ image.image.url }}">{{ image.title }}</a></h3>
+						<h3>{{ image.title }}</h3>
 						<span>{{ image.detail }}</span>
 					</div>
 				</article>

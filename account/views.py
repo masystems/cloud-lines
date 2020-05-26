@@ -558,7 +558,10 @@ def register(request):
                 send_mail('Welcome to Cloud-lines!', user.get_full_name(), email_body, send_to=user.email)
                 send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
 
-            return redirect('order')
+            if request.POST.get("service"):
+                return redirect('order', request.POST.get("service"))
+            else:
+                return redirect('order')
         else:
             return redirect('cl_login')
     else:

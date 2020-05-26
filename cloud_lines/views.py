@@ -51,23 +51,23 @@ def dashboard(request):
         return redirect('welcome')
 
     # updates
-    try:
-        get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
-        updates = get_updates_json.json()
-        updates = updates['results']
-        update_card_size = 44 * len(updates)
-    except (ConnectionError, KeyError):
-        updates = {}
-        update_card_size = 44
+    # try:
+    #     get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
+    #     updates = get_updates_json.json()
+    #     updates = updates['results']
+    #     update_card_size = 44 * len(updates)
+    # except (ConnectionError, KeyError):
+    #     updates = {}
+    #     update_card_size = 44
 
     return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
                                               'top_pedigrees': top_pedigrees,
                                               'latest_breeders': latest_breeders,
                                               'breed_groups': breed_groups,
                                               'breed_chart': breed_chart,
-                                              'pedigree_chart': pedigree_chart,
-                                              'updates': updates,
-                                              'update_card_size': update_card_size})
+                                              'pedigree_chart': pedigree_chart,})
+                                              # 'updates': updates,
+                                              # 'update_card_size': update_card_size})
 
 
 def home(request):
@@ -219,7 +219,7 @@ def privacy_policy(request):
 
 
 @login_required(login_url="/account/login")
-def order(request):
+def order(request, service=None):
     context = {}
     # import stripe key
     if request.user.is_superuser:
@@ -235,6 +235,8 @@ def order(request):
     if 'id' in request.GET:
         # get service the user wants to upgrade to
         context['requested_service'] = Service.objects.get(id=request.GET['id'])
+    elif service:
+        context['requested_service'] = Service.objects.get(id=service)
 
     if 'upgrade' in request.GET:
         try:

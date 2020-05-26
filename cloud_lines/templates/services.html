@@ -100,7 +100,7 @@
                                     <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Buy Now!</a>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'cl_login' %}" class="button button-large button-dark button-rounded">Login/Register</a>
+                                <a href="{% url 'cl_login' %}?service={{ service.id }}" class="button button-large button-dark button-rounded">Login/Register</a>
                             {% endif %}
                         {% else %}
                             <div class="fancy-title title-double-border">
@@ -163,7 +163,7 @@
                                     <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Buy Now!</a>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'cl_login' %}" class="button button-large button-dark button-rounded">Login/Register</a>
+                                <a href="{% url 'cl_login' %}?service={{ service.id }}" class="button button-large button-dark button-rounded">Login/Register</a>
                             {% endif %}
                         {% else %}
                             <div class="fancy-title title-double-border">
