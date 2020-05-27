@@ -44,7 +44,7 @@
 		<div class="container clearfix">
             {% for service in services %}
                 {% if not forloop.counter|divisibleby:2 %}
-                    <div class="section">
+                    <div class="row section">
                         <div class="col_two_fifth topmargin nobottommargin" style="min-height: 350px;">
                             {% if service.image %}
                                 <img src="{{ service.image.url }}" class="img-fluid" alt="{{ service.service_name }}">
@@ -109,82 +109,79 @@
                                 </div>
                             {% endif %}
                         </div>
-                        </div>
-                        {% if not forloop.last %}
-                            <div class="line"></div>
-                        {% endif %}
+                    </div>
 
                 {% endif %}
                 {% if forloop.counter|divisibleby:2 %}
-                    <div class="col_three_fifth">
-                        <div class="heading-block">
-                            <div class="fancy-title title-bottom-border">
-                                <h3 id="{{ service.service_name }}">{{ service.service_name }} PACKAGE</h3>
+                    <div class="row">
+                        <div class="col_three_fifth">
+                            <div class="heading-block">
+                                <div class="fancy-title title-bottom-border">
+                                    <h3 id="{{ service.service_name }}">{{ service.service_name }} PACKAGE</h3>
+                                </div>
+                                <span>
+                                    <button class="button button-mini button-circle" data-container="body"
+                                       data-toggle="tooltip" data-placement="top" title="Max number of admin accounts"
+                                       data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
+
+                                    <button class="button button-mini button-circle" data-container="body"
+                                       data-toggle="tooltip" data-placement="top" title="Max number of contributor accounts"
+                                       data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.contrib_users }}</button>
+
+                                    <button class="button button-mini button-circle" data-container="body"
+                                       data-toggle="tooltip" data-placement="top" title="Max number of read only accounts"
+                                       data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-friends"></i>{% if service.read_only_users == 99 %}<i class="icon-infinity"></i>{% else %}{{ service.read_only_users }}{% endif %}</button>
+
+                                    <button class="button button-mini button-circle" data-container="body"
+                                       data-toggle="tooltip" data-placement="top" title="Max number of animals"
+                                       data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-paw"></i>{% if service.number_of_animals == 99 %}<i class="icon-infinity"></i>{% else %}{{ service.number_of_animals }}{% endif %}</button>
+
+                                    <button class="button button-mini button-circle" data-container="body"
+                                       data-toggle="tooltip" data-placement="top" title="{% if service.multi_breed %}Multi breed available{% else %}No multi breed available{% endif %}"
+                                       data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-list-ol"></i>{% if service.multi_breed %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
+
+                                    <button class="button button-mini button-circle" data-container="body"
+                                       data-toggle="tooltip" data-placement="top" title="{% if service.support %}Premium support available{% else %}No premium support available{% endif %}"
+                                       data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-hands-helping"></i>{% if service.support %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
+
+
+                                    <button class="button button-mini button-circle" data-container="body"
+                                       data-toggle="tooltip" data-placement="top" title="Price per month"
+                                       data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
+                                </span>
                             </div>
-                            <span>
-                                <button class="button button-mini button-circle" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="Max number of admin accounts"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.admin_users }}</button>
 
-                                <button class="button button-mini button-circle" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="Max number of contributor accounts"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-cog"></i>{{ service.contrib_users }}</button>
-
-                                <button class="button button-mini button-circle" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="Max number of read only accounts"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-user-friends"></i>{% if service.read_only_users == 99 %}<i class="icon-infinity"></i>{% else %}{{ service.read_only_users }}{% endif %}</button>
-
-                                <button class="button button-mini button-circle" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="Max number of animals"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-paw"></i>{% if service.number_of_animals == 99 %}<i class="icon-infinity"></i>{% else %}{{ service.number_of_animals }}{% endif %}</button>
-
-                                <button class="button button-mini button-circle" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="{% if service.multi_breed %}Multi breed available{% else %}No multi breed available{% endif %}"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-list-ol"></i>{% if service.multi_breed %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
-
-                                <button class="button button-mini button-circle" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="{% if service.support %}Premium support available{% else %}No premium support available{% endif %}"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-hands-helping"></i>{% if service.support %}<i class="icon-checkmark"></i>{% else %}<i class="icon-line-cross"></i>{% endif %}</button>
-
-
-                                <button class="button button-mini button-circle" data-container="body"
-                                   data-toggle="tooltip" data-placement="top" title="Price per month"
-                                   data-original-title="" aria-describedby="{{ service.service_name }}"><i class="icon-pound-sign"></i>{{ service.price_per_month }} p/month</button>
-                            </span>
-                        </div>
-
-                        {% autoescape off %}
-                            {{ service.service_description }}
-                        {% endautoescape %}
-                        <br>
-                        <br>
-                        {% if service.active %}
-                            {% if user.is_authenticated %}
-                                {% if service.service_name == 'Free' %}
-                                    <a href="{% url 'dashboard' %}" class="button button-large button-dark button-rounded">Start now!</a>
+                            {% autoescape off %}
+                                {{ service.service_description }}
+                            {% endautoescape %}
+                            <br>
+                            <br>
+                            {% if service.active %}
+                                {% if user.is_authenticated %}
+                                    {% if service.service_name == 'Free' %}
+                                        <a href="{% url 'dashboard' %}" class="button button-large button-dark button-rounded">Start now!</a>
+                                    {% else %}
+                                        <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Start Now!</a>
+                                    {% endif %}
                                 {% else %}
-                                    <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Start Now!</a>
+                                    <a href="{% url 'cl_login' %}?service={{ service.id }}" class="button button-large button-dark button-rounded">Start Now!</a>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'cl_login' %}?service={{ service.id }}" class="button button-large button-dark button-rounded">Start Now!</a>
+                                <div class="fancy-title title-double-border">
+                                    <h3><span>Coming Soon!</span></h3>
+                                </div>
                             {% endif %}
-                        {% else %}
-                            <div class="fancy-title title-double-border">
-                                <h3><span>Coming Soon!</span></h3>
-                            </div>
-                        {% endif %}
-                    </div>
+                        </div>
 
-                    <div class="col_two_fifth topmargin col_last" style="min-height: 350px">
-                        {% if service.image %}
-                            <img src="{{ service.image.url }}" class="img-fluid" alt="{{ service.service_name }}">
-                        {% endif %}
+                        <div class="col_two_fifth topmargin col_last" style="min-height: 350px">
+                            {% if service.image %}
+                                <img src="{{ service.image.url }}" class="img-fluid" alt="{{ service.service_name }}">
+                            {% endif %}
+                        </div>
                     </div>
-                    {% if not forloop.last %}
-                        <div class="line"></div>
-                    {% endif %}
                 {% endif %}
             {% endfor %}
+        </div>
 
 
 {% endblock %}
