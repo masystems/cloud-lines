@@ -97,10 +97,10 @@
                                 {% if service.service_name == 'Free' %}
                                     <a href="{% url 'dashboard' %}" class="button button-large button-dark button-rounded">Start now!</a>
                                 {% else %}
-                                    <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Buy Now!</a>
+                                    <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Start Now!</a>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'cl_login' %}?service={{ service.id }}" class="button button-large button-dark button-rounded">Login/Register</a>
+                                <a href="{% url 'cl_login' %}?service={{ service.id }}" class="button button-large button-dark button-rounded">Start Now!</a>
                             {% endif %}
                         {% else %}
                             <div class="fancy-title title-double-border">
@@ -160,10 +160,10 @@
                                 {% if service.service_name == 'Free' %}
                                     <a href="{% url 'dashboard' %}" class="button button-large button-dark button-rounded">Start now!</a>
                                 {% else %}
-                                    <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Buy Now!</a>
+                                    <a href="{% url 'order' %}?service={{ service.service_name }}" class="button button-large button-dark button-rounded">Start Now!</a>
                                 {% endif %}
                             {% else %}
-                                <a href="{% url 'cl_login' %}?service={{ service.id }}" class="button button-large button-dark button-rounded">Login/Register</a>
+                                <a href="{% url 'cl_login' %}?service={{ service.id }}" class="button button-large button-dark button-rounded">Start Now!</a>
                             {% endif %}
                         {% else %}
                             <div class="fancy-title title-double-border">
