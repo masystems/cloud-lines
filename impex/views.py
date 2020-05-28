@@ -40,7 +40,7 @@ def export(request):
                         if key == 'parent_mother_id' or key == 'parent_father_id':
                             try:
                                 parent = Pedigree.objects.get(id=val)
-                                reg_no = parent.reg_no
+                                reg_no = parent.reg_no.strip()
                             except ObjectDoesNotExist:
                                 reg_no = ""
                             row.append('{}'.format(reg_no))
@@ -245,7 +245,7 @@ def import_pedigree_data(request):
                 dod_converted = None
 
             # create each new pedigree ###################
-            pedigree, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=row[reg_no])
+            pedigree, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=row[reg_no].strip())
             pedigree.creator = request.user
             try:
                 pedigree.breeder = breeder_obj
