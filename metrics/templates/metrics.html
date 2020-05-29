@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% load static %}
+
+{% block header %}
+<!--<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>-->
+<!--<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+{% endblock %}
+
+
 {% block content %}
 <style>
     table th {
@@ -31,7 +40,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Kinship</h4>
-                    <p>Select a {{ service.mother_title }} and {{ service.father_title }} to predict what the COI of their offspring will be.</p>
+                    <p id="kinshipText">Select a {{ service.mother_title }} and {{ service.father_title }} to predict what the COI of their offspring will be.</p>
                     <form id="ksForm">
                         <div class="form-row align-items-center">
                             <div class="col-md-5">
@@ -229,58 +238,61 @@
                 <div class="card-body">
                     <h4 class="card-title">Stud Selector</h4>
                     <p id="studIntroText">Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
-                    <form id="saForm" class="pb-4">
-                        <div class="form-row align-items-center">
-                            <div class="col-md-3">
-                                <div id="mothers-alive">
-                                    <input id="sa_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                    <button id="pdfDownloadBtn" class="btn btn-dark d-none">Export to PDF</button>
+                    <span id="pdfArea">
+                        <form id="saForm" class="pb-4">
+                            <div class="form-row align-items-center">
+                                <div class="col-md-3">
+                                    <div id="mothers-alive">
+                                        <input id="sa_mother" data-html2canvas-ignore="true" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button id="saBtn" data-html2canvas-ignore="true" class="btn btn-info" name='Submit' type="button" >Run Advisor</button>
+                                </div>
+                                <div class="col-md-3">
+                                    <div id="motherDetails" class="d-none">
+                                        <h3 class="card-title">{{ service.mother_title }} Details</h3>
+                                        <ul class="list-icons">
+                                            <li id="mdRegID"><i class="ti-angle-right"></i></li>
+                                            <li id="mdName"><i class="ti-angle-right"></i></li>
+                                            <li id="mdMeanKinship"><i class="ti-angle-right"></i></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div id="breedDetails" class="d-none">
+                                        <h3 class="card-title">Breed Details</h3>
+                                        <ul class="list-icons">
+                                            <li id="breedName"><i class="ti-angle-right"></i></li>
+                                            <li id="breedThreshold"><i class="ti-angle-right"></i></li>
+                                            <li id="breedMeanCoi"><i class="ti-angle-right"></i></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <button id="saBtn" class="btn btn-info" name='Submit' type="button" >Run Advisor</button>
-                            </div>
-                            <div class="col-md-3">
-                                <div id="motherDetails" class="d-none">
-                                    <h3 class="card-title">{{ service.mother_title }} Details</h3>
-                                    <ul class="list-icons">
-                                        <li id="mdRegID"><i class="ti-angle-right"></i></li>
-                                        <li id="mdName"><i class="ti-angle-right"></i></li>
-                                        <li id="mdMeanKinship"><i class="ti-angle-right"></i></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div id="breedDetails" class="d-none">
-                                    <h3 class="card-title">Breed Details</h3>
-                                    <ul class="list-icons">
-                                        <li id="breedName"><i class="ti-angle-right"></i></li>
-                                        <li id="breedThreshold"><i class="ti-angle-right"></i></li>
-                                        <li id="breedMeanCoi"><i class="ti-angle-right"></i></li>
-                                    </ul>
-                                </div>
-                            </div>
+                        </form>
+                        <div>
+                            <p><i class='fas fa-circle' style='color:green'></i> This male would be a good match for the selected female, based on the close Mean-Kinship value of both individuals, and the offspring COI being no higher than the breed average COI.</p>
+                            <p><i class='fas fa-circle' style='color:orange'></i> This male may not be the first choice as a mate for the selected female, but it is still relatively close in terms of Mean-Kinship, and the COI of the offspring would be no higher than the breed average COI.</p>
+                            <p><i class='fas fa-circle' style='color:red'></i> This male would not be an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.</p>
                         </div>
-                    </form>
-                    <div>
-                        <p><i class='fas fa-circle' style='color:green'></i> This male would be a good match for the selected female, based on the close Mean-Kinship value of both individuals, and the offspring COI being no higher than the breed average COI.</p>
-                        <p><i class='fas fa-circle' style='color:orange'></i> This male may not be the first choice as a mate for the selected female, but it is still relatively close in terms of Mean-Kinship, and the COI of the offspring would be no higher than the breed average COI.</p>
-                        <p><i class='fas fa-circle' style='color:red'></i> This male would not be an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.</p>
-                    </div>
 
-                    <table id="saTable" class="table table-bordered table-striped">
-                        <thead id="saHeadings">
-                            <tr>
-                                <th scope="col" id="regNo">Reg No. <i class="fas fa-sort text-muted"></i></th>
-                                <th scope="col" id="name">Name <i class="fas fa-sort text-muted"></i></th>
-                                <th scope="col" id="meanKinship">Mean Kinship <i class="fas fa-sort text-muted"></i></th>
-                                <th scope="col" id="kinship">COI of Offspring <i class="fas fa-sort text-muted"></i></th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="saTbody">
-                        </tbody>
-                    </table>
+                        <table id="saTable" class="table table-bordered table-striped">
+                            <thead id="saHeadings">
+                                <tr>
+                                    <th scope="col" id="regNo">Reg No. <i class="fas fa-sort text-muted"></i></th>
+                                    <th scope="col" id="name">Name <i class="fas fa-sort text-muted"></i></th>
+                                    <th scope="col" id="meanKinship">Mean Kinship <i class="fas fa-sort text-muted"></i></th>
+                                    <th scope="col" id="kinship">COI of Offspring <i class="fas fa-sort text-muted"></i></th>
+                                    <th></th>
+                                    <th data-html2canvas-ignore="true"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="saTbody">
+                            </tbody>
+                        </table>
+                    </span>
                 </div>
             </div>
         </div>
@@ -317,12 +329,12 @@
                                 $('#breedDetails').removeClass('d-none');
                                 $('#breedName').hide().html('<i class="ti-angle-right"></i> Name: ' + result.breed).fadeIn(fade);
                                 $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Theshold: ' + result.threshold).fadeIn(fade);
-                                console.log(result.breed_mean_coi);
                                 if (result.breed_mean_coi != "0.0000") {
                                     $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat("result.breed_mean_coi").toFixed(2))).fadeIn(fade);
                                 } else {
                                     $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
                                 }
+                                $('#pdfDownloadBtn').removeClass('d-none');
                             }
                         catch(err) {
                                   // not returned anything
@@ -339,7 +351,7 @@
                         var saResults = JSON.parse(data);
                         $("#saTable tbody").empty();
                         $.each(saResults, function(index, element) {
-                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
+                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center' data-html2canvas-ignore='true'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
                             $('#saTable tbody').append(tr);
                         });
                         $('#kinship').click();
@@ -387,8 +399,61 @@
             });
 
         });
-
 </script>
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
+
+<script>
+    $('#pdfDownloadBtn').click( function() {
+        var quotes = document.getElementById('pdfArea');
+
+        html2canvas(quotes, {
+            onrendered: function(canvas) {
+
+                //! MAKE YOUR PDF
+                var pdf = new jsPDF('p', 'pt', 'letter');
+
+                for (var i = 0; i <= quotes.clientHeight/980; i++) {
+                    //! This is all just html2canvas stuff
+                    var srcImg  = canvas;
+                    var sX      = 0;
+                    var sY      = 980*i; // start 980 pixels down for every new page
+                    var sWidth  = 1280;
+                    var sHeight = 1080;
+                    var dX      = 0;
+                    var dY      = 0;
+                    var dWidth  = 950;
+                    var dHeight = 980;
+
+                    window.onePageCanvas = document.createElement("canvas");
+                    onePageCanvas.setAttribute('width', 1280);
+                    onePageCanvas.setAttribute('height', 980);
+                    var ctx = onePageCanvas.getContext('2d');
+                    // details on this usage of this function:
+                    // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images#Slicing
+                    ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+
+                    // document.body.appendChild(canvas);
+                    var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+
+                    var width         = onePageCanvas.width;
+                    var height        = onePageCanvas.clientHeight;
+
+                    //! If we're on anything other than the first page,
+                    // add another page
+                    if (i > 0) {
+                        pdf.addPage(612, 791); //8.5" x 11" in pts (in*72)
+                    }
+                    //! now we declare that we're working on that page
+                    pdf.setPage(i+1);
+                    //! now we add content to that page!
+                    pdf.addImage(canvasDataURL, 'PNG', 20, 40, (width*.62), (height*.62));
+
+                }
+            //! after the for loop is finished running, we save the pdf.
+            pdf.save('test.pdf');
+            }
+        });
+    });
+</script>
 
 {% endblock %}
