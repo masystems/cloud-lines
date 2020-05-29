@@ -1,6 +1,8 @@
 
 {% extends 'home_base.html' %}
 {% load static %}
+
+
 {% block content %}
 
 <style>
@@ -50,6 +52,11 @@
 <section id="content">
 	<div class="content-wrap">
 		<div class="container clearfix">
+			<div class="title-block">
+				<h4>Thank you for choosing the <span>{{ requested_service.service_name }}</span> package</h4>
+				<span>Before continuing, please login or register</span>
+			</div>
+			<hr>
 			<div class="col_one_third nobottommargin">
 				<div class="well well-lg nobottommargin">
 					<form class="nobottommargin" action="{% url 'cl_login' %}" method="POST" id="loginform">
@@ -96,8 +103,7 @@
 
 				<div class="col_two_third col_last nobottommargin">
 
-
-					<h3>Don't have an Account? Register Now.</h3>
+					<h3>Don't have an Account? Register Now</h3>
 
 					<p>Register now to gain access to our products and services.</p>
 

@@ -297,7 +297,12 @@ def site_login(request):
         if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
             return render(request, 'lt_login.html')
         else:
-            return render(request, 'cl_login.html')
+            if request.GET.get('service'):
+                service_id = request.GET.get('service')
+                requested_service = Service.objects.get(id=service_id)
+            else:
+                requested_service = False
+            return render(request, 'cl_login.html', {'requested_service': requested_service})
 
 
 @login_required(login_url="/account/login")
