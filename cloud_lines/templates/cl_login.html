@@ -52,11 +52,13 @@
 <section id="content">
 	<div class="content-wrap">
 		<div class="container clearfix">
-			<div class="title-block">
-				<h4>Thank you for choosing the <span>{{ requested_service.service_name }}</span> package</h4>
-				<span>Before continuing, please login or register</span>
-			</div>
-			<hr>
+			{% if requested_service %}
+				<div class="title-block">
+					<h4>Thank you for choosing the <span>{{ requested_service.service_name }}</span> package</h4>
+					<span>Before continuing, please login or register</span>
+				</div>
+				<hr>
+			{% endif %}
 			<div class="col_one_third nobottommargin">
 				<div class="well well-lg nobottommargin">
 					<form class="nobottommargin" action="{% url 'cl_login' %}" method="POST" id="loginform">
