@@ -239,7 +239,7 @@
                     <h4 class="card-title">Stud Selector</h4>
                     <p id="studIntroText">Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
                     <button id="pdfDownloadBtn" class="btn btn-dark d-none">Export to PDF</button>
-                    <span id="pdfArea">
+                    <div id="pdfArea">
                         <form id="saForm" class="pb-4">
                             <div class="form-row align-items-center">
                                 <div class="col-md-3">
@@ -292,7 +292,7 @@
                             <tbody id="saTbody">
                             </tbody>
                         </table>
-                    </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -422,7 +422,7 @@
                     var dX      = 0;
                     var dY      = 0;
                     var dWidth  = 950;
-                    var dHeight = 1080;
+                    var dHeight = 1180;
 
                     window.onePageCanvas = document.createElement("canvas");
                     onePageCanvas.setAttribute('width', 1280);
