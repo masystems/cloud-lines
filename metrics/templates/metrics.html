@@ -3,10 +3,11 @@
 {% load static %}
 
 {% block header %}
-<!--<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>-->
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+<script src="https://github.com/niklasvh/html2canvas/releases/download/v1.0.0-rc.5/html2canvas.js"></script>
 <!--<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>-->
 {% endblock %}
 
 
@@ -404,54 +405,49 @@
 
 <script>
     $('#pdfDownloadBtn').click( function() {
-        var quotes = document.getElementById('pdfArea');
 
-        html2canvas(quotes, {
-            onrendered: function(canvas) {
+        html2canvas($("#pdfArea")[0], { allowTaint: true }).then(function(canvas) {
+            pdf = new jsPDF('p', 'pt', [612, 791]);
 
-                //! MAKE YOUR PDF
-                var pdf = new jsPDF('p', 'pt', 'letter');
+            for (var i = 0; i <= $("#pdfArea").outerHeight()/1080; i++) {
+                //! This is all just html2canvas stuff
+                var srcImg  = canvas;
+                var sX      = 0;
+                var sY      = 1080*i; // start 980 pixels down for every new page
+                var sWidth  = 1280;
+                var sHeight = 1080;
+                var dX      = 0;
+                var dY      = 0;
+                var dWidth  = 950;
+                var dHeight = 1180;
 
-                for (var i = 0; i <= quotes.clientHeight/1080; i++) {
-                    //! This is all just html2canvas stuff
-                    var srcImg  = canvas;
-                    var sX      = 0;
-                    var sY      = 1080*i; // start 980 pixels down for every new page
-                    var sWidth  = 1280;
-                    var sHeight = 1080;
-                    var dX      = 0;
-                    var dY      = 0;
-                    var dWidth  = 950;
-                    var dHeight = 1180;
+                window.onePageCanvas = document.createElement("canvas");
+                onePageCanvas.setAttribute('width', 1280);
+                onePageCanvas.setAttribute('height', 1180);
+                var ctx = onePageCanvas.getContext('2d');
+                // details on this usage of this function:
+                // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images#Slicing
+                ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
 
-                    window.onePageCanvas = document.createElement("canvas");
-                    onePageCanvas.setAttribute('width', 1280);
-                    onePageCanvas.setAttribute('height', 1180);
-                    var ctx = onePageCanvas.getContext('2d');
-                    // details on this usage of this function:
-                    // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images#Slicing
-                    ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
+                // document.body.appendChild(canvas);
+                var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
 
-                    // document.body.appendChild(canvas);
-                    var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
+                var width         = onePageCanvas.width;
+                var height        = onePageCanvas.clientHeight;
 
-                    var width         = onePageCanvas.width;
-                    var height        = onePageCanvas.clientHeight;
-
-                    //! If we're on anything other than the first page,
-                    // add another page
-                    if (i > 0) {
-                        pdf.addPage(612, 791); //8.5" x 11" in pts (in*72)
-                    }
-                    //! now we declare that we're working on that page
-                    pdf.setPage(i+1);
-                    //! now we add content to that page!
-                    pdf.addImage(canvasDataURL, 'PNG', 20, 40, (width*.62), (height*.62));
-
+                //! If we're on anything other than the first page,
+                // add another page
+                if (i > 0) {
+                    pdf.addPage(612, 791); //8.5" x 11" in pts (in*72)
                 }
-            //! after the for loop is finished running, we save the pdf.
-            pdf.save('test.pdf');
+                //! now we declare that we're working on that page
+                pdf.setPage(i+1);
+                //! now we add content to that page!
+                pdf.addImage(canvasDataURL, 'PNG', 20, 40, (width*.62), (height*.62));
+
             }
+        //! after the for loop is finished running, we save the pdf.
+        pdf.save('test.pdf');
         });
     });
 </script>

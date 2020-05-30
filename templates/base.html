@@ -35,9 +35,6 @@
     <!-- You can change the theme colors from here -->
     <link href="{% static 'css/colors/green.css' %}" id="theme" rel="stylesheet">
 
-    {% block header %}
-    {% endblock %}
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -45,8 +42,8 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     <script src="{% static 'assets/plugins/jquery/jquery.min.js' %}"></script>
-    <!--Download as pdf-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
+    {% block header %}
+    {% endblock %}
 </head>
 
 <body class="fix-header fix-sidebar card-no-border">
