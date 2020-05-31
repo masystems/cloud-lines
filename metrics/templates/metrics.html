@@ -353,7 +353,7 @@
                         var saResults = JSON.parse(data);
                         $("#saTable tbody").empty();
                         $.each(saResults, function(index, element) {
-                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><img src='https://static.cloud-lines.com/cloud-lines/images/" + element.color + ".png'></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
+                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
                             $('#saTable tbody').append(tr);
                         });
                         $('#kinship').click();
@@ -405,42 +405,14 @@
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
 
 <script>
-    function toDataURL(url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-            var reader = new FileReader();
-            reader.onloadend = function () {
-                callback(reader.result);
-            }
-            reader.readAsDataURL(xhr.response);
-        };
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
-        xhr.send();
-    }
-
-
     $('#pdfDownloadBtn').click( function() {
         pdf = new jsPDF('p', 'pt', [612, 791]);
         //header
-        pdf.text(20, 20, 'Hello world.');
+        //pdf.text(20, 20, 'Hello world.');
 
         //body
         var rows = []
         $('#saTable > tbody  > tr').each(function() {
-            var color = "";
-            if ($(this).find("td").eq(4).html().indexOf('green') >= 0) {
-                toDataURL('https://static.cloud-lines.com/cloud-lines/images/green.png', function(dataUrl) {
-                  color = dataUrl
-                })
-            } else {
-                toDataURL('https://static.cloud-lines.com/cloud-lines/images/green.png', function(dataUrl) {
-                  color = dataUrl
-                })
-            }
-            toDataURL('https://static.cloud-lines.com/cloud-lines/images/green.png', function(dataUrl) {
-              color = dataUrl
-            })
             rows.push([$(this).find("td").eq(0).html(),
                 $(this).find("td").eq(1).html(),
                 $(this).find("td").eq(2).html(),
@@ -449,19 +421,30 @@
         })
         pdf.autoTable({head: [['Reg No.', 'Name', 'Mean Kindship', 'COI of Offspring', 'Score']],
                 body: rows,
-                didDrawCell: function (data) {
-                if (data.column.index === 4 && data.cell.section === 'body') {
-                    var td = data.cell.raw;
-                    var elements = $(data.cell.raw);
-                    var found = $('img', elements);
-                    console.log(found.prevObject[0])
-                    //var img = td.getElementsByTagName('img')[0];
-                    var img = found.prevObject[0]
-                    var dim = data.cell.height - data.cell.padding('vertical');
-                    var textPos = data.cell.textPos;
-                    pdf.addImage(img, 'png', textPos.x, textPos.y, dim, dim);
+                didParseCell: function(data) {
+                    if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
+                        // cell.raw contains the cell data
+                        data.cell.text = "";
+                        data.cell.styles.fillColor = "red";
+                      }
                 }
-            }
+                // didDrawCell: function (data) {
+                // if (data.column.index === 4 && data.cell.section === 'body') {
+                //     var ImageToLoad = new Image();
+                //     //ImageToLoad.crossOrigin = "Anonymous";
+                //
+                //     var elements = $(data.cell.raw);
+                //     var found = $('img', elements);
+                //     var img = found.prevObject[0]
+                //
+                //     //ImageToLoad.addEventListener("load", imageReceived, false);
+                //     ImageToLoad.src = img.src;
+                //     console.log(ImageToLoad);
+                //     var dim = data.cell.height - data.cell.padding('vertical');
+                //     var textPos = data.cell.textPos;
+                //     pdf.addImage({imageData:ImageToLoad, x:textPos.x, y:textPos.y, w:dim, h:dim});
+                // }
+            // }
         });
 
         pdf.save('test.pdf');
