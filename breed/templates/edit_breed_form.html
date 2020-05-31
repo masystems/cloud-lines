@@ -78,7 +78,7 @@
                                             {% render_field field class="form-control" %}
                                         {% elif field.label == 'Mean Kinship threshold' %}
                                             {% if service.metrics %}
-                                                {% render_field field class="form-control" value=breed.mk_threshold %}
+                                                <input type="number" name="mk_threshold" value="{{ breed.mk_threshold }}" step="0.0001" class="form-control" id="id_mk_threshold">
                                                 {{ field.help_text }}
                                             {% else %}
                                                 <p class="text-danger mt-3">Metrics not enabled</p>
