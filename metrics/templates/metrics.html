@@ -3,12 +3,8 @@
 {% load static %}
 
 {% block header %}
-<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
-<!--<script src="https://github.com/niklasvh/html2canvas/releases/download/v1.0.0-rc.5/html2canvas.js"></script>-->
-<script src="https://unpkg.com/jspdf-autotable"></script>
-<!--<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>-->
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>-->
-<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>-->
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable"></script>
 {% endblock %}
 
 
@@ -250,7 +246,6 @@
                                 </div>
                                 <div class="col-md-2">
                                     <button id="saBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
-                                    <button id="pdfDownloadBtn" class="btn btn-dark d-none mt-2">Export to PDF</button>
                                 </div>
                                 <div class="col-md-3">
                                     <div id="motherDetails" class="d-none">
@@ -279,6 +274,8 @@
                             <p><i class='fas fa-circle' style='color:orange'></i> This male may not be the first choice as a mate for the selected female, but it is still relatively close in terms of Mean-Kinship, and the COI of the offspring would be no higher than the breed average COI.</p>
                             <p><i class='fas fa-circle' style='color:red'></i> This male would not be an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.</p>
                         </div>
+
+                        <button id="pdfDownloadBtn" class="btn btn-dark d-none mt-2 mb-2">Export to PDF</button>
 
                         <table id="saTable" class="table table-bordered table-striped">
                             <thead id="saHeadings">
