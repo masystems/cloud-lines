@@ -35,5 +35,6 @@ urlpatterns = [
     path('metrics/', include('metrics.urls')),
     path('primary_account/<str:service>', views.activate_primary_account, name='primary_account'),
     path('get_build_status', views.get_build_status, name='get_build_status'),
+    path('gdpr/', views.gdpr, name='gdpr'),
     path('robots.txt', views.robots)
 ]

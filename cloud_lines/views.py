@@ -218,6 +218,12 @@ def privacy_policy(request):
                                              'services': Service.objects.all()})
 
 
+def gdpr(request):
+    if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+        return redirect('dashboard')
+    return render(request, 'std_page.html', {'content': Page.objects.get(title='gdpr'),
+                                             'services': Service.objects.all()})
+
 @login_required(login_url="/account/login")
 def order(request, service=None):
     context = {}
