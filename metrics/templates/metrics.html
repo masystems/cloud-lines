@@ -436,26 +436,9 @@
                         data.cell.text = "";
                       }
                 }
-                // didDrawCell: function (data) {
-                // if (data.column.index === 4 && data.cell.section === 'body') {
-                //     var ImageToLoad = new Image();
-                //     //ImageToLoad.crossOrigin = "Anonymous";
-                //
-                //     var elements = $(data.cell.raw);
-                //     var found = $('img', elements);
-                //     var img = found.prevObject[0]
-                //
-                //     //ImageToLoad.addEventListener("load", imageReceived, false);
-                //     ImageToLoad.src = img.src;
-                //     console.log(ImageToLoad);
-                //     var dim = data.cell.height - data.cell.padding('vertical');
-                //     var textPos = data.cell.textPos;
-                //     pdf.addImage({imageData:ImageToLoad, x:textPos.x, y:textPos.y, w:dim, h:dim});
-                // }
-            // }
         });
 
-        pdf.save('test.pdf');
+        pdf.save($('#mdRegID').text());
     });
 </script>
 
