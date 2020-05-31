@@ -419,7 +419,7 @@
                 $(this).find("td").eq(3).html(),
                 $(this).find("td").eq(4).html()])
         })
-        pdf.autoTable({head: [['Reg No.', 'Name', 'Mean Kindship', 'COI of Offspring', 'Score']],
+        pdf.autoTable({head: [['Reg No.', 'Name', 'Mean Kinship', 'COI of Offspring', 'Score']],
                 body: rows,
                 didParseCell: function(data) {
                     if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
