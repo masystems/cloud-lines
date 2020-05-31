@@ -38,7 +38,7 @@
 
 
     <div class="row">
-        <div class="col-9">
+        <div class="col-xl-9 col-lg-9">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Kinship</h4>
@@ -47,16 +47,16 @@
                         <div class="form-row align-items-center">
                             <div class="col-md-5">
                                 <div id="mothers-alive">
-                                    <input id="id_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                    <input id="id_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}">
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div id="fathers-alive">
-                                    <input id="id_father" class="typeahead form-control" name='father' type="text" placeholder="{{ service.father_title }}">
+                                    <input id="id_father" class="typeahead form-control mt-2" name='father' type="text" placeholder="{{ service.father_title }}">
                                 </div>
                             </div>
                             <div class="col-md-2">
-                                <button id="ksBtn" class="btn btn-info" name='Submit' type="button" >Calculate Kinship</button>
+                                <button id="ksBtn" class="btn btn-info mt-2" name='Submit' type="button" >Calculate Kinship</button>
                             </div>
                         </div>
                     </form>
@@ -97,7 +97,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-3">
+        <div class="col-xl-3 col-lg-3">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Calculations</h4>
@@ -240,17 +240,17 @@
                 <div class="card-body">
                     <h4 class="card-title">Stud Selector</h4>
                     <p id="studIntroText">Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
-                    <button id="pdfDownloadBtn" class="btn btn-dark d-none">Export to PDF</button>
                     <div id="pdfArea">
                         <form id="saForm" class="pb-4">
                             <div class="form-row align-items-center">
                                 <div class="col-md-3">
                                     <div id="mothers-alive">
-                                        <input id="sa_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                        <input id="sa_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <button id="saBtn" class="btn btn-info" name='Submit' type="button" >Run Advisor</button>
+                                    <button id="saBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
+                                    <button id="pdfDownloadBtn" class="btn btn-dark d-none mt-2">Export to PDF</button>
                                 </div>
                                 <div class="col-md-3">
                                     <div id="motherDetails" class="d-none">
@@ -332,7 +332,6 @@
                                 $('#breedName').hide().html('<i class="ti-angle-right"></i> Name: ' + result.breed).fadeIn(fade);
                                 $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Theshold: ' + result.threshold).fadeIn(fade);
                                 if (result.breed_mean_coi != "0.0000") {
-                                    console.log(result);
                                     $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat(result.breed_mean_coi).toFixed(2))).fadeIn(fade);
                                 } else {
                                     $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
