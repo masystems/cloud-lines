@@ -408,8 +408,18 @@
     $('#pdfDownloadBtn').click( function() {
         pdf = new jsPDF('p', 'pt', [612, 791]);
         //header
-        //pdf.text(20, 20, 'Hello world.');
-
+        pdf.setFontSize(12)
+        pdf.setTextColor(40)
+        pdf.setFontStyle('normal')
+        // if (base64Img) {
+        //     doc.addImage(base64Img, 'JPEG', data.settings.margin.left, 15, 10, 10)
+        // }
+        //pdf.text('Report', data.settings.margin.left + 15, 22)
+        pdf.text(35, 20, $('#mdRegID').text());
+        pdf.text(35, 35, $('#mdName').text());
+        pdf.text(35, 50, $('#mdMeanKinship').text());
+        pdf.text(300, 20, $('#breedName').text());
+        pdf.text(300, 35, $('#breedThreshold').text());
         //body
         var rows = []
         $('#saTable > tbody  > tr').each(function() {
@@ -420,22 +430,23 @@
                 $(this).find("td").eq(4).html()])
         })
         pdf.autoTable({head: [['Reg No.', 'Name', 'Mean Kinship', 'COI of Offspring', 'Score']],
-                body: rows,
-                didParseCell: function(data) {
-                    if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
-                        // cell.raw contains the cell data
-                        if (data.cell.raw.indexOf('green') >= 0) {
-                            data.cell.styles.fillColor = "green";
-                        } else if (data.cell.raw.indexOf('orange') >= 0) {
-                            data.cell.styles.fillColor = "orange";
-                        } else if (data.cell.raw.indexOf('red') >= 0) {
-                            data.cell.styles.fillColor = "red";
-                        } else {
-                            data.cell.styles.fillColor = "red";
-                        }
-                        data.cell.text = "";
-                      }
-                }
+            body: rows,
+            didParseCell: function(data) {
+                if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
+                    // cell.raw contains the cell data
+                    if (data.cell.raw.indexOf('green') >= 0) {
+                        data.cell.styles.fillColor = "green";
+                    } else if (data.cell.raw.indexOf('orange') >= 0) {
+                        data.cell.styles.fillColor = "orange";
+                    } else if (data.cell.raw.indexOf('red') >= 0) {
+                        data.cell.styles.fillColor = "red";
+                    } else {
+                        data.cell.styles.fillColor = "red";
+                    }
+                    data.cell.text = "";
+                  }
+            },
+            margin: { top: 60 },
         });
 
         pdf.save($('#mdRegID').text());
