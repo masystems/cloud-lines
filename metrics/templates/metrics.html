@@ -407,19 +407,9 @@
 <script>
     $('#pdfDownloadBtn').click( function() {
         pdf = new jsPDF('p', 'pt', [612, 791]);
-        //header
-        pdf.setFontSize(12)
-        pdf.setTextColor(40)
-        pdf.setFontStyle('normal')
-        // if (base64Img) {
-        //     doc.addImage(base64Img, 'JPEG', data.settings.margin.left, 15, 10, 10)
-        // }
-        //pdf.text('Report', data.settings.margin.left + 15, 22)
-        pdf.text(35, 20, $('#mdRegID').text());
-        pdf.text(35, 35, $('#mdName').text());
-        pdf.text(35, 50, $('#mdMeanKinship').text());
-        pdf.text(300, 20, $('#breedName').text());
-        pdf.text(300, 35, $('#breedThreshold').text());
+
+
+
         //body
         var rows = []
         $('#saTable > tbody  > tr').each(function() {
@@ -431,6 +421,24 @@
         })
         pdf.autoTable({head: [['Reg No.', 'Name', 'Mean Kinship', 'COI of Offspring', 'Score']],
             body: rows,
+            didDrawPage: function (data) {
+                //header
+                pdf.setFontSize(12)
+                pdf.setTextColor(40)
+                pdf.setFontStyle('normal')
+                // if (base64Img) {
+                //     doc.addImage(base64Img, 'JPEG', data.settings.margin.left, 15, 10, 10)
+                // }
+                pdf.text(35, 20, " Mother Details");
+                pdf.text(35, 35, $('#mdRegID').text());
+                pdf.text(35, 50, $('#mdName').text());
+                pdf.text(35, 65, $('#mdMeanKinship').text());
+
+                pdf.text(300, 20, " Breed Details");
+                pdf.text(300, 35, $('#breedName').text());
+                pdf.text(300, 50, $('#breedThreshold').text());
+                pdf.text(300, 65, $('#breedMeanCoi').text());
+            },
             didParseCell: function(data) {
                 if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
                     // cell.raw contains the cell data
@@ -446,7 +454,7 @@
                     data.cell.text = "";
                   }
             },
-            margin: { top: 60 },
+            margin: { top: 70 },
         });
 
         pdf.save($('#mdRegID').text());
