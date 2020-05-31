@@ -4,7 +4,8 @@
 
 {% block header %}
 <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
-<script src="https://github.com/niklasvh/html2canvas/releases/download/v1.0.0-rc.5/html2canvas.js"></script>
+<!--<script src="https://github.com/niklasvh/html2canvas/releases/download/v1.0.0-rc.5/html2canvas.js"></script>-->
+<script src="https://unpkg.com/jspdf-autotable"></script>
 <!--<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>-->
 <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>-->
 <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>-->
@@ -245,11 +246,11 @@
                             <div class="form-row align-items-center">
                                 <div class="col-md-3">
                                     <div id="mothers-alive">
-                                        <input id="sa_mother" data-html2canvas-ignore="true" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                        <input id="sa_mother" class="typeahead form-control" name='mother' type="text" placeholder="{{ service.mother_title }}">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <button id="saBtn" data-html2canvas-ignore="true" class="btn btn-info" name='Submit' type="button" >Run Advisor</button>
+                                    <button id="saBtn" class="btn btn-info" name='Submit' type="button" >Run Advisor</button>
                                 </div>
                                 <div class="col-md-3">
                                     <div id="motherDetails" class="d-none">
@@ -287,7 +288,7 @@
                                     <th scope="col" id="meanKinship">Mean Kinship <i class="fas fa-sort text-muted"></i></th>
                                     <th scope="col" id="kinship">COI of Offspring <i class="fas fa-sort text-muted"></i></th>
                                     <th></th>
-                                    <th data-html2canvas-ignore="true"></th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody id="saTbody">
@@ -352,7 +353,7 @@
                         var saResults = JSON.parse(data);
                         $("#saTable tbody").empty();
                         $.each(saResults, function(index, element) {
-                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center' data-html2canvas-ignore='true'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
+                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><img src='https://static.cloud-lines.com/cloud-lines/images/" + element.color + ".png'></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
                             $('#saTable tbody').append(tr);
                         });
                         $('#kinship').click();
@@ -404,51 +405,66 @@
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
 
 <script>
-    $('#pdfDownloadBtn').click( function() {
-
-        html2canvas($("#pdfArea")[0], { allowTaint: true }).then(function(canvas) {
-            pdf = new jsPDF('p', 'pt', [612, 791]);
-
-            for (var i = 0; i <= $("#pdfArea").outerHeight()/1080; i++) {
-                //! This is all just html2canvas stuff
-                var srcImg  = canvas;
-                var sX      = 0;
-                var sY      = 1080*i; // start 980 pixels down for every new page
-                var sWidth  = 1280;
-                var sHeight = 1080;
-                var dX      = 0;
-                var dY      = 0;
-                var dWidth  = 950;
-                var dHeight = 1180;
-
-                window.onePageCanvas = document.createElement("canvas");
-                onePageCanvas.setAttribute('width', 1280);
-                onePageCanvas.setAttribute('height', 1180);
-                var ctx = onePageCanvas.getContext('2d');
-                // details on this usage of this function:
-                // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Using_images#Slicing
-                ctx.drawImage(srcImg,sX,sY,sWidth,sHeight,dX,dY,dWidth,dHeight);
-
-                // document.body.appendChild(canvas);
-                var canvasDataURL = onePageCanvas.toDataURL("image/png", 1.0);
-
-                var width         = onePageCanvas.width;
-                var height        = onePageCanvas.clientHeight;
-
-                //! If we're on anything other than the first page,
-                // add another page
-                if (i > 0) {
-                    pdf.addPage(612, 791); //8.5" x 11" in pts (in*72)
-                }
-                //! now we declare that we're working on that page
-                pdf.setPage(i+1);
-                //! now we add content to that page!
-                pdf.addImage(canvasDataURL, 'PNG', 20, 40, (width*.62), (height*.62));
-
+    function toDataURL(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                callback(reader.result);
             }
-        //! after the for loop is finished running, we save the pdf.
-        pdf.save('test.pdf');
+            reader.readAsDataURL(xhr.response);
+        };
+        xhr.open('GET', url);
+        xhr.responseType = 'blob';
+        xhr.send();
+    }
+
+
+    $('#pdfDownloadBtn').click( function() {
+        pdf = new jsPDF('p', 'pt', [612, 791]);
+        //header
+        pdf.text(20, 20, 'Hello world.');
+
+        //body
+        var rows = []
+        $('#saTable > tbody  > tr').each(function() {
+            var color = "";
+            if ($(this).find("td").eq(4).html().indexOf('green') >= 0) {
+                toDataURL('https://static.cloud-lines.com/cloud-lines/images/green.png', function(dataUrl) {
+                  color = dataUrl
+                })
+            } else {
+                toDataURL('https://static.cloud-lines.com/cloud-lines/images/green.png', function(dataUrl) {
+                  color = dataUrl
+                })
+            }
+            toDataURL('https://static.cloud-lines.com/cloud-lines/images/green.png', function(dataUrl) {
+              color = dataUrl
+            })
+            rows.push([$(this).find("td").eq(0).html(),
+                $(this).find("td").eq(1).html(),
+                $(this).find("td").eq(2).html(),
+                $(this).find("td").eq(3).html(),
+                $(this).find("td").eq(4).html()])
+        })
+        pdf.autoTable({head: [['Reg No.', 'Name', 'Mean Kindship', 'COI of Offspring', 'Score']],
+                body: rows,
+                didDrawCell: function (data) {
+                if (data.column.index === 4 && data.cell.section === 'body') {
+                    var td = data.cell.raw;
+                    var elements = $(data.cell.raw);
+                    var found = $('img', elements);
+                    console.log(found.prevObject[0])
+                    //var img = td.getElementsByTagName('img')[0];
+                    var img = found.prevObject[0]
+                    var dim = data.cell.height - data.cell.padding('vertical');
+                    var textPos = data.cell.textPos;
+                    pdf.addImage(img, 'png', textPos.x, textPos.y, dim, dim);
+                }
+            }
         });
+
+        pdf.save('test.pdf');
     });
 </script>
 
