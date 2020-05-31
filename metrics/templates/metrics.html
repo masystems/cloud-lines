@@ -332,9 +332,9 @@
                                 $('#breedName').hide().html('<i class="ti-angle-right"></i> Name: ' + result.breed).fadeIn(fade);
                                 $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Theshold: ' + result.threshold).fadeIn(fade);
                                 if (result.breed_mean_coi != "0.0000") {
-                                    $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat("result.breed_mean_coi").toFixed(2))).fadeIn(fade);
-                                } else {
                                     console.log(result);
+                                    $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat(result.breed_mean_coi).toFixed(2))).fadeIn(fade);
+                                } else {
                                     $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
                                 }
                                 $('#pdfDownloadBtn').removeClass('d-none');
