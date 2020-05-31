@@ -424,8 +424,16 @@
                 didParseCell: function(data) {
                     if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
                         // cell.raw contains the cell data
+                        if (data.cell.raw.indexOf('green') >= 0) {
+                            data.cell.styles.fillColor = "green";
+                        } else if (data.cell.raw.indexOf('amber') >= 0) {
+                            data.cell.styles.fillColor = "orange";
+                        } else if (data.cell.raw.indexOf('red') >= 0) {
+                            data.cell.styles.fillColor = "red";
+                        } else {
+                            data.cell.styles.fillColor = "red";
+                        }
                         data.cell.text = "";
-                        data.cell.styles.fillColor = "red";
                       }
                 }
                 // didDrawCell: function (data) {
