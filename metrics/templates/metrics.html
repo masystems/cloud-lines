@@ -350,7 +350,7 @@
                         var saResults = JSON.parse(data);
                         $("#saTable tbody").empty();
                         $.each(saResults, function(index, element) {
-                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><i class='fas fa-circle' style='color:" + element.color + "'></i></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
+                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><p style=\"visibility: hidden;\"><i class='fas fa-circle' style='visibility: visible;color:" + element.color + "'></i>" + element.color + "</p></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
                             $('#saTable tbody').append(tr);
                         });
                         $('#kinship').click();
