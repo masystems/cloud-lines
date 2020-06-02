@@ -166,7 +166,7 @@ def import_pedigree_data(request):
                 else:
                     current_owner_obj = None
             except KeyError:
-                breeder_obj = None
+                current_owner_obj = None
 
             # get or create parents ###################
             def get_or_create_parent(parent):
