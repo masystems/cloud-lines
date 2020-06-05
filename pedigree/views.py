@@ -462,6 +462,10 @@ def edit_pedigree_form(request, id):
             return redirect('pedigree_search')
 
         # check whether it's valid:
+        if pedigree_form['reg_no'].value().strip() != pedigree.reg_no:
+            if Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['reg_no'].value().strip()).exists():
+                pedigree_form.add_error('reg_no', 'Selected reg number already exists')
+                pre_checks = False
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
             pedigree_form.add_error('breeder', 'Selected breeder does not exist')
             pre_checks = False
