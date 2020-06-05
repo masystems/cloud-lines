@@ -203,7 +203,7 @@
             <div class="form-group row">
                 <label class="col-sm-3 text-right col-form-label">{{ field.label }}</label>
                 <div class="col-md-9">
-                    {% render_field field class="dropzone" %}
+                    {% render_field field class+="dropzone" %}
                     {% for error in field.errors %}
                       <span class="help-block text-danger">{{ error }}</span>
                     {% endfor %}
