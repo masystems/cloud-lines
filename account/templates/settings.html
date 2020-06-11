@@ -28,10 +28,6 @@
                     <center class="mt-4"> <i class="fas fa-user-circle fa-4x"></i>
                         <h4 class="card-title mt-2">{{ request.user.get_full_name }}</h4>
                         <h6 class="card-subtitle">{% if editor %}Editor{% else %}User{% endif %}</h6>
-<!--                        <div class="row text-center justify-content-md-center">-->
-<!--                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-people"></i> <font class="font-medium">254</font></a></div>-->
-<!--                            <div class="col-4"><a href="javascript:void(0)" class="link"><i class="icon-picture"></i> <font class="font-medium">54</font></a></div>-->
-<!--                        </div>-->
                     </center>
                 </div>
                 <div>
@@ -55,7 +51,7 @@
                 <ul class="nav nav-tabs profile-tab" role="tablist">
                     <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#overview" role="tab">Overview</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#users" role="tab">Users</a> </li>
-                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#customFields" role="tab">Custom Fields</a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#customisation" role="tab">Customisation</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#metrics" role="tab">Metrics</a> </li>
                 </ul>
                 <!-- Tab panes -->
@@ -370,7 +366,7 @@
                         </div>
                     </div>
 <!--                    thrid tab-->
-                    <div class="tab-pane" id="customFields" role="tabpanel">
+                    <div class="tab-pane" id="customisation" role="tabpanel">
                         <div class="card-body">
                             <p class="text-left">You can add your own custom fields below! Start by clicking Edit rows, then click add new.</p>
                             <table id="cfTable" class="table table-bordered table-striped">
@@ -559,7 +555,6 @@
                                     <div class="col-2">
                                         <button id="selectTitleSettings" class="btn btn-success float-right">Update Titles</button>
                                     </div>
-
                                 </div>
                                 <script>
                                     $('#selectTitleSettings').click(function () {
@@ -583,6 +578,68 @@
                                             error: function (xhr, textStatus, error) {
                                                 $('#titleSettingsMessage').hide().html('<h5 class="text-right">Something went wrong, but we are working on it!</h5>').fadeIn(1000);
                                                 console.log(error);
+                                            },
+                                        });
+                                    });
+                                </script>
+
+                                <hr>
+                                <h4>Pedigree Columns</h4>
+                                <p>Select which columns should be shown within the pedigree search page.</p>
+                                <form id="pedigreeColumnsForm">
+                                    <ul class="list-group">
+                                        {% for heading in pedigree_headings %}
+                                            {% if heading.verbose_name != None %}
+                                                <li class="list-group-item d-flex align-items-center">
+                                                    <div class="checkbox checkbox-success">
+                                                        <input id="checkbox{{ forloop.counter }}" class="pedigreeColumnCheckBox" type="checkbox" value="{{ heading.name }}"
+                                                               {% if heading.name in active_pedigree_columns %}checked{% endif %}>
+                                                        <label class="mb-0" for="checkbox{{ forloop.counter }}" data-tokens="{{ heading.name }}"> {{ heading.verbose_name|title }} </label>
+                                                        <p><small>{{ heading.help_text }}</small></p>
+                                                    </div>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </form>
+                            <div class="row">
+                                    <div class="col-10">
+                                        <div class="alert " id="pedigreeColumnsAlert"> <div id="pedigreeColumnsMessage"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <button id="selectPedigreeColumnsBtn" class="btn btn-success float-right">Update Columns</button>
+                                    </div>
+                                </div>
+                                <script>
+                                    $('#selectPedigreeColumnsBtn').click(function () {
+                                        var selectedColumns = $('.pedigreeColumnCheckBox:checkbox:checked');
+                                        var columnsArray = new Array();
+                                        $('.pedigreeColumnCheckBox:checkbox:checked').each(function(){
+                                            columnsArray.push($(this).val());
+                                        });
+                                        var dataString = 'columns='+ columnsArray;
+
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "{% url 'update_pedigree_columns' %}",
+                                            dataType: "text",
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            data: dataString,
+                                            beforeSend: function() {
+                                                if (selectedColumns.length < 4) {
+                                                    $('#pedigreeColumnsMessage').hide().html('<h5 class="text-right">Not enough selected! Min 4 columns</h5>').fadeIn(1000);
+                                                    return false
+                                                } else if (selectedColumns.length > 7) {
+                                                    $('#pedigreeColumnsMessage').hide().html('<h5 class="text-right">Too many column selected! Max 7 columns</h5>').fadeIn(1000);
+                                                    return false
+                                                }
+                                            },
+                                            success: function (data) {
+                                                $('#pedigreeColumnsMessage').hide().html('<h5 class="text-right">Columns updated!</h5>').fadeIn(1000);
+                                            },
+                                            error: function (xhr, textStatus, error) {
+                                                $('#pedigreeColumnsMessage').hide().html('<h5 class="text-right">Something went wrong, but we are working on it!</h5>').fadeIn(1000);
                                             },
                                         });
                                     });

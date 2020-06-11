@@ -17,6 +17,7 @@ from breeder.forms import BreederForm
 from breed.forms import BreedForm
 from breed_group.models import BreedGroup
 from .forms import PedigreeForm, ImagesForm
+from .functions import get_site_pedigree_column_headings
 from django.db.models import Q
 import re
 import json
@@ -28,8 +29,11 @@ import dateutil.parser
 @login_required(login_url="/account/login")
 def search(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(Q(account=attached_service) | Q(account=attached_service)).exclude(state='unapproved').values('id', 'reg_no', 'mean_kinship', 'name', 'dob', 'status', 'breed', 'breed__breed_name', 'sex')
-    return render(request, 'search.html', {'pedigrees': pedigrees})
+    columns, column_data = get_site_pedigree_column_headings(attached_service)
+    pedigrees = Pedigree.objects.filter(Q(account=attached_service) | Q(account=attached_service)).exclude(state='unapproved').values('id', *columns)
+    return render(request, 'search.html', {'pedigrees': pedigrees,
+                                           'columns': columns,
+                                           'column_data': column_data})
 
 
 class PedigreeBase(LoginRequiredMixin, TemplateView):
@@ -681,4 +685,3 @@ def create_approval(request, pedigree, attached_service, state, type):
                             type=type,
                             pedigree=pedigree,
                             data=data)
-

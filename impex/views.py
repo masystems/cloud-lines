@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from pedigree.models import Pedigree, PedigreeImage
+from pedigree.functions import get_pedigree_column_headings
 from breeder.models import Breeder
 from breed.models import Breed
 from account.views import is_editor, get_main_account
@@ -97,9 +98,7 @@ def importx(request):
         upload_database.save(database_file)
 
         # get pedigree model headings
-        forbidden_pedigree_fields = ['id', 'creator', 'account', 'date_added']
-        forbidden_pedigree_att_fields = ['id', 'account', 'custom_fields', 'reg_no']
-        pedigree_headings = [field for field in Pedigree._meta.get_fields(include_parents=False, include_hidden=False) if field.name not in forbidden_pedigree_fields]
+        pedigree_headings = get_pedigree_column_headings()
 
         # get breeder model headings
         forbidden_breeeder_fields = ['id', 'account', 'custom_fields']

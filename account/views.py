@@ -13,6 +13,7 @@ from django.conf import settings as django_settings
 from .models import UserDetail, AttachedService
 from cloud_lines.models import Service, Page
 from pedigree.models import Pedigree
+from pedigree.functions import get_pedigree_column_headings
 from breed.models import Breed
 from breeder.models import Breeder
 from approvals.models import Approval
@@ -360,13 +361,19 @@ def profile(request):
 @login_required(login_url="/account/login")
 def settings(request):
     user_detail = UserDetail.objects.get(user=request.user)
-    custom_fields = user_detail.current_service.custom_fields
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
 
+    custom_fields = user_detail.current_service.custom_fields
     try:
         custom_fields = json.loads(custom_fields)
     except:
         pass
-    return render(request, 'settings.html', {'custom_fields': custom_fields})
+
+    active_pedigree_columns = attached_service.pedigree_columns.split(',')
+
+    return render(request, 'settings.html', {'custom_fields': custom_fields,
+                                             'pedigree_headings': get_pedigree_column_headings(),
+                                             'active_pedigree_columns': active_pedigree_columns})
 
 
 @user_passes_test(is_editor)
@@ -489,6 +496,19 @@ def update_titles(request):
         return HttpResponse('Done')
     return HttpResponse('Fail')
 
+
+@user_passes_test(is_editor)
+@login_required(login_url="/account/login")
+def update_pedigree_columns(request):
+    if request.method == 'POST':
+        user_detail = UserDetail.objects.get(user=request.user)
+        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+        columns = request.POST['columns']
+        attached_service.pedigree_columns = str(columns)
+        attached_service.save()
+
+        return HttpResponse('Done')
+    return HttpResponse('Fail')
 
 @user_passes_test(is_editor)
 @login_required(login_url="/account/login")

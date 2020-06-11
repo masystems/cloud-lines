@@ -14,6 +14,7 @@ urlpatterns = [
     path('user_edit', views.user_edit, name='user_edit'),
     path('custom_field_edit', views.custom_field_edit, name='custom_field_edit'),
     path('update_titles', views.update_titles, name='update_titles'),
+    path('update_pedigree_columns', views.update_pedigree_columns, name='update_pedigree_columns'),
     path('metrics_switch', views.metrics_switch, name='metrics_switch'),
     path('update_card', views.update_card, name='update_card'),
     path('update_user', views.update_user, name='update_user'),

@@ -1,27 +1,46 @@
+{% load custom_tags %}
+
 <table id="file_export" class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th scope="col">Reg No.</th>
-            <th scope="col" class="d-none d-sm-table-cell">Mean Kinship </th>
-            <th scope="col">Name</th>
-            <th scope="col" class="d-none d-sm-table-cell">DOB</th>
-            <th scope="col" class="d-none d-sm-table-cell">Status</th>
-            <th scope="col" class="d-none d-sm-table-cell">Breed</th>
-            <th scope="col" class="d-none d-sm-table-cell">Sex</th>
+            {% for col in columns %}
+                {% for ped_col, data in column_data.items %}
+                    {% if col == data.db_id %}
+                        <th scope="col">{{ data.name }}</th>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+<!--            <th scope="col">Reg No.</th>-->
+<!--            <th scope="col" class="d-none d-sm-table-cell">Mean Kinship </th>-->
+<!--            <th scope="col">Name</th>-->
+<!--            <th scope="col" class="d-none d-sm-table-cell">DOB</th>-->
+<!--            <th scope="col" class="d-none d-sm-table-cell">Status</th>-->
+<!--            <th scope="col" class="d-none d-sm-table-cell">Breed</th>-->
+<!--            <th scope="col" class="d-none d-sm-table-cell">Sex</th>-->
         </tr>
     </thead>
-<tbody>
-{% for pedigree in pedigrees.all %}
-<tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
-    style="cursor: pointer;">
-    <th scope="row">{{ pedigree.reg_no }}</th>
-    <th scope="row" class="d-none d-sm-table-cell">{{ pedigree.mean_kinship }}</th>
-    <td>{{ pedigree.name }}</td>
-    <td class="d-none d-sm-table-cell" data-order="{{ pedigree.dob|date:'Y-m-d' }}">{{ pedigree.dob }}</td>
-    <td class="d-none d-sm-table-cell">{{ pedigree.status|title }}</td>
-    <td class="d-none d-sm-table-cell">{{ pedigree.breed__breed_name }}</td>
-    <td class="d-none d-sm-table-cell"><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>
-</tr>
-{% endfor %}
-</tbody>
+    <tbody>
+        {% for pedigree in pedigrees.all %}
+            <tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
+                style="cursor: pointer;">
+                {% for col in columns %}
+                    {% for ped_col, data in column_data.items %}
+                        {% if col == data.db_id %}
+                            <th scope="row">
+                                {% autoescape off %}
+                                    {% pedigree_column_data pedigree data.db_id data.html %}
+                                {% endautoescape %}
+                            </th>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+<!--                <th scope="row" class="d-none d-sm-table-cell">{{ pedigree.mean_kinship }}</th>-->
+<!--                <td>{{ pedigree.name }}</td>-->
+<!--                <td class="d-none d-sm-table-cell" data-order="{{ pedigree.dob|date:'Y-m-d' }}">{{ pedigree.dob }}</td>-->
+<!--                <td class="d-none d-sm-table-cell">{{ pedigree.status|title }}</td>-->
+<!--                <td class="d-none d-sm-table-cell">{{ pedigree.breed__breed_name }}</td>-->
+<!--                <td class="d-none d-sm-table-cell"><span class="label {% if pedigree.sex == 'male' %}label-light-info{% else %}label-light-primary{% endif %}"> {{ pedigree.sex|title }} </span></td>-->
+            </tr>
+        {% endfor %}
+    </tbody>
 </table>

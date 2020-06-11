@@ -22,6 +22,7 @@ class AttachedService(models.Model):
     domain = models.CharField(max_length=250, blank=True)
     animal_type = models.CharField(max_length=250)
     custom_fields = models.TextField(blank=True)
+    pedigree_columns = models.CharField(blank=False, max_length=500, default="reg_no,mean_kinship,name,dob,status,breed,sex")
     mother_title = models.CharField(max_length=250, default='Mother')
     father_title = models.CharField(max_length=250, default='Father')
     coi_timeout = models.IntegerField(default=60)
