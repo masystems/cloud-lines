@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Breeder
 from pedigree.models import Pedigree
+from pedigree.functions import get_site_pedigree_column_headings
 from breed_group.models import BreedGroup
 from account.views import is_editor, get_main_account
 from .forms import BreederForm
@@ -14,8 +15,12 @@ import json
 def breeder(request, breeder):
     attached_service = get_main_account(request.user)
     breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breeder)
-    pedigrees = Pedigree.objects.filter(account=attached_service, breeder__breeding_prefix__exact=breeder)
-    owned = Pedigree.objects.filter(account=attached_service, current_owner__breeding_prefix__exact=breeder)
+    columns, column_data = get_site_pedigree_column_headings(attached_service)
+    breeder_pedigrees = Pedigree.objects.filter(account=attached_service, breeder__breeding_prefix__exact=breeder).exclude(
+                state='unapproved').values('id', *columns)
+    owner_pedigrees = Pedigree.objects.filter(account=attached_service,
+                                                current_owner__breeding_prefix__exact=breeder).exclude(
+        state='unapproved').values('id', *columns)
     groups = BreedGroup.objects.filter(breeder=breeder)
     # get custom fields
     try:
@@ -23,17 +28,19 @@ def breeder(request, breeder):
     except json.decoder.JSONDecodeError:
         custom_fields = {}
     return render(request, 'breeder.html', {'breeder': breeder,
-                                            'pedigrees': pedigrees,
-                                            'owned': owned,
+                                            'breeder_pedigrees': breeder_pedigrees,
+                                            'owner_pedigrees': owner_pedigrees,
                                             'groups': groups,
-                                            'custom_fields': custom_fields})
+                                            'custom_fields': custom_fields,
+                                            'columns': columns,
+                                            'column_data': column_data
+                                            })
 
 
 @login_required(login_url="/account/login")
 def breeders(request):
     attached_service = get_main_account(request.user)
-    breeders = Breeder.objects.filter(account=attached_service)
-    return render(request, 'breeders.html', {'breeders': breeders})
+    return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
 
 
 @login_required(login_url="/account/login")

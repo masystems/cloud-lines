@@ -10,7 +10,7 @@ def pedigree_column_data(pedigree, db_id, html=""):
     try:
         value = Variable(f"pedigree.{db_id}").resolve(pedigree_context)
     except VariableDoesNotExist:
-        value = None
+        value = ""
 
     if html != "":
         try:
