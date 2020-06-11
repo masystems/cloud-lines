@@ -113,7 +113,7 @@
 							$('#articleID').val('{{ article.id }}');
 							$('#title').val('{{ article.title }}');
 							$('#video').val('{{ article.video }}');
-							$('#article_content').html('{{ article.content }}');
+							$('#article_content').text(`{{ article.content }}`);
 							$('#newEditArticleModalBtn').click();
 						});
 					</script>
