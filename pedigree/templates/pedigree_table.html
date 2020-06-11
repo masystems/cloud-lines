@@ -21,7 +21,7 @@
                         {% if col == data.db_id %}
                             <th scope="row">
                                 {% autoescape off %}
-                                    {% pedigree_column_data pedigree data.db_id data.html %}
+                                    {% pedigree_column_data pedigree data %}
                                 {% endautoescape %}
                             </th>
                         {% endif %}

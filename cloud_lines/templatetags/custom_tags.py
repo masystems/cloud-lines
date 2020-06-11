@@ -5,23 +5,31 @@ register = template.Library()
 
 
 @register.simple_tag
-def pedigree_column_data(pedigree, db_id, html=""):
+def pedigree_column_data(pedigree, data):
     pedigree_context = {'pedigree': pedigree}
     try:
-        value = Variable(f"pedigree.{db_id}").resolve(pedigree_context)
+        value = Variable(f"pedigree.{data['db_id']}").resolve(pedigree_context)
     except VariableDoesNotExist:
         value = ""
 
-    if html != "":
+    # upper/title
+    if data['upper']:
         try:
-            value = html.replace('%REPLACEME%', value.title())
-            return value
+            value = value.upper()
         except AttributeError:
-            return value
-
+            # must be a NoneType
+            pass
     else:
         try:
-            return value.title()
+            value = value.title()
         except AttributeError:
-            return value
+            # must be a decimal
+            pass
+
+    # html
+    if data['html'] != "":
+        value = data['html'].replace('%REPLACEME%', value)
+        return value
+    else:
+        return value
 
