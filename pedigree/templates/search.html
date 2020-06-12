@@ -82,7 +82,7 @@
                             {% endif %}
                         </div>
                     </form>
-                    {% if pedigrees.count >= 1000 %}
+                    {% if pedigrees.count >= 500 %}
                         <p>The below table will show the last 1000 pedigrees added. For a more refined search, use the search bar above.</p>
                     {% endif %}
                     {% include 'pedigree_table.html' with table_id='file_export'%}
