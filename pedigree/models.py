@@ -7,7 +7,7 @@ from account.models import AttachedService
 
 class Pedigree(models.Model):
     class Meta:
-        get_latest_by = "order_date"
+        ordering = ['-date_added']
 
     STATES = (
         ('edited', 'Edited'),
@@ -57,9 +57,6 @@ class Pedigree(models.Model):
 
     def __str__(self):
         return self.reg_no
-
-    class Meta:
-        ordering = ['-date_added']
 
 
 def user_directory_path(instance, filename):
