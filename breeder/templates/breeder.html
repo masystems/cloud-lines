@@ -154,7 +154,11 @@
 
     <script>
         $(document).ready(function() {
-            $('.table.table').DataTable();
+            $('.table.table').DataTable({
+                "language": {
+                    "search": "Filter records:"
+                  }
+            });
         } );
     </script>
 
