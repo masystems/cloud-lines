@@ -1,4 +1,19 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+
+    <!-- This page plugin CSS -->
+    <link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.css' %}" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+{% endblock %}
 
 {% block content %}
 <div class="row page-titles">
@@ -35,12 +50,28 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                {% include 'pedigree_table.html' %}
+                {% include 'pedigree_table.html' with table_id='file_export'%}
             </div>
         </div>
     </div>
 </div>
 
+{% endblock %}
 
+{% block footer %}
+
+    <script src="{% static 'assets/libs/datatables/media/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'dist/js/pages/datatable/custom-datatable.js' %}"></script>
+
+    <!-- start - This is for export functionality only -->
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
+    <script src="{% static 'dist/js/pages/datatable/datatable-advanced.init.js' %}"></script>
 
 {% endblock %}
