@@ -82,11 +82,11 @@
                         </div>
                         <hr>
                         <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} currently owned by {{ breeder.breeding_prefix }}</h3>
-                        {% include 'pedigree_table.html' with pedigrees=breeder_pedigrees %}
+                        {% include 'pedigree_table.html' with pedigrees=owner_pedigrees %}
 
                         <hr>
                         <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} bred by {{ breeder.breeding_prefix }}</h3>
-                        {% include 'pedigree_table.html' with pedigrees=owner_pedigrees %}
+                        {% include 'pedigree_table.html' with pedigrees=breeder_pedigrees %}
                         <hr>
                         {% if service.site_mode == 'poultry' %}
                             <h3>Breed groups by {{ breeder.breeding_prefix }}</h3>
