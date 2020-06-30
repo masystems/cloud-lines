@@ -9,11 +9,11 @@ def get_pedigree_column_headings():
 
 
 def get_site_pedigree_column_headings(atatched_service):
-    pedigree_mapping = {'breeder': {'db_id': 'breeder__breeder_prefix',
+    pedigree_mapping = {'breeder': {'db_id': 'breeder__breeding_prefix',
                                     'name': 'Breeder',
                                     'upper': False,
                                     'html': ''},
-                        'current_owner': {'db_id': 'current_owner__breeder_prefix',
+                        'current_owner': {'db_id': 'current_owner__breeding_prefix',
                                           'name': 'Current Owner',
                                           'upper': False,
                                           'html': ''},
