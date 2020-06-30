@@ -7,7 +7,7 @@ from account.models import AttachedService
 
 class Pedigree(models.Model):
     class Meta:
-        ordering = ['-date_added']
+        ordering = ['-reg_no']
 
     STATES = (
         ('edited', 'Edited'),

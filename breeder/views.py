@@ -87,7 +87,7 @@ def new_breeder_form(request):
     if request.method == 'POST':
         if breeder_form.is_valid():
             new_breeder = Breeder()
-            new_breeder.breeding_prefix = breeder_form['breeding_prefix'].value()
+            new_breeder.breeding_prefix = breeder_form['breeding_prefix'].value().replace("'", "").replace("/", "")
             new_breeder.contact_name = breeder_form['contact_name'].value()
             new_breeder.address = breeder_form['address'].value()
             new_breeder.phone_number1 = breeder_form['phone_number1'].value()
@@ -140,7 +140,9 @@ def edit_breeder_form(request, breeder_id):
             breeder.delete()
             return redirect('breeders')
         if breeder_form.is_valid():
-            breeder_form.save()
+            breeder = breeder_form.save()
+            breeder.breeding_prefix = breeder.breeding_prefix.replace("'", "").replace("/", "")
+            breeder.save()
 
             for id, field in custom_fields.items():
                 custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
