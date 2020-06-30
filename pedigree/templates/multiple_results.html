@@ -61,7 +61,7 @@
 {% block footer %}
 
     <script src="{% static 'assets/libs/datatables/media/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'dist/js/pages/datatable/custom-datatable.js' %}"></script>
+<!--    <script src="{% static 'dist/js/pages/datatable/custom-datatable.js' %}"></script>-->
 
     <!-- start - This is for export functionality only -->
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
@@ -72,6 +72,19 @@
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
-    <script src="{% static 'dist/js/pages/datatable/datatable-advanced.init.js' %}"></script>
+<!--    <script src="{% static 'dist/js/pages/datatable/datatable-advanced.init.js' %}"></script>-->
 
+    <script>
+        $('#file_export').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            "language": {
+                            "search": "Filter records:"
+                          },
+            "order": []
+        });
+        $('.buttons-copy, .buttons-csv, .buttons-print, .buttons-pdf, .buttons-excel').addClass('btn btn-primary mr-1');
+    </script>
 {% endblock %}
