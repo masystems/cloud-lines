@@ -17,10 +17,10 @@ def breeder(request, breeder):
     breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breeder)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
     breeder_pedigrees = Pedigree.objects.filter(account=attached_service, breeder__breeding_prefix__exact=breeder).exclude(
-                state='unapproved').values('id', *columns)
+                state='unapproved').values('id', *columns)[:500]
     owner_pedigrees = Pedigree.objects.filter(account=attached_service,
                                                 current_owner__breeding_prefix__exact=breeder).exclude(
-        state='unapproved').values('id', *columns)
+        state='unapproved').values('id', *columns)[:500]
     groups = BreedGroup.objects.filter(breeder=breeder)
     # get custom fields
     try:
