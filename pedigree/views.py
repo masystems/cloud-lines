@@ -103,10 +103,10 @@ class GeneratePDF(View):
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "%s.pdf" % pdf_filename
-            content = "attachment; filename='%s'" % filename
+            content = "attachment; filename=%s" % filename
             download = request.GET.get("download")
             if download:
-                content = "attachment; filename='%s'" % filename
+                content = "attachment; filename=%s" % filename
             response['Content-Disposition'] = content
             return response
         return HttpResponse("Not found")
