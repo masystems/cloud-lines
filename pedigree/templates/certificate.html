@@ -78,7 +78,11 @@
                     <tr>
                         <!--## col1 ##-->
                         <td class="top-td">
-                            <img class="img" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo.png">
+                            {% if attached_service.image %}
+                                <img class="img" src="{{ attached_service.image.url }}">
+                            {% else %}
+                                <img class="img" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo.png">
+                            {% endif %}
                         </td>
                         <!--## col2 ##-->
                         <td>

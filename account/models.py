@@ -3,6 +3,10 @@ from django.contrib.auth.models import User
 from cloud_lines.models import Service
 
 
+def user_directory_path(instance, filename):
+    return 'acc_{0}_{1}/{2}'.format(instance.id, instance.domain.replace('https://', ''), filename)
+
+
 class UserDetail(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user')
     phone = models.CharField(max_length=15, blank=False)
@@ -20,6 +24,7 @@ class AttachedService(models.Model):
     read_only_users = models.ManyToManyField(User, related_name='read_only_users', blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
     domain = models.CharField(max_length=250, blank=True)
+    image = models.ImageField(upload_to=user_directory_path, blank=True)
     animal_type = models.CharField(max_length=250)
     custom_fields = models.TextField(blank=True)
     pedigree_columns = models.CharField(blank=False, max_length=500, default="reg_no,mean_kinship,name,dob,status,breed,sex")
