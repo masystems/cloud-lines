@@ -42,6 +42,29 @@
     <!-- ============================================================== -->
     <!-- End Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
+    <!-- Confirm submission moal -->
+    <div class="modal fade confirmForm" tabindex="-1" role="dialog" aria-labelledby="confirmForm" aria-hidden="true" style="display: none;">
+         <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to save this pedigree?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                    <button id="confirmSaveBtn" type="button" class="btn btn-success waves-effect waves-light">Save Pedigree</button>
+                </div>
+                <script>
+                    $('#confirmSaveBtn').click(function () {
+                        $('#newPedigreeForm').submit();
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
     <!-- add new breeder modal content -->
     <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="newBreederModal" aria-hidden="true" style="display: none;">
          <div class="modal-dialog modal-lg">
@@ -160,21 +183,22 @@
                     {% csrf_token %}
                     <div class="form-body">
                         {% include 'new_pedigree_form.html' %}
-                        <div class="form-actions">
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <div class="row container">
-                                        <div class="col-md-offset-3 col-md-9 button-wrapper">
-                                            <button id="submitPedigree" type="submit" class="btn btn-success">{% if contributor %}Submit for approval{% else %}Submit{% endif %}</button>
-                                            <a href="{% url 'pedigree_search' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6"> </div>
-                            </div>
-                        </div>
+
                     </div>
                 </form>
+                <div class="form-actions">
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <div class="row container">
+                                <div class="col-md-offset-3 col-md-9 button-wrapper">
+                                    <button id="submitPedigree" data-toggle="modal" data-target=".confirmForm" class="btn btn-success">{% if contributor %}Submit for approval{% else %}Submit{% endif %}</button>
+                                    <a href="{% url 'pedigree_search' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6"> </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -186,62 +210,5 @@
 
 {% block footer %}
 
-<!--<script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>-->
-<!--<script>-->
-<!--    var errors = false;-->
-<!--    Dropzone.options.newPedigreeForm = {-->
-<!--        autoProcessQueue: false,-->
-<!--        uploadMultiple: true,-->
-<!--        parallelUploads: 100,-->
-<!--        maxFiles: 100,-->
-<!--        maxFilesize: 5000,-->
-<!--        acceptedFiles: "image/*",-->
-<!--        addRemoveLinks: true,-->
-<!--        ignoreHiddenFiles: true,-->
-<!--        dictDefaultMessage: "Click or images here",-->
-<!--        timeout: 999999,-->
-<!--        thumbnailWidth: 450,-->
-<!--        thumbnailHeight: 400,-->
-<!--        error: function(file, errorMessage) {-->
-<!--            errors = true;-->
-<!--            },-->
-<!--        init: function() {-->
-<!--            var classSubDz = this;-->
-
-<!--            // First change the button to actually tell Dropzone to process the queue.-->
-<!--            $('#submitPedigree').click( function(e) {-->
-<!--              // Make sure that the form isn't actually being sent.-->
-<!--              e.preventDefault();-->
-<!--              e.stopPropagation();-->
-<!--              // classSubDz.processQueue();-->
-<!--              // if (classSubDz.files.length < 1) {-->
-<!--              //     $('#classSubForm{{ class.id }}').submit();-->
-<!--              // }-->
-<!--            });-->
-
-<!--            // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead-->
-<!--            // of the sending event because uploadMultiple is set to true.-->
-<!--            this.on("sendingmultiple", function() {-->
-<!--              // Gets triggered when the form is actually being sent.-->
-<!--              // Hide the success button or the complete form.-->
-<!--            });-->
-<!--            this.on("successmultiple", function(files, response) {-->
-<!--              // Gets triggered when the files have successfully been sent.-->
-<!--              // Redirect user or notify of success.-->
-<!--            });-->
-<!--            this.on("errormultiple", function(files, response) {-->
-<!--              // Gets triggered when there was an error sending the files.-->
-<!--              // Maybe show form again, and notify user of error-->
-<!--              console.log(response);-->
-<!--            });-->
-<!--        }-->
-
-<!--    }-->
-
-<!--    // First change the button to actually tell Dropzone to process the queue.-->
-<!--    // $("#submitPedigree").click(function(e) {-->
-<!--    //   $('#newPedigreeForm').submit();-->
-<!--    // });-->
-<!--</script>-->
 
 {% endblock %}

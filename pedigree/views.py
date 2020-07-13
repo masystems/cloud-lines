@@ -460,6 +460,7 @@ def edit_pedigree_form(request, id):
         custom_fields = {}
 
     if request.method == 'POST':
+        print(request.POST)
         if 'delete' in request.POST:
             if request.user in attached_service.contributors.all():
                 # contributors are not allowed to delete pedigrees!
