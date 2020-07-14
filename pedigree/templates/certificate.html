@@ -103,6 +103,9 @@
                         <td>
                             <ul style="list-style-type:none;">
                                 <li><strong>Reg No.</strong>: {{ lvl1.reg_no }}</li>
+                                {% if lvl1.tag_no %}
+                                    <li><strong>Tag No.</strong> {{ lvl1.tag_no }}</li>
+                                {% endif %}
                                 <li><strong>Name:</strong> {{ lvl1.name }}</li>
                                 {% if lvl1.dob %}
                                     <li><strong>DOB:</strong> {{ lvl1.dob }}</li>
@@ -142,10 +145,6 @@
                                 {{ attached_service.father_title }}
                                 {{ lvl2_1.reg_no }}
                                 <br>
-                                {% if lvl2_1.tag_no %}
-                                    Tag No. {{ lvl2_1.tag_no }}
-                                {% endif %}
-                                <br>
                                 {{ lvl2_1.name }}
                             {% else %}
                                 ~~~
@@ -157,10 +156,6 @@
                                 {{ attached_service.father_title }}
                                 {{ lvl3_1.reg_no }}
                                 <br>
-                                {% if lvl3_1.tag_no %}
-                                    Tag No. {{ lvl3_1.tag_no }}
-                                {% endif %}
-                                <br>
                                 {{ lvl3_1.name }}
                             {% else %}
                                 ~~~
@@ -171,10 +166,6 @@
                             {% if lvl4_1 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl4_1.reg_no }}
-                                <br>
-                                {% if lvl4_1.tag_no %}
-                                    Tag No. {{ lvl4_1.tag_no }}
-                                {% endif %}
                                 <br>
                                 {{ lvl4_1.name }}
                             {% else %}
@@ -189,10 +180,6 @@
                                 {{ attached_service.mother_title }}
                                 {{ lvl4_2.reg_no }}
                                 <br>
-                                {% if lvl4_2.tag_no %}
-                                    Tag No. {{ lvl4_2.tag_no }}
-                                {% endif %}
-                                <br>
                                 {{ lvl4_2.name }}
                             {% else %}
                                 ~~~
@@ -206,10 +193,6 @@
                                 {{ attached_service.mother_title }}
                                 {{ lvl3_2.reg_no }}
                                 <br>
-                                {% if lvl3_2.tag_no %}
-                                    Tag No. {{ lvl3_2.tag_no }}
-                                {% endif %}
-                                <br>
                                 {{ lvl3_2.name }}
                             {% else %}
                                 ~~~
@@ -220,10 +203,6 @@
                             {% if lvl4_3 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl4_3.reg_no }}
-                                <br>
-                                {% if lvl4_3.tag_no %}
-                                    Tag No. {{ lvl4_3.tag_no }}
-                                {% endif %}
                                 <br>
                                 {{ lvl4_3.name }}
                             {% else %}
@@ -237,10 +216,6 @@
                             {% if lvl4_4 %}
                                 {{ attached_service.mother_title }}
                                 {{ lvl4_4.reg_no }}
-                                <br>
-                                {% if lvl4_4.tag_no %}
-                                    Tag No. {{ lvl4_4.tag_no }}
-                                {% endif %}
                                 <br>
                                 {{ lvl4_4.name }}
                             {% else %}
@@ -256,10 +231,6 @@
                                 {{ attached_service.mother_title }}
                                 {{ lvl2_2.reg_no }}
                                 <br>
-                                {% if lvl2_2.tag_no %}
-                                    Tag No. {{ lvl2_2.tag_no }}
-                                {% endif %}
-                                <br>
                                 {{ lvl2_2.name }}
                             {% else %}
                                 ~~~
@@ -271,10 +242,6 @@
                                 {{ attached_service.father_title }}
                                 {{ lvl3_3.reg_no }}
                                 <br>
-                                {% if lvl3_3.tag_no %}
-                                    Tag No. {{ lvl3_3.tag_no }}
-                                {% endif %}
-                                <br>
                                 {{ lvl3_3.name }}
                             {% else %}
                                 ~~~
@@ -285,10 +252,6 @@
                             {% if lvl4_5 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl4_5.reg_no }}
-                                <br>
-                                {% if lvl4_5.tag_no %}
-                                    Tag No. {{ lvl4_5.tag_no }}
-                                {% endif %}
                                 <br>
                                 {{ lvl4_5.name }}
                             {% else %}
@@ -303,10 +266,6 @@
                                 {{ attached_service.mother_title }}
                                 {{ lvl4_6.reg_no }}
                                 <br>
-                                {% if lvl4_6.tag_no %}
-                                    Tag No. {{ lvl4_6.tag_no }}
-                                {% endif %}
-                                <br>
                                 {{ lvl4_6.name }}
                             {% else %}
                                 ~~~
@@ -320,10 +279,6 @@
                                 {{ attached_service.mother_title }}
                                 {{ lvl3_4.reg_no }}
                                 <br>
-                                {% if lvl3_4.tag_no %}
-                                    Tag No. {{ lvl3_4.tag_no }}
-                                {% endif %}
-                                <br>
                                 {{ lvl3_4.name }}
                             {% else %}
                                 ~~~
@@ -334,10 +289,6 @@
                             {% if lvl4_7 %}
                                 {{ attached_service.father_title }}
                                 {{ lvl4_7.reg_no }}
-                                <br>
-                                {% if lvl4_7.tag_no %}
-                                    Tag No. {{ lvl4_7.tag_no }}
-                                {% endif %}
                                 <br>
                                 {{ lvl4_7.name }}
                             {% else %}
@@ -351,10 +302,6 @@
                             {% if lvl4_8 %}
                                 {{ attached_service.mother_title }}
                                 {{ lvl4_8.reg_no }}
-                                <br>
-                                {% if lvl4_8.tag_no %}
-                                    Tag No. {{ lvl4_8.tag_no }}
-                                {% endif %}
                                 <br>
                                 {{ lvl4_8.name }}
                             {% else %}
