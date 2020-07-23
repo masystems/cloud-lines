@@ -109,7 +109,8 @@ def new_breeder_form(request):
 
             return redirect('breeder', new_breeder.breeding_prefix)
         else:
-            print(request.POST)
+            return render(request, 'new_breeder_form_base.html', {'breeder_form': breeder_form,
+                                                                  'custom_fields': custom_fields})
 
     else:
         breeder_form = BreederForm()
@@ -136,6 +137,7 @@ def edit_breeder_form(request, breeder_id):
             custom_fields = {}
 
     if request.method == 'POST':
+        print(request.POST)
         if 'delete' in request.POST:
             breeder.delete()
             return redirect('breeders')
@@ -151,6 +153,10 @@ def edit_breeder_form(request, breeder_id):
             breeder.save()
 
             return redirect('breeder', breeder.breeding_prefix)
+        else:
+            return render(request, 'edit_breeder_form.html', {'breeder_form': breeder_form,
+                                                              'breeder': breeder,
+                                                              'custom_fields': custom_fields})
 
     else:
         breeder_form = BreederForm()
