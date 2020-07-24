@@ -137,7 +137,6 @@ def edit_breeder_form(request, breeder_id):
             custom_fields = {}
 
     if request.method == 'POST':
-        print(request.POST)
         if 'delete' in request.POST:
             breeder.delete()
             return redirect('breeders')
