@@ -499,6 +499,19 @@ def update_titles(request):
 
 @user_passes_test(is_editor)
 @login_required(login_url="/account/login")
+def update_name(request):
+    if request.method == 'POST':
+        user_detail = UserDetail.objects.get(user=request.user)
+        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+        attached_service.organisation_or_society_name = request.POST.get('organisation_or_society_name')
+        attached_service.save()
+
+        return HttpResponse('Done')
+    return HttpResponse('Fail')
+
+
+@user_passes_test(is_editor)
+@login_required(login_url="/account/login")
 def update_pedigree_columns(request):
     if request.method == 'POST':
         user_detail = UserDetail.objects.get(user=request.user)

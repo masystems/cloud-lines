@@ -368,6 +368,51 @@
 <!--                    thrid tab-->
                     <div class="tab-pane" id="customisation" role="tabpanel">
                         <div class="card-body">
+                            <h4>Organisation or Society Name</h4>
+                            <p>This title is used at the top of the page to show you what package you're viewing and used on certificates.</p>
+
+                            <div class="form-group">
+                                <label class="col-md-12">Name</label>
+                                <div class="col-md-12">
+                                    <input type="text" value="{{ service.organisation_or_society_name }}" name="organisation_or_society_name" id="organisation_or_society_name" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-10">
+                                    <div class="alert"> <div id="nameSettingsMessage"></div>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <button id="selectNameSettings" class="btn btn-success float-right">Update Name</button>
+                                </div>
+                            </div>
+                            <script>
+                                $('#selectNameSettings').click(function () {
+
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "{% url 'update_name' %}",
+                                        dataType: "text",
+                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                        data: {
+                                            "organisation_or_society_name": $('#organisation_or_society_name').val()
+                                        },
+                                        beforeSend: function() {
+                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Updating</h5>').fadeIn(1000);
+                                        },
+                                        success: function (data) {
+                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Name updated!</h5>').fadeIn(1000);
+                                            console.log(data);
+                                        },
+                                        error: function (xhr, textStatus, error) {
+                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Something went wrong, but we are working on it!</h5>').fadeIn(1000);
+                                            console.log(error);
+                                        },
+                                    });
+                                });
+                            </script>
+
+                            <hr>
                             <p class="text-left">You can add your own custom fields below! Start by clicking Edit rows, then click add new.</p>
                             <table id="cfTable" class="table table-bordered table-striped">
                                 <thead>
@@ -391,144 +436,145 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
-                            {% if editor %}
-                                <a type="hidden" id="openCfModal" data-toggle="modal" data-target="#cfverticalcenter"></a>
-                                <button class="btn btn-success" id="createNewCf">Create New Custom Field</button>
+                            <div class="pb-4">
+                                {% if editor %}
+                                    <a type="hidden" id="openCfModal" data-toggle="modal" data-target="#cfverticalcenter"></a>
+                                    <button class="btn btn-success float-right" id="createNewCf">Create New Custom Field</button>
 
-                                <div id="cfverticalcenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="cfvcenter" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="cfvcenter">New/Edit Custom Field</h4>
-                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form class="form-horizontal" id="cfEditor">
-                                                    <div class="form-group">
-                                                        <label for="cfLocation" class="col-sm-3 control-label">Location</label>
-                                                        <div class="col-sm-9">
-                                                            <select class="form-control" id="cfLocation" name="location" required>
-                                                            <option value="pedigree">Pedigree</option>
-                                                            <option value="breeder">Breeder</option>
-                                                            <option value="breed">Breed</option>
-                                                        </select>
+                                    <div id="cfverticalcenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="cfvcenter" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title" id="cfvcenter">New/Edit Custom Field</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form class="form-horizontal" id="cfEditor">
+                                                        <div class="form-group">
+                                                            <label for="cfLocation" class="col-sm-3 control-label">Location</label>
+                                                            <div class="col-sm-9">
+                                                                <select class="form-control" id="cfLocation" name="location" required>
+                                                                <option value="pedigree">Pedigree</option>
+                                                                <option value="breeder">Breeder</option>
+                                                                <option value="breed">Breed</option>
+                                                            </select>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="form-group required">
-                                                        <label for="cfFieldName" class="col-sm-4 control-label">Field Name</label>
-                                                        <div class="col-sm-9">
-                                                            <input type="text" class="form-control" id="cfFieldName" name="fieldName" placeholder="Field Name" required>
+                                                        <div class="form-group required">
+                                                            <label for="cfFieldName" class="col-sm-4 control-label">Field Name</label>
+                                                            <div class="col-sm-9">
+                                                                <input type="text" class="form-control" id="cfFieldName" name="fieldName" placeholder="Field Name" required>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="cfFieldType" class="col-sm-3 control-label">Field Type</label>
-                                                        <div class="col-sm-9">
-                                                            <select class="form-control" id="cfFieldType" name="fieldType" required>
-                                                            <option value="textField">Text Field</option>
-                                                            <option value="textBox">Text Box</option>
-                                                        </select>
+                                                        <div class="form-group">
+                                                            <label for="cfFieldType" class="col-sm-3 control-label">Field Type</label>
+                                                            <div class="col-sm-9">
+                                                                <select class="form-control" id="cfFieldType" name="fieldType" required>
+                                                                <option value="textField">Text Field</option>
+                                                                <option value="textBox">Text Box</option>
+                                                            </select>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <input type="hidden" id="cfID" name="id">
-                                                    <input type="hidden" id="cfFormType" name="formType">
-                                                </form>
-                                                <div class="modal-footer">
+                                                        <input type="hidden" id="cfID" name="id">
+                                                        <input type="hidden" id="cfFormType" name="formType">
+                                                    </form>
+                                                    <div class="modal-footer">
 
-                                                    <button type="submit" id="cfFormBtn" class="btn btn-success">Save changes</button>
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                        <button type="submit" id="cfFormBtn" class="btn btn-success">Save changes</button>
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- delete user modal content -->
-                             <a type="hidden" id="deleteCfModal" data-toggle="modal" data-target="#deleteCf"></a>
-                                <div id="deleteCf" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="vcenter" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="cfDelvcenter">Deletion Confirmation</h4>
-                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <p>Are you sure you want to delete custom field?</p>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
-                                                <button type="submit" id="cfDelete" name="delete" value="delete" class="btn btn-danger float-right">Yes, delete it!</button>
+                                    <!-- delete user modal content -->
+                                 <a type="hidden" id="deleteCfModal" data-toggle="modal" data-target="#deleteCf"></a>
+                                    <div id="deleteCf" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="vcenter" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title" id="cfDelvcenter">Deletion Confirmation</h4>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to delete custom field?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
+                                                    <button type="submit" id="cfDelete" name="delete" value="delete" class="btn btn-danger float-right">Yes, delete it!</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            {% endif %}
-                            <script>
-                                $('#createNewCf').click(function() {
-                                    var currentRow=$(this).closest("tr");
+                                {% endif %}
+                                <script>
+                                    $('#createNewCf').click(function() {
+                                        var currentRow=$(this).closest("tr");
 
-                                    $('#cfLocaltion').val('Pedigree');
-                                    $('#cfFieldName').val('');
-                                    $('#cfFieldType').val('textField');
+                                        $('#cfLocaltion').val('Pedigree');
+                                        $('#cfFieldName').val('');
+                                        $('#cfFieldType').val('textField');
 
-                                    // edit form type
-                                    $('#cfFormType').val('new');
-                                    // open modal
-                                    $('#openCfModal').click();
-                                });
-
-                                $("#cfTable").on('click','#cfEdit',function(){
-                                    var currentRow=$(this).closest("tr");
-                                    $('#cfID').val(currentRow.find("td:eq(0)").text());
-                                    $('#cfLocation').val(currentRow.find("td:eq(1)").text());
-                                    $('#cfFieldName').val(currentRow.find("td:eq(2)").text());
-                                    $('#cfFieldType').val(currentRow.find("td:eq(3)").text());
-                                    // edit form type
-                                    $('#cfFormType').val('edit');
-                                    // open modal
-                                    $('#openCfModal').click();
-
-                                });
-
-                                $("#cfTable").on('click','#cfDeleteBtn',function(){
-                                    var currentRow=$(this).closest("tr");
-                                    $('#cfID').val(currentRow.find("td:eq(0)").text());
-                                    $('#cfLocation').val(currentRow.find("td:eq(1)").text());
-                                    $('#cfFieldName').val(currentRow.find("td:eq(2)").text());
-                                    $('#cfFieldType').val(currentRow.find("td:eq(3)").text());
-                                    // edit form type
-                                    $('#cfFormType').val('delete');
-                                    // open modal
-                                    $('#deleteCfModal').click();
-
-                                });
-
-                                $("#cfDelete").click( function(){
-                                    // auto click submit
-                                    $('#cfFormBtn').click();
-                                });
-
-                                $("#cfFormBtn").click( function(){
-                                    $.ajax({
-                                        url: "{% url 'custom_field_edit' %}",
-                                        type: 'POST',
-                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                                        dataType: 'text',
-                                        data: $('#cfEditor').serialize(),
-                                        success: function(data) {
-                                            console.log(data);
-                                            var result = JSON.parse(data);
-                                            if (result.success){
-                                                $('#cfverticalcenter').modal('toggle');
-                                                location.reload();
-                                            } else {
-                                                console.log('something went wrong!');
-                                            }
-                                        }
+                                        // edit form type
+                                        $('#cfFormType').val('new');
+                                        // open modal
+                                        $('#openCfModal').click();
                                     });
-                                });
-                            </script>
 
+                                    $("#cfTable").on('click','#cfEdit',function(){
+                                        var currentRow=$(this).closest("tr");
+                                        $('#cfID').val(currentRow.find("td:eq(0)").text());
+                                        $('#cfLocation').val(currentRow.find("td:eq(1)").text());
+                                        $('#cfFieldName').val(currentRow.find("td:eq(2)").text());
+                                        $('#cfFieldType').val(currentRow.find("td:eq(3)").text());
+                                        // edit form type
+                                        $('#cfFormType').val('edit');
+                                        // open modal
+                                        $('#openCfModal').click();
+
+                                    });
+
+                                    $("#cfTable").on('click','#cfDeleteBtn',function(){
+                                        var currentRow=$(this).closest("tr");
+                                        $('#cfID').val(currentRow.find("td:eq(0)").text());
+                                        $('#cfLocation').val(currentRow.find("td:eq(1)").text());
+                                        $('#cfFieldName').val(currentRow.find("td:eq(2)").text());
+                                        $('#cfFieldType').val(currentRow.find("td:eq(3)").text());
+                                        // edit form type
+                                        $('#cfFormType').val('delete');
+                                        // open modal
+                                        $('#deleteCfModal').click();
+
+                                    });
+
+                                    $("#cfDelete").click( function(){
+                                        // auto click submit
+                                        $('#cfFormBtn').click();
+                                    });
+
+                                    $("#cfFormBtn").click( function(){
+                                        $.ajax({
+                                            url: "{% url 'custom_field_edit' %}",
+                                            type: 'POST',
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            dataType: 'text',
+                                            data: $('#cfEditor').serialize(),
+                                            success: function(data) {
+                                                console.log(data);
+                                                var result = JSON.parse(data);
+                                                if (result.success){
+                                                    $('#cfverticalcenter').modal('toggle');
+                                                    location.reload();
+                                                } else {
+                                                    console.log('something went wrong!');
+                                                }
+                                            }
+                                        });
+                                    });
+                                </script>
+                            </div>
                             {% if editor %}
                                 <!-- End Popup Model -->
                                 <hr>
