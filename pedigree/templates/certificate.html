@@ -17,6 +17,15 @@
         @page {
             size: letter landscape;
             margin: 2cm;
+
+            @frame footer {
+                -pdf-frame-content: footer;
+                bottom: 2cm;
+                margin-left: 1cm;
+                margin-right: 1cm;
+                height: 1cm;
+
+            }
         }
 
         td:nth-child(1) {
@@ -57,22 +66,11 @@
 <!-- Main wrapper - style you can find in pages.scss -->
 <!-- ============================================================== -->
 <div id="main-wrapper">
-    <!-- ============================================================== -->
-    <!-- Topbar header - style you can find in pages.scss -->
-    <!-- ============================================================== -->
-    <header class="topbar">
-        <nav class="navbar top-navbar navbar-expand-md navbar-light">
-            <!-- ============================================================== -->
-            <!-- Logo -->
-            <!-- ============================================================== -->
-            <div class="navbar-header">
-                <h2 style="color:white"> CloudLines</h2>
-            </div>
-        </nav>
-    </header>
-
     <div class="page-wrapper">
         <div class="container-fluid">
+            {% if attached_service.organisation_or_society_name %}
+                <h1 style="text-align: center">{{ attached_service.organisation_or_society_name }}</h1>
+            {% endif %}
             <table class="responsive" style="width:100%">
                 <tbody>
                     <tr>
@@ -81,7 +79,7 @@
                             {% if attached_service.image %}
                                 <img class="img" src="{{ attached_service.image.url }}">
                             {% else %}
-                                <img class="img" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo.png">
+                                <img class="img" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo-teal-transparent.png">
                             {% endif %}
                         </td>
                         <!--## col2 ##-->
@@ -312,10 +310,11 @@
                 </tbody>
             </table>
         </div>
-        <footer class="footer">
-            © 2019 MA Systems Ltd | V2.0
-        </footer>
     </div>
+
+</div>
+<div id="footer">
+    Created with <img class="img" style="max-width:100px" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo-teal-transparent.png">
 </div>
 
 </body>
