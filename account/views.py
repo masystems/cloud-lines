@@ -221,7 +221,8 @@ def user_edit(request):
                                                                                            new_user.username,
                                                                                            urljoin(domain, 'accounts/password_reset/'),
                                                                                            domain)
-            send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
+            if not django_settings.DEBUG:
+                send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
             return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'edit':
@@ -242,11 +243,11 @@ def user_edit(request):
                 main_account.contributors.add(new_user)
             else:
                 main_account.read_only_users.add(new_user)
-            print('edit user!!')
+
             return HttpResponse(json.dumps({'success': True}))
 
         elif request.POST.get('formType') == 'delete':
-            print('delete user')
+
             User.objects.get(username=request.POST.get('register-form-username'),
                              email=request.POST.get('register-form-email')).delete()
 
@@ -593,8 +594,9 @@ def register(request):
             <p>Feel free to contact us about anything and enjoy!</p>""".format(user.get_full_name(), user.username)
 
             if 'localhost' not in request.build_absolute_uri():
-                send_mail('Welcome to Cloud-lines!', user.get_full_name(), email_body, send_to=user.email)
-                send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
+                if not django_settings.DEBUG:
+                    send_mail('Welcome to Cloud-lines!', user.get_full_name(), email_body, send_to=user.email)
+                    send_mail('New site registration', user.get_full_name(), email_body, reply_to=user.email)
 
             if request.POST.get("service"):
                 return redirect('order', request.POST.get("service"))
