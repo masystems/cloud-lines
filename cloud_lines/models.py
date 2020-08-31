@@ -120,11 +120,11 @@ class Update(models.Model):
     body = models.TextField(default="""<strong>Features</strong>
     <br>
         <ul class="list-icons">
-            <li><i class="fa fa-check text-info"></i> </li>
+            <li><i class="fad fa-check text-info"></i> </li>
         </ul>
 <strong>Bug Fixes</strong>
         <ul class="list-icons">
-            <li><i class="fa fa-check text-info"></i> </li>
+            <li><i class="fad fa-check text-info"></i> </li>
         </ul>""")
 
     def __str__(self):

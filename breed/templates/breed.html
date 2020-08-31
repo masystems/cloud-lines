@@ -16,19 +16,19 @@
         <div class="col-md-6 col-4 align-self-center">
             {% if add_breed %}
                 {% if editor %}
-                    <a href="{% url 'new_breed_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Create
+                    <a href="{% url 'new_breed_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Create
                     </a>
-                    <a href="{% url 'edit_breed_form' breed.id %}" id="editBreed" class="btn btn-outline-info float-right mr-1"><i class="fas fa-pencil-alt"></i> Edit
+                    <a href="{% url 'edit_breed_form' breed.id %}" id="editBreed" class="btn btn-outline-info float-right mr-1"><i class="fad fa-pencil-alt"></i> Edit
                     </a>
                 {% else %}
                     {% include 'login_modal.html' %}
                     <!-- /.modal -->
-                    <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Create</button>
+                    <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Create</button>
                 {% endif %}
             {% else %}
                 {% include 'upgrade_modal.html' with type='breeds' %}
-                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fas fa-plus-square"></i> Create</button>
-                <a href="{% url 'edit_breed_form' breed.id %}" class="btn btn-outline-info float-right mr-2"><i class="fas fa-pencil-alt"></i> Edit
+                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Create</button>
+                <a href="{% url 'edit_breed_form' breed.id %}" class="btn btn-outline-info float-right mr-2"><i class="fad fa-pencil-alt"></i> Edit
                     </a>
             {% endif %}
         </div>

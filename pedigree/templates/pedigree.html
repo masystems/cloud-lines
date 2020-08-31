@@ -31,21 +31,21 @@ vertical-align: middle;
         <div class="col-md-6 col-4 align-self-center">
             {% if editor or contributor %}
                 {% if lvl1.state == 'approved' or editor %}
-                    <a href="{% url 'edit_pedigree_form' lvl1.id %}" id="editPedigree" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fas fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                    <a href="{% url 'edit_pedigree_form' lvl1.id %}" id="editPedigree" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
                 {% endif %}
                 {% if add_pedigree %}
-                    <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                    <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
                 {% else %}
                     {% include 'upgrade_modal.html' with type='pedigrees' %}
-                    <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fas fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                    <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
                 {% endif %}
             {% else %}
                 {% include 'login_modal.html' %}
                 <!-- /.modal -->
-                <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fas fa-pencil-alt"></i> Edi {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
-                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fad fa-pencil-alt"></i> Edi {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
             {% endif %}
 
         </div>
@@ -475,15 +475,15 @@ vertical-align: middle;
                 <ul class="feeds">
                     {% if lvl1.creator %}
                     <li>
-                        <div class="bg-light-primary"><i class="fas fa-plus"></i></div> Added by <span class="font-weight-normal">{{ lvl1.creator.get_full_name }}</span></li>
+                        <div class="bg-light-primary"><i class="fad fa-plus"></i></div> Added by <span class="font-weight-normal">{{ lvl1.creator.get_full_name }}</span></li>
                     {% endif %}
                     {% if lvl1.breeder.breeding_prefix %}
                     <li>
-                        <div class="bg-light-info"><i class="fas fa-user-plus"></i></div> Breeder <span class=""><a href="{% url 'breeder' lvl1.breeder.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.breeder.breeding_prefix }}</button></a></span></li>
+                        <div class="bg-light-info"><i class="fad fa-user-plus"></i></div> Breeder <span class=""><a href="{% url 'breeder' lvl1.breeder.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.breeder.breeding_prefix }}</button></a></span></li>
                     {% endif %}
                     {% if lvl1.current_owner.breeding_prefix %}
                     <li>
-                        <div class="bg-light-success"><i class="fas fa-user"></i></div> Owner <span class=""><a href="{% url 'breeder' lvl1.current_owner.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.current_owner.breeding_prefix }}</button></a></span></li>
+                        <div class="bg-light-success"><i class="fad fa-user"></i></div> Owner <span class=""><a href="{% url 'breeder' lvl1.current_owner.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.current_owner.breeding_prefix }}</button></a></span></li>
                     {% endif %}
                     {% if lvl1.reg_no %}
                     <li>
@@ -495,7 +495,7 @@ vertical-align: middle;
                     {% endif %}
                     {% if lvl1.name %}
                     <li>
-                        <div class="bg-light-danger"><i class="fas fa-smile"></i></div> Name<span class="font-weight-normal">{{ lvl1.name }}</span></li>
+                        <div class="bg-light-danger"><i class="fad fa-smile"></i></div> Name<span class="font-weight-normal">{{ lvl1.name }}</span></li>
                     {% endif %}
                     {% if lvl1.date_of_registration %}
                     <li>
@@ -503,7 +503,7 @@ vertical-align: middle;
                     {% endif %}
                     {% if lvl1.dob %}
                     <li>
-                        <div class="bg-light-info"><i class="fas fa-birthday-cake"></i></div> Date of Birth <span class="font-weight-normal">{{ lvl1.dob }}</span></li>
+                        <div class="bg-light-info"><i class="fad fa-birthday-cake"></i></div> Date of Birth <span class="font-weight-normal">{{ lvl1.dob }}</span></li>
                     {% endif %}
                     {% if lvl1.dod %}
                     <li>
@@ -511,15 +511,15 @@ vertical-align: middle;
                     {% endif %}
                     {% if lvl1.status %}
                     <li>
-                        <div class="bg-light-inverse"><i class="{% if lvl1.status == 'alive' %}far fa-heart{% elif lvl1.status == 'dead' %}fas fa-skull{% else %}far fa-question-circle{% endif %}"></i></div> Status <span class="font-weight-normal">{{ lvl1.status|title }}</span></li>
+                        <div class="bg-light-inverse"><i class="{% if lvl1.status == 'alive' %}far fa-heart{% elif lvl1.status == 'dead' %}fad fa-skull{% else %}far fa-question-circle{% endif %}"></i></div> Status <span class="font-weight-normal">{{ lvl1.status|title }}</span></li>
                     {% endif %}
                     {% if lvl1.sex %}
                     <li>
-                        <div class="bg-light-inverse"><i class="fas fa-venus-mars"></i></div> Sex <span class="font-weight-normal">{{ lvl1.sex|title }}</span></li>
+                        <div class="bg-light-inverse"><i class="fad fa-venus-mars"></i></div> Sex <span class="font-weight-normal">{{ lvl1.sex|title }}</span></li>
                     {% endif %}
                     {% if lvl1.attribute.breed.breed_name %}
                     <li>
-                        <div class="bg-light-warning"><i class="fas fa-dna"></i></div> Breed <span class="font-weight-normal">{{ lvl1.attribute.breed.breed_name }}</span></li>
+                        <div class="bg-light-warning"><i class="fad fa-dna"></i></div> Breed <span class="font-weight-normal">{{ lvl1.attribute.breed.breed_name }}</span></li>
                     {% endif %}
                     {% if lvl1.breed_group %}
                     <li>

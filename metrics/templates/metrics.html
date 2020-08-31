@@ -68,7 +68,7 @@
                                 data: $('#ksForm').serialize(),
                                 beforeSend: function() {
                                     $('#ksBtn').attr("disabled", true);
-                                    $('#ksResults').html('<i class="fa fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                                    $('#ksResults').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
                                     $('#ksResults').removeClass('d-none');
                                 },
                                 success: function(data) {
@@ -118,7 +118,7 @@
                 dataType: 'text',
                 data: [],
                 beforeSend: function() {
-                    $('#coiTimer').html('<i class="fa fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                    $('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
                 },
                 success: function(data) {
                     try {
@@ -178,7 +178,7 @@
                 dataType: 'text',
                 data: [],
                 beforeSend: function() {
-                    $('#meanKinshipTimer').html('<i class="fa fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                    $('#meanKinshipTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
                 },
                 success: function(data) {
                     try {
@@ -270,9 +270,9 @@
                             </div>
                         </form>
                         <div>
-                            <p><i class='fas fa-circle' style='color:green'></i> This male would be a good match for the selected female, based on the close Mean-Kinship value of both individuals, and the offspring COI being no higher than the breed average COI.</p>
-                            <p><i class='fas fa-circle' style='color:orange'></i> This male may not be the first choice as a mate for the selected female, but it is still relatively close in terms of Mean-Kinship, and the COI of the offspring would be no higher than the breed average COI.</p>
-                            <p><i class='fas fa-circle' style='color:red'></i> This male would not be an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.</p>
+                            <p><i class='fad fa-circle' style='color:green'></i> This male would be a good match for the selected female, based on the close Mean-Kinship value of both individuals, and the offspring COI being no higher than the breed average COI.</p>
+                            <p><i class='fad fa-circle' style='color:orange'></i> This male may not be the first choice as a mate for the selected female, but it is still relatively close in terms of Mean-Kinship, and the COI of the offspring would be no higher than the breed average COI.</p>
+                            <p><i class='fad fa-circle' style='color:red'></i> This male would not be an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.</p>
                         </div>
 
                         <button id="pdfDownloadBtn" class="btn btn-dark d-none mt-2 mb-2">Export to PDF</button>
@@ -280,11 +280,11 @@
                         <table id="saTable" class="table table-bordered table-striped">
                             <thead id="saHeadings">
                                 <tr>
-                                    <th scope="col" id="regNo">Reg No. <i class="fas fa-sort text-muted"></i></th>
-                                    <th scope="col" id="name">Name <i class="fas fa-sort text-muted"></i></th>
-                                    <th scope="col" id="meanKinship">Mean Kinship <i class="fas fa-sort text-muted"></i></th>
-                                    <th scope="col" id="kinship">COI of Offspring <i class="fas fa-sort text-muted"></i></th>
-                                    <th scope="col" id="score">Score <i class="fas fa-sort text-muted"></i></th>
+                                    <th scope="col" id="regNo">Reg No. <i class="fad fa-sort text-muted"></i></th>
+                                    <th scope="col" id="name">Name <i class="fad fa-sort text-muted"></i></th>
+                                    <th scope="col" id="meanKinship">Mean Kinship <i class="fad fa-sort text-muted"></i></th>
+                                    <th scope="col" id="kinship">COI of Offspring <i class="fad fa-sort text-muted"></i></th>
+                                    <th scope="col" id="score">Score <i class="fad fa-sort text-muted"></i></th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -307,7 +307,7 @@
             dataType: 'text',
             data: $('#saForm').serialize(),
             beforeSend: function() {
-                $('#saTbody').html('<i class="fa fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                $('#saTbody').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
                 $.ajax({
                     url: '{% url 'stud_advisor_mother_details' %}',
                     type: 'post',
@@ -350,7 +350,7 @@
                         var saResults = JSON.parse(data);
                         $("#saTable tbody").empty();
                         $.each(saResults, function(index, element) {
-                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><p style=\"visibility: hidden;\"><i class='fas fa-circle' style='visibility: visible;color:" + element.color + "'></i>" + element.color + "</p></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
+                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><p style=\"visibility: hidden;\"><i class='fad fa-circle' style='visibility: visible;color:" + element.color + "'></i>" + element.color + "</p></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
                             $('#saTable tbody').append(tr);
                         });
                         $('#kinship').click();

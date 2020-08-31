@@ -22,12 +22,12 @@
         <div class="col-md-6 col-4 align-self-center">
 
             {% if editor %}
-            <a href="{% url 'new_breeder_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fas fa-plus-square"></i> Add Breeder
+            <a href="{% url 'new_breeder_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add Breeder
             </a>
             {% else %}
                 {% include 'login_modal.html' %}
             <!-- /.modal -->
-            <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fas fa-plus-square"></i> Add Breeder</button>
+            <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Add Breeder</button>
         {% endif %}
         </div>
     </div>

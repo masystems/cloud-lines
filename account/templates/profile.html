@@ -61,7 +61,7 @@
         <div class="col-md-12 col-lg-4 col-xlg-3">
             <div class="card">
                 <div class="card-body">
-                    <center class="mt-4"> <i class="fas fa-user-circle fa-4x"></i>
+                    <center class="mt-4"> <i class="fad fa-user-circle fa-4x"></i>
                         <h4 class="card-title mt-2">{{ request.user.get_full_name }}</h4>
                         <h6 class="card-subtitle">{% if editor %}Editor{% else %}User{% endif %}</h6>
 <!--                        <div class="row text-center justify-content-md-center">-->
@@ -148,31 +148,31 @@
                                                             <p class="uppercase">per month</p>
                                                         </div>
                                                         <div class="price-table-content">
-                                                            <div class="price-row"><i class="fas fa-pencil-alt"></i> {{ plan.admin_users }} Editors</div>
-                                                            <div class="price-row"><i class="fas fa-pencil-ruler"></i> {% if plan.contrib_users == 99 %}
+                                                            <div class="price-row"><i class="fad fa-pencil-alt"></i> {{ plan.admin_users }} Editors</div>
+                                                            <div class="price-row"><i class="fad fa-pencil-ruler"></i> {% if plan.contrib_users == 99 %}
                                                                                                                         Unlimited
                                                                                                                       {% else %}
                                                                                                                         {{ plan.contrib_users }}
                                                                                                                        {% endif %} Contributors</div>
-                                                            <div class="price-row"><i class="fas fa-book-reader"></i> {% if plan.read_only_users == 99 %}
+                                                            <div class="price-row"><i class="fad fa-book-reader"></i> {% if plan.read_only_users == 99 %}
                                                                                                                         Unlimited
                                                                                                                       {% else %}
                                                                                                                        {{ plan.read_only_users }}
                                                                                                                       {% endif %} Read only Users</div>
-                                                            <div class="price-row"><i class="fas fa-paw"></i> {% if plan.number_of_animals == 99 %}
+                                                            <div class="price-row"><i class="fad fa-paw"></i> {% if plan.number_of_animals == 99 %}
                                                                                                                     Unlimited
                                                                                                                 {% else %}
                                                                                                                     {{ plan.number_of_animals }}
-                                                                                                                {% endif %} Animals <i class="fas fa-feather-alt"></i></div>
+                                                                                                                {% endif %} Animals <i class="fad fa-feather-alt"></i></div>
                                                             <div class="price-row">{% if plan.multi_breed %}
-                                                                                        <i class="fas fa-check"></i>
+                                                                                        <i class="fad fa-check"></i>
                                                                                     {% else %}
-                                                                                        <i class="fas fa-times"></i>
+                                                                                        <i class="fad fa-times"></i>
                                                                                     {% endif %} Multibreed</div>
                                                             <div class="price-row">{% if plan.support %}
-                                                                                        <td><i class="fas fa-check"></i></td>
+                                                                                        <td><i class="fad fa-check"></i></td>
                                                                                     {% else %}
-                                                                                        <td><i class="fas fa-times"></i></td>
+                                                                                        <td><i class="fad fa-times"></i></td>
                                                                                     {% endif %} Support</div>
                                                             <div class="price-row">
                                                                 {% if plan.active %}

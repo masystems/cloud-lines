@@ -27,14 +27,14 @@
                                 {% if editor or contributor %}
                                     <a href="{% url 'new_pedigree_form' %}">
                                         <div class="box text-center">
-                                            <h1 class="font-light text-white"><i class="fas fa-plus"></i> </h1>
+                                            <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
                                             <h6 class="text-white">Add New {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
                                         </div>
                                     </a>
                                 {% else %}
                                     <a href="#" data-toggle="modal" data-target="#login">
                                         <div class="box text-center">
-                                            <h1 class="font-light text-white"><i class="fas fa-plus"></i> </h1>
+                                            <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
                                             <h6 class="text-white">Add New {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
                                         </div>
                                     </a>
@@ -42,7 +42,7 @@
                             {% else %}
                                 <a href="#" data-toggle="modal" data-target="#upgrade">
                                     <div class="box text-center">
-                                        <h1 class="font-light text-white"><i class="fas fa-plus"></i> </h1>
+                                        <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
                                         <h6 class="text-white">Add New {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}</h6>
                                     </div>
                                 </a>
@@ -55,14 +55,14 @@
                             {% if editor %}
                                 <a href="{% url 'new_breeder_form' %}">
                                     <div class="box text-center">
-                                        <h1 class="font-light text-white"><i class="fas fa-user-plus"></i></h1>
+                                        <h1 class="font-light text-white"><i class="fad fa-user-plus"></i></h1>
                                         <h6 class="text-white">Add New Breeder/Owner</h6>
                                     </div>
                                 </a>
                             {% else %}
                                 <a href="#" data-toggle="modal" data-target="#login">
                                     <div class="box text-center">
-                                        <h1 class="font-light text-white"><i class="fas fa-user-plus"></i></h1>
+                                        <h1 class="font-light text-white"><i class="fad fa-user-plus"></i></h1>
                                         <h6 class="text-white">Add New Breeder/Owner</h6>
                                     </div>
                                 </a>
@@ -76,14 +76,14 @@
                                 {% if editor %}
                                     <a href="{% url 'new_breed_form' %}">
                                         <div class="box text-center">
-                                            <h1 class="font-light text-white"><i class="fas fa-dna"></i></h1>
+                                            <h1 class="font-light text-white"><i class="fad fa-dna"></i></h1>
                                             <h6 class="text-white">Add New Breed</h6>
                                         </div>
                                     </a>
                                 {% else %}
                                     <a href="#" data-toggle="modal" data-target="#login">
                                         <div class="box text-center">
-                                            <h1 class="font-light text-white"><i class="fas fa-dna"></i></h1>
+                                            <h1 class="font-light text-white"><i class="fad fa-dna"></i></h1>
                                             <h6 class="text-white">Add New Breed</h6>
                                         </div>
                                     </a>
@@ -91,7 +91,7 @@
                             {% else %}
                                 <a href="#" data-toggle="modal" data-target="#upgrade">
                                     <div class="box text-center">
-                                        <h1 class="font-light text-white"><i class="fas fa-dna"></i></h1>
+                                        <h1 class="font-light text-white"><i class="fad fa-dna"></i></h1>
                                         <h6 class="text-white">Add New Breed</h6>
                                     </div>
                                 </a>
@@ -105,14 +105,14 @@
                                 {% if editor or contributor %}
                                     <a href="{% url 'new_breed_group_form' %}">
                                         <div class="box text-center">
-                                            <h1 class="font-light text-white"><i class="far fa-object-ungroup"></i></h1>
+                                            <h1 class="font-light text-white"><i class="fad fa-object-ungroup"></i></h1>
                                             <h6 class="text-white">Add New Breed Group</h6>
                                         </div>
                                     </a>
                                 {% else %}
                                     <a href="#" data-toggle="modal" data-target="#login">
                                         <div class="box text-center">
-                                            <h1 class="font-light text-white"><i class="far fa-object-ungroup"></i></h1>
+                                            <h1 class="font-light text-white"><i class="fad fa-object-ungroup"></i></h1>
                                             <h6 class="text-white">Add New Breed Group</h6>
                                         </div>
                                     </a>
@@ -137,7 +137,7 @@
                                 {% else %}
                                     <div class="alert alert-info">
                                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button>
-                                        <h3 class="text-info"><i class="fa fa-exclamation-circle"></i> Information</h3>
+                                        <h3 class="text-info"><i class="fad fa-exclamation-circle"></i> Information</h3>
                                         You have not added any {{ service.animal_type|title }} yet to your Cloudlines instance.
                                         You can <a href="{% url 'new_pedigree_form' %}">click here</a> or click the 'Add New Pedigree' button above to get started.
                                         Don't forget you need to have at least one breed added before you can add a pedigree!

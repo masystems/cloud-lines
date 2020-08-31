@@ -11,7 +11,8 @@
     <meta name="author" content="">
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/images/favicon.png' %}">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<!--    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.14.0/css/all.css" integrity="sha384-VhBcF/php0Z/P5ZxlxaEx1GwqTQVIBu4G4giRWxTKOCjTxsPFETUDdVL5B6vYvOt" crossorigin="anonymous">
 
     <title>Cloud-Lines</title>
     <!-- Bootstrap Core CSS -->
@@ -95,7 +96,7 @@
                     <li class="nav-item dropdown">
 <!--                        alert for editors -->
                         {% if editor %}
-                            <a class="nav-link dropdown-toggle text-muted text-muted waves-effect waves-dark" href="{% url 'approvals' %}"> <i class="fas fa-bell"></i>
+                            <a class="nav-link dropdown-toggle text-muted text-muted waves-effect waves-dark" href="{% url 'approvals' %}"> <i class="fad fa-bell"></i>
                                 {% if pending_approvals %}
                                     <div class="notify"> <span class="heartbit"></span> <span class="point"></span> </div>
                                 {% endif %}
@@ -105,9 +106,9 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" id="2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {% if service.site_mode == 'mammal' %}
-                                    <i class="fas fa-paw"></i>
+                                    <i class="fad fa-paw"></i>
                                 {% else %}
-                                    <i class="fas fa-feather-alt"></i>
+                                    <i class="fad fa-feather-alt"></i>
                                 {% endif %}
                                 {{ service.organisation_or_society_name }}
                             </a>
@@ -121,7 +122,7 @@
                                             {% for att_service in attached_services.all %}
                                                 <!-- Message -->
                                                 <a href="{% url 'primary_account' att_service.id %}">
-                                                    <div class="btn btn-danger btn-circle"><i class="fa fa-link"></i></div>
+                                                    <div class="btn btn-danger btn-circle"><i class="fad fa-link"></i></div>
                                                     <div class="mail-contnet">
                                                         <h5>{{ att_service.organisation_or_society_name }}</h5> <span class="mail-desc"><strong>Service:</strong> {{ att_service.service }}</span> <span class="time"><strong>Owner:</strong> {{ att_service.user.user.get_full_name }}</span> </div>
                                                 </a>
@@ -129,7 +130,7 @@
                                         </div>
                                     </li>
                                     <li>
-                                    <a class="nav-link text-center" href="https://cloud-lines.com/order/"> <strong>Get more services?</strong> <i class="fa fa-angle-right"></i> </a>
+                                    <a class="nav-link text-center" href="https://cloud-lines.com/order/"> <strong>Get more services?</strong> <i class="fad fa-angle-right"></i> </a>
                                 </li>
                                 </ul>
                             </div>
@@ -157,13 +158,13 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user-circle fa-lg"></i> {{ request.user.get_full_name }}</a>
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fad fa-user-circle fa-lg"></i> {{ request.user.get_full_name }}</a>
                         {% if user.is_authenticated %}
                         <div class="dropdown-menu dropdown-menu-right animated flipInY">
                             <ul class="dropdown-user">
                                 <li>
                                     <div class="dw-user-box">
-                                        <div class="u-img"><i class="fas fa-user-circle fa-4x"></i></div>
+                                        <div class="u-img"><i class="fad fa-user-circle fa-4x"></i></div>
                                         <div class="u-text">
                                             <h4>{{ request.user.get_full_name }} {{ request.user.last }}</h4>
                                             <p class="text-muted">{{ request.user.email }}</p>
@@ -172,18 +173,18 @@
                                         </div>
                                     </div>
                                 </li>
-                                <li><a href="{% url 'approvals' %}"><i class="fas fa-check"></i> <i class="fas fa-times" style="color: Tomato;"></i> Approvals</a></li>
+                                <li><a href="{% url 'approvals' %}"><i class="fad fa-check"></i> <i class="fad fa-times" style="color: Tomato;"></i> Approvals</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li><a href="{% url 'settings' %}"><i class="fas fa-cogs"></i> Site Settings</a></li>
-                                <li><a href="{% url 'profile' %}"><i class="fas fa-user-cog"></i> Account Settings</a></li>
+                                <li><a href="{% url 'settings' %}"><i class="fad fa-cogs"></i> Site Settings</a></li>
+                                <li><a href="{% url 'profile' %}"><i class="fad fa-user-cog"></i> Account Settings</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li><a href="{% url 'cl_logout' %}"><i class="fa fa-power-off"></i> Logout</a></li>
+                                <li><a href="{% url 'cl_logout' %}"><i class="fad fa-power-off"></i> Logout</a></li>
                             </ul>
                         </div>
                         {% else %}
                         <div class="dropdown-menu dropdown-menu-right animated flipInY">
                             <ul class="dropdown-user">
-                                <li><a href="{% url 'login' %}"><i class="fa fa-power-off"></i> Login</a></li>
+                                <li><a href="{% url 'login' %}"><i class="fad fa-power-off"></i> Login</a></li>
                             </ul>
                         </div>
                         {% endif %}
@@ -205,31 +206,31 @@
             <nav class="sidebar-nav">
                 <ul id="sidebarnav">
                     <li>
-                        <a class="" href="{% url 'dashboard' %}" aria-expanded="false"><i class="fas fa-home"></i><span
+                        <a class="" href="{% url 'dashboard' %}" aria-expanded="false"><i class="fad fa-home"></i><span
                                 class="hide-menu"> Dashboard</span></a>
                     </li>
                     <li>
-                        <a href="{% url 'pedigree_search' %}"><i class="{% if service.site_mode == 'mammal' %}fas fa-paw{% else %}fas fa-egg{% endif %}"></i><span
+                        <a href="{% url 'pedigree_search' %}"><i class="{% if service.site_mode == 'mammal' %}fad fa-paw{% else %}fad fa-egg{% endif %}"></i><span
                                 class="hide-menu"> {{ service.animal_type|title }}</span></a>
                     </li>
-                    <li><a href="{% url 'breeders' %}"><i class="fas fa-users"></i><span
+                    <li><a href="{% url 'breeders' %}"><i class="fad fa-users"></i><span
                                 class="hide-menu"> Breeders</span></a></li>
                     {% if service.site_mode == 'poultry' %}
-                        <li><a href="{% url 'breed_groups' %}"><i class="far fa-object-ungroup"></i><span
+                        <li><a href="{% url 'breed_groups' %}"><i class="fad fa-object-ungroup"></i><span
                                     class="hide-menu"> Breed Groups</span></a></li>
                     {% endif %}
 
-                    <li><a href="{% url 'breeds' %}"><i class="fas fa-random"></i><span
+                    <li><a href="{% url 'breeds' %}"><i class="fad fa-random"></i><span
                             class="hide-menu"> Breed{% if service.service.multi_breed %}s{% endif %}</span></a></li>
 
                     {% if service.metrics %}
-                    <li><a href="{% url 'metrics' %}"><i class="fas fa-chart-bar"></i><span
+                    <li><a href="{% url 'metrics' %}"><i class="fad fa-chart-bar"></i><span
                             class="hide-menu"> Metrics</span></a></li>
                     {% endif %}
 
                     {% if editor %}
                     <li>
-                        <a class="has-arrow " href="#" aria-expanded="false"><i class="fas fa-arrow-alt-circle-down"></i><span
+                        <a class="has-arrow " href="#" aria-expanded="false"><i class="fad fa-arrow-alt-circle-down"></i><span
                                 class="hide-menu"> Impex Database</span></a>
                         <ul aria-expanded="false" class="collapse">
                             {% if add_pedigree %}
@@ -242,7 +243,7 @@
                     </li>
                     {% endif %}
 
-                    <li><a href="{% url 'support' %}"><i class="fas fa-hands-helping"></i><span
+                    <li><a href="{% url 'support' %}"><i class="fad fa-hands-helping"></i><span
                                 class="hide-menu"> Support</span></a></li>
                 </ul>
             </nav>
