@@ -178,11 +178,12 @@ def stud_advisor(request):
                             json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
 
     studs_raw = loads(coi_raw.json())
+    print(studs_raw)
     studs_data = {}
 
     for stud, kinship in studs_raw.items():
         try:
-            male = Pedigree.objects.get(account=attached_service, reg_no=stud, sex='male', status='alive')
+            male = Pedigree.objects.get(account=attached_service, id=stud, sex='male', status='alive')
             print(f"{mother.mean_kinship} {mother.breed.mk_threshold} {male.mean_kinship} {mother.mean_kinship} {mother.breed.mk_threshold} {kinship}")
             if (mother.mean_kinship - mother.breed.mk_threshold) <= male.mean_kinship <= (mother.mean_kinship + mother.breed.mk_threshold)\
                     and kinship <= float(mother_details['breed_mean_coi']):
