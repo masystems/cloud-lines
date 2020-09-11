@@ -48,7 +48,8 @@ def metrics(request):
 
     return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
                                             'coi_date': coi_date,
-                                            'mean_kinship_date': mean_kinship_date})
+                                            'mean_kinship_date': mean_kinship_date,
+                                            'breeds': Breed.objects.filter(account=attached_service)})
 
 
 def run_coi(request):
@@ -208,3 +209,25 @@ def stud_advisor(request):
             continue
 
     return HttpResponse(dumps(studs_data))
+
+
+def poprep_export(request):
+    from datetime import datetime
+    import csv
+
+    date = datetime.now()
+    attached_service = get_main_account(request.user)
+
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="PopRep-Export-{{ breed }}-{}.csv"'.format(
+        date.strftime("%Y-%m-%d"))
+
+    writer = csv.writer(response, delimiter="|")
+
+    breed = Breed.objects.get(id=request.POST['breed'])
+
+    for pedigree in Pedigree.objects.filter(account=attached_service, breed=breed).exclude(state='unapproved').values('reg_no', 'parent_father__reg_no', 'parent_mother__reg_no', 'dob', 'sex'):
+        writer.writerow([pedigree['reg_no'], pedigree['parent_father__reg_no'], pedigree['parent_mother__reg_no'], pedigree['dob'], pedigree['sex'][:1].upper()])
+
+    return response

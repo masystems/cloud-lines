@@ -26,6 +26,22 @@
                 <li class="breadcrumb-item active">Metrics</li>
             </ol>
         </div>
+        <div class="col-md-6 col-3 align-self-center">
+            <form action="{% url 'poprep_export' %}" method="POST" class="form-horizontal">
+                {% csrf_token %}
+                <div class="btn-group float-right">
+                    <button type="button" class="btn btn-success dropdown-toggle"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        PopRep Export
+                    </button>
+                    <div class="dropdown-menu">
+                        {% for breed in breeds.all %}
+                            <button class="dropdown-item" name="breed" value='{{ breed.id }}'>Breed</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- ============================================================== -->
