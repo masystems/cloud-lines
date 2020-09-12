@@ -217,17 +217,24 @@ def poprep_export(request):
 
     date = datetime.now()
     attached_service = get_main_account(request.user)
+    breed = Breed.objects.get(id=request.POST['breed'])
 
     # Create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="PopRep-Export-{{ breed }}-{}.csv"'.format(
+    response['Content-Disposition'] = 'attachment; filename="PopRep-Export-{}-{}.csv"'.format(breed,
         date.strftime("%Y-%m-%d"))
 
     writer = csv.writer(response, delimiter="|")
 
-    breed = Breed.objects.get(id=request.POST['breed'])
 
     for pedigree in Pedigree.objects.filter(account=attached_service, breed=breed).exclude(state='unapproved').values('reg_no', 'parent_father__reg_no', 'parent_mother__reg_no', 'dob', 'sex'):
-        writer.writerow([pedigree['reg_no'], pedigree['parent_father__reg_no'], pedigree['parent_mother__reg_no'], pedigree['dob'], pedigree['sex'][:1].upper()])
+        if pedigree.sex == "male":
+            sex = "M"
+        elif pedigree.set == "female":
+            sex = "F"
+        else:
+            sex = ""
+
+        writer.writerow([pedigree['reg_no'], pedigree['parent_father__reg_no'], pedigree['parent_mother__reg_no'], pedigree['dob'], sex])
 
     return response
