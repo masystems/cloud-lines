@@ -36,7 +36,7 @@
                     </button>
                     <div class="dropdown-menu">
                         {% for breed in breeds.all %}
-                            <button class="dropdown-item" name="breed" value='{{ breed.id }}'>Breed</button>
+                            <button class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
                         {% endfor %}
                     </div>
                 </div>
