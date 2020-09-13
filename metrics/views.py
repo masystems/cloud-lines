@@ -227,7 +227,13 @@ def poprep_export(request):
     writer = csv.writer(response, delimiter="|")
 
     for pedigree in Pedigree.objects.filter(account=attached_service, breed=breed).exclude(state='unapproved').values('reg_no', 'parent_father__reg_no', 'parent_mother__reg_no', 'dob', 'sex'):
-        if pedigree['sex'] in ("male", "female"):
-            writer.writerow([pedigree['reg_no'], pedigree['parent_father__reg_no'], pedigree['parent_mother__reg_no'], pedigree['dob'], pedigree['sex'][:1].upper()])
+        if pedigree.sex == "male":
+            sex = "M"
+        elif pedigree.set == "female":
+            sex = "F"
+        elif pedigree.sex == "castrated":
+            sex = "M"
+
+        writer.writerow([pedigree['reg_no'], pedigree['parent_father__reg_no'], pedigree['parent_mother__reg_no'], pedigree['dob'], sex])
 
     return response
