@@ -233,6 +233,8 @@ def poprep_export(request):
             sex = "F"
         elif pedigree.sex == "castrated":
             sex = "M"
+        else:
+            sex = ""
 
         writer.writerow([pedigree['reg_no'], pedigree['parent_father__reg_no'], pedigree['parent_mother__reg_no'], pedigree['dob'], sex])
 
