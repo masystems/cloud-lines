@@ -40,6 +40,14 @@ class PedigreeForm(forms.Form):
     ]
     sex = forms.ChoiceField(choices=GENDERS, widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='female', required=True)
 
+    BORNAS = (
+        ('single', 'Single'),
+        ('twin', 'Twin'),
+        ('triplet', 'Triplet'),
+        ('quad', 'Quad')
+    )
+    born_as = forms.ChoiceField(choices=BORNAS, widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='single', required=True)
+
     date_of_death = forms.DateField(required=False, widget=forms.widgets.DateInput(attrs={'type': 'date'}))
     date_of_death.widget.attrs['class'] = 'form-control'
     date_of_death.widget.attrs['placeholder'] = 'dd/mm/yyyy'

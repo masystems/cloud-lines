@@ -43,6 +43,17 @@ class Pedigree(models.Model):
     )
 
     sex = models.CharField(max_length=10, choices=GENDERS, null=True, default='female', help_text="Accepted formats: male, female, castrated")
+
+    BORNAS = (
+        ('single', 'Single'),
+        ('twin', 'Twin'),
+        ('triplet', 'Triplet'),
+        ('quad', 'Quad')
+    )
+
+    born_as = models.CharField(max_length=10, choices=BORNAS, null=True, default='single',
+                           help_text="Accepted formats: single, twin, triplet, quad")
+
     parent_father = models.ForeignKey('self', related_name='father', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='father', help_text="This should be the parents registration number.")
     parent_father_notes = models.CharField(max_length=500, blank=True, null=True, verbose_name='Father Notes', help_text="Max 500 characters")
     parent_mother = models.ForeignKey('self', related_name='mother', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='mother', help_text="This should be the parents registration number.")
