@@ -142,6 +142,7 @@ def import_pedigree_data(request):
         dob = post_data['dob'] or ''
         dod = post_data['dod'] or ''
         sex = post_data['sex'] or ''
+        born_as = post_data['born_as'] or ''
         status = post_data['status'] or ''
         father = post_data['parent_father'] or ''
         father_notes = post_data['parent_father_notes'] or ''
@@ -298,6 +299,11 @@ def import_pedigree_data(request):
             #############################
             try:
                 pedigree.sex = row[sex]
+            except KeyError:
+                pass
+            #############################
+            try:
+                pedigree.born_as = row[born_as]
             except KeyError:
                 pass
             #############################
