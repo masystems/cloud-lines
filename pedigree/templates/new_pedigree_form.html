@@ -69,7 +69,9 @@
                         </div>
                     {% endif %}
                     {% if 'setup' not in request.get_full_path %}
-                        <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breeder</button>
+                        {% if editor %}
+                            <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breeder</button>
+                        {% endif %}
                     {% endif %}
                 {% elif field.label == 'Current owner' %}
                     {% if 'setup' in request.path %}
@@ -81,7 +83,9 @@
                         </div>
                     {% endif %}
                     {% if 'setup' not in request.get_full_path %}
-                        <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Owner</button>
+                        {% if editor %}
+                            <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Owner</button>
+                        {% endif %}
                     {% endif %}
                 {% elif field.label == 'Registration Number' %}
                         <input class="form-control" name='{{ field.name }}' type="text" value="{{ suggested_reg }}">
