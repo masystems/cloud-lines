@@ -84,7 +84,7 @@ async def coi(request):
     coi_dict = loads(coi_raw.json())
 
     for pedigree in coi_dict:
-        Pedigree.objects.filter(account=attached_service, reg_no=pedigree['Indiv']).update(coi=pedigree['Inbr'])
+        Pedigree.objects.filter(account=attached_service, id=pedigree['Indiv']).update(coi=pedigree['Inbr'])
 
     return HttpResponse(coi_dict)
 
