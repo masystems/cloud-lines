@@ -125,7 +125,7 @@ async def mean_kinship(request):
     attached_service = get_main_account(request.user)
     breeds = Breed.objects.filter(account=attached_service)
     for breed in breeds.all():
-        pedigrees = Pedigree.objects.filter(account=attached_service, status='alive', breed=breed).values('id',
+        pedigrees = Pedigree.objects.filter(account=attached_service, breed=breed).values('id',
                                                                                           'parent_father__id',
                                                                                           'parent_mother__id',
                                                                                           'sex',
@@ -137,7 +137,7 @@ async def mean_kinship(request):
 
             coi_dict = loads(coi_raw.json())
             for pedigree, value in coi_dict.items():
-                Pedigree.objects.filter(account=attached_service, reg_no=pedigree.replace('.', '-')).update(mean_kinship=value['1'])
+                Pedigree.objects.filter(account=attached_service, id=pedigree.strip('X')).update(mean_kinship=value['1'])
 
 
 def stud_advisor_mother_details(request):
