@@ -53,6 +53,11 @@
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#users" role="tab">Users</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#customisation" role="tab">Customisation</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#metrics" role="tab">Metrics</a> </li>
+                    {% for bolton in service.boltons.all %}
+                        {% if bolton.name == "Membership" %}
+                            <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#boltons" role="tab">Boltons</a> </li>
+                        {% endif %}
+                    {% endfor %}
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content">
@@ -244,10 +249,13 @@
                                     // check if editor
                                     var status = currentRow.find("td:eq(4)").text();
                                     var editor = status.includes('Editor');
+                                    var contrib = status.includes('Contributor');
                                     if (editor) {
-                                       $('#status').val('Editor');
-                                    } else {
-                                       $('#status').val('Read Only');
+                                        $('#status').val('Editor');
+                                    } else if (contrib) {
+                                        $('#status').val('Contributor');
+                                    }else {
+                                        $('#status').val('Read Only');
                                     }
                                     // edit form type
                                     $('#formType').val('edit');
@@ -713,6 +721,24 @@
                             {% endif %}
                         </div>
                     </div>
+
+                    <div class="tab-pane" id="boltons" role="tabpanel">
+                        <div class="card-body">
+                            {% for bolton in service.boltons.all %}
+                                {% if bolton.name == "Membership" %}
+                                    <p class="text-left">Membership bolton is enabled.</p>
+                                    <div class="form-group">
+                                        <div class="mb-4">
+<!--                                                <button class="btn {% if service.metrics %}btn-danger{% else%}btn-success{% endif %}"-->
+<!--                                                        id="metricsSwitch">{% if service.metrics %}Disable Metrics{% else%}Enable Metrics{% endif %}</button>-->
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                            {% endfor %}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
