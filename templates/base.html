@@ -176,7 +176,6 @@
                                 <li><a href="{% url 'approvals' %}"><i class="fad fa-check"></i> <i class="fad fa-times" style="color: Tomato;"></i> Approvals</a></li>
                                 {% if request.user.is_superuser %}
                                     <li><a href="/admin"><i class="fad fa-cogs"></i></i> Backend Admin</a></li>
-                                    <li><a href="{% url 'membership' %}"><i class="fad fa-users"></i></i> Membership</a></li>
                                 {% endif %}
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{% url 'settings' %}"><i class="fad fa-cogs"></i> Site Settings</a></li>
