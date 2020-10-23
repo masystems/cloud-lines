@@ -120,13 +120,15 @@
                                     {% if request.user == service.user.user %}
                                         <p class="text-muted">Service Owner</p>
                                     {% else %}
-                                    <p class="text-muted"><strong>{% if editor %}Editor{% else %}Read only{% endif %}</strong>  member of <strong>{{ service.service }}</strong>, owned by <strong>{{ service.user.user.get_full_name }}</strong>(<a href="mailto:{{ service.user.user.email }}">{{ service.user.user.email }}</a>)</p>
+                                    <p class="text-muted"><strong>{% if editor %}Editor{% elif contributor %}Contributor{% else %}Read only{% endif %}</strong>  member of <strong>{{ service.service }}</strong>, owned by <strong>{{ service.user.user.get_full_name }}</strong>(<a href="mailto:{{ service.user.user.email }}">{{ service.user.user.email }}</a>)</p>
                                     {% endif %}
                                 </div>
                             </div>
                             <hr>
                             {% if editor %}
-                                <p class="mt-4">As an editor you're able to add/delete {{ service.animal_type }}, breeders/owners, breeds and breed groups if it's a poultry service.</p>
+                                <p class="mt-4">As an editor you're able to add/edit/delete {{ service.animal_type }}, breeders/owners, breeds and breed groups if it's a poultry service.</p>
+                            {% elif contributor %}
+                                <p class="mt-4">As a contributor you're able to add/edit/delete {{ service.animal_type }} but all changes/additions will need to be approved by an editor before the change is made live.</p>
                             {% else %}
                                 <p class="mt-4">As a read only user you cannot add/delete any {{ service.animal_type }}, however you're free to browse all the data on this site.</p>
                             {% endif %}
