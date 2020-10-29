@@ -3,6 +3,7 @@
 {% load static %}
 
 {% block header %}
+
     <script src="{% static 'assets/plugins/jsPDF-1.3.2/dist/jspdf.min.js' %}"></script>
     <script src="https://unpkg.com/jspdf-autotable"></script>
 {% endblock %}
@@ -444,16 +445,16 @@
         pdf.setFontSize(10);
         pdf.setLineWidth(0.1);
 
-        pdf.setFillColor('#00FF00')
-        pdf.circle(35, 76, 4, 'FD');
+        pdf.setFillColor(0, 255, 0)
+        pdf.circle(35, 76, 4, 'F');
         pdf.text(45, 80, "Good match, close Mean-Kinship value, and the offspring COI being no higher than the breed average COI.")
 
-        pdf.setFillColor('#ffa500')
-        pdf.circle(35, 88, 4, 'FD');
+        pdf.setFillColor(255, 165, 0)
+        pdf.circle(35, 88, 4, 'F');
         pdf.text(45, 92, "Not the first choice, relatively close in terms of Mean-Kinship, COI of offspring lower than the breed average COI.")
 
-        pdf.setFillColor('#ff0000')
-        pdf.circle(35, 100, 4, 'FD');
+        pdf.setFillColor(255, 0, 0)
+        pdf.circle(35, 100, 4, 'F');
         pdf.text(45, 104, "Not an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.")
 
         //body
@@ -482,16 +483,16 @@
                 if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
                     // cell.raw contains the cell data
                     if (data.cell.raw.indexOf('green') >= 0) {
-                        pdf.setFillColor('#00FF00')
+                        pdf.setFillColor(0, 255, 0)
                         pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
                     } else if (data.cell.raw.indexOf('orange') >= 0) {
-                        pdf.setFillColor('#ffa500')
+                        pdf.setFillColor(255, 165, 0)
                         pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
                     } else if (data.cell.raw.indexOf('red') >= 0) {
-                        pdf.setFillColor('#ff0000')
+                        pdf.setFillColor(255, 0, 0)
                         pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
                     } else {
-                        pdf.setFillColor('#ff0000')
+                        pdf.setFillColor(255, 0, 0)
                         pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
                     }
                   }
