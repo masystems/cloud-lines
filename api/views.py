@@ -7,6 +7,7 @@ from .serializers import ApiUpdatesSerializer, \
     ApiBreederSerializer, \
     ApiBreedSerializer, \
     ApiBreedGroupSerializer, \
+    ApiFaqSerializer, \
     ApiServiceSerializer, \
     ApiAuthentication
 from cloud_lines.models import Update
@@ -14,7 +15,7 @@ from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
-from cloud_lines.models import Service
+from cloud_lines.models import Service, Faq
 from account.models import UserDetail, AttachedService
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -105,6 +106,13 @@ class BreedGroupViews(viewsets.ModelViewSet):
         user = self.request.user
         main_account = get_main_account(user)
         return BreedGroup.objects.filter(account=main_account)
+
+
+@permission_classes((AllowAny, ))
+class FaqViews(viewsets.ModelViewSet):
+    serializer_class = ApiFaqSerializer
+    queryset = Faq.objects.all()
+    filter_backends = [SearchFilter]
 
 
 class Authenticate(viewsets.ModelViewSet):

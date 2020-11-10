@@ -4,6 +4,7 @@ from .forms import SupportForm
 from .models import Ticket
 from account.views import send_mail
 from account.views import is_editor, get_main_account
+import requests
 
 
 @login_required(login_url="/account/login")
@@ -33,4 +34,8 @@ def support(request):
 
 @login_required(login_url="/account/login")
 def faq(request):
-    return render(request, 'faq.html')
+    get_updates_json = requests.get('https://cloud-lines.com/api/faq/?format=json')
+    faqs = get_updates_json.json()
+    faqs = faqs['results']
+    print(faqs)
+    return render(request, 'faq.html', {'faqs': faqs})
