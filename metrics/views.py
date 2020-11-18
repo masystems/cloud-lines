@@ -170,22 +170,18 @@ def stud_advisor(request):
                                         status='alive',
                                         breed=mother.breed).values('id',
                                                                    'parent_father__id',
-                                                                   'parent_mother__id',
-                                                                   'sex',
-                                                                   'breed__breed_name',
-                                                                   'status')
+                                                                   'parent_mother__id')
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
                             json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
 
     studs_raw = loads(coi_raw.json())
-    print(studs_raw)
     studs_data = {}
 
     for stud, kinship in studs_raw.items():
         try:
             male = Pedigree.objects.get(account=attached_service, id=stud, sex='male', status='alive')
-            print(f"{mother.mean_kinship} {mother.breed.mk_threshold} {male.mean_kinship} {mother.mean_kinship} {mother.breed.mk_threshold} {kinship}")
+            #print(f"{male} {mother.mean_kinship} {mother.breed.mk_threshold} {male.mean_kinship} {mother.mean_kinship} {mother.breed.mk_threshold} {kinship}")
             if (mother.mean_kinship - mother.breed.mk_threshold) <= male.mean_kinship <= (mother.mean_kinship + mother.breed.mk_threshold)\
                     and kinship <= float(mother_details['breed_mean_coi']):
                 color = 'green'
