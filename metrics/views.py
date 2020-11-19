@@ -100,7 +100,7 @@ def kinship(request):
     data = list(pedigrees)
     mother = Pedigree.objects.get(reg_no=request.POST['mother'])
     father = Pedigree.objects.get(reg_no=request.POST['father'])
-q
+
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/'.format(mother.id, father.id),
                             json=dumps(data, cls=DjangoJSONEncoder))
 
