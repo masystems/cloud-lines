@@ -91,16 +91,16 @@ async def coi(request):
 
 def kinship(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service, status='alive').values('id',
-                                                                                         'parent_father__id',
-                                                                                         'parent_mother__id',
-                                                                                         'sex',
-                                                                                         'breed__breed_name',
-                                                                                         'status')
+    pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
+                                                                         'parent_father__id',
+                                                                         'parent_mother__id',
+                                                                         'sex',
+                                                                         'breed__breed_name',
+                                                                         'status')
     data = list(pedigrees)
     mother = Pedigree.objects.get(reg_no=request.POST['mother'])
     father = Pedigree.objects.get(reg_no=request.POST['father'])
-
+q
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/'.format(mother.id, father.id),
                             json=dumps(data, cls=DjangoJSONEncoder))
 
