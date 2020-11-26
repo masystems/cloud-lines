@@ -143,11 +143,11 @@ async def mean_kinship(request):
 def stud_advisor_mother_details(request):
     attached_service = get_main_account(request.user)
     mother = Pedigree.objects.get(account=attached_service, reg_no=request.POST['mother'])
-    cois = Pedigree.objects.filter(account=attached_service, breed=mother.breed).values('coi')
+    cois = Pedigree.objects.filter(account=attached_service, breed=mother.breed, status='alive').values('coi')
     total = 0
     for coi in cois.all():
         total += coi['coi']
-    breed_mean_coi = total / Pedigree.objects.filter(account=attached_service, breed=mother.breed).count()
+    breed_mean_coi = total / Pedigree.objects.filter(account=attached_service, breed=mother.breed, status='alive').count()
 
     mother_details = {'reg_no': mother.reg_no,
                       'name': mother.name,
