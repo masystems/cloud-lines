@@ -76,10 +76,12 @@ def export(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def importx(request):
+    attached_service = get_main_account(request.user)
+    if request.user != attached_service.admin_users or request.user != attached_service.owner:
+        return redirect('dashboard')
     allowed_file_types = ('.csv')
     if request.method == 'POST':
-        attached_service = get_main_account(request.user)
-        print(request.FILES)
+
         database_file = request.FILES['uploadDatabase']
         imported_headings = []
 
