@@ -77,39 +77,40 @@ def export(request):
 @user_passes_test(is_editor)
 def importx(request):
     attached_service = get_main_account(request.user)
-    if request.user != attached_service.admin_users or request.user != attached_service.owner:
+    if request.user in attached_service.admin_users.all() or request.user == attached_service.user:
+        allowed_file_types = ('.csv')
+        if request.method == 'POST':
+
+            database_file = request.FILES['uploadDatabase']
+            imported_headings = []
+
+            f_type = splitext(str(request.FILES['uploadDatabase']))[1]
+            if f_type not in allowed_file_types:
+                return render(request, 'import.html', {'error': '{} is not an allowed file type!'.format(f_type)})
+
+            if f_type == '.csv':
+                file = request.FILES['uploadDatabase']
+                decoded_file = file.read().decode('utf-8').splitlines()
+                database_items = csv.DictReader(decoded_file)
+                imported_headings = database_items.fieldnames
+
+            # upload file
+            upload_database = DatabaseUpload(account=attached_service, database=database_file, file_type=f_type)
+            upload_database.save(database_file)
+
+            # get pedigree model headings
+            pedigree_headings = get_pedigree_column_headings()
+
+            # get breeder model headings
+            forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
+            breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
+                                 if field.name not in forbidden_breeeder_fields]
+            return render(request, 'analyse.html', {'imported_headings': imported_headings,
+                                                    'pedigree_headings': pedigree_headings,
+                                                    'breeder_headings': breeder_headings})
+        return render(request, 'import.html')
+    else:
         return redirect('dashboard')
-    allowed_file_types = ('.csv')
-    if request.method == 'POST':
-
-        database_file = request.FILES['uploadDatabase']
-        imported_headings = []
-
-        f_type = splitext(str(request.FILES['uploadDatabase']))[1]
-        if f_type not in allowed_file_types:
-            return render(request, 'import.html', {'error': '{} is not an allowed file type!'.format(f_type)})
-
-        if f_type == '.csv':
-            file = request.FILES['uploadDatabase']
-            decoded_file = file.read().decode('utf-8').splitlines()
-            database_items = csv.DictReader(decoded_file)
-            imported_headings = database_items.fieldnames
-
-        # upload file
-        upload_database = DatabaseUpload(account=attached_service, database=database_file, file_type=f_type)
-        upload_database.save(database_file)
-
-        # get pedigree model headings
-        pedigree_headings = get_pedigree_column_headings()
-
-        # get breeder model headings
-        forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
-        breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
-                             if field.name not in forbidden_breeeder_fields]
-        return render(request, 'analyse.html', {'imported_headings': imported_headings,
-                                                'pedigree_headings': pedigree_headings,
-                                                'breeder_headings': breeder_headings})
-    return render(request, 'import.html')
 
 
 @login_required(login_url="/account/login")
