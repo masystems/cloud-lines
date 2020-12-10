@@ -181,13 +181,18 @@ def stud_advisor(request):
         try:
             male = Pedigree.objects.get(account=attached_service, id=stud, sex='male', status='alive')
             #print(f"{male} {mother.mean_kinship} {mother.breed.mk_threshold} {male.mean_kinship} {mother.mean_kinship} {mother.breed.mk_threshold} {kinship}")
-            if (mother.mean_kinship - mother.breed.mk_threshold) <= male.mean_kinship <= (mother.mean_kinship + mother.breed.mk_threshold)\
+            mk_minus_mk_thresh = mother.mean_kinship - mother.breed.mk_threshold
+            mk_plus_mk_thresh = mother.mean_kinship + mother.breed.mk_threshold
+            mk_minus_mk_thresh_2 = mother.mean_kinship - (mother.breed.mk_threshold*2)
+            mk_plus_mk_thresh_2 = mother.mean_kinship + (mother.breed.mk_threshold*2)
+
+            if mk_minus_mk_thresh <= male.mean_kinship <= mk_plus_mk_thresh\
                     and kinship <= float(mother_details['breed_mean_coi']):
                 color = 'green'
-            elif (mother.mean_kinship - (mother.breed.mk_threshold*2)) <= male.mean_kinship <= (mother.mean_kinship + (mother.breed.mk_threshold*2))\
+            elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
                     and kinship <= float(mother_details['breed_mean_coi']):
                 color = 'orange'
-            elif (mother.mean_kinship - (mother.breed.mk_threshold*2)) <= male.mean_kinship <= (mother.mean_kinship + (mother.breed.mk_threshold*2))\
+            elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
                     and male.coi > float(mother_details['breed_mean_coi']):
                 color = 'red'
             else:
