@@ -186,13 +186,13 @@ def stud_advisor(request):
             mk_minus_mk_thresh_2 = mother.mean_kinship - (mother.breed.mk_threshold*2)
             mk_plus_mk_thresh_2 = mother.mean_kinship + (mother.breed.mk_threshold*2)
 
-            if mk_minus_mk_thresh <= male.mean_kinship <= mk_plus_mk_thresh\
+            if min(mk_minus_mk_thresh, mk_plus_mk_thresh) <= male.mean_kinship <= max(mk_minus_mk_thresh, mk_plus_mk_thresh)\
                     and kinship <= float(mother_details['breed_mean_coi']):
                 color = 'green'
-            elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
+            elif min(mk_minus_mk_thresh_2, mk_plus_mk_thresh_2) <= male.mean_kinship <= max(mk_minus_mk_thresh_2, mk_plus_mk_thresh_2)\
                     and kinship <= float(mother_details['breed_mean_coi']):
                 color = 'orange'
-            elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
+            elif min(mk_minus_mk_thresh_2, mk_plus_mk_thresh_2) <= male.mean_kinship <= max(mk_minus_mk_thresh_2, mk_plus_mk_thresh_2)\
                     and male.coi > float(mother_details['breed_mean_coi']):
                 color = 'red'
             else:
