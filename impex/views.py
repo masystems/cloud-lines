@@ -77,7 +77,7 @@ def export(request):
 @user_passes_test(is_editor)
 def importx(request):
     attached_service = get_main_account(request.user)
-    if request.user in attached_service.admin_users.all() or request.user == attached_service.user:
+    if request.user in attached_service.admin_users.all() or request.user == attached_service.user.user:
         allowed_file_types = ('.csv')
         if request.method == 'POST':
 
