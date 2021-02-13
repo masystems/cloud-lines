@@ -18,23 +18,24 @@
                         <p><strong>Loading dashboard!</strong></p>
                     </div>
                 </div>
-                    <h3>Welcome</h3>
-                    <section>
-                        <div class="text-center">
-                            <img src="{% static 'assets/images/cloud-lines-logo-teal-transparent.png' %}" style="max-height:300px" class="img-fluid">
-                        </div>
+                <h3>Welcome</h3>
+                <section>
+                    <div class="text-center">
+                        <img src="{% static 'assets/images/cloud-lines-logo-teal-transparent.png' %}" style="max-height:300px" class="img-fluid">
+                    </div>
 
-                        <p><strong>Welcome to Cloud-Lines!</strong></p>
-                        <p>To get you started, use the menu bar at the top to navigate around the system,
-                            in each section you should be able to add a new item or edit existing ones e.g. pedigree, breeders or breed etc. </p>
+                    <p><strong>Welcome to Cloud-Lines!</strong></p>
+                    <p>To get you started, use the menu bar at the top to navigate around the system,
+                        in each section you should be able to add a new item or edit existing ones e.g. pedigree, breeders or breed etc. </p>
 
-                        <p>Alternatively, navigate to the 'Impex' tool to import bulk data.</p>
+                    <p>Alternatively, navigate to the 'Impex' tool to import bulk data.</p>
 
-                        <p>If you're stuck on anything or if you have a suggestion for the system, please use the 'Support'
-                        section to create a new ticket.</p>
+                    <p>If you're stuck on anything or if you have a suggestion for the system, please use the 'Support'
+                    section to create a new ticket.</p>
 
-                        <p>We wish you all the best and welcome you to the Cloud-lines community!</p>
-                    </section>
+                    <p>We wish you all the best and welcome you to the Cloud-lines community!</p>
+                </section>
+                <a href="https://s3.eu-west-2.amazonaws.com/static.cloud-lines.com/CL+getting+started.mp4" class="html5lightbox"><button class="btn btn-cls btn-info mr-1 mt-1">Get Started Video</button></a>
             </div>
         </div>
     </div>
@@ -45,4 +46,8 @@
 <!-- Sweet-Alert  -->
 <script src="{% static 'assets/plugins/sweetalert/sweetalert.min.js' %}"></script>
 
+{% endblock %}
+
+{% block footer %}
+    <script type="text/javascript" src="{% static 'assets/plugins/html5lightbox/html5lightbox.js' %}"></script>
 {% endblock %}

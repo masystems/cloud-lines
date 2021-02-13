@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+
 
 {% block content %}
     <!-- ============================================================== -->
@@ -11,6 +13,9 @@
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 <li class="breadcrumb-item active">FAQs</li>
             </ol>
+        </div>
+        <div class="col-md-6 col-4">
+            <a href="https://s3.eu-west-2.amazonaws.com/static.cloud-lines.com/CL+getting+started.mp4" class="html5lightbox"><button class="btn btn-cls btn-info mr-1 mt-1 float-right">Get Started</button></a>
         </div>
     </div>
     <!-- ============================================================== -->
@@ -47,4 +52,8 @@
 
 
 
+{% endblock %}
+
+{% block footer %}
+    <script type="text/javascript" src="{% static 'assets/plugins/html5lightbox/html5lightbox.js' %}"></script>
 {% endblock %}

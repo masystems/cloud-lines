@@ -37,5 +37,4 @@ def faq(request):
     get_updates_json = requests.get('https://cloud-lines.com/api/faq/?format=json')
     faqs = get_updates_json.json()
     faqs = faqs['results']
-    print(faqs)
     return render(request, 'faq.html', {'faqs': faqs})
