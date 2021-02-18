@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'impex',
     'approvals',
     'metrics',
+    'boltons',
     'widget_tweaks',
     'django_s3_storage',
     'storages',

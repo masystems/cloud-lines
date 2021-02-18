@@ -33,6 +33,7 @@ urlpatterns = [
     path('dashboard', views.dashboard, name='dashboard'),
     path('api/', include('api.urls')),
     path('metrics/', include('metrics.urls')),
+    path('bolton/', include('boltons.urls')),
     path('primary_account/<str:service>', views.activate_primary_account, name='primary_account'),
     path('get_build_status', views.get_build_status, name='get_build_status'),
     path('gdpr/', views.gdpr, name='gdpr'),

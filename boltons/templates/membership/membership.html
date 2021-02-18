@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">{{ breed.breed_name }}</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Membership</li>
+            </ol>
+        </div>
+        <div class="col-md-6 col-4 align-self-center">
+            {% if add_breed %}
+                {% if editor %}
+                    <a href="#" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Create
+                    </a>
+                    <a href="#" id="editBreed" class="btn btn-outline-info float-right mr-1"><i class="fad fa-pencil-alt"></i> Edit
+                    </a>
+                {% else %}
+                    {% include 'login_modal.html' %}
+                    <!-- /.modal -->
+                    <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Create</button>
+                {% endif %}
+            {% else %}
+                {% include 'upgrade_modal.html' with type='breeds' %}
+                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Create</button>
+                <a href="#" class="btn btn-outline-info float-right mr-2"><i class="fad fa-pencil-alt"></i> Edit
+                    </a>
+            {% endif %}
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="row">
+        <div class="col-12 mt-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">{{ breed.breed_name|title }} Details</h4>
+                    <h6 class="card-subtitle mb-2 text-muted"></h6>
+                    {% if breed.image %}
+                        <img src="{{ breed.image.url }}" style="max-width:350px" class="float-left pr-2">
+                    {% endif %}
+                    <p class="card-text">{{ breed.breed_description|linebreaks }}</p>
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <dl>
+                                {% if custom_fields %}
+                                    {% for field_key, field_vals in custom_fields.items %}
+                                        {% if field_vals.location == 'breed' %}
+                                            <dt>{{ field_vals.fieldName }}</dt>
+                                            <dd>{% if field_vals.field_value %}{{ field_vals.field_value }}{% else %}<br>{% endif %}</dd>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

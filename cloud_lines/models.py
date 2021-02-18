@@ -36,6 +36,16 @@ class Service(models.Model):
         ordering = ['ordering']
 
 
+class Bolton(models.Model):
+    name = models.CharField(max_length=50)
+    price = models.FloatField()
+    description = models.TextField()
+    visible_to_public = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
 class Gallery(models.Model):
     title = models.CharField(max_length=100, blank=True)
     image = models.ImageField(blank=True)

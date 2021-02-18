@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from cloud_lines.models import Service
+from cloud_lines.models import Service, Bolton
 
 
 def user_directory_path(instance, filename):
@@ -23,6 +23,7 @@ class AttachedService(models.Model):
     contributors = models.ManyToManyField(User, related_name='contributors', blank=True)
     read_only_users = models.ManyToManyField(User, related_name='read_only_users', blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
+    boltons = models.ManyToManyField(Bolton, related_name='boltons', blank=True)
     domain = models.CharField(max_length=250, blank=True)
     organisation_or_society_name = models.CharField(max_length=250, blank=True)
     image = models.ImageField(upload_to=user_directory_path, blank=True)

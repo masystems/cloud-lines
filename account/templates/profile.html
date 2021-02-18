@@ -282,7 +282,6 @@
                                         <th scope="col">ID</th>
                                         <th scope="col">Amount</th>
                                         <th scope="col">Created</th>
-                                        <th scope="col">Invoice</th>
                                         <th scope="col">Paid</th>
                                         <th scope="col">Receipt</th>
                                     </tr>
@@ -293,7 +292,6 @@
                                         <td scope="row"><p data-toggle="tooltip" data-placement="top" title="{{ charge.id }}">{{ charge.id|slice:"-6:" }}</p></td>
                                         <td>{{ charge.amount }}</td>
                                         <td>{{ charge.created }}</td>
-                                        <td><a href="{{ charge.invoice }}"><button class="btn btn-outline-info">Download</button></a></td>
                                         <td><span class="label {% if charge.paid %}label-light-success{% else %}label-light-danger{% endif %}"> {% if charge.paid %}Yes{% else %}No{% endif %} </span></td>
                                         <td>{% if charge.paid %}<a href="{{ charge.receipt_url }}"><button class="btn btn-outline-success">Download</button></a>{% endif %}</td>
                                     </tr>

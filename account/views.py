@@ -109,7 +109,7 @@ def site_mode(request):
                 'editor': editor,
                 'contributor': contributor,
                 'read_only': read_only,
-                'gdpr': gdpr,
+                #'gdpr': gdpr,
                 'pending_approvals': pending_approvals}
 
     return {'authenticated': 'no',
