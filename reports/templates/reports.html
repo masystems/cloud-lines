@@ -25,7 +25,8 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title"></h4>
-                    <a href="{% url 'flockbook' %}"><button class="btn btn-info">Flock Book XLSX</button></a>
+                    <a href="{% url 'census' 'xlsx' %}"><button class="btn btn-info">Census Export XLSX</button></a>
+                    <a href="{% url 'census' 'pdf' %}"><button class="btn btn-info">Census Export PDF</button></a>
                 </div>
             </div>
         </div>

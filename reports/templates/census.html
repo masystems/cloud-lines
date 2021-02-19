@@ -1,0 +1,215 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Cloud-Lines</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="{% static 'css/colors/green.css' %}" id="theme" rel="stylesheet">
+
+    <title>CloudLines</title>
+    <style>
+        @page {
+            size: letter landscape;
+            margin: 2cm;
+
+            @frame footer {
+                -pdf-frame-content: footer;
+                bottom: 2cm;
+                margin-left: 1cm;
+                margin-right: 1cm;
+                height: 1cm;
+
+            }
+        }
+
+        h1 {
+            font-family: "Rubik", sans-serif;
+            font-size: 40px;
+        }
+
+        td:nth-child(1) {
+            vertical-align: middle;
+        }
+        td:nth-child(2) {
+            vertical-align: middle;
+        }
+
+        .feeds li span {
+            font-size: 14px;
+        }
+        main-table {
+            font-family: arial, sans-serif;
+            width:100% !important;
+            border-collapse: collapse;
+        }
+        .top-td, th {
+          text-align: center;
+          padding: 2px;
+        }
+        .main-td, th {
+          border: 1px solid #dddddd;
+          text-align: center;
+          padding: 2px;
+        }
+        .img {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            width: 200px;
+        }
+    </style>
+</head>
+
+<body class="fix-header fix-sidebar card-no-border">
+<!-- ============================================================== -->
+<!-- Main wrapper - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<div id="main-wrapper">
+    <div class="page-wrapper">
+        <div class="container-fluid">
+            {% if attached_service.organisation_or_society_name %}
+                <h1 style="text-align: center">{{ attached_service.organisation_or_society_name }}</h1>
+            {% endif %}
+            <table class="responsive" style="width:100%">
+                <tbody>
+                    <tr>
+                        <!--## col1 ##-->
+                        <td class="top-td mb-4">
+                            {% if attached_service.image %}
+                                <img class="img" src="{{ attached_service.image.url }}">
+                            {% else %}
+                                <img class="img" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo-teal-transparent.png">
+                            {% endif %}
+                        </td>
+                        <!--## col2 ##-->
+<!--                        <td>-->
+<!--                            <ul style="list-style-type:none;">-->
+<!--                              <li><strong>Breeder:</strong> {{ lvl1.breeder.breeding_prefix }}</li>-->
+<!--                              <li><strong>Owner:</strong> {{ lvl1.current_owner.breeding_prefix }}</li>-->
+<!--                            </ul>-->
+<!--                            {% if lvl1.images.first %}-->
+<!--                                <img src="{% for image in lvl1.images.all %}-->
+<!--                                            {% if forloop.first %}-->
+<!--                                                {{ image.image.url }}-->
+<!--                                            {% endif %}-->
+<!--                                        {% endfor %}"-->
+<!--                                   class="img">-->
+<!--                            {% endif %}-->
+<!--                        </td>-->
+<!--                        &lt;!&ndash;## col3 ##&ndash;&gt;-->
+<!--                        <td>-->
+<!--                            <ul style="list-style-type:none;">-->
+<!--                                <li><strong>Reg No.</strong>: {{ lvl1.reg_no }}</li>-->
+<!--                                {% if lvl1.tag_no %}-->
+<!--                                    <li><strong>Tag No.</strong> {{ lvl1.tag_no }}</li>-->
+<!--                                {% endif %}-->
+<!--                                <li><strong>Name:</strong> {{ lvl1.name }}</li>-->
+<!--                                {% if lvl1.dob %}-->
+<!--                                    <li><strong>DOB:</strong> {{ lvl1.dob }}</li>-->
+<!--                                {% endif %}-->
+<!--                                {% if lvl1.dod %}-->
+<!--                                    <li><strong>DOD:</strong> {{ lvl1.dod }}</li>-->
+<!--                                {% endif %}-->
+<!--                                {% if lvl1.date_of_registration %}-->
+<!--                                    <li><strong>DOR:</strong> {{ lvl1.date_of_registration }}</li>-->
+<!--                                {% endif %}-->
+<!--                                {% if lvl1.sex %}-->
+<!--                                    <li><strong>Sex:</strong> {{ lvl1.sex }}</li>-->
+<!--                                {% endif %}-->
+<!--                                {% if lvl1.note %}-->
+<!--                                    <li><strong>Note:</strong> {{ lvl1.note }}</li>-->
+<!--                                {% endif %}-->
+<!--                            </ul>-->
+<!--                        </td>-->
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="main-table responsive" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Sex</th>
+                        <th>Reg No.</th>
+                        <th>Date Of Birth</th>
+                        <th>Name</th>
+                        <th>Tag No.</th>
+                        <th>Born</th>
+                        <th>Sire</th>
+                        <th>Damn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for breeder in breeders.all %}
+                        <tr>
+                            <th>
+                                {{ breeder.contact_name }}
+                            </th>
+                            <th>
+                                Prefix: {{ breeder }}
+                            </th>
+                        </tr>
+                        {% for pedigree in pedigrees.all %}
+                            {% if pedigree.current_owner == breeder %}
+                                <tr>
+                                    <!--## sex ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.sex }}
+                                    </td>
+
+                                    <!--## Reg No ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.reg_no }}
+                                    </td>
+
+                                    <!--## Date Of Birth ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.dob }}
+                                    </td>
+
+                                    <!--## Name ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.name }}
+                                    </td>
+
+                                    <!--## Tag No ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.tag_no }}
+                                    </td>
+
+                                    <!--## Born ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.born_as }}
+                                    </td>
+
+                                    <!--## Sire ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.parent_father.reg_no }}
+                                    </td>
+
+                                    <!--## Dam ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.parent_mother.reg_no }}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<div id="footer">
+    Created with <img class="img" style="max-width:100px" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo-teal-transparent.png">
+</div>
+
+</body>
+
+</html>
