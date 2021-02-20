@@ -18,7 +18,7 @@ def reports(request):
 def census(request, type):
     attached_service = get_main_account(request.user)
     date = datetime.now()
-    if type == 'xlsx':
+    if type == 'xls':
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
         # creating workbook
