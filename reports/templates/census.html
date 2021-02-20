@@ -87,73 +87,36 @@
                                 <img class="img" src="https://static.cloud-lines.com/assets/images/cloud-lines-logo-teal-transparent.png">
                             {% endif %}
                         </td>
-                        <!--## col2 ##-->
-<!--                        <td>-->
-<!--                            <ul style="list-style-type:none;">-->
-<!--                              <li><strong>Breeder:</strong> {{ lvl1.breeder.breeding_prefix }}</li>-->
-<!--                              <li><strong>Owner:</strong> {{ lvl1.current_owner.breeding_prefix }}</li>-->
-<!--                            </ul>-->
-<!--                            {% if lvl1.images.first %}-->
-<!--                                <img src="{% for image in lvl1.images.all %}-->
-<!--                                            {% if forloop.first %}-->
-<!--                                                {{ image.image.url }}-->
-<!--                                            {% endif %}-->
-<!--                                        {% endfor %}"-->
-<!--                                   class="img">-->
-<!--                            {% endif %}-->
-<!--                        </td>-->
-<!--                        &lt;!&ndash;## col3 ##&ndash;&gt;-->
-<!--                        <td>-->
-<!--                            <ul style="list-style-type:none;">-->
-<!--                                <li><strong>Reg No.</strong>: {{ lvl1.reg_no }}</li>-->
-<!--                                {% if lvl1.tag_no %}-->
-<!--                                    <li><strong>Tag No.</strong> {{ lvl1.tag_no }}</li>-->
-<!--                                {% endif %}-->
-<!--                                <li><strong>Name:</strong> {{ lvl1.name }}</li>-->
-<!--                                {% if lvl1.dob %}-->
-<!--                                    <li><strong>DOB:</strong> {{ lvl1.dob }}</li>-->
-<!--                                {% endif %}-->
-<!--                                {% if lvl1.dod %}-->
-<!--                                    <li><strong>DOD:</strong> {{ lvl1.dod }}</li>-->
-<!--                                {% endif %}-->
-<!--                                {% if lvl1.date_of_registration %}-->
-<!--                                    <li><strong>DOR:</strong> {{ lvl1.date_of_registration }}</li>-->
-<!--                                {% endif %}-->
-<!--                                {% if lvl1.sex %}-->
-<!--                                    <li><strong>Sex:</strong> {{ lvl1.sex }}</li>-->
-<!--                                {% endif %}-->
-<!--                                {% if lvl1.note %}-->
-<!--                                    <li><strong>Note:</strong> {{ lvl1.note }}</li>-->
-<!--                                {% endif %}-->
-<!--                            </ul>-->
-<!--                        </td>-->
                     </tr>
                 </tbody>
             </table>
 
-            <table class="main-table responsive" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Sex</th>
-                        <th>Reg No.</th>
-                        <th>Date Of Birth</th>
-                        <th>Name</th>
-                        <th>Tag No.</th>
-                        <th>Born</th>
-                        <th>Sire</th>
-                        <th>Damn</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for breeder in breeders.all %}
+            {% for breeder in breeders.all %}
+                <table class="responsive" style="width:100%">
+                    <tbody>
                         <tr>
-                            <th>
-                                {{ breeder.contact_name }}
-                            </th>
-                            <th>
-                                Prefix: {{ breeder }}
-                            </th>
+                            <!--## col1 ##-->
+                            <td class="top-td"><strong>Contact</strong></td>
+                            <td class="top-td">{{ breeder.contact_name }}</td>
+                            <td class="top-td"><strong>Prefix</strong></td>
+                            <td class="top-td">{{ breeder }}</td>
                         </tr>
+                    </tbody>
+                </table>
+                <table class="main-table responsive" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Sex</th>
+                            <th>Reg No.</th>
+                            <th>Date Of Birth</th>
+                            <th>Name</th>
+                            <th>Tag No.</th>
+                            <th>Born</th>
+                            <th>Sire</th>
+                            <th>Damn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {% for pedigree in pedigrees.all %}
                             {% if pedigree.current_owner == breeder %}
                                 <tr>
@@ -199,9 +162,10 @@
                                 </tr>
                             {% endif %}
                         {% endfor %}
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+                <hr>
+            {% endfor %}
         </div>
     </div>
 

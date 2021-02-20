@@ -41,7 +41,7 @@ def census(request, type):
         for col_num in range(len(columns)):
             worksheet.write(row_num, col_num, columns[col_num], font_style_header)
 
-        for breeder in Breeder.objects.filter(active=True):
+        for breeder in Breeder.objects.filter(account=attached_service, active=True):
             # write breeder column headers in sheet
             row_num = row_num + 1
             worksheet.write(row_num, 0, breeder.contact_name, font_style_header)
@@ -50,7 +50,7 @@ def census(request, type):
             # Sheet body, remaining rows
             font_style = xlwt.XFStyle()
 
-            pedigrees = Pedigree.objects.filter(current_owner=breeder, status='alive')
+            pedigrees = Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive')
             for pedigree in pedigrees:
                 row_num = row_num + 1
                 try:
@@ -72,9 +72,9 @@ def census(request, type):
         workbook.save(response)
     elif type == 'pdf':
         context = {}
-        context['attached_service'] = get_main_account(request.user)
-        context['breeders'] = Breeder.objects.filter(active=True)
-        context['pedigrees'] = Pedigree.objects.filter(status='alive')
+        attached_service = get_main_account(request.user)
+        context['breeders'] = Breeder.objects.filter(account=attached_service, active=True)
+        context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive')
 
         pdf = render_to_pdf('census.html', context)
         response = HttpResponse(pdf, content_type='application/pdf')
