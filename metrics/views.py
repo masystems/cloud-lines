@@ -96,13 +96,13 @@ async def coi(request):
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
         subdomain = host.partition('.')[0]
-        local_output = f"/tmp/{subdomain}_output.json"
-        remote_output = f"metrics/{subdomain}_output.json"
-        file_name = f"{subdomain}_output.json"
+        local_output = f"/tmp/coi_{subdomain}_output.json"
+        remote_output = f"metrics/coi_{subdomain}_output.json"
+        file_name = f"coi_{subdomain}_output.json"
     else:
-        local_output = f"/tmp/{attached_service.id}_output.json"
-        remote_output = f"metrics/{attached_service.id}_output.json"
-        file_name = f"{attached_service.id}_output.json"
+        local_output = f"/tmp/coi_{attached_service.id}_output.json"
+        remote_output = f"metrics/coi_{attached_service.id}_output.json"
+        file_name = f"coi_{attached_service.id}_output.json"
 
     with open(local_output, 'w') as file:
         file.write(dumps(list(pedigrees)))
@@ -166,8 +166,28 @@ async def mean_kinship(request):
                                                                                           'breed__breed_name',
                                                                                           'status')
         if len(pedigrees) > 1:
+            # create unique paths
+            if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
+                host = attached_service.domain.partition('://')[2]
+                subdomain = host.partition('.')[0]
+                local_output = f"/tmp/mk_{subdomain}_output.json"
+                remote_output = f"metrics/mk_{subdomain}_output.json"
+                file_name = f"mk_{subdomain}_output.json"
+            else:
+                local_output = f"/tmp/mk_{attached_service.id}_output.json"
+                remote_output = f"metrics/mk_{attached_service.id}_output.json"
+                file_name = f"mk_{attached_service.id}_output.json"
+
+            with open(local_output, 'w') as file:
+                file.write(dumps(list(pedigrees)))
+
+            multi_part_upload_with_s3(local_output, remote_output)
+
+            data = {'data_path': remote_output,
+                    'file_name': file_name}
+
             coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
-                                    json=dumps(list(pedigrees), cls=DjangoJSONEncoder), stream=True)
+                                    json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
             coi_dict = loads(coi_raw.json())
             for pedigree, value in coi_dict.items():
