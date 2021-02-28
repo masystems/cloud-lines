@@ -96,11 +96,11 @@ async def coi(request):
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
         subdomain = host.partition('.')[0]
-        local_output = f"metrics/data/{subdomain}_output.json"
+        local_output = f"/tmp/{subdomain}_output.json"
         remote_output = f"metrics/{subdomain}_output.json"
         file_name = f"{subdomain}_output.json"
     else:
-        local_output = f"metrics/data/{attached_service.id}_output.json"
+        local_output = f"/tmp/{attached_service.id}_output.json"
         remote_output = f"metrics/{attached_service.id}_output.json"
         file_name = f"{attached_service.id}_output.json"
 
