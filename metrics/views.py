@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
 from breed.models import Breed
@@ -10,6 +11,8 @@ from datetime import datetime, timedelta
 import requests
 import asyncio
 import pytz
+import boto3
+from boto3.s3.transfer import TransferConfig
 
 
 def calc_last_run(attached_service, obj, dt=None, timezone="UTC"):
@@ -52,6 +55,17 @@ def metrics(request):
                                             'breeds': Breed.objects.filter(account=attached_service)})
 
 
+def multi_part_upload_with_s3(file_path, key_path):
+    s3 = boto3.resource('s3')
+    # Multipart upload
+    config = TransferConfig(multipart_threshold=1024 * 10, max_concurrency=10,
+                            multipart_chunksize=1024 * 10, use_threads=True)
+    s3.meta.client.upload_file(file_path, settings.AWS_S3_CUSTOM_DOMAIN, key_path,
+                            ExtraArgs={'ACL': 'public-read', 'ContentType': 'text/json'},
+                            Config=config,
+                            )
+
+
 def run_coi(request):
     attached_service = get_main_account(request.user)
     obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
@@ -78,8 +92,28 @@ async def coi(request):
                                                                          'breed__breed_name',
                                                                          'status')
 
+    # create unique paths
+    if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
+        host = attached_service.domain.partition('://')[2]
+        subdomain = host.partition('.')[0]
+        local_output = f"metrics/data/{subdomain}_output.json"
+        remote_output = f"metrics/{subdomain}_output.json"
+        file_name = f"{subdomain}_output.json"
+    else:
+        local_output = f"metrics/data/{attached_service.id}_output.json"
+        remote_output = f"metrics/{attached_service.id}_output.json"
+        file_name = f"{attached_service.id}_output.json"
+
+    with open(local_output, 'w') as file:
+        file.write(dumps(list(pedigrees)))
+
+    multi_part_upload_with_s3(local_output, remote_output)
+
+    data = {'data_path': remote_output,
+            'file_name': file_name}
+
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
-                            json=dumps(list(pedigrees), cls=DjangoJSONEncoder))
+                            json=dumps(data, cls=DjangoJSONEncoder))
 
     coi_dict = loads(coi_raw.json())
 
