@@ -135,8 +135,27 @@ def kinship(request):
     mother = Pedigree.objects.get(reg_no=request.POST['mother'])
     father = Pedigree.objects.get(reg_no=request.POST['father'])
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/'.format(mother.id, father.id),
-                            json=dumps(data, cls=DjangoJSONEncoder))
+    if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
+        host = attached_service.domain.partition('://')[2]
+        subdomain = host.partition('.')[0]
+        local_output = f"/tmp/mk_{subdomain}_output.json"
+        remote_output = f"metrics/mk_{subdomain}_output.json"
+        file_name = f"mk_{subdomain}_output.json"
+    else:
+        local_output = f"/tmp/mk_{attached_service.id}_output.json"
+        remote_output = f"metrics/mk_{attached_service.id}_output.json"
+        file_name = f"mk_{attached_service.id}_output.json"
+
+    with open(local_output, 'w') as file:
+        file.write(dumps(list(pedigrees)))
+
+    multi_part_upload_with_s3(local_output, remote_output)
+
+    data = {'data_path': remote_output,
+            'file_name': file_name}
+
+    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/',
+                            json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
     return HttpResponse(coi_raw.json())
 
