@@ -131,7 +131,7 @@ def kinship(request):
                                                                          'sex',
                                                                          'breed__breed_name',
                                                                          'status')
-    data = list(pedigrees)
+    #data = list(pedigrees)
     mother = Pedigree.objects.get(reg_no=request.POST['mother'])
     father = Pedigree.objects.get(reg_no=request.POST['father'])
 
@@ -154,7 +154,7 @@ def kinship(request):
     data = {'data_path': remote_output,
             'file_name': file_name}
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/{}/kinship/',
+    coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother}/{father}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
     return HttpResponse(coi_raw.json())
