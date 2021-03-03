@@ -116,7 +116,7 @@ async def coi(request):
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
                             json=dumps(data, cls=DjangoJSONEncoder))
-
+    logger.error(coi_raw.text)
     coi_dict = loads(coi_raw.json())
 
     for pedigree in coi_dict:
@@ -209,7 +209,7 @@ async def mean_kinship(request):
 
             coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
                                     json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-            logger.error(coi_raw.text)
+
             coi_dict = loads(coi_raw.json())
             for pedigree, value in coi_dict.items():
                 Pedigree.objects.filter(account=attached_service, id=pedigree.strip('X')).update(mean_kinship=value['1'])
