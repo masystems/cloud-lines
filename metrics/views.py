@@ -8,12 +8,14 @@ from django.core.serializers.json import DjangoJSONEncoder
 from .models import CoiLastRun, MeanKinshipLastRun
 from json import dumps, loads
 from datetime import datetime, timedelta
+import logging
 import requests
 import asyncio
 import pytz
 import boto3
 from boto3.s3.transfer import TransferConfig
 
+logger = logging.getLogger(__name__)
 
 def calc_last_run(attached_service, obj, dt=None, timezone="UTC"):
 
@@ -156,7 +158,7 @@ def kinship(request):
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother}/{father}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-
+    logger.error(coi_raw.text)
     return HttpResponse(coi_raw.json())
 
 
