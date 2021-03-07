@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
+from django.db.models import Q
 from io import BytesIO
 from account.views import is_editor, get_main_account
 from breeder.models import Breeder
@@ -18,6 +19,21 @@ def reports(request):
 def census(request, type):
     attached_service = get_main_account(request.user)
     date = datetime.now()
+
+    form = False
+    if type == 'form':
+        form = True
+        # convert dates
+        start_date_object = datetime.strptime(request.POST.get('from_date'), '%d/%m/%Y')
+        start_date = start_date_object.strftime('%Y-%m-%d')
+        end_date_object = datetime.strptime(request.POST.get('end_date'), '%d/%m/%Y')
+        end_date = end_date_object.strftime('%Y-%m-%d')
+
+        if 'xls_submit' in request.POST:
+            type = 'xls'
+        else:
+            type = 'pdf'
+
     if type == 'xls':
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
@@ -50,7 +66,13 @@ def census(request, type):
             # Sheet body, remaining rows
             font_style = xlwt.XFStyle()
 
-            pedigrees = Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive')
+            if form:
+                pedigrees = Pedigree.objects.filter(account=attached_service,
+                                                    current_owner=breeder,
+                                                    date_of_registration__range=[start_date, end_date],
+                                                    status='alive')
+            else:
+                pedigrees = Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive')
             for pedigree in pedigrees:
                 row_num = row_num + 1
                 try:
@@ -74,7 +96,12 @@ def census(request, type):
         context = {}
         attached_service = get_main_account(request.user)
         context['breeders'] = Breeder.objects.filter(account=attached_service, active=True)
-        context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive')
+        if form:
+            context['pedigrees'] = Pedigree.objects.filter(account=attached_service,
+                                                           status='alive',
+                                                           date_of_registration__range=[start_date, end_date],)
+        else:
+            context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive')
 
         pdf = render_to_pdf('census.html', context)
         response = HttpResponse(pdf, content_type='application/pdf')
@@ -91,29 +118,3 @@ def render_to_pdf(template_src, context_dict):
     if not pdf.err:
         return HttpResponse(result.getvalue(), content_type='application/pdf')
     return None
-
-
-# class GeneratePDF(View):
-#     def get(self, request, *args, **kwargs):
-#         context = {}
-#         context['attached_service'] = get_main_account(request.user)
-#         context['lvl1'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
-#         context = generate_hirearchy(context)
-#
-#         pdf_filename = "{date}-{name}{pedigree}-certificate".format(
-#             date=context['lvl1'].date_added.strftime('%Y-%m-%d'),
-#             name=slugify(context['lvl1'].name),
-#             pedigree=context['lvl1'].reg_no,
-#         )
-#
-#         pdf = render_to_pdf('certificate.html', context)
-#         if pdf:
-#             response = HttpResponse(pdf, content_type='application/pdf')
-#             filename = "%s.pdf" % pdf_filename
-#             content = "attachment; filename=%s" % filename
-#             download = request.GET.get("download")
-#             if download:
-#                 content = "attachment; filename=%s" % filename
-#             response['Content-Disposition'] = content
-#             return response
-#         return HttpResponse("Not found")

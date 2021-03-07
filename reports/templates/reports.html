@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block header %}
+        <link rel="stylesheet" type="text/css" href="{% static 'assets/libs/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}">
+{% endblock %}
+
 {% block content %}
     <!-- ============================================================== -->
     <!-- Bread crumb and right sidebar toggle -->
@@ -24,12 +29,43 @@
         <div class="col-12 mt-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title"></h4>
+                    <h4 class="card-title">Reports</h4>
+                    <p>Download the full Census reports.</p>
                     <a href="{% url 'census' 'xls' %}"><button class="btn btn-info">Census Export XLSX</button></a>
                     <a href="{% url 'census' 'pdf' %}"><button class="btn btn-info">Census Export PDF</button></a>
+                    <hr>
+                    <h5>Specify Date Range</h5>
+                    <p>Specify the Start and End date of what animals you'd like to capture in the report.</p>
+                    <form class="form" method="POST" action="{% url 'census' 'form' %}">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="col-3">
+                                <input type="text" class="form-control datepicker" name="from_date" required>
+                                <small>From date</small>
+                            </div>
+                            <div class="col-3">
+                                <input type="text" class="form-control datepicker" name="end_date" required>
+                                <small>End date</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-info" name="xls_submit" value="xls">Census Export XLSX</button>
+                        <button type="submit" class="btn btn-info" name="pdf_submit" value="pdf">Census Export PDF</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
+{% endblock %}
+
+{% block footer %}
+    <script src="{% static 'assets/libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>
+    <script>
+        // Date Picker
+        jQuery('.datepicker').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: 'dd/mm/yyyy'
+        });
+    </script>
 {% endblock %}
