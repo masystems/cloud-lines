@@ -143,6 +143,7 @@
                             var result = JSON.parse(data);
                             var coi_countDownDate = new Date(result.coi_date).getTime();
                             var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
+                            infoMsg('COI now running, allow time for values to be updated')
                         }
                     catch(err) {
                               // not returned anything
@@ -203,6 +204,7 @@
                             var result = JSON.parse(data);
                             var mk_countDownDate = new Date(result.mean_kinship_date).getTime();
                             var mk_countDownInterval = setInterval(function() { mk_countDown(mk_countDownDate); }, 1000);
+                            infoMsg('Mean Kindship now running, allow time for values to be updated')
                         }
                     catch(err) {
                               // not returned anything
@@ -315,6 +317,9 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block footer %}
 <script>
     var breed_mean_coi;
     $('#saBtn').click( function() {

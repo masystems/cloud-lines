@@ -24,6 +24,7 @@
     <link href="{% static 'assets/plugins/bootstrap-select/bootstrap-select.min.css' %}" rel="stylesheet" />
     <link href="{% static 'assets/plugins/multiselect/css/multi-select.css' %}" rel="stylesheet" type="text/css" />
     <link href="{% static 'assets/plugins/dropzone-master/dist/dropzone.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/extra-libs/toastr/dist/build/toastr.min.css' %}" rel="stylesheet">
 
     <!-- chart-->
     <link href="{% static 'assets/plugins/morrisjs/morris.css' %}" rel="stylesheet">
@@ -586,6 +587,9 @@ $(document).ready(function() {
     });
 });
 </script>
+
+{% include 'toastr.html' %}
+this
 {% block footer %}
 
 {% endblock %}
