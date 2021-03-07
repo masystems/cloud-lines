@@ -133,6 +133,7 @@
                 type: 'post',
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
                 dataType: 'text',
+                async: true,
                 data: [],
                 beforeSend: function() {
                     $('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');

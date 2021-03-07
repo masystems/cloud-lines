@@ -10,7 +10,6 @@ from json import dumps, loads
 from datetime import datetime, timedelta
 import logging
 import requests
-import asyncio
 import pytz
 import boto3
 from boto3.s3.transfer import TransferConfig
@@ -74,9 +73,7 @@ def run_coi(request):
     obj.last_run = datetime.now()
     obj.save()
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(coi(request))
+    coi(request)
 
     obj.last_run = calc_last_run(attached_service, obj)
 
@@ -85,7 +82,7 @@ def run_coi(request):
     return HttpResponse(dumps({'coi_date': coi_date}))
 
 
-async def coi(request):
+def coi(request):
     attached_service = get_main_account(request.user)
     pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
                                                                          'parent_father__id',
@@ -158,7 +155,7 @@ def kinship(request):
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother}/{father}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-    logger.error(coi_raw.text)
+
     return HttpResponse(coi_raw.json())
 
 
@@ -168,15 +165,13 @@ def run_mean_kinship(request):
 
     obj.last_run = datetime.now()
     obj.save()
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(mean_kinship(request))
+    mean_kinship(request)
     obj.last_run = calc_last_run(attached_service, obj)
     mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     return HttpResponse(dumps({'mean_kinship_date': mean_kinship_date}))
 
 
-async def mean_kinship(request):
+def mean_kinship(request):
     attached_service = get_main_account(request.user)
     breeds = Breed.objects.filter(account=attached_service)
     for breed in breeds.all():
