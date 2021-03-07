@@ -130,8 +130,8 @@ def kinship(request):
                                                                          'breed__breed_name',
                                                                          'status')
 
-    mother = Pedigree.objects.get(reg_no=request.POST['mother'])
-    father = Pedigree.objects.get(reg_no=request.POST['father'])
+    mother = Pedigree.objects.get(reg_no=request.POST['mother']).id
+    father = Pedigree.objects.get(reg_no=request.POST['father']).id
 
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
