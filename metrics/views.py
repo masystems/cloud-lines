@@ -74,7 +74,7 @@ def run_coi(request):
     obj.last_run = datetime.now()
     obj.save()
 
-    Thread(target=coi(request)).start()
+    Thread(target=coi, args=(request, )).start()
 
     obj.last_run = calc_last_run(attached_service, obj)
 
@@ -164,7 +164,7 @@ def run_mean_kinship(request):
 
     obj.last_run = datetime.now()
     obj.save()
-    Thread(target=mean_kinship(request))
+    Thread(target=mean_kinship, args=(request, ))
     obj.last_run = calc_last_run(attached_service, obj)
     mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     return HttpResponse(dumps({'mean_kinship_date': mean_kinship_date}))
