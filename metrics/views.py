@@ -13,6 +13,7 @@ import requests
 import pytz
 import boto3
 from boto3.s3.transfer import TransferConfig
+from threading import Thread
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,7 @@ def run_coi(request):
     obj.last_run = datetime.now()
     obj.save()
 
-    coi(request)
+    Thread(target=coi(request)).start()
 
     obj.last_run = calc_last_run(attached_service, obj)
 
@@ -119,8 +120,6 @@ def coi(request):
     for pedigree in coi_dict:
         Pedigree.objects.filter(account=attached_service, id=pedigree['Indiv']).update(coi=pedigree['Inbr'])
 
-    return HttpResponse(coi_dict)
-
 
 def kinship(request):
     attached_service = get_main_account(request.user)
@@ -165,7 +164,7 @@ def run_mean_kinship(request):
 
     obj.last_run = datetime.now()
     obj.save()
-    mean_kinship(request)
+    Thread(target=mean_kinship(request))
     obj.last_run = calc_last_run(attached_service, obj)
     mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     return HttpResponse(dumps({'mean_kinship_date': mean_kinship_date}))
