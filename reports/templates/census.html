@@ -113,7 +113,9 @@
                             <th>Tag No.</th>
                             <th>Born</th>
                             <th>Sire</th>
-                            <th>Damn</th>
+                            <th>Sire Name</th>
+                            <th>Dam</th>
+                            <th>Dam Name</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,10 +156,19 @@
                                     <td class="main-td">
                                         {{ pedigree.parent_father.reg_no }}
                                     </td>
+                                    <!--## Sire Name ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.parent_father.name }}
+                                    </td>
 
                                     <!--## Dam ##-->
                                     <td class="main-td">
                                         {{ pedigree.parent_mother.reg_no }}
+                                    </td>
+
+                                    <!--## Dam Name ##-->
+                                    <td class="main-td">
+                                        {{ pedigree.parent_mother.name }}
                                     </td>
                                 </tr>
                             {% endif %}

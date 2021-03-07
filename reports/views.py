@@ -51,7 +51,7 @@ def census(request, type):
         font_style_header.font.bold = True
 
         # column header names, you can use your own headers here
-        columns = ['Sex', 'Reg No', 'Date Of Birth', 'Name', 'Tag No', 'Born', 'Sire', 'Damn']
+        columns = ['Sex', 'Reg No', 'Date Of Birth', 'Name', 'Tag No', 'Born', 'Sire', 'Sire Name', 'Dam', 'Dam Name']
 
         # write column headers in sheet
         for col_num in range(len(columns)):
@@ -77,12 +77,16 @@ def census(request, type):
                 row_num = row_num + 1
                 try:
                     father = pedigree.parent_father.reg_no
+                    father_name = pedigree.parent_father.name
                 except AttributeError:
                     father = ""
+                    father_name = ""
                 try:
                     mother = pedigree.parent_mother.reg_no
+                    mother_name = pedigree.parent_mother.name
                 except AttributeError:
                     mother = ""
+                    mother_name = ""
                 worksheet.write(row_num, 0, pedigree.sex, font_style)
                 worksheet.write(row_num, 1, pedigree.reg_no, font_style)
                 worksheet.write(row_num, 2, pedigree.dob, font_style)
@@ -90,7 +94,9 @@ def census(request, type):
                 worksheet.write(row_num, 4, pedigree.tag_no, font_style)
                 worksheet.write(row_num, 5, pedigree.born_as, font_style)
                 worksheet.write(row_num, 6, father, font_style)
-                worksheet.write(row_num, 7, mother, font_style)
+                worksheet.write(row_num, 7, father_name, font_style)
+                worksheet.write(row_num, 8, mother, font_style)
+                worksheet.write(row_num, 9, mother_name, font_style)
         workbook.save(response)
     elif type == 'pdf':
         context = {}
