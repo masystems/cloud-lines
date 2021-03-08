@@ -323,6 +323,7 @@ def logout(request):
 def profile(request):
     from django.conf import settings
     stripe_pk = settings.STRIPE_PUBLIC_KEY
+    stripe.api_key = settings.STRIPE_SECRET_KEY
     context = {'public_api_key': stripe_pk, 'user_detail': UserDetail.objects.get(user=request.user)}
 
     main_account = get_main_account(request.user)
