@@ -26,6 +26,10 @@ import stripe
 import time
 import json
 import requests
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def site_mode(request):
@@ -348,6 +352,7 @@ def profile(request):
 
             context['charges'] = charges
         except stripe.error.AuthenticationError:
+            logger.error('Stripe authentication error')
             pass
 
         # payment methods

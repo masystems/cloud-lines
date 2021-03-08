@@ -15,7 +15,9 @@ import boto3
 from boto3.s3.transfer import TransferConfig
 from threading import Thread
 
+
 logger = logging.getLogger(__name__)
+
 
 def calc_last_run(attached_service, obj, dt=None, timezone="UTC"):
 
