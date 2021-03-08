@@ -50,6 +50,9 @@ def census(request, type):
         # headers are bold
         font_style_header.font.bold = True
 
+        date_format = xlwt.XFStyle()
+        date_format.num_format_str = 'dd/mm/yyyy'
+
         # column header names, you can use your own headers here
         columns = ['Sex', 'Reg No', 'Date Of Birth', 'Name', 'Tag No', 'Born', 'Sire', 'Sire Name', 'Dam', 'Dam Name', 'DOR']
 
@@ -97,7 +100,7 @@ def census(request, type):
                 worksheet.write(row_num, 7, father_name, font_style)
                 worksheet.write(row_num, 8, mother, font_style)
                 worksheet.write(row_num, 9, mother_name, font_style)
-                worksheet.write(row_num, 10, pedigree.date_of_registration, font_style)
+                worksheet.write(row_num, 10, pedigree.date_of_registration, date_format)
         workbook.save(response)
     elif type == 'pdf':
         context = {}
