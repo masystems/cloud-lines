@@ -308,9 +308,13 @@ def new_pedigree_form(request):
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value()).exists() and pedigree_form['current_owner'].value() not in ['Current Owner', '', 'None', None]:
             pedigree_form.add_error('current_owner', 'Selected owner does not exist')
             pre_checks = False
-        if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['mother'].value().strip()).exists() and pedigree_form['mother'].value().strip() not in ['Mother', '', 'None', None]:
-            pedigree_form.add_error('mother', 'Selected mother does not exist')
-            pre_checks = False
+        try:
+            if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['mother'].value().strip()).exists() and pedigree_form['mother'].value().strip() not in ['Mother', '', 'None', None]:
+                pedigree_form.add_error('mother', 'Selected mother does not exist')
+                pre_checks = False
+        except AttributeError:
+            # ends up here if a breed group is added, so pedigree_form['mother'] doesn't exist in the post request
+            pass
         if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['father'].value().strip()).exists() and pedigree_form['father'].value() not in ['Father', '', 'None', None]:
             pedigree_form.add_error('father', 'Selected father does not exist')
             pre_checks = False
@@ -461,7 +465,6 @@ def edit_pedigree_form(request, id):
         custom_fields = {}
 
     if request.method == 'POST':
-        print(request.POST)
         if 'delete' in request.POST:
             if request.user in attached_service.contributors.all():
                 # contributors are not allowed to delete pedigrees!
@@ -485,9 +488,13 @@ def edit_pedigree_form(request, id):
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value()).exists() and pedigree_form['current_owner'].value() not in ['Current Owner', '', 'None', None]:
             pedigree_form.add_error('current_owner', 'Selected owner does not exist')
             pre_checks = False
-        if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['mother'].value().strip()).exists() and pedigree_form['mother'].value() not in ['Mother', '', 'None', None]:
-            pedigree_form.add_error('mother', 'Selected mother does not exist')
-            pre_checks = False
+        try:
+            if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['mother'].value().strip()).exists() and pedigree_form['mother'].value() not in ['Mother', '', 'None', None]:
+                pedigree_form.add_error('mother', 'Selected mother does not exist')
+                pre_checks = False
+        except AttributeError:
+            # ends up here if a breed group is added, so pedigree_form['mother'] doesn't exist in the post request
+            pass
         if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['father'].value().strip()).exists() and pedigree_form['father'].value() not in ['Father', '', 'None', None]:
             pedigree_form.add_error('father', 'Selected father does not exist')
             pre_checks = False
