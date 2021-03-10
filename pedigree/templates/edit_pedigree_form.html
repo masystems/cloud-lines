@@ -307,7 +307,7 @@
                             url: "{% url 'image_upload' pedigree.id %}",
                             headers: {'X-CSRFToken': '{{ csrf_token }}'},
                             method: "POST",
-                            autoProcessQueue: false,
+                            autoProcessQueue: true,
                             uploadMultiple: true,
                             parallelUploads: 5,
                             maxFiles: 10,
