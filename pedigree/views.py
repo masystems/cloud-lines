@@ -359,7 +359,7 @@ def new_pedigree_form(request):
             try:
                 new_pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value().strip())
 
-            except ObjectDoesNotExist:
+            except (ObjectDoesNotExist, AttributeError):
                 new_pedigree.breed_group = pedigree_form['breed_group'].value()
 
             try:
@@ -550,7 +550,7 @@ def edit_pedigree_form(request, id):
                 else:
                     try:
                         pedigree.parent_mother = Pedigree.objects.get(account=attached_service, reg_no=pedigree_form['mother'].value().strip())
-                    except ObjectDoesNotExist:
+                    except (ObjectDoesNotExist, AttributeError):
                         pedigree.breed_group = pedigree_form['breed_group'].value()
 
             except:
