@@ -209,6 +209,25 @@
 {% endblock %}
 
 {% block footer %}
-
+<script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
+<script>
+    Dropzone.options.imageUploads= {
+    url: "{% url 'image_upload' 0 %}",
+    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    timeout: 180000,
+    method: "POST",
+    autoProcessQueue: false,
+    uploadMultiple: true,
+    parallelUploads: 5,
+    maxFiles: 10,
+    acceptedFiles: 'image/*',
+    ignoreHiddenFiles: true,
+    dictDefaultMessage: "Click or drop files here to upload",
+    resizeWidth: 1000,
+    resizeHeight: 1000,
+    resizeMethod: 'contain',
+    resizeQuality: 1.0,
+    }
+</script>
 
 {% endblock %}
