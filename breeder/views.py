@@ -12,9 +12,9 @@ import json
 
 
 @login_required(login_url="/account/login")
-def breeder(request, breeder):
+def breeder(request, breeder_id, breeder):
     attached_service = get_main_account(request.user)
-    breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breeder)
+    breeder = Breeder.objects.get(account=attached_service, id=breeder_id)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
     breeder_pedigrees = Pedigree.objects.filter(account=attached_service, breeder__breeding_prefix__exact=breeder).exclude(
                 state='unapproved').values('id', *columns)[:500]

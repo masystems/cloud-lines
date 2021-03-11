@@ -306,6 +306,7 @@
                             Dropzone.options.imageUploads= {
                             url: "{% url 'image_upload' pedigree.id %}",
                             headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                            timeout: 180000,
                             method: "POST",
                             autoProcessQueue: true,
                             uploadMultiple: true,
