@@ -289,7 +289,6 @@ def search_results(request):
 @never_cache
 def new_pedigree_form(request):
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
-    image_form = ImagesForm(request.POST or None, request.FILES or None)
     pre_checks = True
     attached_service = get_main_account(request.user)
     try:
@@ -325,7 +324,7 @@ def new_pedigree_form(request):
             pedigree_form.add_error('breed', 'Selected breed does not exist')
             pre_checks = False
 
-        if pedigree_form.is_valid() and image_form.is_valid() and pre_checks:
+        if pedigree_form.is_valid() and pre_checks:
             new_pedigree = Pedigree()
             new_pedigree.creator = request.user
             try:
@@ -402,11 +401,9 @@ def new_pedigree_form(request):
                 new_pedigree.save()
 
 
-            files = request.FILES.getlist('upload_images')
-
-            for file in files:
-                upload = PedigreeImage(account=attached_service, image=file, reg_no=new_pedigree)
-                upload.save()
+            # for key, file in request.FILES.items():
+            #     upload = PedigreeImage(account=attached_service, image=file, reg_no=new_pedigree)
+            #     upload.save()
 
             new_pedigree.save()
             return redirect('pedigree', new_pedigree.id)
@@ -423,7 +420,6 @@ def new_pedigree_form(request):
         suggested_reg = 'REG12345'
 
     return render(request, 'new_pedigree_form_base.html', {'pedigree_form': pedigree_form,
-                                                           'image_form': image_form,
                                                            'pedigrees': Pedigree.objects.filter(account=attached_service),
                                                            'breeders': Breeder.objects.filter(account=attached_service),
                                                            'breeds': Breed.objects.filter(account=attached_service),

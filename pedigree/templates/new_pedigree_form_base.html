@@ -58,9 +58,9 @@
                     <button id="confirmSaveBtn" type="button" class="btn btn-success waves-effect waves-light">Save Pedigree</button>
                 </div>
                 <script>
-                    $('#confirmSaveBtn').click(function () {
-                        $('#newPedigreeForm').submit();
-                    });
+                    // $('#confirmSaveBtn').click(function () {
+                    //     $('#newPedigreeForm').submit();
+                    // });
                 </script>
             </div>
         </div>
@@ -211,23 +211,80 @@
 {% block footer %}
 <script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
 <script>
-    Dropzone.options.imageUploads= {
-    url: "{% url 'image_upload' 0 %}",
-    headers: {'X-CSRFToken': '{{ csrf_token }}'},
-    timeout: 180000,
-    method: "POST",
-    autoProcessQueue: false,
-    uploadMultiple: true,
-    parallelUploads: 5,
-    maxFiles: 10,
-    acceptedFiles: 'image/*',
-    ignoreHiddenFiles: true,
-    dictDefaultMessage: "Click or drop files here to upload",
-    resizeWidth: 1000,
-    resizeHeight: 1000,
-    resizeMethod: 'contain',
-    resizeQuality: 1.0,
-    }
+    $("#confirmSaveBtn").on("click", function(e) {
+        $('#newPedigreeForm').submit();
+    });
+    // var errors = false;
+    // $("#newPedigreeForm").dropzone({
+    //     autoProcessQueue: false,
+    //     autoQueue: false,
+    //     uploadMultiple: true,
+    //     parallelUploads: 100,
+    //     maxFiles: 100,
+    //     maxFilesize: 5000,
+    //     acceptedFiles: "video/*, image/*",
+    //     addRemoveLinks: true,
+    //     ignoreHiddenFiles: true,
+    //     dictDefaultMessage: "Click or drop images here to upload",
+    //     timeout: 999999,
+    //     thumbnailWidth: 450,
+    //     thumbnailHeight: 400,
+    //     error: function(file, errorMessage) {
+    //         errorMsg(errorMessage)
+    //         errors = true;
+    //         },
+    //     errormultiple: function(file, errorMessage) {
+    //         errorMsg(errorMessage)
+    //         errors = true;
+    //         },
+    //     queuecomplete: function() {
+    //         if(errors) {
+    //             errorMsg(errors)
+    //         } else {
+    //             //window.location.href = "{% url 'pedigree_search' %}";
+    //         }
+    //     },
+    //     init: function() {
+    //         var pedDz = this;
+    //
+    //         // First change the button to actually tell Dropzone to process the queue.
+    //         $("#confirmSaveBtn").on("click", function(e) {
+    //           // Make sure that the form isn't actually being sent.
+    //             $('#newPedigreeForm').submit();
+    //           //pedDz.processQueue();
+    //           if (pedDz.files.length < 1) {
+    //               $('#newPedigreeForm').submit();
+    //           }
+    //         });
+    //
+    //         // Listen to the sendingmultiple event. In this case, it's the sendingmultiple event instead
+    //         // of the sending event because uploadMultiple is set to true.
+    //         this.on("sendingmultiple", function() {
+    //           // Gets triggered when the form is actually being sent.
+    //           // Hide the success button or the complete form.
+    //         });
+    //         this.on("successmultiple", function(files, response) {
+    //           // Gets triggered when the files have successfully been sent.
+    //           // Redirect user or notify of success.
+    //         });
+    //         this.on("errormultiple", function(files, response) {
+    //           // Gets triggered when there was an error sending the files.
+    //           // Maybe show form again, and notify user of error
+    //             errorMsg(response)
+    //         });
+    //         this.on("error", function (file, error, xhr) {
+    //             errorMsg(error)
+    //             var ficheiro = { nome: file.name, status: xhr.status, statusText: xhr.statusText, erro: error.message };
+    //             $scope.$apply($scope.errorFiles.push(ficheiro));
+    //         });
+    //         this.on("success", function (file, response) {
+    //             //infoMsg(response);
+    //             var responsetext = JSON.parse(file.xhr.responseText);
+    //             console.log(responsetext);
+    //         });
+    //     }
+    //
+    // });
 </script>
 
 {% endblock %}
