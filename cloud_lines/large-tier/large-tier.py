@@ -184,7 +184,6 @@ class LargeTier:
                     with open(os.path.join(self.target_dir, 'user.json'), 'w') as outfile:
                         json.dump(user, outfile)
 
-
             # wrap user.json in square brackets because django said so!
             with open(os.path.join(self.target_dir, 'user.json'), "r+") as original:
                 data = original.read()

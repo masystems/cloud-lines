@@ -87,7 +87,6 @@ vertical-align: middle;
                                                                         {% endif %}
                                                                     {% endfor %}"
                                                                class="img-responsive thumbnail mr-3">
-
                                     {% endif %}
                                 </div>
                                 <div class="col-md-8">
@@ -486,7 +485,7 @@ vertical-align: middle;
                     {% endif %}
                     {% if lvl1.current_owner.breeding_prefix %}
                     <li>
-                        <div class="bg-light-success"><i class="fad fa-user"></i></div> Owner <span class=""><a href="{% url 'breeder' lvl1.breeder.id lvl1.current_owner.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.current_owner.breeding_prefix }}</button></a></span></li>
+                        <div class="bg-light-success"><i class="fad fa-user"></i></div> Owner <span class=""><a href="{% url 'breeder' lvl1.current_owner.id lvl1.current_owner.breeding_prefix %}"><button class="btn btn-xs btn-outline-dark">{{ lvl1.current_owner.breeding_prefix }}</button></a></span></li>
                     {% endif %}
                     {% if lvl1.reg_no %}
                     <li>

@@ -405,6 +405,7 @@ def new_pedigree_form(request):
             #     upload = PedigreeImage(account=attached_service, image=file, reg_no=new_pedigree)
             #     upload.save()
 
+
             new_pedigree.save()
             return redirect('pedigree', new_pedigree.id)
     else:
