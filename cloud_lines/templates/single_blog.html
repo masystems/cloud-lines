@@ -96,7 +96,7 @@
 				============================================= -->
 				<ul class="entry-meta clearfix">
 					<li><i class="icon-calendar3"></i> {{ article.date_added }}</li>
-						{% if request.user.username == 'sheepishsophie' or request.user.is_superuser %}
+						{% if request.user.is_superuser %}
 						<li><a href="#" id="editArticle"><i class="icon-edit"></i> Edit</a></li>
 						<script>
 							$('#editArticle').click( function() {
@@ -148,9 +148,7 @@
 				<!-- Entry Content
 				============================================= -->
 				<div class="entry-content notopmargin">
-
-					{{ article.content|linebreaks }}
-
+						{{ article.content|safe|linebreaks }}
 					<!-- Tag Cloud
 					============================================= -->
 <!--					<div class="tagcloud clearfix bottommargin">-->
