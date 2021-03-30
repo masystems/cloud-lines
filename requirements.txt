@@ -28,7 +28,7 @@ django-s3-storage==0.13.0
 django-storages==1.8
 django-weasyprint==0.5.5
 django-widget-tweaks==1.4.5
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 docutils==0.15
 durationpy==0.5
 filelock==3.0.12
