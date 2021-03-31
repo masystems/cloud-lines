@@ -43,6 +43,8 @@ def export(request):
                                 pass
                             elif key == 'account_id':
                                 pass
+                            elif key == 'breed_group':
+                                pass
                             # use verbose names of the pedigree fields as field names
                             else:
                                 head.append(Pedigree._meta.get_field(key).verbose_name)
@@ -53,6 +55,8 @@ def export(request):
                         elif key == 'creator_id':
                             pass
                         elif key == 'account_id':
+                            pass
+                        elif key == 'breed_group':
                             pass
                         elif key == 'parent_mother_id' or key == 'parent_father_id':
                             try:
