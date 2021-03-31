@@ -10,6 +10,7 @@ from .models import DatabaseUpload
 from datetime import datetime
 from os.path import splitext
 import csv
+from json import loads, JSONDecodeError
 
 
 @login_required(login_url="/account/login")
@@ -60,6 +61,21 @@ def export(request):
                             except ObjectDoesNotExist:
                                 breed_name = ""
                             row.append('{}'.format(breed_name))
+                        elif key == 'custom_fields':
+                            cf_string = ''
+
+                            # get pedigree custom fields
+                            try:
+                                custom_fields = dict(loads(pedigree.custom_fields)).values()
+                            except JSONDecodeError:
+                                pass
+
+                            # iterate through custom fields
+                            for field in custom_fields:
+                                if 'field_value' in field:
+                                    cf_string += f"{field['fieldName']}: {field['field_value']}  \n"
+
+                            row.append(cf_string)
                         else:
                             row.append('{}'.format(val))
                 if not header:
