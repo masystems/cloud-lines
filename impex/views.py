@@ -36,15 +36,23 @@ def export(request):
                 for key, val in pedigree.__dict__.items():
                     if key not in ('_state',):
                         if not header:
-                            # don't display ID
+                            # don't display ID, creator, or account
                             if key == 'id':
+                                pass
+                            elif key == 'creator_id':
+                                pass
+                            elif key == 'account_id':
                                 pass
                             # use verbose names of the pedigree fields as field names
                             else:
                                 head.append(Pedigree._meta.get_field(key).verbose_name)
 
-                        # don't display ID
+                        # don't display ID, creator, or account
                         if key == 'id':
+                            pass
+                        elif key == 'creator_id':
+                            pass
+                        elif key == 'account_id':
                             pass
                         elif key == 'parent_mother_id' or key == 'parent_father_id':
                             try:
