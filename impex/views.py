@@ -36,9 +36,21 @@ def export(request):
                 row = []
                 for key, val in pedigree.__dict__.items():
                     if key not in ('_state', 'state', 'id', 'creator_id', 'account_id', 'breed_group', 'date_added'):
+                        # load custom fields
+                        if key == 'custom_fields':
+                            try:
+                                custom_fields = dict(loads(pedigree.custom_fields)).values()
+                            except JSONDecodeError:
+                                pass
+                        
                         if not header:
-                            # use verbose names of the pedigree fields as field names
-                            head.append(Pedigree._meta.get_field(key).verbose_name)
+                            if key == 'custom_fields':
+                                # add a columns for each custom field
+                                for field in custom_fields:
+                                    head.append(field['fieldName'])
+                            else:
+                                # use verbose names of the pedigree fields as field names
+                                head.append(Pedigree._meta.get_field(key).verbose_name)
                         
                         if key == 'parent_mother_id' or key == 'parent_father_id':
                             try:
@@ -62,20 +74,12 @@ def export(request):
                                 breed_name = ""
                             row.append('{}'.format(breed_name))
                         elif key == 'custom_fields':
-                            cf_string = ''
-
-                            # get pedigree custom fields
-                            try:
-                                custom_fields = dict(loads(pedigree.custom_fields)).values()
-                            except JSONDecodeError:
-                                pass
-
-                            # iterate through custom fields
+                            # populate each custom field column with the value
                             for field in custom_fields:
                                 if 'field_value' in field:
-                                    cf_string += f"{field['fieldName']}: {field['field_value']}  \n"
-
-                            row.append(cf_string)
+                                    row.append(field['field_value'])
+                                else:
+                                    row.append('')
                         else:
                             row.append('{}'.format(val))
                 if not header:
@@ -378,23 +382,23 @@ def import_pedigree_data(request):
 
             #############################
             pedigree.custom_fields = attached_service.custom_fields
-            try:
-                custom_fields_in = row[custom_fields]
-                if custom_fields_in not in ('', None):
+            # try:
+            #     custom_fields_in = row[custom_fields]
+            #     if custom_fields_in not in ('', None):
 
-                    # get pedigree custom fields
-                    try:
-                        custom_fields = dict(loads(pedigree.custom_fields)).values()
-                    except JSONDecodeError:
-                        pass
+            #         # get pedigree custom fields
+            #         try:
+            #             custom_fields = dict(loads(pedigree.custom_fields)).values()
+            #         except JSONDecodeError:
+            #             pass
 
-                    for field in custom_fields:
-                        # populate
-                        # if the field was given in the row, take the value for the field given(after '<field_name>: ', before '\n'), and use it for the value of that field in pedigree.custom_fields
+            #         for field in custom_fields:
+            #             # populate
+            #             # if the field was given in the row, take the value for the field given(after '<field_name>: ', before '\n'), and use it for the value of that field in pedigree.custom_fields
 
-                    pedigree.custom_fields = custom_fields
-            except KeyError:
-                pass
+            #         pedigree.custom_fields = custom_fields
+            # except KeyError:
+            #     pass
             
             pedigree.save()
 
