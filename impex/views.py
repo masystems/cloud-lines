@@ -168,7 +168,7 @@ def import_pedigree_data(request):
         father_notes = post_data['parent_father_notes'] or ''
         mother = post_data['parent_mother'] or ''
         mother_notes = post_data['parent_mother_notes'] or ''
-
+        custom_fields = post_data['custom_fields'] or ''
         for row in database_items:
             # create breeder if it doesn't exist ###################
             try:
@@ -375,7 +375,27 @@ def import_pedigree_data(request):
                 pedigree.breed = breed_obj
             except KeyError:
                 pass
+
+            #############################
             pedigree.custom_fields = attached_service.custom_fields
+            try:
+                custom_fields_in = row[custom_fields]
+                if custom_fields_in not in ('', None):
+
+                    # get pedigree custom fields
+                    try:
+                        custom_fields = dict(loads(pedigree.custom_fields)).values()
+                    except JSONDecodeError:
+                        pass
+
+                    for field in custom_fields:
+                        # populate
+                        # if the field was given in the row, take the value for the field given(after '<field_name>: ', before '\n'), and use it for the value of that field in pedigree.custom_fields
+
+                    pedigree.custom_fields = custom_fields
+            except KeyError:
+                pass
+            
             pedigree.save()
 
     return redirect('pedigree_search')
