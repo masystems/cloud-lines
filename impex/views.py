@@ -34,10 +34,11 @@ def export(request):
                 head = []
                 row = []
                 for key, val in pedigree.__dict__.items():
-                    if key not in ('_state',):
+                    if key not in ('_state', 'state', 'id', 'creator_id', 'account_id', 'breed_group', 'date_added'):
                         if not header:
-                            head.append('{}'.format(key))
-
+                            # use verbose names of the pedigree fields as field names
+                            head.append(Pedigree._meta.get_field(key).verbose_name)
+                        
                         if key == 'parent_mother_id' or key == 'parent_father_id':
                             try:
                                 parent = Pedigree.objects.get(id=val)
