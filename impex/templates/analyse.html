@@ -59,6 +59,24 @@
                                             </div>
                                         {% endif %}
                                     {% endfor %}
+                                    <!-- custom fields -->
+                                    {% for field in custom_fields %}
+                                        <div class="row mx-lg-n5">
+                                            <div class="col bg-light border">
+                                                <p class="mt-2"><strong>{{ field }}</strong></p>
+                                            </div>
+                                            <div class="col bg-light border">
+                                                <div class="dropdown bootstrap-select mb-3 mr-2">
+                                                    <select class="selectpicker mt-2 mb-2 mr-2" name="{{ field }}" data-style="btn-info btn-outline-info" tabindex="-98">
+                                                            <option data-tokens="" selected>---</option>
+                                                            {% for imported_heading in imported_headings %}
+                                                                <option data-tokens="{{ field }}">{{ imported_heading }}</option>
+                                                            {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
                                     <button class="btn btn-block btn-outline-info">Import Data</button>
                                 </form>
                             </div>
