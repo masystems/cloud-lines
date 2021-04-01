@@ -107,7 +107,7 @@ def new_breeder_form(request):
             new_breeder.custom_fields = json.dumps(custom_fields)
             new_breeder.save()
 
-            return redirect('breeder', new_breeder.breeding_prefix)
+            return redirect('breeder', new_breeder.id, new_breeder.breeding_prefix)
         else:
             return render(request, 'new_breeder_form_base.html', {'breeder_form': breeder_form,
                                                                   'custom_fields': custom_fields})
