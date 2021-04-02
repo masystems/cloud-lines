@@ -626,14 +626,27 @@ def image_upload(request, id):
     attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
-    file = request.FILES['file[0]']
+    image = request.FILES['file[0]']
+    from PIL import Image
+    from django.core.files.base import ContentFile
+    import pyheif
+    from io import BytesIO
+    from os import path
+
+    filename, file_extension = path.splitext(str(request.FILES['file[0]']))
+    if filename == "HEIC":
+        img_io = BytesIO()
+        heif_file = pyheif.read(request.FILES['file[0]'])
+        image = Image.frombytes(mode=heif_file.mode, size=heif_file.size, data=heif_file.data)
+        image.save(img_io, format='JPEG', quality=100)
+        image = ContentFile(img_io.getvalue(), f"{filename}.jpeg")
+
     if request.user in attached_service.contributors.all():
-        upload = PedigreeImage(account=attached_service, state='unapproved', image=file, reg_no=pedigree)
+        upload = PedigreeImage(account=attached_service, state='unapproved', image=image, reg_no=pedigree)
         upload.save()
     else:
-        upload = PedigreeImage(account=attached_service, image=file, reg_no=pedigree)
+        upload = PedigreeImage(account=attached_service, image=image, reg_no=pedigree)
         upload.save()
-
     return HttpResponse('')
 
 
