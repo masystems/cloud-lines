@@ -634,7 +634,6 @@ def image_upload(request, id):
     from os import path
 
     filename, file_extension = path.splitext(str(request.FILES['file[0]']))
-    print(file_extension)
     if file_extension == ".HEIC":
         img_io = BytesIO()
         heif_file = pyheif.read(request.FILES['file[0]'])
