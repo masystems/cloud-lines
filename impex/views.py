@@ -10,6 +10,7 @@ from .models import DatabaseUpload
 from datetime import datetime
 from os.path import splitext
 import csv
+from json import loads, dumps, JSONDecodeError
 
 
 @login_required(login_url="/account/login")
@@ -34,10 +35,23 @@ def export(request):
                 head = []
                 row = []
                 for key, val in pedigree.__dict__.items():
-                    if key not in ('_state',):
+                    if key not in ('_state', 'state', 'id', 'creator_id', 'account_id', 'breed_group', 'date_added'):
+                        # load custom fields
+                        if key == 'custom_fields':
+                            try:
+                                custom_fields = dict(loads(pedigree.custom_fields)).values()
+                            except JSONDecodeError:
+                                custom_fields = {}
+                        
                         if not header:
-                            head.append('{}'.format(key))
-
+                            if key == 'custom_fields':
+                                # add a columns for each custom field
+                                for field in custom_fields:
+                                    head.append(field['fieldName'])
+                            else:
+                                # use verbose names of the pedigree fields as field names
+                                head.append(Pedigree._meta.get_field(key).verbose_name)
+                        
                         if key == 'parent_mother_id' or key == 'parent_father_id':
                             try:
                                 parent = Pedigree.objects.get(id=val)
@@ -59,6 +73,13 @@ def export(request):
                             except ObjectDoesNotExist:
                                 breed_name = ""
                             row.append('{}'.format(breed_name))
+                        elif key == 'custom_fields':
+                            # populate each custom field column with the value
+                            for field in custom_fields:
+                                if 'field_value' in field:
+                                    row.append(field['field_value'])
+                                else:
+                                    row.append('')
                         else:
                             row.append('{}'.format(val))
                 if not header:
@@ -105,9 +126,20 @@ def importx(request):
             forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
             breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
                                  if field.name not in forbidden_breeeder_fields]
+
+            # get custom fields
+            try:
+                custom_fields = dict(loads(attached_service.custom_fields)).values()
+            except JSONDecodeError:
+                custom_fields = {}
+            custom_field_names = []
+            for field in custom_fields:
+                custom_field_names.append(field['fieldName'])
+
             return render(request, 'analyse.html', {'imported_headings': imported_headings,
                                                     'pedigree_headings': pedigree_headings,
-                                                    'breeder_headings': breeder_headings})
+                                                    'breeder_headings': breeder_headings,
+                                                    'custom_fields': custom_field_names})
         return render(request, 'import.html')
     else:
         return redirect('dashboard')
@@ -123,10 +155,26 @@ def import_pedigree_data(request):
         database_items = csv.DictReader(decoded_file)
         date_fields = ['date_of_registration', 'dob', 'dod']
         post_data = {}
+        
+        # get custom fields of account
+        try:
+            acc_custom_fields = loads(attached_service.custom_fields)
+        except json.decoder.JSONDecodeError:
+            acc_custom_fields = {}
+        # get names of custom fields
+        field_names = []
+        for key, field in acc_custom_fields.items():
+            field_names.append(field['fieldName'])
+        custom_fields_in = []
 
-        # remove blank ('---') entries ###################
+        # iterate through columns
         for key, val in request.POST.items():
-            if val == '---':
+            # add custom field columns
+            if key in field_names:
+                custom_fields_in.append(key)
+            
+            # remove blank ('---') entries ###################
+            elif val == '---':
                 if key in date_fields:
                     post_data[key] = None
                 post_data[key] = ''
@@ -347,7 +395,7 @@ def import_pedigree_data(request):
             elif breed != '---':
                 try:
                     breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
-                    print(created)
+                    #print(created)
                 except KeyError:
                     breed_obj = None
             else:
@@ -358,7 +406,17 @@ def import_pedigree_data(request):
                 pedigree.breed = breed_obj
             except KeyError:
                 pass
-            pedigree.custom_fields = attached_service.custom_fields
+
+            #############################
+            for cf_col in custom_fields_in:
+                # iterate through account custom fields
+                for id, field in acc_custom_fields.items():
+                    if acc_custom_fields[id]['fieldName'] == cf_col:
+                        # populate with value from the imported csv file
+                        acc_custom_fields[id]['field_value'] = row[cf_col]
+
+            pedigree.custom_fields = dumps(acc_custom_fields)
+            
             pedigree.save()
 
     return redirect('pedigree_search')
