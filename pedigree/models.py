@@ -61,11 +61,11 @@ class Pedigree(models.Model):
     parent_mother_notes = models.CharField(max_length=500, blank=True, null=True, verbose_name='Mother Notes', help_text="Max 500 characters")
     breed_group = models.CharField(max_length=255, blank=True, null=True, verbose_name='Breed Group')
     breed = models.ForeignKey(Breed, on_delete=models.CASCADE, blank=True, null=True, related_name='Breed', verbose_name="Breed")
-    custom_fields = models.TextField(blank=True, verbose_name="Custom Fields")
     coi = models.DecimalField(decimal_places=4, max_digits=5, default=0, blank=True, verbose_name="COI")
     mean_kinship = models.DecimalField(decimal_places=4, max_digits=5, default=0, blank=True, verbose_name="Mean Kinship")
     # hidden
     date_added = models.DateTimeField(auto_now_add=True, verbose_name="Date Added")
+    custom_fields = models.TextField(blank=True, verbose_name="Custom Fields")
 
     def __str__(self):
         return self.reg_no
