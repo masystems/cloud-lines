@@ -7,7 +7,7 @@
                 <span class="btn-label"> <strong>All Breed Groups</strong></span></a>
             <ul class="list-icons">
                 <li class="text-muted"><i class="ti-angle-right"></i> <strong>Group Name:</strong> {{ breed_group.group_name }}</li>
-                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Breeder:</strong> <a href="{% url 'breeder' breed_group.breeder.breeding_prefix %}">{{ breed_group.breeder }}</a></li>
+                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Breeder:</strong> <a href="{% url 'breeder' breed_group.breeder.id %}">{{ breed_group.breeder }}</a></li>
             </ul>
         </span>
     </span>

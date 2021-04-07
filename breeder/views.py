@@ -12,7 +12,7 @@ import json
 
 
 @login_required(login_url="/account/login")
-def breeder(request, breeder_id, breeder):
+def breeder(request, breeder_id):
     attached_service = get_main_account(request.user)
     breeder = Breeder.objects.get(account=attached_service, id=breeder_id)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
@@ -107,7 +107,7 @@ def new_breeder_form(request):
             new_breeder.custom_fields = json.dumps(custom_fields)
             new_breeder.save()
 
-            return redirect('breeder', new_breeder.id, new_breeder.breeding_prefix)
+            return redirect('breeder', new_breeder.id)
         else:
             return render(request, 'new_breeder_form_base.html', {'breeder_form': breeder_form,
                                                                   'custom_fields': custom_fields})
@@ -151,7 +151,7 @@ def edit_breeder_form(request, breeder_id):
             breeder.custom_fields = json.dumps(custom_fields)
             breeder.save()
 
-            return redirect('breeder', breeder.breeding_prefix)
+            return redirect('breeder', breeder.id)
         else:
             return render(request, 'edit_breeder_form.html', {'breeder_form': breeder_form,
                                                               'breeder': breeder,
