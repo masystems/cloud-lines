@@ -53,7 +53,7 @@
                         </thead>
                         <tbody id="bredTable">
                         {% for breeder in breeders.all %}
-                            <tr onclick="window.location='{% url 'breeder' breeder.id breeder.breeding_prefix %}';"
+                            <tr onclick="window.location='{% url 'breeder' breeder.id %}';"
                                                 style="cursor: pointer;">
                                 <th scope="row">{{ breeder.contact_name }}</th>
                                 <td>{{ breeder.breeding_prefix }}</td>

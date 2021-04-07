@@ -278,7 +278,7 @@
                             </thead>
                             <tbody>
                                 {% for breeder in latest_breeders.all %}
-                                    <tr onclick="window.location='{% url 'breeder' breeder.id breeder.breeding_prefix %}';"
+                                    <tr onclick="window.location='{% url 'breeder' breeder.id %}';"
                                         style="cursor: pointer;">
                                         <td style="width:50px;">
                                             <span class="round">{{ breeder.breeding_prefix|slice:"1" }}</span>
