@@ -115,6 +115,10 @@ def importx(request):
                 database_items = csv.DictReader(decoded_file)
                 imported_headings = database_items.fieldnames
 
+            # check if file is empty
+            if file.size <= 1:
+                return render(request, 'import.html', {'error': '{} is empty!'.format(request.FILES['uploadDatabase'])})
+
             # upload file
             upload_database = DatabaseUpload(account=attached_service, database=database_file, file_type=f_type)
             upload_database.save(database_file)
