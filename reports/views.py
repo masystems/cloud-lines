@@ -221,4 +221,6 @@ def all(request, type):
             worksheet.write(row_num, 15, pedigree.coi, font_style)
             worksheet.write(row_num, 16, pedigree.mean_kinship, font_style)
         workbook.save(response)
+    date = datetime.now()
+    response['Content-Disposition'] = f'attachment; filename="{attached_service.animal_type}-Living_Animal_Export-{date.strftime("%Y-%m-%d")}.{type}"'
     return response
