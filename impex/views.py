@@ -453,9 +453,27 @@ def import_breeder_data(request):
         email = post_data['email'] or ''
         active = post_data['active'] or ''
 
+        # errors is a dictionary to keep track of missing and invalid fields
+        errors = {}
+        # only mandatory fields are added to 
+        errors['missing'] = []
+        # only fields that need to be in a certain format are added to invalid fields
+        errors['invalid'] = []
+
+        row_number = 1
         # get or create each new pedigree ###################
         for row in database_items:
-            breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+            row_number += 1
+            
+            # validate data
+            if row[breeding_prefix] == '':
+                errors['missing'].append({
+                    'col': 'Breeding Prefix',
+                    'row': row_number,
+                    'name': row[contact_name]
+                })
+            else:
+                breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
 
             try:
                 breeder.contact_name = row[contact_name]
@@ -493,7 +511,17 @@ def import_breeder_data(request):
                 pass
             ###################
 
-            breeder.save()
+            # check if this row is valid before saving the breeder
+            if len(errors['missing']) > 0:
+                if errors['missing'][-1]['row'] != row_number: #and errors['invalid'].last()['row'] != row_number:
+                    breeder.save()
+
+        # if there were errors, redirect back to analyse page
+        if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
+            return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+        else:
+            return HttpResponse(dumps({'result': 'success'}))
+
     return redirect('breeders')
 
 
