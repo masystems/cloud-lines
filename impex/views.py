@@ -464,9 +464,10 @@ def import_breeder_data(request):
         # get or create each new pedigree ###################
         for row in database_items:
             row_number += 1
-            
-            # validate data
-            if row[breeding_prefix] == '': #
+
+            ################### breeding prefix
+            # check it is not empty
+            if row[breeding_prefix] == '':
                 errors['missing'].append({
                     'col': 'Breeding Prefix',
                     'row': row_number,
@@ -474,32 +475,32 @@ def import_breeder_data(request):
                 })
             else:
                 breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
-
+            ################### contact name
             try:
                 breeder.contact_name = row[contact_name]
             except KeyError:
                 pass
-            ###################
+            ################### address
             try:
                 breeder.address = row[address]
             except KeyError:
                 pass
-            ###################
+            ################### phone_number1
             try:
                 breeder.phone_number1 = row[phone_number1]
             except KeyError:
                 pass
-            ###################
+            ################### phone_number2
             try:
                 breeder.phone_number2 = row[phone_number2]
             except KeyError:
                 pass
-            ###################
+            ################### email
             try:
                 breeder.email = row[email]
             except KeyError:
                 pass
-            ###################
+            ################### active
             try:
                 if row[active].title() in ('True', 'False'):
                     breeder.active = row[active].title()
@@ -511,13 +512,20 @@ def import_breeder_data(request):
                 pass
             ###################
 
-            # check if this row is valid before saving the breeder
-            if len(errors['missing']) > 0:
-                if errors['missing'][-1]['row'] != row_number: #and errors['invalid'].last()['row'] != row_number:
-                    breeder.save()
-
-        # if there were errors, redirect back to analyse page
+            # check that no rows are invalid before saving the breeder
+            if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+                breeder.save()
+        
+        # if there were errors, delete any breeders that were created, and redirect back to analyse page
         if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
+            # set database_items again because we've already iterated through it
+            database_items = csv.DictReader(decoded_file)
+            # delete any breeders that were created
+            for row in database_items:
+                imported = Breeder.objects.filter(breeding_prefix=row[breeding_prefix])
+                if len(imported) > 0:
+                    imported[0].delete()
+
             return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
         else:
             return HttpResponse(dumps({'result': 'success'}))
