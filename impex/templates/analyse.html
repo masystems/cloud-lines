@@ -83,7 +83,7 @@
                         </div>
                         <div class="tab-pane" id="breeders" role="tabpanel">
                             <div class="card-body">
-                                <form action="{% url 'import_breeder_data' %}" method="POST" enctype="multipart/form-data">
+                                <form action="{% url 'import_breeder_data' %}" method="POST" enctype="multipart/form-data" id="breeders-form">
                                     {% csrf_token %}
                                         {% for breeder_heading in breeder_headings %}
                                             {% if breeder_heading.verbose_name != None %}
@@ -105,7 +105,7 @@
                                                 </div>
                                             {% endif %}
                                         {% endfor %}
-                                    <button class="btn btn-block btn-outline-info">Import Data</button>
+                                    <button id="import-breeders" class="btn btn-block btn-outline-info">Import Data</button>
                                 </form>
                             </div>
                         </div>
@@ -117,5 +117,43 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block footer %}
+
+<!-- importing data data -->
+<script>
+    // importing pedigrees
+
+    // importing breeders
+    $('#import-breeders').click( function(e){
+        e.preventDefault();
+
+        $.ajax({
+            url: "{% url 'import_breeder_data' %}",
+            type: 'post',
+            dataType: 'text',
+            data: $('#breeders-form').serialize(),
+            success: function(data) {
+                var result = JSON.parse(data);
+                if (result.result == 'success') {
+                    // redirect to breeders page
+                    window.location.replace("{% url 'breeders' %}");
+                } else {
+                    //errors
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
+    })
+</script>
 
 {% endblock %}
