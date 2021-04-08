@@ -466,7 +466,7 @@ def import_breeder_data(request):
             row_number += 1
             
             # validate data
-            if row[breeding_prefix] == '':
+            if row[breeding_prefix] == '': #
                 errors['missing'].append({
                     'col': 'Breeding Prefix',
                     'row': row_number,
