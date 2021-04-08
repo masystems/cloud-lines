@@ -128,3 +128,97 @@ def render_to_pdf(template_src, context_dict):
     if not pdf.err:
         return HttpResponse(result.getvalue(), content_type='application/pdf')
     return None
+
+
+@login_required(login_url="/account/login")
+def all(request, type):
+    attached_service = get_main_account(request.user)
+
+    if type == 'form':
+        if 'xls_submit' in request.POST:
+            type = 'xls'
+        else:
+            type = 'pdf'
+
+    if type == 'xls':
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+        # creating workbook
+        workbook = xlwt.Workbook(encoding='utf-8')
+
+        # adding sheet
+        worksheet = workbook.add_sheet("all living animals")
+
+        # Sheet header, first row
+        row_num = 0
+
+        font_style_header = xlwt.XFStyle()
+        # headers are bold
+        font_style_header.font.bold = True
+
+        date_format = xlwt.XFStyle()
+        date_format.num_format_str = 'dd/mm/yyyy'
+
+        # column header names, you can use your own headers here
+        columns = ['Breeder',
+                   'Current Owner',
+                   'Reg No',
+                   'Tag No',
+                   'Name',
+                   'Description',
+                   'Date Of Registration',
+                   'Date Of Birth',
+                   'Sex',
+                   'Born',
+                   attached_service.father_title,
+                   f'{attached_service.father_title} Notes',
+                   attached_service.mother_title,
+                   f'{attached_service.mother_title} Notes',
+                   'Breed',
+                   'COI',
+                   'Mean Kinship']
+
+        # write column headers in sheet
+        for col_num in range(len(columns)):
+            worksheet.write(row_num, col_num, columns[col_num], font_style_header)
+
+        for pedigree in Pedigree.objects.filter(account=attached_service, status__icontains='alive'):
+            # Sheet body, remaining rows
+            font_style = xlwt.XFStyle()
+
+            row_num = row_num + 1
+            try:
+                breeding_prefix = pedigree.breeder.breeding_prefix
+            except AttributeError:
+                breeding_prefix = ""
+            try:
+                current_owner = pedigree.current_owner.breeding_prefix
+            except AttributeError:
+                current_owner = ""
+            try:
+                father = pedigree.parent_father.reg_no
+            except AttributeError:
+                father = ""
+            try:
+                mother = pedigree.parent_mother.reg_no
+            except AttributeError:
+                mother = ""
+            worksheet.write(row_num, 0, breeding_prefix, font_style)
+            worksheet.write(row_num, 1, current_owner, font_style)
+            worksheet.write(row_num, 2, pedigree.reg_no, font_style)
+            worksheet.write(row_num, 3, pedigree.tag_no, font_style)
+            worksheet.write(row_num, 4, pedigree.name, font_style)
+            worksheet.write(row_num, 5, pedigree.description, font_style)
+            worksheet.write(row_num, 6, pedigree.date_of_registration, date_format)
+            worksheet.write(row_num, 7, pedigree.dob, date_format)
+            worksheet.write(row_num, 8, pedigree.sex, font_style)
+            worksheet.write(row_num, 9, pedigree.born_as, font_style)
+            worksheet.write(row_num, 10, father, font_style)
+            worksheet.write(row_num, 11, pedigree.parent_father_notes, font_style)
+            worksheet.write(row_num, 12, mother, font_style)
+            worksheet.write(row_num, 13, pedigree.parent_mother_notes, font_style)
+            worksheet.write(row_num, 14, pedigree.breed.breed_name, font_style)
+            worksheet.write(row_num, 15, pedigree.coi, font_style)
+            worksheet.write(row_num, 16, pedigree.mean_kinship, font_style)
+        workbook.save(response)
+    return response
