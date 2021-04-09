@@ -205,7 +205,16 @@ def import_pedigree_data(request):
         mother = post_data['parent_mother'] or ''
         mother_notes = post_data['parent_mother_notes'] or ''
 
+        # errors is a dictionary to keep track of missing and invalid fields
+        errors = {}
+        # only mandatory fields are added to 
+        errors['missing'] = []
+        # only fields that need to be in a certain format are added to invalid fields
+        errors['invalid'] = []
+
+        row_number = 1
         for row in database_items:
+            row_number += 1
             # create breeder if it doesn't exist ###################
             try:
                 if row[breeder] not in ('', None):
@@ -423,6 +432,30 @@ def import_pedigree_data(request):
             pedigree.custom_fields = dumps(acc_custom_fields)
             
             pedigree.save()
+
+        #(((((((((((((TESTING)))))))))))))
+        errors['missing'].append({
+            'col': 'Missing Col',
+            'row': row_number,
+            'name': row[name]
+        })
+        errors['invalid'].append({
+            'col': 'Invalid Col',
+            'row': row_number,
+            'name': row[name],
+            'reason': 'the field was invalid'
+        })
+        #(((((((((((((TESTING)))))))))))))
+
+        # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
+        # , and redirect back to analyse page
+        if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
+            # for saved_breeder in saved_breeders:
+            #     saved_breeder.delete()
+
+            return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+        else:
+            return HttpResponse(dumps({'result': 'success'}))
 
     return redirect('pedigree_search')
 
