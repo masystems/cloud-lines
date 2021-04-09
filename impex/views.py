@@ -11,6 +11,7 @@ from datetime import datetime
 from os.path import splitext
 import csv
 from json import loads, dumps, JSONDecodeError
+import re
 
 
 @login_required(login_url="/account/login")
@@ -453,6 +454,9 @@ def import_breeder_data(request):
         email = post_data['email'] or ''
         active = post_data['active'] or ''
 
+        # regex pattern used to validate email
+        email_pattern = re.compile('^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+
         # errors is a dictionary to keep track of missing and invalid fields
         errors = {}
         # only mandatory fields are added to 
@@ -516,7 +520,22 @@ def import_breeder_data(request):
                 pass
             ################### email
             try:
-                breeder.email = row[email]
+                # if email given
+                if row[email] != '':
+                    # validate email
+                    if email_pattern.match(row[email]):
+                        breeder.email = row[email]
+                    # add to errors invalid
+                    else:
+                        errors['invalid'].append({
+                            'col': 'Email',
+                            'row': row_number,
+                            'name': row[contact_name],
+                            'reason': 'the email given is invalid'
+                        })
+                        # delete breeder if one was created
+                        if breeder.id:
+                            breeder.delete()
             except KeyError:
                 pass
             except UnboundLocalError:
