@@ -11,6 +11,7 @@ from datetime import datetime
 from os.path import splitext
 import csv
 from json import loads, dumps, JSONDecodeError
+import re
 
 
 @login_required(login_url="/account/login")
@@ -453,47 +454,130 @@ def import_breeder_data(request):
         email = post_data['email'] or ''
         active = post_data['active'] or ''
 
+        # regex pattern used to validate email
+        email_pattern = re.compile('^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+
+        # errors is a dictionary to keep track of missing and invalid fields
+        errors = {}
+        # only mandatory fields are added to 
+        errors['missing'] = []
+        # only fields that need to be in a certain format are added to invalid fields
+        errors['invalid'] = []
+
+        # list of breeders saved into the DB
+        saved_breeders = []
+        row_number = 1
         # get or create each new pedigree ###################
         for row in database_items:
-            breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+            row_number += 1
 
+            ################### breeding prefix
+            # check it is not empty
+            if row[breeding_prefix] == '':
+                errors['missing'].append({
+                    'col': 'Breeding Prefix',
+                    'row': row_number,
+                    'name': row[contact_name]
+                })
+            # check prefix doesn't yet exist in the database
+            elif Breeder.objects.filter(breeding_prefix=row[breeding_prefix]).exists():
+                errors['invalid'].append({
+                    'col': 'Breeding Prefix',
+                    'row': row_number,
+                    'name': row[contact_name],
+                    'reason': 'a breeder with this prefix already exists'
+                })
+            # check no data is missing/invalid before creating a new breeder
+            elif len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+                breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+            ################### contact name
             try:
                 breeder.contact_name = row[contact_name]
             except KeyError:
                 pass
-            ###################
+            except UnboundLocalError:
+                pass
+            ################### address
             try:
                 breeder.address = row[address]
             except KeyError:
                 pass
-            ###################
+            except UnboundLocalError:
+                pass
+            ################### phone_number1
             try:
                 breeder.phone_number1 = row[phone_number1]
             except KeyError:
                 pass
-            ###################
+            except UnboundLocalError:
+                pass
+            ################### phone_number2
             try:
                 breeder.phone_number2 = row[phone_number2]
             except KeyError:
                 pass
-            ###################
+            except UnboundLocalError:
+                pass
+            ################### email
             try:
-                breeder.email = row[email]
+                # if email given
+                if row[email] != '':
+                    # validate email
+                    if email_pattern.match(row[email]):
+                        breeder.email = row[email]
+                    # add to errors invalid
+                    else:
+                        errors['invalid'].append({
+                            'col': 'Email',
+                            'row': row_number,
+                            'name': row[contact_name],
+                            'reason': 'the email given is invalid'
+                        })
+                        # delete breeder if one was created
+                        if breeder.id:
+                            breeder.delete()
             except KeyError:
                 pass
-            ###################
+            except UnboundLocalError:
+                pass
+            ################### active
             try:
-                if row[active].title() in ('True', 'False'):
-                    breeder.active = row[active].title()
-                else:
-                    pass
+                if row[active].title() == 'Active':
+                    breeder.active = True
+                elif row[active].title() == 'Inactive':
+                    breeder.active = False
+                # add to invalid if content was invalid
+                elif row[active] != '':
+                    errors['invalid'].append({
+                        'col': 'Status',
+                        'row': row_number,
+                        'name': row[contact_name],
+                        'reason': 'status must be "Active" or "Inactive" - if left blank, it defaults to "Inactive"'
+                    })
+                    # delete breeder if one was created
+                    if breeder.id:
+                        breeder.delete()
             except ValidationError:
                 pass
             except KeyError:
                 pass
+            except UnboundLocalError:
+                pass
             ###################
+            # check that no rows are invalid before saving the breeder and adding to saved_breeders list
+            if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+                breeder.save()
+                saved_breeders.append(breeder)
+        # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
+        # , and redirect back to analyse page
+        if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
+            for saved_breeder in saved_breeders:
+                saved_breeder.delete()
 
-            breeder.save()
+            return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+        else:
+            return HttpResponse(dumps({'result': 'success'}))
+
     return redirect('breeders')
 
 
