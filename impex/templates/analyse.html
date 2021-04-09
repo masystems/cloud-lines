@@ -170,6 +170,8 @@
                             result.errors.invalid.forEach( invalidField => {
                                 if (invalidField.name.length > 0) {
                                     errorHtml = errorHtml + '<li>' + invalidField.col + ' for breeder with contact name ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                } else {
+                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ')</li>';
                                 }
                             });
                         }

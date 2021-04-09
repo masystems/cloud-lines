@@ -523,10 +523,21 @@ def import_breeder_data(request):
                 pass
             ################### active
             try:
-                if row[active].title() in ('True', 'False'):
-                    breeder.active = row[active].title()
-                else:
-                    pass
+                if row[active].title() == 'Active':
+                    breeder.active = True
+                elif row[active].title() == 'Inactive':
+                    breeder.active = False
+                # add to invalid if content was invalid
+                elif row[active] != '':
+                    errors['invalid'].append({
+                        'col': 'Status',
+                        'row': row_number,
+                        'name': row[contact_name],
+                        'reason': 'status must be "Active" or "Inactive" - if left blank, it defaults to "Inactive"'
+                    })
+                    # delete breeder if one was created
+                    if breeder.id:
+                        breeder.delete()
             except ValidationError:
                 pass
             except KeyError:
