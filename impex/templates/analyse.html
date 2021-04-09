@@ -95,7 +95,7 @@
                                                     </div>
                                                     <div class="col bg-light border">
                                                         <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                            <select class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-99">
+                                                            <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-99">
                                                                     <option data-tokens="" selected>---</option>
                                                                     {% for imported_heading in imported_headings %}
                                                                         <option data-tokens="{{ breeder_heading.name }}">{{ imported_heading }}</option>
@@ -131,64 +131,73 @@
     $('#import-breeders').click( function(e){
         e.preventDefault();
 
-        $.ajax({
-            url: "{% url 'import_breeder_data' %}",
-            type: 'post',
-            dataType: 'text',
-            data: $('#breeders-form').serialize(),
-            success: function(data) {
-                var result = JSON.parse(data);
-                if (result.result == 'success') {
-                    // redirect to breeders page
-                    window.location.replace("{% url 'breeders' %}");
-                } else {
-                    errorMsg("Your data had errors!");
-                    $('#errors').removeClass('d-none');
+        // check required headings have been matched
+        if ($('#select-breeding_prefix').val() == '---') {
+            errorMsg("You must match Breeding Prefix!");
+        } else {
+            $.ajax({
+                url: "{% url 'import_breeder_data' %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#breeders-form').serialize(),
+                success: function(data) {
+                    var result = JSON.parse(data);
+                    if (result.result == 'success') {
+                        // redirect to breeders page
+                        window.location.replace("{% url 'breeders' %}");
+                    } else {
+                        errorMsg("Your data had errors!");
+                        $('#errors').removeClass('d-none');
 
-                    // create html to display what fields were erroneous
-                    var errorHtml = "";
-                    if (result.errors) {
-                        errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+                        // create html to display what fields were erroneous
+                        var errorHtml = "";
+                        if (result.errors) {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
 
-                        // go through missing fields
-                        if (result.errors.missing.length > 0) {
-                            errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
+                            // go through missing fields
+                            if (result.errors.missing.length > 0) {
+                                errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
 
-                            result.errors.missing.forEach( missingField => {
-                                if (missingField.name.length > 0) {
-                                    errorHtml = errorHtml + '<li>' + missingField.col + ' for breeder with contact name ' + missingField.name + ' (row ' + missingField.row + ')</li>';
-                                } else {
-                                    errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
-                                }
-                            });
+                                result.errors.missing.forEach( missingField => {
+                                    if (missingField.name.length > 0) {
+                                        errorHtml = errorHtml + '<li>' + missingField.col + ' for breeder with contact name ' + missingField.name + ' (row ' + missingField.row + ')</li>';
+                                    } else {
+                                        errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
+                                    }
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+
+                            // go through invalid fields
+                            if (result.errors.invalid.length > 0) {
+                                errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
+
+                                result.errors.invalid.forEach( invalidField => {
+                                    if (invalidField.name.length > 0) {
+                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' for breeder with contact name ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                    } else {
+                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                    }
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
                         }
 
-                        // go through invalid fields
-                        if (result.errors.invalid.length > 0) {
-                            errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:';
-
-                            result.errors.invalid.forEach( invalidField => {
-                                if (invalidField.name.length > 0) {
-                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' for breeder with contact name ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
-                                } else {
-                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ')</li>';
-                                }
-                            });
-                        }
+                        $('#errors').html(errorHtml);
                     }
-
-                    $('#errors').html(errorHtml);
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown){
-                console.log('jqXHR:');
-                console.log(jqXHR);
-                console.log('textStatus:');
-                console.log(textStatus);
-                console.log('errorThrown:');
-                console.log(errorThrown);
-            }
-        });
+            });
+        }
     })
 </script>
 
