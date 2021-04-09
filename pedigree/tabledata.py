@@ -85,7 +85,6 @@ def get_pedigrees(request):
             for col in columns:
                 for data in column_data:
                     if col == column_data[data]['db_id']:
-                        # print(pedigree.exec("column_data[data]['db_id_internal']"))
                         try:
                             exec(f"row[column_data[data]['db_id']] = pedigree.{column_data[data]['db_id_internal']}")
                         except AttributeError:
