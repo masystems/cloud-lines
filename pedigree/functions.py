@@ -100,7 +100,7 @@ def get_site_pedigree_column_headings(atatched_service):
                                   'upper': False,
                                   'html': ''},
                         'coi': {'db_id': 'coi',
-                                'db_id_internal': 'coi',
+                                'db_id_internal': 'coi.to_eng_string()',
                                 'name': 'COI',
                                 'upper': False,
                                 'html': ''},
