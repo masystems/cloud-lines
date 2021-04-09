@@ -462,7 +462,6 @@ def import_breeder_data(request):
 
         # list of breeders saved into the DB
         saved_breeders = []
-        print('#########################################################')
         row_number = 1
         # get or create each new pedigree ###################
         for row in database_items:
@@ -484,7 +483,8 @@ def import_breeder_data(request):
                     'name': row[contact_name],
                     'reason': 'a breeder with this prefix already exists'
                 })
-            else:
+            # check no data is missing/invalid before creating a new breeder
+            elif len(errors['missing']) == 0 and len(errors['invalid']) == 0:
                 breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             ################### contact name
             try:
@@ -538,16 +538,8 @@ def import_breeder_data(request):
             if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
                 breeder.save()
                 saved_breeders.append(breeder)
-            # make sure breeder isn't saved
-            else:
-                try:
-                    breeder.delete()
-                except UnboundLocalError:
-                    pass
-                except AssertionError:
-                    pass
-            print(saved_breeders)
-        # if there were errors, delete any breeders that were created, and redirect back to analyse page
+        # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
+        # , and redirect back to analyse page
         if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
             for saved_breeder in saved_breeders:
                 saved_breeder.delete()
