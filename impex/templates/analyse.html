@@ -145,9 +145,6 @@
                     errorMsg("Your data had errors!");
                     $('#errors').removeClass('d-none');
 
-                    // String to display what fields were erroneous
-                    
-
                     // create html to display what fields were erroneous
                     var errorHtml = "";
                     if (result.errors) {
@@ -169,6 +166,12 @@
                         // go through invalid fields
                         if (result.errors.invalid.length > 0) {
                             errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:';
+
+                            result.errors.invalid.forEach( invalidField => {
+                                if (invalidField.name.length > 0) {
+                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' for breeder with contact name ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                }
+                            });
                         }
                     }
 

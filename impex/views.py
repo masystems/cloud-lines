@@ -460,6 +460,9 @@ def import_breeder_data(request):
         # only fields that need to be in a certain format are added to invalid fields
         errors['invalid'] = []
 
+        # list of breeders saved into the DB
+        saved_breeders = []
+        print('#########################################################')
         row_number = 1
         # get or create each new pedigree ###################
         for row in database_items:
@@ -473,6 +476,14 @@ def import_breeder_data(request):
                     'row': row_number,
                     'name': row[contact_name]
                 })
+            # check prefix doesn't yet exist in the database
+            elif Breeder.objects.filter(breeding_prefix=row[breeding_prefix]).exists():
+                errors['invalid'].append({
+                    'col': 'Breeding Prefix',
+                    'row': row_number,
+                    'name': row[contact_name],
+                    'reason': 'a breeder with this prefix already exists'
+                })
             else:
                 breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             ################### contact name
@@ -480,25 +491,35 @@ def import_breeder_data(request):
                 breeder.contact_name = row[contact_name]
             except KeyError:
                 pass
+            except UnboundLocalError:
+                pass
             ################### address
             try:
                 breeder.address = row[address]
             except KeyError:
+                pass
+            except UnboundLocalError:
                 pass
             ################### phone_number1
             try:
                 breeder.phone_number1 = row[phone_number1]
             except KeyError:
                 pass
+            except UnboundLocalError:
+                pass
             ################### phone_number2
             try:
                 breeder.phone_number2 = row[phone_number2]
             except KeyError:
                 pass
+            except UnboundLocalError:
+                pass
             ################### email
             try:
                 breeder.email = row[email]
             except KeyError:
+                pass
+            except UnboundLocalError:
                 pass
             ################### active
             try:
@@ -510,21 +531,26 @@ def import_breeder_data(request):
                 pass
             except KeyError:
                 pass
+            except UnboundLocalError:
+                pass
             ###################
-
-            # check that no rows are invalid before saving the breeder
+            # check that no rows are invalid before saving the breeder and adding to saved_breeders list
             if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
                 breeder.save()
-        
+                saved_breeders.append(breeder)
+            # make sure breeder isn't saved
+            else:
+                try:
+                    breeder.delete()
+                except UnboundLocalError:
+                    pass
+                except AssertionError:
+                    pass
+            print(saved_breeders)
         # if there were errors, delete any breeders that were created, and redirect back to analyse page
         if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
-            # set database_items again because we've already iterated through it
-            database_items = csv.DictReader(decoded_file)
-            # delete any breeders that were created
-            for row in database_items:
-                imported = Breeder.objects.filter(breeding_prefix=row[breeding_prefix])
-                if len(imported) > 0:
-                    imported[0].delete()
+            for saved_breeder in saved_breeders:
+                saved_breeder.delete()
 
             return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
         else:
