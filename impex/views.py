@@ -471,20 +471,26 @@ def import_breeder_data(request):
         for row in database_items:
             row_number += 1
 
+            # set name for error messages
+            if contact_name:
+                name = row[contact_name]
+            else:
+                name = ''
+
             ################### breeding prefix
             # check it is not empty
             if row[breeding_prefix] == '':
                 errors['missing'].append({
                     'col': 'Breeding Prefix',
                     'row': row_number,
-                    'name': row[contact_name]
+                    'name': name
                 })
             # check prefix doesn't yet exist in the database
             elif Breeder.objects.filter(breeding_prefix=row[breeding_prefix]).exists():
                 errors['invalid'].append({
                     'col': 'Breeding Prefix',
                     'row': row_number,
-                    'name': row[contact_name],
+                    'name': name,
                     'reason': 'a breeder with this prefix already exists'
                 })
             # check no data is missing/invalid before creating a new breeder
@@ -530,7 +536,7 @@ def import_breeder_data(request):
                         errors['invalid'].append({
                             'col': 'Email',
                             'row': row_number,
-                            'name': row[contact_name],
+                            'name': name,
                             'reason': 'the email given is invalid'
                         })
                         # delete breeder if one was created
@@ -551,7 +557,7 @@ def import_breeder_data(request):
                     errors['invalid'].append({
                         'col': 'Status',
                         'row': row_number,
-                        'name': row[contact_name],
+                        'name': name,
                         'reason': 'status must be "Active" or "Inactive" - if left blank, it defaults to "Inactive"'
                     })
                     # delete breeder if one was created
