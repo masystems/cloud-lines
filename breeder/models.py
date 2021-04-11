@@ -13,7 +13,7 @@ class Breeder(models.Model):
     email = models.CharField(max_length=100, blank=True)
     custom_fields = models.TextField(blank=True)
 
-    active = models.BooleanField(default=False, help_text="Is the breeder currently active?")
+    active = models.BooleanField(default=False, help_text="Is the breeder currently active?", verbose_name='Status')
 
     def __str__(self):
         return self.breeding_prefix
