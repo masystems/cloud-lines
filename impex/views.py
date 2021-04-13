@@ -221,6 +221,12 @@ def import_pedigree_data(request):
                     breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder].rstrip())
                 else:
                     breeder_obj = None
+                    # error if missing
+                    errors['missing'].append({
+                        'col': 'Breeder',
+                        'row': row_number,
+                        'name': row[name]
+                    })
             except KeyError:
                 breeder_obj = None
 
