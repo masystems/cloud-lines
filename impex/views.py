@@ -380,7 +380,19 @@ def import_pedigree_data(request):
                 pass
             #############################
             try:
-                pedigree.born_as = row[born_as]
+                # if born_as given
+                if row[born_as] != '':
+                    # if it's valid, save it
+                    if row[born_as].lower() in ('single', 'twin', 'triplet', 'quad'):
+                        pedigree.born_as = row[born_as]
+                    # invalid, so add error
+                    else:
+                        errors['invalid'].append({
+                            'col': 'Born As',
+                            'row': row_number,
+                            'name': row[name],
+                            'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
+                        })
             except KeyError:
                 pass
             #############################
