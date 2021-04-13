@@ -417,6 +417,13 @@ def import_pedigree_data(request):
                             'name': row[name],
                             'reason': 'the input for status, if given, must be one of "dead", "alive", or "unknown"'
                         })
+                # error if missing
+                else:
+                    errors['missing'].append({
+                        'col': 'Status',
+                        'row': row_number,
+                        'name': row[name]
+                    })
             except KeyError:
                 pass
             #############################
