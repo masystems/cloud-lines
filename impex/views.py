@@ -383,6 +383,13 @@ def import_pedigree_data(request):
                             'name': row[name],
                             'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
                         })
+                # error if missing
+                else:
+                    errors['missing'].append({
+                        'col': 'Sex',
+                        'row': row_number,
+                        'name': row[name]
+                    })
             except KeyError:
                 pass
             ############################# born as
