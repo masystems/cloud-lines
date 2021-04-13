@@ -148,6 +148,21 @@
                     if (result.errors) {
                         errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
 
+                        // go through missing fields
+                        if (result.errors.missing.length > 0) {
+                            errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
+
+                            result.errors.missing.forEach( missingField => {
+                                if (missingField.name.length > 0) {
+                                    errorHtml = errorHtml + '<li>' + missingField.col + ' for pedigree named ' + missingField.name + ' (row ' + missingField.row + ')</li>';
+                                } else {
+                                    errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
+                                }
+                            });
+
+                            errorHtml = errorHtml + '</ul>';
+                        }
+
                         // go through invalid fields
                         if (result.errors.invalid.length > 0) {
                             errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';

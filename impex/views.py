@@ -308,6 +308,13 @@ def import_pedigree_data(request):
                 dod_converted = convert_date(row[dod])
             except KeyError:
                 dod_converted = None
+            ############################# reg_no
+            if row[reg_no] == '':
+                errors['missing'].append({
+                    'col': 'Registration Number',
+                    'row': row_number,
+                    'name': row[name]
+                })
 
             # create each new pedigree ###################
             pedigree, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=row[reg_no].strip())
@@ -378,7 +385,7 @@ def import_pedigree_data(request):
                         })
             except KeyError:
                 pass
-            #############################
+            ############################# born as
             try:
                 # if born_as given
                 if row[born_as] != '':
@@ -395,7 +402,7 @@ def import_pedigree_data(request):
                         })
             except KeyError:
                 pass
-            #############################
+            ############################# status
             try:
                 # if status given
                 if row[status] != '':
@@ -468,14 +475,6 @@ def import_pedigree_data(request):
             pedigree.custom_fields = dumps(acc_custom_fields)
             
             pedigree.save()
-
-        #(((((((((((((TESTING)))))))))))))
-        # errors['missing'].append({
-        #     'col': 'Missing Col',
-        #     'row': row_number,
-        #     'name': row[name]
-        # })
-        #(((((((((((((TESTING)))))))))))))
 
         # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
         # , and redirect back to analyse page
