@@ -361,9 +361,21 @@ def import_pedigree_data(request):
                 pass
             except KeyError:
                 pass
-            #############################
+            ############################# sex
             try:
-                pedigree.sex = row[sex]
+                # if sex given
+                if row[sex] != '':
+                    # if it's valid, save it
+                    if row[sex].lower() in ('male', 'female', 'castrated'):
+                        pedigree.sex = row[sex]
+                    # invalid, so add error
+                    else:
+                        errors['invalid'].append({
+                            'col': 'Sex',
+                            'row': row_number,
+                            'name': row[name],
+                            'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
+                        })
             except KeyError:
                 pass
             #############################
@@ -434,17 +446,11 @@ def import_pedigree_data(request):
             pedigree.save()
 
         #(((((((((((((TESTING)))))))))))))
-        errors['missing'].append({
-            'col': 'Missing Col',
-            'row': row_number,
-            'name': row[name]
-        })
-        errors['invalid'].append({
-            'col': 'Invalid Col',
-            'row': row_number,
-            'name': row[name],
-            'reason': 'the field was invalid'
-        })
+        # errors['missing'].append({
+        #     'col': 'Missing Col',
+        #     'row': row_number,
+        #     'name': row[name]
+        # })
         #(((((((((((((TESTING)))))))))))))
 
         # if there were errors, delete any breeders that were created (before invalid/missing fields were found),

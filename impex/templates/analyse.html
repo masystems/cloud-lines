@@ -147,6 +147,21 @@
                     var errorHtml = "";
                     if (result.errors) {
                         errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+
+                        // go through invalid fields
+                        if (result.errors.invalid.length > 0) {
+                            errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
+
+                            result.errors.invalid.forEach( invalidField => {
+                                if (invalidField.name.length > 0) {
+                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' for pedigree named ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                } else {
+                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                }
+                            });
+
+                            errorHtml = errorHtml + '</ul>';
+                        }
                     }
                     $('#errors').html(errorHtml);
                 }
