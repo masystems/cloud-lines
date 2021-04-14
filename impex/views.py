@@ -212,6 +212,9 @@ def import_pedigree_data(request):
         # only fields that need to be in a certain format are added to invalid fields
         errors['invalid'] = []
 
+        # list to store saved pedigrees so they can be deleted if there are errors
+        saved_pedigrees = []
+
         row_number = 1
         for row in database_items:
             row_number += 1
@@ -338,57 +341,79 @@ def import_pedigree_data(request):
                     'name': row[name]
                 })
 
-            # create each new pedigree ###################
-            pedigree, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=row[reg_no].strip())
-            pedigree.creator = request.user
+            # create each new pedigree if no errors found in file ###################
+            if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+                pedigree, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=row[reg_no].strip())
+            
+            try:
+                pedigree.creator = request.user
+            except NameError:
+                pass
+            
             try:
                 pedigree.breeder = breeder_obj
             except ValueError:
                 pass
             except UnboundLocalError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# owner
             try:
                 pedigree.current_owner = current_owner_obj
             except ValueError:
                 pass
             except UnboundLocalError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# tag_no
             try:
                 pedigree.tag_no = row[tag_no]
             except KeyError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# name
             try:
                 pedigree.name = row[name]
             except KeyError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# description
             try:
                 pedigree.description = row[description]
             except KeyError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# dor
             try:
                 pedigree.date_of_registration = date_of_registration_converted
             except ValidationError:
                 pass
             except KeyError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# dob
             try:
                 pedigree.dob = dob_converted
             except ValidationError:
                 pass
             except KeyError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# dod
             try:
                 pedigree.dod = dod_converted
             except ValidationError:
                 pass
             except KeyError:
+                pass
+            except NameError:
                 pass
             ############################# sex
             try:
@@ -405,6 +430,9 @@ def import_pedigree_data(request):
                             'name': row[name],
                             'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
                         })
+                        # delete pedigree if one was created
+                        if pedigree.id:
+                            pedigree.delete()
                 # error if missing
                 else:
                     errors['missing'].append({
@@ -412,7 +440,12 @@ def import_pedigree_data(request):
                         'row': row_number,
                         'name': row[name]
                     })
+                    # delete pedigree if one was created
+                    if pedigree.id:
+                        pedigree.delete()
             except KeyError:
+                pass
+            except NameError:
                 pass
             ############################# born as
             try:
@@ -429,7 +462,12 @@ def import_pedigree_data(request):
                             'name': row[name],
                             'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
                         })
+                        # delete pedigree if one was created
+                        if pedigree.id:
+                            pedigree.delete()
             except KeyError:
+                pass
+            except NameError:
                 pass
             ############################# status
             try:
@@ -446,6 +484,9 @@ def import_pedigree_data(request):
                             'name': row[name],
                             'reason': 'the input for status, if given, must be one of "dead", "alive", or "unknown"'
                         })
+                        # delete pedigree if one was created
+                        if pedigree.id:
+                            pedigree.delete()
                 # error if missing
                 else:
                     errors['missing'].append({
@@ -453,28 +494,41 @@ def import_pedigree_data(request):
                         'row': row_number,
                         'name': row[name]
                     })
+                    # delete pedigree if one was created
+                    if pedigree.id:
+                        pedigree.delete()
             except KeyError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# father
             try:
                 pedigree.parent_father = father_obj
             except KeyError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# mother
             try:
                 pedigree.parent_mother = mother_obj
             except KeyError:
                 pass
-            #############################
+            except NameError:
+                pass
+            ############################# father notes
             try:
                 pedigree.parent_father_notes = row[father_notes]
             except KeyError:
                 pedigree.parent_father_notes = ''
-            #############################
+            except NameError:
+                pass
+            ############################# mother notes
             try:
                 pedigree.parent_mother_notes = row[mother_notes]
             except KeyError:
                 pedigree.parent_mother_notes = ''
+            except NameError:
+                pass
             #############################
 
             # create breed if it doesn't exist ###################
@@ -499,24 +553,32 @@ def import_pedigree_data(request):
                 pedigree.breed = breed_obj
             except KeyError:
                 pass
+            except NameError:
+                pass
 
-            #############################
+            ############################# custom
             for cf_col in custom_fields_in:
                 # iterate through account custom fields
                 for id, field in acc_custom_fields.items():
                     if acc_custom_fields[id]['fieldName'] == cf_col:
                         # populate with value from the imported csv file
                         acc_custom_fields[id]['field_value'] = row[cf_col]
-
-            pedigree.custom_fields = dumps(acc_custom_fields)
             
-            pedigree.save()
+            try:
+                pedigree.custom_fields = dumps(acc_custom_fields)
+                
+                pedigree.save()
+                # add pedigree to list so it can be deleted if needed
+                saved_pedigrees.append(pedigree)
+            except NameError:
+                pass
 
-        # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
+        # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
         # , and redirect back to analyse page
         if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
-            # for saved_breeder in saved_breeders:
-            #     saved_breeder.delete()
+            for saved_pedigree in saved_pedigrees:
+                if saved_pedigree.id:
+                    saved_pedigree.delete()
 
             return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
         else:
@@ -676,7 +738,8 @@ def import_breeder_data(request):
         # , and redirect back to analyse page
         if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
             for saved_breeder in saved_breeders:
-                saved_breeder.delete()
+                if saved_breeder.id:
+                    saved_breeder.delete()
 
             return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
         else:
