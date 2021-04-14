@@ -218,7 +218,15 @@ def import_pedigree_data(request):
             # create breeder if it doesn't exist ###################
             try:
                 if row[breeder] not in ('', None):
-                    breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                    breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                    # error if breeder doesn't exist
+                    if not breeder_obj.exists():
+                        errors['invalid'].append({
+                            'col': 'Breeder',
+                            'row': row_number,
+                            'name': row[name],
+                            'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
+                        })
                 else:
                     breeder_obj = None
                     # error if missing
