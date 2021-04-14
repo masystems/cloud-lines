@@ -31,12 +31,40 @@
                     <div id="errors" class="d-none alert alert-danger"></div>
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs profile-tab" role="tablist">
-                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#pedigrees" role="tab">Pedigrees</a> </li>
-                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#breeders" role="tab">Breeders/Owners</a> </li>
+                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#breeders" role="tab">Breeders/Owners</a> </li>
+                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#pedigrees" role="tab">Pedigrees</a> </li>
                     </ul>
                     <!-- Tab panes -->
                     <div class="tab-content">
-                        <div class="tab-pane active" id="pedigrees" role="tabpanel">
+                        <div class="tab-pane  active" id="breeders" role="tabpanel">
+                            <div class="card-body">
+                                <form action="{% url 'import_breeder_data' %}" method="POST" enctype="multipart/form-data" id="breeders-form">
+                                    {% csrf_token %}
+                                        {% for breeder_heading in breeder_headings %}
+                                            {% if breeder_heading.verbose_name != None %}
+                                                <div class="row mx-lg-n5">
+                                                    <div class="col bg-light border">
+                                                        <p class="mt-2"><strong>{{ breeder_heading.verbose_name|title }}</strong></p>
+                                                        <p><small>{{ breeder_heading.help_text }}</small></p>
+                                                    </div>
+                                                    <div class="col bg-light border">
+                                                        <div class="dropdown bootstrap-select mb-3 mr-2">
+                                                            <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-99">
+                                                                    <option data-tokens="" selected>---</option>
+                                                                    {% for imported_heading in imported_headings %}
+                                                                        <option data-tokens="{{ breeder_heading.name }}">{{ imported_heading }}</option>
+                                                                    {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    <button id="import-breeders" class="btn btn-block btn-outline-info">Import Data</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="pedigrees" role="tabpanel">
                             <div class="card-body">
                                 <form action="{% url 'import_pedigree_data' %}" method="POST" enctype="multipart/form-data" id="pedigrees-form">
                                     {% csrf_token %}
@@ -79,34 +107,6 @@
                                         </div>
                                     {% endfor %}
                                     <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="breeders" role="tabpanel">
-                            <div class="card-body">
-                                <form action="{% url 'import_breeder_data' %}" method="POST" enctype="multipart/form-data" id="breeders-form">
-                                    {% csrf_token %}
-                                        {% for breeder_heading in breeder_headings %}
-                                            {% if breeder_heading.verbose_name != None %}
-                                                <div class="row mx-lg-n5">
-                                                    <div class="col bg-light border">
-                                                        <p class="mt-2"><strong>{{ breeder_heading.verbose_name|title }}</strong></p>
-                                                        <p><small>{{ breeder_heading.help_text }}</small></p>
-                                                    </div>
-                                                    <div class="col bg-light border">
-                                                        <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                            <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-99">
-                                                                    <option data-tokens="" selected>---</option>
-                                                                    {% for imported_heading in imported_headings %}
-                                                                        <option data-tokens="{{ breeder_heading.name }}">{{ imported_heading }}</option>
-                                                                    {% endfor %}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    <button id="import-breeders" class="btn btn-block btn-outline-info">Import Data</button>
                                 </form>
                             </div>
                         </div>
