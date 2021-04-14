@@ -237,7 +237,7 @@ def stud_advisor(request):
     mother = request.POST['mother']
     mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
     pedigrees = Pedigree.objects.filter(account=attached_service,
-                                        breed=mother.breed).values('id',
+                                        breed=mother.breed, status__icontains='alive').values('id',
                                                                    'parent_father__id',
                                                                    'parent_mother__id')
 
