@@ -539,30 +539,38 @@ def import_pedigree_data(request):
                 pass
             #############################
 
-            # create breed if it doesn't exist ###################
-
+            #################### breed
+            # not organisation
             if attached_service.service.service_name != 'Organisation':
-                if Breed.objects.filter(account=attached_service).count() == 0:
-                    breed_obj = Breed.objects.create(account=attached_service, breed_name=row[breed])
-                    # breed created, so add to created_objects list
-                    created_objects.append(breed_obj)
-                else:
-                    breed_obj = Breed.objects.filter(account=attached_service).first()
-
+                breed_obj = Breed.objects.filter(account=attached_service).first()
+                # error if given breed doesn't match account breed, if given
+                if breed_obj.breed_name != row[breed] and row[breed] != '':
+                    errors['invalid'].append({
+                        'col': 'Breed',
+                        'row': row_number,
+                        'name': row[name],
+                        'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
+                    })
+            # organisation
             elif breed != '---':
                 try:
-                    # check if breed already exists
-                    if Breed.objects.filter(account=attached_service).count() == 0:
-                        breed_obj = Breed.objects.create(account=attached_service, breed_name=row[breed])
-                        # breed created, so add to created_objects list
-                        created_objects.append(breed_obj)
+                    # check if breed exists
+                    if Breed.objects.filter(account=attached_service, breed_name=row[breed]).count() > 0:
+                        breed_obj = Breed.objects.filter(account=attached_service, breed_name=row[breed]).first()
+                    # error if breed not been created
                     else:
-                        breed_obj = Breed.objects.filter(account=attached_service).first()
+                        breed_obj = None
+                        if row[breed] != '':
+                            errors['invalid'].append({
+                                'col': 'Breed',
+                                'row': row_number,
+                                'name': row[name],
+                                'reason': 'the input for breed must be one of the breeds created for your account - you can create more breeds via the <a href="/breeds">Breed</a> page'
+                            })
                 except KeyError:
                     breed_obj = None
             else:
                 breed_obj = None
-
 
             try:
                 pedigree.breed = breed_obj
