@@ -246,11 +246,11 @@ def stud_advisor(request):
         subdomain = host.partition('.')[0]
         local_output = f"/tmp/sa_{subdomain}_output.json"
         remote_output = f"metrics/sa_{subdomain}_output.json"
-        file_name = f"mk_{subdomain}_output.json"
+        file_name = f"sa_{subdomain}_output.json"
     else:
         local_output = f"/tmp/sa_{attached_service.id}_output.json"
         remote_output = f"metrics/sa_{attached_service.id}_output.json"
-        file_name = f"mk_{attached_service.id}_output.json"
+        file_name = f"sa_{attached_service.id}_output.json"
 
     with open(local_output, 'w') as file:
         file.write(dumps(list(pedigrees)))
