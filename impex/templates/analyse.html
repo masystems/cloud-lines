@@ -106,7 +106,14 @@
                                             </div>
                                         </div>
                                     {% endfor %}
-                                    <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
+                                    <!-- don't show import button if there are no breeds -->
+                                    {% if has_breeds %}
+                                        <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
+                                    {% else %}
+                                        <div class="alert alert-danger">
+                                            You need to create a breed from the <a href="{% url 'breeds' %}">Breed</a> page before you can import your pedigrees.
+                                        </div>
+                                    {% endif %}
                                 </form>
                             </div>
                         </div>

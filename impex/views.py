@@ -141,10 +141,14 @@ def importx(request):
             for field in custom_fields:
                 custom_field_names.append(field['fieldName'])
 
+            # see if any breeds have been set up
+            has_breeds = Breed.objects.filter(account=attached_service).count() > 0
+
             return render(request, 'analyse.html', {'imported_headings': imported_headings,
                                                     'pedigree_headings': pedigree_headings,
                                                     'breeder_headings': breeder_headings,
-                                                    'custom_fields': custom_field_names})
+                                                    'custom_fields': custom_field_names,
+                                                    'has_breeds': has_breeds})
         return render(request, 'import.html')
     else:
         return redirect('dashboard')
