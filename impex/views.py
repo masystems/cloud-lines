@@ -212,13 +212,13 @@ def import_pedigree_data(request):
         # only fields that need to be in a certain format are added to invalid fields
         errors['invalid'] = []
 
-        # list to store saved pedigrees so they can be deleted if there are errors
-        saved_pedigrees = []
+        # list to store created objects so they can be deleted if there are errors
+        created_objects = []
 
         row_number = 1
         for row in database_items:
             row_number += 1
-            # create breeder if it doesn't exist ###################
+            # get breeder. error if breeder doesn't exist or missing ###################
             try:
                 if row[breeder] not in ('', None):
                     breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[breeder].rstrip())
@@ -241,7 +241,7 @@ def import_pedigree_data(request):
             except KeyError:
                 breeder_obj = None
 
-            # create current owner if it doesn't exist ###################
+            # get current owner - error if if it doesn't exist ###################
             try:
                 if row[current_owner] not in ('', None):
                     current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[current_owner].rstrip())
@@ -258,24 +258,27 @@ def import_pedigree_data(request):
             except KeyError:
                 current_owner_obj = None
 
-            # get or create parents ###################
-            def get_or_create_parent(parent):
-                if parent not in ('', None):
-                    if Pedigree.objects.filter(account=attached_service, reg_no=parent).count() <= 1:
-                        pedigree_object, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=parent)
-                        return pedigree_object
+            # get or create pedigrees ###################
+            def get_or_create_pedigree(pedigree):
+                if pedigree not in ('', None):
+                    if Pedigree.objects.filter(account=attached_service, reg_no=pedigree).count() < 1:
+                        # pedigree doesn't exist, so create one
+                        pedigree_obj =  Pedigree.objects.create(account=attached_service, reg_no=pedigree)
+                        created_objects.append(pedigree_obj)
+                        return pedigree_obj
                     else:
-                        return Pedigree.objects.filter(account=attached_service, reg_no=parent).first()
+                        # pedigree does exist, so get it
+                        return Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first()
                 else:
                     return None
 
             try:
-                father_obj = get_or_create_parent(row[father])
+                father_obj = get_or_create_pedigree(row[father])
             except KeyError:
                 father_obj = None
 
             try:
-                mother_obj = get_or_create_parent(row[mother])
+                mother_obj = get_or_create_pedigree(row[mother])
             except KeyError:
                 mother_obj = None
 
@@ -343,8 +346,9 @@ def import_pedigree_data(request):
 
             # create each new pedigree if no errors found in file ###################
             if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
-                pedigree, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=row[reg_no].strip())
-            
+                # get or create pedigree
+                pedigree = get_or_create_pedigree(row[reg_no])
+
             try:
                 pedigree.creator = request.user
             except NameError:
@@ -535,14 +539,21 @@ def import_pedigree_data(request):
 
             if attached_service.service.service_name != 'Organisation':
                 if Breed.objects.filter(account=attached_service).count() == 0:
-                    breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
+                    breed_obj = Breed.objects.create(account=attached_service, breed_name=row[breed])
+                    # breed created, so add to created_objects list
+                    created_objects.append(breed_obj)
                 else:
                     breed_obj = Breed.objects.filter(account=attached_service).first()
 
             elif breed != '---':
                 try:
-                    breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
-                    #print(created)
+                    # check if breed already exists
+                    if Breed.objects.filter(account=attached_service).count() == 0:
+                        breed_obj = Breed.objects.create(account=attached_service, breed_name=row[breed])
+                        # breed created, so add to created_objects list
+                        created_objects.append(breed_obj)
+                    else:
+                        breed_obj = Breed.objects.filter(account=attached_service).first()
                 except KeyError:
                     breed_obj = None
             else:
@@ -568,17 +579,15 @@ def import_pedigree_data(request):
                 pedigree.custom_fields = dumps(acc_custom_fields)
                 
                 pedigree.save()
-                # add pedigree to list so it can be deleted if needed
-                saved_pedigrees.append(pedigree)
             except NameError:
                 pass
 
         # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
         # , and redirect back to analyse page
         if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
-            for saved_pedigree in saved_pedigrees:
-                if saved_pedigree.id:
-                    saved_pedigree.delete()
+            for saved_object in created_objects:
+                if saved_object.id:
+                    saved_object.delete()
 
             return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
         else:
