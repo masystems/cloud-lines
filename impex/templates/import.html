@@ -30,7 +30,8 @@
                         <div class="tab-pane active" id="csv" role="tabpanel">
                             <div class="card-body">
                                 <h4 class="card-title">Upload your existing database file</h4>
-                                <h6>Please upload one .CSV file at a time. It's recommended to limit the amount of pedigrees to 500 per import.</h6>
+                                <p>Please upload one .CSV file at a time. It's recommended to limit the amount of pedigrees to 500 per import.</p>
+                                <p>Breeders/owners should be imported first, as pedigrees cannot reference any breeders/owners that do not already exist in the database.</p>
                                 {% if error %}
                                     <div class="alert alert-danger">{{ error }} </div>
                                 {% endif %}
