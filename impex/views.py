@@ -241,7 +241,15 @@ def import_pedigree_data(request):
             # create current owner if it doesn't exist ###################
             try:
                 if row[current_owner] not in ('', None):
-                    current_owner_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[current_owner].rstrip())
+                    current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[current_owner].rstrip())
+                    # error if owner doesn't exist
+                    if not current_owner_obj.exists():
+                        errors['invalid'].append({
+                            'col': 'Current Owner',
+                            'row': row_number,
+                            'name': row[name],
+                            'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
+                        })
                 else:
                     current_owner_obj = None
             except KeyError:
