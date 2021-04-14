@@ -156,7 +156,6 @@ def kinship(request):
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother}/{father}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-
     return HttpResponse(coi_raw.json())
 
 
@@ -245,12 +244,12 @@ def stud_advisor(request):
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
         subdomain = host.partition('.')[0]
-        local_output = f"/tmp/mk_{subdomain}_output.json"
-        remote_output = f"metrics/mk_{subdomain}_output.json"
+        local_output = f"/tmp/sa_{subdomain}_output.json"
+        remote_output = f"metrics/sa_{subdomain}_output.json"
         file_name = f"mk_{subdomain}_output.json"
     else:
-        local_output = f"/tmp/mk_{attached_service.id}_output.json"
-        remote_output = f"metrics/mk_{attached_service.id}_output.json"
+        local_output = f"/tmp/sa_{attached_service.id}_output.json"
+        remote_output = f"metrics/sa_{attached_service.id}_output.json"
         file_name = f"mk_{attached_service.id}_output.json"
 
     with open(local_output, 'w') as file:
@@ -263,7 +262,7 @@ def stud_advisor(request):
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-
+    print(coi_raw.json())
     studs_raw = loads(coi_raw.json())
     studs_data = {}
 
