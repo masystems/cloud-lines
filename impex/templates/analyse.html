@@ -77,7 +77,7 @@
                                                 </div>
                                                 <div class="col bg-light border">
                                                     <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                        <select class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-98">
+                                                        <select id="select-{{ pedigree_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-98">
                                                                 <option data-tokens="" selected>---</option>
                                                                 {% for imported_heading in imported_headings %}
                                                                     <option data-tokens="{{ pedigree_heading.name }}">{{ imported_heading }}</option>
@@ -136,67 +136,83 @@
     $('#import-pedigrees').click( function(e){
         e.preventDefault();
 
-        $.ajax({
-            url: "{% url 'import_pedigree_data' %}",
-            type: 'post',
-            dataType: 'text',
-            data: $('#pedigrees-form').serialize(),
-            success: function(data) {
-                var result = JSON.parse(data);
-                if (result.result == 'success') {
-                    // redirect to breeders page
-                    window.location.replace("{% url 'pedigree_search' %}");
-                } else {
-                    errorMsg("Your data had errors!");
-                    $('#errors').removeClass('d-none');
-
-                    // create html to display what fields were erroneous
-                    var errorHtml = "";
-                    if (result.errors) {
-                        errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
-
-                        // go through missing fields
-                        if (result.errors.missing.length > 0) {
-                            errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
-
-                            result.errors.missing.forEach( missingField => {
-                                if (missingField.name.length > 0) {
-                                    errorHtml = errorHtml + '<li>' + missingField.col + ' for pedigree named ' + missingField.name + ' (row ' + missingField.row + ')</li>';
-                                } else {
-                                    errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
-                                }
-                            });
-
-                            errorHtml = errorHtml + '</ul>';
-                        }
-
-                        // go through invalid fields
-                        if (result.errors.invalid.length > 0) {
-                            errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
-
-                            result.errors.invalid.forEach( invalidField => {
-                                if (invalidField.name.length > 0) {
-                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' for pedigree named ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
-                                } else {
-                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
-                                }
-                            });
-
-                            errorHtml = errorHtml + '</ul>';
-                        }
-                    }
-                    $('#errors').html(errorHtml);
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown){
-                console.log('jqXHR:');
-                console.log(jqXHR);
-                console.log('textStatus:');
-                console.log(textStatus);
-                console.log('errorThrown:');
-                console.log(errorThrown);
+        // check required headings have been matched
+        if ( ($('#select-reg_no').val() == '---') || ($('#select-sex').val() == '---') || ($('#select-breeder').val() == '---') || ($('#select-status').val() == '---') ) {
+            if ($('#select-reg_no').val() == '---') {
+                errorMsg("You must match Registration Number!");
             }
-        });
+            if ($('#select-sex').val() == '---') {
+                errorMsg("You must match Sex!");
+            }
+            if ($('#select-breeder').val() == '---') {
+                errorMsg("You must match Breeder!");
+            }
+            if ($('#select-status').val() == '---') {
+                errorMsg("You must match Status!");
+            }
+        } else {
+            $.ajax({
+                url: "{% url 'import_pedigree_data' %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#pedigrees-form').serialize(),
+                success: function(data) {
+                    var result = JSON.parse(data);
+                    if (result.result == 'success') {
+                        // redirect to breeders page
+                        window.location.replace("{% url 'pedigree_search' %}");
+                    } else {
+                        errorMsg("Your data had errors!");
+                        $('#errors').removeClass('d-none');
+
+                        // create html to display what fields were erroneous
+                        var errorHtml = "";
+                        if (result.errors) {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+
+                            // go through missing fields
+                            if (result.errors.missing.length > 0) {
+                                errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
+
+                                result.errors.missing.forEach( missingField => {
+                                    if (missingField.name.length > 0) {
+                                        errorHtml = errorHtml + '<li>' + missingField.col + ' for pedigree named ' + missingField.name + ' (row ' + missingField.row + ')</li>';
+                                    } else {
+                                        errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
+                                    }
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+
+                            // go through invalid fields
+                            if (result.errors.invalid.length > 0) {
+                                errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
+
+                                result.errors.invalid.forEach( invalidField => {
+                                    if (invalidField.name.length > 0) {
+                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' for pedigree named ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                    } else {
+                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                    }
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+                        }
+                        $('#errors').html(errorHtml);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
+        }
     })
 
     // importing breeders
