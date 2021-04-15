@@ -239,7 +239,10 @@ def stud_advisor(request):
     pedigrees = Pedigree.objects.filter(account=attached_service,
                                         breed=mother.breed).values('id',
                                                                    'parent_father__id',
-                                                                   'parent_mother__id')
+                                                                   'parent_mother__id',
+                                                                   'sex',
+                                                                   'breed__breed_name',
+                                                                   'status')
 
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
