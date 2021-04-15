@@ -551,13 +551,14 @@ def import_pedigree_data(request):
             if attached_service.service.service_name != 'Organisation':
                 breed_obj = Breed.objects.filter(account=attached_service).first()
                 # error if given breed doesn't match account breed, if given
-                if breed_obj.breed_name != row[breed] and row[breed] != '':
-                    errors['invalid'].append({
-                        'col': 'Breed',
-                        'row': row_number,
-                        'name': row[name],
-                        'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
-                    })
+                if breed != '':
+                    if breed_obj.breed_name != row[breed] and row[breed] != '':
+                        errors['invalid'].append({
+                            'col': 'Breed',
+                            'row': row_number,
+                            'name': row[name],
+                            'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
+                        })
             # organisation
             elif breed != '---':
                 try:
