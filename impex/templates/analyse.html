@@ -150,6 +150,9 @@
             if ($('#select-status').val() == '---') {
                 errorMsg("You must match Status!");
             }
+            if (('{{ breed_required }}' == 'yes') && (($('#select-breed').val() == '---'))) {
+                errorMsg("You must match Breed!");
+            }
         } else {
             $.ajax({
                 url: "{% url 'import_pedigree_data' %}",

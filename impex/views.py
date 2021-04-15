@@ -144,11 +144,18 @@ def importx(request):
             # see if any breeds have been set up
             has_breeds = Breed.objects.filter(account=attached_service).count() > 0
 
+            # breed is required if org account with multiple breeds
+            if attached_service.service.service_name == 'Organisation' and Breed.objects.filter(account=attached_service).count() > 1:
+                breed_required = 'yes'
+            else:
+                breed_required = 'no'
+
             return render(request, 'analyse.html', {'imported_headings': imported_headings,
                                                     'pedigree_headings': pedigree_headings,
                                                     'breeder_headings': breeder_headings,
                                                     'custom_fields': custom_field_names,
-                                                    'has_breeds': has_breeds})
+                                                    'has_breeds': has_breeds,
+                                                    'breed_required': breed_required})
         return render(request, 'import.html')
     else:
         return redirect('dashboard')
