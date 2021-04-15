@@ -223,12 +223,22 @@ def import_pedigree_data(request):
         # only fields that need to be in a certain format are added to invalid fields
         errors['invalid'] = []
 
+        # existing pedigrees can be added, but with a warning
+        existing = []
+
         # list to store created objects so they can be deleted if there are errors
         created_objects = []
 
         row_number = 1
         for row in database_items:
             row_number += 1
+            
+            # variable to store pedigree name or empty string
+            if name:
+                ped_name = row[name]
+            else:
+                ped_name = ''
+            
             # get breeder. error if breeder doesn't exist or missing ###################
             try:
                 if row[breeder] not in ('', None):
@@ -238,7 +248,7 @@ def import_pedigree_data(request):
                         errors['invalid'].append({
                             'col': 'Breeder',
                             'row': row_number,
-                            'name': row[name],
+                            'name': ped_name,
                             'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
                         })
                 else:
@@ -247,7 +257,7 @@ def import_pedigree_data(request):
                     errors['missing'].append({
                         'col': 'Breeder',
                         'row': row_number,
-                        'name': row[name]
+                        'name': ped_name
                     })
             except KeyError:
                 breeder_obj = None
@@ -261,7 +271,7 @@ def import_pedigree_data(request):
                         errors['invalid'].append({
                             'col': 'Current Owner',
                             'row': row_number,
-                            'name': row[name],
+                            'name': ped_name,
                             'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
                         })
                 else:
@@ -352,11 +362,19 @@ def import_pedigree_data(request):
                 errors['missing'].append({
                     'col': 'Registration Number',
                     'row': row_number,
-                    'name': row[name]
+                    'name': ped_name
                 })
 
             # create each new pedigree if no errors found in file ###################
             if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+                # add to existing if this pedigree already exists
+                if Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).count() > 0:
+                    existing.append({
+                        'row': row_number,
+                        'name': ped_name,
+                        'reg_no': row[reg_no]
+                    })
+                
                 # get or create pedigree
                 pedigree = get_or_create_pedigree(row[reg_no])
 
@@ -442,7 +460,7 @@ def import_pedigree_data(request):
                         errors['invalid'].append({
                             'col': 'Sex',
                             'row': row_number,
-                            'name': row[name],
+                            'name': ped_name,
                             'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
                         })
                         # delete pedigree if one was created
@@ -453,7 +471,7 @@ def import_pedigree_data(request):
                     errors['missing'].append({
                         'col': 'Sex',
                         'row': row_number,
-                        'name': row[name]
+                        'name': ped_name
                     })
                     # delete pedigree if one was created
                     if pedigree.id:
@@ -474,7 +492,7 @@ def import_pedigree_data(request):
                         errors['invalid'].append({
                             'col': 'Born As',
                             'row': row_number,
-                            'name': row[name],
+                            'name': ped_name,
                             'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
                         })
                         # delete pedigree if one was created
@@ -496,7 +514,7 @@ def import_pedigree_data(request):
                         errors['invalid'].append({
                             'col': 'Status',
                             'row': row_number,
-                            'name': row[name],
+                            'name': ped_name,
                             'reason': 'the input for status, if given, must be one of "dead", "alive", or "unknown"'
                         })
                         # delete pedigree if one was created
@@ -507,7 +525,7 @@ def import_pedigree_data(request):
                     errors['missing'].append({
                         'col': 'Status',
                         'row': row_number,
-                        'name': row[name]
+                        'name': ped_name
                     })
                     # delete pedigree if one was created
                     if pedigree.id:
@@ -556,7 +574,7 @@ def import_pedigree_data(request):
                         errors['invalid'].append({
                             'col': 'Breed',
                             'row': row_number,
-                            'name': row[name],
+                            'name': ped_name,
                             'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
                         })
             # organisation
@@ -572,7 +590,7 @@ def import_pedigree_data(request):
                             errors['invalid'].append({
                                 'col': 'Breed',
                                 'row': row_number,
-                                'name': row[name],
+                                'name': ped_name,
                                 'reason': 'the input for breed must be one of the breeds created for your account - you can create more breeds via the <a href="/breeds">Breed</a> page'
                             })
                 except KeyError:
@@ -605,11 +623,20 @@ def import_pedigree_data(request):
         # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
         # , and redirect back to analyse page
         if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
-            for saved_object in created_objects:
-                if saved_object.id:
-                    saved_object.delete()
+            for created_object in created_objects:
+                if created_object.id:
+                    created_object.delete()
 
             return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+        # need to warn user if they specified any pedigrees that already exist
+        elif len(existing) > 0:
+            # get and pass in ids of created objects so it is known what to delete if user cancels
+            created = []
+            for created_object in created_objects:
+                if created_object.id:
+                    created.append(created_object.id)
+
+            return HttpResponse(dumps({'result': 'existing', 'existing': existing, 'created': created}))
         else:
             return HttpResponse(dumps({'result': 'success'}))
 
