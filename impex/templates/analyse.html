@@ -258,6 +258,7 @@
             type: 'post',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
+            // pass in ids of created objects to be deleted
             data: {'created': $('#created').html()},
             // hide modal on success, when created objects have been deleted
             success: function(data) { $('#update-modal').modal('hide'); },
@@ -270,6 +271,12 @@
                 console.log(errorThrown);
             }
         });
+    })
+
+    // update modal - update button clicked
+    $('#modal-update').click( function(e){
+        // redirect to breeders page
+        window.location.replace("{% url 'pedigree_search' %}");
     })
 
     // importing breeders
