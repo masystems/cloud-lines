@@ -126,6 +126,9 @@
     </div>
 </div>
 
+<!-- modal to check that user wants to update existing pedigrees -->
+{% include 'update_modal.html' %}
+
 {% endblock %}
 
 {% block footer %}
@@ -164,6 +167,9 @@
                     if (result.result == 'success') {
                         // redirect to breeders page
                         window.location.replace("{% url 'pedigree_search' %}");
+                    } else if (result.result == 'existing') {
+                        // warn users that they're about to change existing pedigrees
+                        $('#update-modal').modal('show');
                     } else {
                         errorMsg("Your data had errors!");
                         $('#errors').removeClass('d-none');
