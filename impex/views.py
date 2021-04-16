@@ -290,8 +290,12 @@ def import_pedigree_data(request):
                             created_objects.append(pedigree_obj)
                             return pedigree_obj
                         else:
-                            # pedigree does exist, so get it
-                            return Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first()
+                            # if user has confirmed updates, update existing pedigree
+                            if request.POST.get('update') == 'yes':
+                                # pedigree does exist, so get it
+                                return Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first()
+                            else:
+                                return None
                     else:
                         return None
 
@@ -384,6 +388,8 @@ def import_pedigree_data(request):
                     pedigree.creator = request.user
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
                 
                 try:
                     pedigree.breeder = breeder_obj
@@ -392,6 +398,8 @@ def import_pedigree_data(request):
                 except UnboundLocalError:
                     pass
                 except NameError:
+                    pass
+                except AttributeError:
                     pass
                 ############################# owner
                 try:
@@ -402,12 +410,16 @@ def import_pedigree_data(request):
                     pass
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
                 ############################# tag_no
                 try:
                     pedigree.tag_no = row[tag_no]
                 except KeyError:
                     pass
                 except NameError:
+                    pass
+                except AttributeError:
                     pass
                 ############################# name
                 try:
@@ -416,12 +428,16 @@ def import_pedigree_data(request):
                     pass
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
                 ############################# description
                 try:
                     pedigree.description = row[description]
                 except KeyError:
                     pass
                 except NameError:
+                    pass
+                except AttributeError:
                     pass
                 ############################# dor
                 try:
@@ -432,6 +448,8 @@ def import_pedigree_data(request):
                     pass
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
                 ############################# dob
                 try:
                     pedigree.dob = dob_converted
@@ -441,6 +459,8 @@ def import_pedigree_data(request):
                     pass
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
                 ############################# dod
                 try:
                     pedigree.dod = dod_converted
@@ -449,6 +469,8 @@ def import_pedigree_data(request):
                 except KeyError:
                     pass
                 except NameError:
+                    pass
+                except AttributeError:
                     pass
                 ############################# sex
                 try:
@@ -482,6 +504,8 @@ def import_pedigree_data(request):
                     pass
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
                 ############################# born as
                 try:
                     # if born_as given
@@ -503,6 +527,8 @@ def import_pedigree_data(request):
                 except KeyError:
                     pass
                 except NameError:
+                    pass
+                except AttributeError:
                     pass
                 ############################# status
                 try:
@@ -536,12 +562,16 @@ def import_pedigree_data(request):
                     pass
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
                 ############################# father
                 try:
                     pedigree.parent_father = father_obj
                 except KeyError:
                     pass
                 except NameError:
+                    pass
+                except AttributeError:
                     pass
                 ############################# mother
                 try:
@@ -550,19 +580,31 @@ def import_pedigree_data(request):
                     pass
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
                 ############################# father notes
                 try:
                     pedigree.parent_father_notes = row[father_notes]
                 except KeyError:
-                    pedigree.parent_father_notes = ''
+                    try:
+                        pedigree.parent_father_notes = ''
+                    except AttributeError:
+                        pass
                 except NameError:
+                    pass
+                except AttributeError:
                     pass
                 ############################# mother notes
                 try:
                     pedigree.parent_mother_notes = row[mother_notes]
                 except KeyError:
-                    pedigree.parent_mother_notes = ''
+                    try:
+                        pedigree.parent_mother_notes = ''
+                    except AttributeError:
+                        pass
                 except NameError:
+                    pass
+                except AttributeError:
                     pass
                 #############################
 
@@ -606,6 +648,8 @@ def import_pedigree_data(request):
                     pass
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
 
                 ############################# custom
                 for cf_col in custom_fields_in:
@@ -621,6 +665,8 @@ def import_pedigree_data(request):
                     pedigree.save()
                 except NameError:
                     pass
+                except AttributeError:
+                    pass
 
             # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
             # , and redirect back to analyse page
@@ -630,8 +676,8 @@ def import_pedigree_data(request):
                         created_object.delete()
 
                 return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
-            # need to warn user if they specified any pedigrees that already exist
-            elif len(existing) > 0:
+            # need to warn user if they specified any pedigrees that already exist, unless they have confirmed updates
+            elif len(existing) > 0 and request.POST.get('update') == 'no':
                 # get and pass in ids of created objects so it is known what to delete if user cancels
                 created = []
                 for created_object in created_objects:
@@ -643,7 +689,7 @@ def import_pedigree_data(request):
                 return HttpResponse(dumps({'result': 'success'}))
 
         
-        # cancel import
+        # cancel import by deleting the created objects
         else:
             for obj_id in list(request.POST.get('created').split(',')):
                 if obj_id:
