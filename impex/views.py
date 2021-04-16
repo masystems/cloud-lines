@@ -253,6 +253,9 @@ def import_pedigree_data(request):
                                 'name': ped_name,
                                 'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
                             })
+                        # get the breeder
+                        else:
+                            breeder_obj = breeder_obj.first()
                     else:
                         breeder_obj = None
                         # error if missing
@@ -282,7 +285,7 @@ def import_pedigree_data(request):
                     current_owner_obj = None
 
                 # get or create pedigrees ###################
-                def get_or_create_pedigree(pedigree):
+                def get_or_create_pedigree(pedigree, is_parent):
                     if pedigree not in ('', None):
                         if Pedigree.objects.filter(account=attached_service, reg_no=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
@@ -290,8 +293,8 @@ def import_pedigree_data(request):
                             created_objects.append(pedigree_obj)
                             return pedigree_obj
                         else:
-                            # if user has confirmed updates, update existing pedigree
-                            if request.POST.get('update') == 'yes':
+                            # if user has confirmed updates, update existing pedigree, or the pedigree is also a parent that was created because none existed
+                            if request.POST.get('update') == 'yes' or is_parent or not Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first().breeder:
                                 # pedigree does exist, so get it
                                 return Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first()
                             else:
@@ -300,12 +303,12 @@ def import_pedigree_data(request):
                         return None
 
                 try:
-                    father_obj = get_or_create_pedigree(row[father])
+                    father_obj = get_or_create_pedigree(row[father], True)
                 except KeyError:
                     father_obj = None
 
                 try:
-                    mother_obj = get_or_create_pedigree(row[mother])
+                    mother_obj = get_or_create_pedigree(row[mother], True)
                 except KeyError:
                     mother_obj = None
 
@@ -373,8 +376,8 @@ def import_pedigree_data(request):
 
                 # create each new pedigree if no errors found in file ###################
                 if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
-                    # add to existing if this pedigree already exists
-                    if Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).count() > 0:
+                    # add to existing if this pedigree already exists, and if it's not a parent that was created because it didn't exist
+                    if Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).count() > 0 and Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).first().breeder:
                         existing.append({
                             'row': row_number,
                             'name': ped_name,
@@ -382,7 +385,7 @@ def import_pedigree_data(request):
                         })
                     
                     # get or create pedigree
-                    pedigree = get_or_create_pedigree(row[reg_no])
+                    pedigree = get_or_create_pedigree(row[reg_no], False)
 
                 try:
                     pedigree.creator = request.user
