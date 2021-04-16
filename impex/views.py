@@ -165,7 +165,7 @@ def importx(request):
 @user_passes_test(is_editor)
 def import_pedigree_data(request):
     if request.method == 'POST':
-        # check if this is import or cancel
+        # check if this is import or cancel - created not passed in if it's import
         if 'created' not in request.POST.keys():
             attached_service = get_main_account(request.user)
             db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
