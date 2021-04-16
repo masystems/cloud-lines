@@ -187,6 +187,14 @@
                             $('#pedigrees-list').html(pedigreesHtml);
                         }
 
+                        // pass in each created object to be deleted if cancel is clicked
+                        if (result.created.length > 0) {
+                            var createdHtml = '';
+                            result.created.forEach( id => {
+                                createdHtml = createdHtml + id + ',';
+                            });
+                            $('#created').html(createdHtml);
+                        }
                         // display modal
                         $('#update-modal').modal('show');
                     } else {
@@ -241,6 +249,27 @@
                 }
             });
         }
+    })
+
+    // update modal - cancel button clicked
+    $('#modal-cancel').click( function(e){
+        $.ajax({
+            url: "{% url 'import_pedigree_data' %}",
+            type: 'post',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'created': $('#created').html()},
+            // hide modal on success, when created objects have been deleted
+            success: function(data) { $('#update-modal').modal('hide'); },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
     })
 
     // importing breeders

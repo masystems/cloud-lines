@@ -12,9 +12,12 @@ aria-labelledby="scrollableModalTitle" aria-hidden="true" id="update-modal">
             <div id="pedigrees-list"></div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-outline-info" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-outline-danger">Update</button>
+            <button type="button" class="btn btn-outline-info" id="modal-cancel">Cancel</button>
+            <button type="button" class="btn btn-outline-danger" id="modal-update">Update</button>
         </div>
     </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- invisible div to store ids of created pedigrees -->
+<div class="d-none" id="created"></div>
