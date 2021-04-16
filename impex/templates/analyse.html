@@ -169,6 +169,25 @@
                         window.location.replace("{% url 'pedigree_search' %}");
                     } else if (result.result == 'existing') {
                         // warn users that they're about to change existing pedigrees
+                        // list the existing pedigrees
+                        var pedigreesHtml = "";
+                        if (result.existing) {
+                            pedigreesHtml = '<ul>';
+
+                            result.existing.forEach( existingPed => {
+                                if (existingPed.name.length > 0) {
+                                    pedigreesHtml = pedigreesHtml + '<li>' + existingPed.name + ' with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
+                                } else {
+                                    pedigreesHtml = pedigreesHtml + '<li>Pedigree with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
+                                }
+                            });
+
+                            pedigreesHtml = pedigreesHtml + '</ul>';
+
+                            $('#pedigrees-list').html(pedigreesHtml);
+                        }
+
+                        // display modal
                         $('#update-modal').modal('show');
                     } else {
                         errorMsg("Your data had errors!");
