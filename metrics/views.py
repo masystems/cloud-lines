@@ -265,14 +265,13 @@ def stud_advisor(request):
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-    print(coi_raw.json())
+
     studs_raw = loads(coi_raw.json())
     studs_data = {}
 
     for stud, kinship in studs_raw[0].items():
         try:
             male = Pedigree.objects.get(account=attached_service, id=stud, sex='male', status='alive')
-            #print(f"{male} {mother.mean_kinship} {mother.breed.mk_threshold} {male.mean_kinship} {mother.mean_kinship} {mother.breed.mk_threshold} {kinship}")
             mk_minus_mk_thresh = mother.mean_kinship - mother.breed.mk_threshold
             mk_plus_mk_thresh = mother.mean_kinship + mother.breed.mk_threshold
             mk_minus_mk_thresh_2 = mother.mean_kinship - (mother.breed.mk_threshold*2)
