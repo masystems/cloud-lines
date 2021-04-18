@@ -269,7 +269,7 @@ def stud_advisor(request):
     studs_raw = loads(coi_raw.json())
     studs_data = {}
 
-    for stud, kinship in studs_raw.items():
+    for stud, kinship in studs_raw[0].items():
         try:
             male = Pedigree.objects.get(account=attached_service, id=stud, sex='male', status='alive')
             #print(f"{male} {mother.mean_kinship} {mother.breed.mk_threshold} {male.mean_kinship} {mother.mean_kinship} {mother.breed.mk_threshold} {kinship}")
