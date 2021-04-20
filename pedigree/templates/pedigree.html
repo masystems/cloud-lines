@@ -539,6 +539,13 @@ vertical-align: middle;
                         <div class="bg-light-warning"><i class="far fa-chart-bar"></i></div> COI <span class="font-weight-normal">{{ lvl1.coi }}</span></li>
                     <li>
                         <div class="bg-light-warning"><i class="far fa-chart-bar"></i></div> Mean Kinship <span class="font-weight-normal">{{ lvl1.mean_kinship }}</span></li>
+                    <li>
+                        {% if lvl1.sale_or_hire %}
+                            <div class="bg-light-success"><i class="fad fa-hand-holding-usd"></i></div> For Sale/Hire
+                        {% else %}
+                            <div class="bg-light-danger"><i class="fad fa-hand-holding-usd"></i></div> Not For Sale/Hire
+                        {% endif %}
+                    </li>
                 </ul>
             </div>
         </div>
