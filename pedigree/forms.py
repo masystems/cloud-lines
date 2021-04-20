@@ -69,6 +69,9 @@ class PedigreeForm(forms.Form):
     custom_fields = forms.CharField(widget=forms.Textarea, required=False)
     custom_fields.widget.attrs['class'] = 'form-control'
 
+    sale_or_hire = forms.BooleanField(required=False)
+    sale_or_hire.widget.attrs['class'] = 'form-control'
+
 
 class ImagesForm(forms.Form):
 
