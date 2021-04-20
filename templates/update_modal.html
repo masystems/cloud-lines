@@ -1,0 +1,23 @@
+<!-- modal to check that user wants to update existing records -->
+<div class="modal fade" tabindex="-1" role="dialog"
+aria-labelledby="scrollableModalTitle" aria-hidden="true" id="update-modal">
+<div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+        <div class="modal-header alert alert-danger">
+            <h4 class="modal-title text-danger" id="scrollableModalTitle">Existing Pedigrees</h5>
+        </div>
+        <div class="modal-body">
+            <p>The following are pedigrees you are trying to import that have matching registration numbers with pedigrees that already exist in the database.</p>
+            <p>Do you wish to <strong><span class="text-danger">update</span></strong> these pedigrees with the data you are importing, or do you wish to <strong><span class="text-info">cancel</span></strong> the import?</p>
+            <div id="pedigrees-list"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-info" id="modal-cancel">Cancel</button>
+            <button type="button" class="btn btn-outline-danger" id="modal-update">Update</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- invisible div to store ids of created pedigrees -->
+<div class="d-none" id="created"></div>
