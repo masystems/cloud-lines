@@ -582,6 +582,8 @@ def edit_pedigree_form(request, id):
 
             pedigree.breed = Breed.objects.get(account=attached_service, breed_name=pedigree_form['breed'].value())
 
+            pedigree.sale_or_hire = pedigree_form['sale_or_hire'].value()
+
             try:
                 custom_fields = json.loads(pedigree.custom_fields)
             except json.decoder.JSONDecodeError:
