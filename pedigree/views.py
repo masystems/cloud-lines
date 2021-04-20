@@ -617,6 +617,17 @@ def edit_pedigree_form(request, id):
     else:
         pedigree_form = PedigreeForm()
 
+    # pass in pedigree reg_nos
+    # ped_reg_nos = []
+    # for pedigree in Pedigree.objects.filter(account=attached_service):
+    #     ped_reg_nos.append(pedigree.reg_no)
+    # print(ped_reg_nos)
+    # print(json.dumps(ped_reg_nos))
+
+    ped_reg_nos = ""
+    for pedigree in Pedigree.objects.filter(account=attached_service):
+        ped_reg_nos = ped_reg_nos + pedigree.reg_no + ','
+
     return render(request, 'edit_pedigree_form.html', {'pedigree_form': pedigree_form,
                                                        'image_form': image_form,
                                                        'pedigree': pedigree,
@@ -624,7 +635,8 @@ def edit_pedigree_form(request, id):
                                                        'breeders': Breeder.objects.filter(account=attached_service),
                                                        'breeds': Breed.objects.filter(account=attached_service),
                                                        'breed_groups': BreedGroup.objects.filter(account=attached_service),
-                                                       'custom_fields': custom_fields})
+                                                       'custom_fields': custom_fields,
+                                                       'ped_reg_nos': ped_reg_nos})
 
 
 def image_upload(request, id):
