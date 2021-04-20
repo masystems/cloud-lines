@@ -239,6 +239,10 @@
                                             <input name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
                                             <input class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
                                         {% endif %}
+                                    {% elif field.label == 'Sale or hire' %}
+                                        <div>
+                                            <input name='{{ field.name }}' type="checkbox"  class="mt-2" {% if pedigree.sale_or_hire %}checked{% endif %}>
+                                        </div>
                                     {% elif field.label == 'Custom fields' %}
                                         {% if custom_fields %}
                                             {% for field_key, field_vals in custom_fields.items %}
