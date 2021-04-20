@@ -140,6 +140,10 @@
                     {% if 'setup' not in request.get_full_path %}
                         <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="{% if add_breed %}#newBreedModal{% else %}#upgrade{% endif %}" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breed</button>
                     {% endif %}
+                {% elif field.label == 'Sale or hire' %}
+                    <div>
+                        <input name='{{ field.name }}' type="checkbox"  class="mt-2">
+                    </div>
                 {% elif field.label == 'Custom fields' %}
                     {% if custom_fields %}
                         {% for field_key, field_vals in custom_fields.items %}

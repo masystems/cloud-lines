@@ -382,6 +382,9 @@ def new_pedigree_form(request):
             breed = Breed.objects.get(account=attached_service, breed_name=request.POST.get('breed'))
             new_pedigree.breed = breed
 
+            # sale or hire
+            new_pedigree.sale_or_hire = pedigree_form['sale_or_hire'].value()
+
             try:
                 custom_fields = json.loads(attached_service.custom_fields)
 
