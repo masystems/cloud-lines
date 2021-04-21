@@ -24,231 +24,15 @@
             <h3 class="text-themecolor m-b-0 m-t-0">Metrics</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-                <li class="breadcrumb-item active">Metrics</li>
+                <li class="breadcrumb-item"><a href="{% url 'metrics' %}">Metrics</a></li>
+                <li class="breadcrumb-item active">Stud Advisor Results</li>
             </ol>
-        </div>
-        <div class="col-md-6 col-3 align-self-center">
-            <form action="{% url 'poprep_export' %}" method="POST" class="form-horizontal">
-                {% csrf_token %}
-                <div class="btn-group float-right">
-                    <button type="button" class="btn btn-success dropdown-toggle"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        PopRep Export
-                    </button>
-                    <div class="dropdown-menu">
-                        {% for breed in breeds.all %}
-                            <button class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
-                        {% endfor %}
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
 
     <!-- ============================================================== -->
     <!-- End Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
-
-
-    <div class="row">
-        <div class="col-xl-9 col-lg-9">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Kinship</h4>
-                    <p id="kinshipText">Select a {{ service.mother_title }} and {{ service.father_title }} to predict what the COI of their offspring will be.</p>
-                    <form id="ksForm">
-                        <div class="form-row align-items-center">
-                            <div class="col-md-5">
-                                <div id="mothers-alive">
-                                    <input id="id_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}">
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <div id="fathers-alive">
-                                    <input id="id_father" class="typeahead form-control mt-2" name='father' type="text" placeholder="{{ service.father_title }}">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <button id="ksBtn" class="btn btn-info mt-2" name='Submit' type="button" >Calculate Kinship</button>
-                            </div>
-                        </div>
-                    </form>
-                    <p id="ksResults" class="mt-2 d-none text-center"></p>
-
-                    <script>
-                        $('#ksBtn').click( function() {
-                            $.ajax({
-                                url: '{% url 'kinship' %}',
-                                type: 'post',
-                                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                                dataType: 'text',
-                                data: $('#ksForm').serialize(),
-                                beforeSend: function() {
-                                    $('#ksBtn').attr("disabled", true);
-                                    $('#ksResults').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
-                                    $('#ksResults').removeClass('d-none');
-                                },
-                                success: function(data) {
-                                    try {
-                                            var result = JSON.parse(data);
-                                        }
-                                    catch(err) {
-                                              // not returned anything
-                                              var result = '';
-                                            }
-                                    var coi = result.coi.replace('[1] ', '');
-                                    $('#ksResults').html('<h4>Kinship results:</h4><p class="text-info">' + coi + '</p>')
-                                    $('#ksBtn').attr("disabled", false);
-                                 },
-                                error: function(jqXHR, textStatus, errorThrown){
-                                    $('#ksResults').html('<p class="text-danger">Error! Check the parent fields are correct.</p>')
-                                    $('#ksBtn').attr("disabled", false);
-                                }
-                            });
-                        });
-                    </script>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-lg-3">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Calculations</h4>
-                    <p id="coiTimer" class="text-center"></p>
-                    {% if not read_only %}
-                        <button id="coiBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>
-                    {% endif %}
-                    <hr>
-                    <p id="meanKinshipTimer" class="text-center"></p>
-                    {% if not read_only %}
-                        <button id="meanKinshipBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run Mean Kinship</button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <script>
-        $('#coiBtn').click( function() {
-            $.ajax({
-                url: '{% url 'run_coi' %}',
-                type: 'post',
-                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                dataType: 'text',
-                async: true,
-                data: [],
-                beforeSend: function() {
-                    $('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
-                },
-                success: function(data) {
-                    try {
-                            var result = JSON.parse(data);
-                            var coi_countDownDate = new Date(result.coi_date).getTime();
-                            var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
-                            infoMsg('COI now running, allow time for values to be updated')
-                        }
-                    catch(err) {
-                              // not returned anything
-                              var result = '';
-                            }
-                 },
-                error: function(jqXHR, textStatus, errorThrown){
-                }
-            });
-        });
-
-        // Set the date we're counting down to and start loop interval
-        var coi_countDownDate = new Date("{{ coi_date }}").getTime();
-
-        var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
-
-
-        // Update the count down every 1 second
-        function coi_countDown(coi_countDownDate) {
-          // Get today's date and time
-          var coi_now = new Date().getTime();
-
-          // Find the distance between now and the count down date
-          var coi_distance = coi_countDownDate - coi_now;
-
-          // Time calculations for days, hours, minutes and seconds
-          var coi_days = Math.floor(coi_distance / (1000 * 60 * 60 * 24));
-          var coi_hours = Math.floor((coi_distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          var coi_minutes = Math.floor((coi_distance % (1000 * 60 * 60)) / (1000 * 60));
-          var coi_seconds = Math.floor((coi_distance % (1000 * 60)) / 1000);
-
-          // If the count down is over, write some text
-
-          if (coi_distance < 0) {
-            clearInterval(coi_countDownInterval);
-            $("#coiTimer").html("COI ready!");
-            $('#coiBtn').attr("disabled", false);
-          } else {
-            // Output the result in an element with id="demo"
-            $("#coiTimer").html('Run COI again in:<br/>' + coi_days + "d " + coi_hours + "h " + coi_minutes + "m " + coi_seconds + "s ");
-            $('#coiBtn').attr("disabled", true);
-          }
-        }
-    </script>
-        <script>
-        $('#meanKinshipBtn').click( function() {
-            $.ajax({
-                url: '{% url 'run_mean_kinship' %}',
-                type: 'post',
-                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                dataType: 'text',
-                data: [],
-                beforeSend: function() {
-                    $('#meanKinshipTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
-                },
-                success: function(data) {
-                    try {
-                            var result = JSON.parse(data);
-                            var mk_countDownDate = new Date(result.mean_kinship_date).getTime();
-                            var mk_countDownInterval = setInterval(function() { mk_countDown(mk_countDownDate); }, 1000);
-                            infoMsg('Mean Kindship now running, allow time for values to be updated')
-                        }
-                    catch(err) {
-                              // not returned anything
-                              var result = '';
-                            }
-                 },
-                error: function(jqXHR, textStatus, errorThrown){
-                }
-            });
-        });
-
-        // Set the date we're counting down to and start loop interval
-        var mk_countDownDate = new Date("{{ mean_kinship_date }}").getTime();
-        var mk_countDownInterval = setInterval(function() { mk_countDown(mk_countDownDate); }, 1000);
-
-        // Update the count down every 1 second
-        function mk_countDown(mk_countDownDate) {
-          // Get today's date and time
-          var mk_now = new Date().getTime();
-
-          // Find the distance between now and the count down date
-          var mk_distance = mk_countDownDate - mk_now;
-
-          // Time calculations for days, hours, minutes and seconds
-          var mk_days = Math.floor(mk_distance / (1000 * 60 * 60 * 24));
-          var mk_hours = Math.floor((mk_distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          var mk_minutes = Math.floor((mk_distance % (1000 * 60 * 60)) / (1000 * 60));
-          var mk_seconds = Math.floor((mk_distance % (1000 * 60)) / 1000);
-
-          // Output the result in an element with id="demo"
-          document.getElementById("meanKinshipTimer").innerHTML = 'Run Mean Kinship again in:<br/>' + mk_days + "d " + mk_hours + "h "
-          + mk_minutes + "m " + mk_seconds + "s ";
-
-          // If the count down is over, write some text
-          if (mk_distance < 0) {
-            clearInterval(mk_countDownInterval);
-            document.getElementById("meanKinshipTimer").innerHTML = "Mean Kinship ready!";
-            $('#meanKinshipBtn').attr("disabled", false);
-          } else {
-            $('#meanKinshipBtn').attr("disabled", true);
-          }
-        }
-    </script>
-    </div>
 
     <div class="row">
         <div class="col-12">
@@ -259,14 +43,6 @@
                     <div id="pdfArea">
                         <form id="saForm" class="pb-4">
                             <div class="form-row align-items-center">
-                                <div class="col-md-3">
-                                    <div id="mothers-alive">
-                                        <input id="sa_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <button id="saBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
-                                </div>
                                 <div class="col-md-3">
                                     <div id="motherDetails" class="d-none">
                                         <h3 class="card-title">{{ service.mother_title }} Details</h3>
@@ -309,9 +85,12 @@
                                 </tr>
                             </thead>
                             <tbody id="saTbody">
+
+                                <tr>
+                                    <td></td>
+                                </tr>
                             </tbody>
                         </table>
-                        <h4 id="saMsg"></h4>
                     </div>
                 </div>
             </div>

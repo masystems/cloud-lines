@@ -5,13 +5,14 @@ from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
 from breed.models import Breed
 from django.core.serializers.json import DjangoJSONEncoder
-from .models import CoiLastRun, MeanKinshipLastRun
+from .models import CoiLastRun, MeanKinshipLastRun, StudAdvisorQueue
 from json import dumps, loads
 from datetime import datetime, timedelta
 import logging
 import requests
 import pytz
 import boto3
+from time import time
 from boto3.s3.transfer import TransferConfig
 from threading import Thread
 
@@ -231,8 +232,8 @@ def stud_advisor_mother_details(request):
 def stud_advisor(request):
     mother_details = stud_advisor_mother_details(request)
     mother_details = eval(mother_details.content.decode())
-
     attached_service = get_main_account(request.user)
+    epoch = int(time())
 
     mother = request.POST['mother']
     mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
@@ -247,13 +248,13 @@ def stud_advisor(request):
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
         subdomain = host.partition('.')[0]
-        local_output = f"/tmp/sa_{subdomain}_output.json"
-        remote_output = f"metrics/sa_{subdomain}_output.json"
-        file_name = f"sa_{subdomain}_output.json"
+        local_output = f"/tmp/sa_{subdomain}-{epoch}_output.json"
+        remote_output = f"metrics/sa_{subdomain}-{epoch}_output.json"
+        file_name = f"sa_{subdomain}-{epoch}_output.json"
     else:
-        local_output = f"/tmp/sa_{attached_service.id}_output.json"
-        remote_output = f"metrics/sa_{attached_service.id}_output.json"
-        file_name = f"sa_{attached_service.id}_output.json"
+        local_output = f"/tmp/sa_{attached_service.id}-{epoch}_output.json"
+        remote_output = f"metrics/sa_{attached_service.id}-{epoch}_output.json"
+        file_name = f"sa_{attached_service.id}-{epoch}_output.json"
 
     with open(local_output, 'w') as file:
         file.write(dumps(list(pedigrees)))
@@ -263,10 +264,25 @@ def stud_advisor(request):
     data = {'data_path': remote_output,
             'file_name': file_name}
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
-                            json=dumps(data, cls=DjangoJSONEncoder), stream=True)
+    try:
+        coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
+                                json=dumps(data, cls=DjangoJSONEncoder), stream=True, timeout=1)
+    except requests.exceptions.ReadTimeout:
+        StudAdvisorQueue.objects.create(account=attached_service, user=request.user, file=file_name)
+        response = {'status': 'message',
+                    'msg': "Your request will be complete in a few minutes. We'll email you with the results."}
+        return HttpResponse(dumps(response))
+    except requests.exceptions.ConnectionError:
+        response = {'status': 'message',
+                    'msg': "Your connection timed out. Please try again or contact support if it continues."}
+        return HttpResponse(dumps(response))
 
     studs_raw = loads(coi_raw.json())
+    studs_data = calculate_sa_thresholds(studs_raw)
+    return HttpResponse(dumps(studs_data))
+
+
+def calculate_sa_thresholds(studs_raw):
     studs_data = {}
 
     for stud, kinship in studs_raw[0].items():
@@ -299,7 +315,7 @@ def stud_advisor(request):
         except ObjectDoesNotExist:
             continue
 
-    return HttpResponse(dumps(studs_data))
+    return studs_data
 
 
 def poprep_export(request):
