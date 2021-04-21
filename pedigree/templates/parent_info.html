@@ -1,0 +1,26 @@
+<span class="mytooltip tooltip-effect-4"><span class="tooltip-item"><i
+    class="{% if pedigree.sex == 'female' %}fad fa-venus{% else %}fad fa-mars{% endif %}"></i> {{ pedigree.name }}</span>
+    <span class="tooltip-content clearfix">
+        <span class="tooltip-text2">
+            {% if pedigree.images.all %}
+                <div class="pb-2">
+
+                    <img src="{% for image in pedigree.images.all %}
+                                {% if forloop.first %}
+                                    {{ image.image.url }}
+                                {% endif %}
+                            {% endfor %}" class="img-thumbnail">
+
+                </div>
+            {% endif %}
+            <a href="{% url 'pedigree' pedigree.id %}"
+               class="btn btn-outline-{% if pedigree.sex == 'male' %}info{% else %}primary{% endif %} waves-effect waves-light mt-1 ml-1" role="button">
+                <span class="btn-label"><i class="{% if pedigree.sex == 'female' %}fad fa-venus{% else %}fad fa-mars{% endif %}"></i></span> <strong>Profile</strong></a>
+            <ul class="list-icons">
+                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Reg #:</strong> {{ pedigree.reg_no }}</li>
+                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Name:</strong> {{ pedigree.name }}</li>
+                <li class="text-muted"><i class="{% if lvl1.status == 'alive' %}fad fa-heart{% elif lvl1.status == 'dead' %}fad fa-skull{% else %}fad fa-question-circle{% endif %}"></i> <strong>Status:</strong> {{ pedigree.status }}</li>
+            </ul>
+        </span>
+    </span>
+</span>
