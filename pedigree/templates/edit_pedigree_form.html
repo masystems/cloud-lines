@@ -181,7 +181,9 @@
                                             {% endif %}
                                         </div>
                                         <ul class="list-icons d-none" id="mother-info">
-                                            <li class="text-muted"><i class="ti-angle-right"></i> <strong>Name:</strong> {{ pedigree.name }}</li>
+                                            <li class="text-muted">
+                                                <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="mother-name">{{ pedigree.name }}</span>
+                                            </li>
                                         </ul>
                                     {% elif field.label == 'Mother notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_mother_notes %}
@@ -426,16 +428,31 @@
     <!-- display pop up for parent info -->
     <script>
         $('#id_mother').bind('keyup change', function(event) {
-            // get pedigree reg numbers and remove the last element, as this will be empty string
-            var reg_nos = '{{ ped_reg_nos }}'.split(',');
-            reg_nos.pop();
+            // // get pedigree reg numbers and remove the last element, as this will be empty string
+            // var reg_nos = '{{ ped_reg_nos }}'.split(',');
+            // reg_nos.pop();
             
-            // check if the input reg number is in the array
-            if (jQuery.inArray($(this).val(), reg_nos) != -1) {
-                // display info pop up
-                $('#mother-info').removeClass('d-none');
-            } else {
-                // hide info pop up
+            // // check if the input reg number is in the array
+            // if (jQuery.inArray($(this).val(), reg_nos) != -1) {
+            //     // display info pop up
+            //     $('#mother-info').removeClass('d-none');
+            // } else {
+            //     // hide info pop up
+            //     $('#mother-info').addClass('d-none');
+            // }
+            
+            var noneMatched = true;
+            '{% for mother in pedigrees %}'
+                if ($(this).val() == '{{ mother.reg_no }}') {
+                    console.log('{{ mother.reg_no }}');
+                    $('#mother-name').html('{{ mother.name }}');
+                    $('#mother-info').removeClass('d-none');
+                    noneMatched = false;
+                }
+            '{% endfor %}'
+            // if none of the pedigrees matched the reg number and mother info is not currently hidden
+            if ( noneMatched && !$('#mother-info').hasClass('d-none') ) {
+                console.log('hello - hiding');
                 $('#mother-info').addClass('d-none');
             }
         });
