@@ -423,14 +423,13 @@
     <!-- display pop up for parent info -->
     <script>
         $('#id_mother').bind('keyup change', function(event) {
-            //'{{ ped_reg_nos }}'.forEach( reg_no => {console.log(reg_no)} )
-            //var ped_reg_nos = replace('&quot;', "\"");
-            if (jQuery.inArray($(this).val(), '{{ ped_reg_nos }}'.split(','))) {
-                // console.log(jQuery.inArray($(this).val() + '&#39;', '{{ ped_reg_nos }}'));
-                //console.log(JSON.parse('{{ ped_reg_nos }}'.replace('&quot;', "\"")));
-                //console.log('{{ ped_reg_nos }}'.replace('&quot;', "\"").toArray());
-                // console.log($(this).val() + '&#39;');
-                console.log(jQuery.inArray($(this).val(), '{{ ped_reg_nos }}'.split(',')));
+            // get pedigree reg numbers and remove the last element, as this will be empty string
+            var reg_nos = '{{ ped_reg_nos }}'.split(',');
+            reg_nos.pop();
+            
+            // check if the input reg number is in the array
+            if (jQuery.inArray($(this).val(), reg_nos) != -1) {
+                console.log('time to display pop up');
             }
         });
     </script>
