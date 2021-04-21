@@ -66,7 +66,8 @@ class Pedigree(models.Model):
     # hidden
     date_added = models.DateTimeField(auto_now_add=True, verbose_name="Date Added")
     custom_fields = models.TextField(blank=True, verbose_name="Custom Fields")
-
+    sale_or_hire = models.BooleanField(default=False, help_text="Is the pedigree for sale/hire, or not?", verbose_name="For Sale/Hire")
+    
     def __str__(self):
         return self.reg_no
 
