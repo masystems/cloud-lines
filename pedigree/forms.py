@@ -48,10 +48,6 @@ class PedigreeForm(forms.Form):
     )
     born_as = forms.ChoiceField(choices=BORNAS, widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='single', required=True)
 
-    date_of_death = forms.DateField(required=False, widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    date_of_death.widget.attrs['class'] = 'form-control'
-    date_of_death.widget.attrs['placeholder'] = 'dd/mm/yyyy'
-
     father = forms.CharField(required=False)
     father_notes = forms.CharField(required=False)
     father_notes.widget.attrs['class'] = 'form-control'
@@ -59,6 +55,10 @@ class PedigreeForm(forms.Form):
     mother = forms.CharField(required=False)
     mother_notes = forms.CharField(required=False)
     mother_notes.widget.attrs['class'] = 'form-control'
+
+    date_of_death = forms.DateField(required=False, widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    date_of_death.widget.attrs['class'] = 'form-control'
+    date_of_death.widget.attrs['placeholder'] = 'dd/mm/yyyy'
 
     breed_group = forms.CharField(required=False)
 
