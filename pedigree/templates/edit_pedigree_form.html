@@ -180,6 +180,9 @@
                                                 <small>Leave blank if using a breed group</small>
                                             {% endif %}
                                         </div>
+                                        <ul class="list-icons d-none" id="mother-info">
+                                            <li class="text-muted"><i class="ti-angle-right"></i> <strong>Name:</strong> {{ pedigree.name }}</li>
+                                        </ul>
                                     {% elif field.label == 'Mother notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_mother_notes %}
                                     {% elif field.label == 'Breed group' %}
@@ -429,9 +432,11 @@
             
             // check if the input reg number is in the array
             if (jQuery.inArray($(this).val(), reg_nos) != -1) {
-                // remove d-none from parent-info
+                // display info pop up
+                $('#mother-info').removeClass('d-none');
             } else {
-                // add d-none to parent-info
+                // hide info pop up
+                $('#mother-info').addClass('d-none');
             }
         });
     </script>
