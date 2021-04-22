@@ -1,0 +1,47 @@
+<!-- display pop up for parent info -->
+<script>
+    $('#id_mother').bind('keyup change', function(event) {
+        // variable to track whether there has been a match
+        var noneMatched = true;
+
+        // iterate through pedigrees
+        '{% for mother in pedigrees %}'
+            // if reg number matches
+            if ($(this).val() == '{{ mother.reg_no }}') {
+                // set the name of the note and display it
+                $('#mother-name').html('{{ mother.name }}');
+                $('#mother-info').removeClass('d-none');
+                
+                // set the variable
+                noneMatched = false;
+            }
+        '{% endfor %}'
+        
+        // if none of the pedigrees matched the reg number and mother info is not currently hidden
+        if ( noneMatched && !$('#mother-info').hasClass('d-none') ) {
+            $('#mother-info').addClass('d-none');
+        }
+    });
+
+    $('#id_father').bind('keyup change', function(event) {
+        var noneMatched = true;
+
+        // iterate through pedigrees
+        '{% for father in pedigrees %}'
+            // if reg number matches
+            if ($(this).val() == '{{ father.reg_no }}') {
+                // set the name of the note and display it
+                $('#father-name').html('{{ father.name }}');
+                $('#father-info').removeClass('d-none');
+                
+                // set the variable
+                noneMatched = false;
+            }
+        '{% endfor %}'
+        
+        // if none of the pedigrees matched the reg number and father info is not currently hidden
+        if ( noneMatched && !$('#father-info').hasClass('d-none') ) {
+            $('#father-info').addClass('d-none');
+        }
+    });
+</script>

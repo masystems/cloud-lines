@@ -180,6 +180,12 @@
                                                 <small>Leave blank if using a breed group</small>
                                             {% endif %}
                                         </div>
+                                        <!-- hidden note which will show name of mother if reg number has a match -->
+                                        <ul class="list-icons d-none" id="mother-info">
+                                            <li class="text-muted">
+                                                <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="mother-name"></span>
+                                            </li>
+                                        </ul>
                                     {% elif field.label == 'Mother notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_mother_notes %}
                                     {% elif field.label == 'Breed group' %}
@@ -190,8 +196,14 @@
                                         {% endif %}
                                     {% elif field.label == 'Father' %}
                                         <div id="fathers">
-                                            <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_father != None %}{{ pedigree.parent_father }}{% endif %}">
+                                            <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_father != None %}{{ pedigree.parent_father }}{% endif %}">
                                         </div>
+                                        <!-- hidden note which will show name of mother if reg number has a match -->
+                                        <ul class="list-icons d-none" id="father-info">
+                                            <li class="text-muted">
+                                                <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="father-name"></span>
+                                            </li>
+                                        </ul>
                                     {% elif field.label == 'Father notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_father_notes %}
 
@@ -406,6 +418,9 @@
 {% endblock %}
 
 {% block footer %}
+
+    <!-- javascript to display mother/father name -->
+    {% include 'parent_info.html' %}
 
     <script>
         $('.confirmSaveBtn').click(function () {

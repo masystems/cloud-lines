@@ -97,10 +97,22 @@
                             <small>Leave blank if using a breed group</small>
                         {% endif %}
                     </div>
+                    <!-- hidden note which will show name of mother if reg number has a match -->
+                    <ul class="list-icons d-none" id="mother-info">
+                        <li class="text-muted">
+                            <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="mother-name"></span>
+                        </li>
+                    </ul>
                 {% elif field.label == 'Father'  %}
                     <div id="fathers">
                         <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.father_title }}">
                     </div>
+                    <!-- hidden note which will show name of mother if reg number has a match -->
+                    <ul class="list-icons d-none" id="father-info">
+                        <li class="text-muted">
+                            <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="father-name"></span>
+                        </li>
+                    </ul>
                 {% elif field.label == 'Breed group' %}
                     {% if service.site_mode == 'poultry' %}
                         <div id="breed_groups">
@@ -212,3 +224,7 @@
 <!--        </div>-->
 <!--    {% endfor %}-->
 <!--{% endif %}-->
+
+{% block footer %}
+    {% include 'parent_info.html' %}
+{% endblock %}
