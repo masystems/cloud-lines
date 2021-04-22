@@ -43,7 +43,7 @@
     <!-- End Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
     <!-- Confirm submission moal -->
-    <div class="modal fade confirmForm" tabindex="-1" role="dialog" aria-labelledby="confirmForm" aria-hidden="true" style="display: none;">
+    <div id="save_ped_modal" class="modal fade confirmForm" tabindex="-1" role="dialog" aria-labelledby="confirmForm" aria-hidden="true" style="display: none;">
          <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -225,7 +225,11 @@
                         // redirect to breeders page
                         window.location.replace("/pedigree/" + result.ped_id);
                     } else {
-                        
+                        // remove modal
+                        $('#save_ped_modal').modal('hide');
+                        // add content to danger section
+
+                        // display danger section
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown){
