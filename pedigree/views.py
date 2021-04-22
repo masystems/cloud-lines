@@ -323,7 +323,6 @@ def new_pedigree_form(request):
         if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
             pedigree_form.add_error('breed', 'Selected breed does not exist')
             pre_checks = False
-
         if pedigree_form.is_valid() and pre_checks:
             new_pedigree = Pedigree()
             new_pedigree.creator = request.user
@@ -413,6 +412,22 @@ def new_pedigree_form(request):
             return HttpResponse(json.dumps({'result': 'success', 'ped_id': new_pedigree.id}))
         # form invalid
         else:
+            if pedigree_form.errors:
+                print('|||||||||||||||')
+                print('###############    fields in form')
+                for field in pedigree_form:
+                    for error in field.errors:
+                        print(f'{field.label} - {error}')
+                        print('  -')
+                # print('###############    errors in form errors')
+                # for error in pedigree_form.errors:
+                #     print(error)
+                #     print('  -')
+                print('###############    non_field_errors in form non_field_errors')
+                for non_field_error in pedigree_form.non_field_errors():
+                    print(non_field_error)
+                    print('  -')
+
             return HttpResponse(json.dumps({'result': 'fail'}))
     else:
         pedigree_form = PedigreeForm()
