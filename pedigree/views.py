@@ -410,7 +410,10 @@ def new_pedigree_form(request):
 
 
             new_pedigree.save()
-            return redirect('pedigree', new_pedigree.id)
+            return HttpResponse(json.dumps({'result': 'success', 'ped_id': new_pedigree.id}))
+        # form invalid
+        else:
+            return HttpResponse(json.dumps({'result': 'fail'}))
     else:
         pedigree_form = PedigreeForm()
 

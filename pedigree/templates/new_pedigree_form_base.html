@@ -212,7 +212,31 @@
 <script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
 <script>
     $("#confirmSaveBtn").on("click", function(e) {
-        $('#newPedigreeForm').submit();
+        e.preventDefault();
+
+        $.ajax({
+                url: "{% url 'new_pedigree_form' %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#newPedigreeForm').serialize(),
+                success: function(data) {
+                    var result = JSON.parse(data);
+                    if (result.result == 'success') {
+                        // redirect to breeders page
+                        window.location.replace("/pedigree/" + result.ped_id);
+                    } else {
+                        
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
     });
     // var errors = false;
     // $("#newPedigreeForm").dropzone({
