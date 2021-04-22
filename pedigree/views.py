@@ -412,13 +412,20 @@ def new_pedigree_form(request):
             return HttpResponse(json.dumps({'result': 'success', 'ped_id': new_pedigree.id}))
         # form invalid
         else:
+            # variable to store form errors to be passed to template
+            errors = {}
             if pedigree_form.errors:
+                errors['field_errors'] = {}
+                errors['non_field_errors'] = []
+                
                 print('|||||||||||||||')
                 print('###############    fields in form')
                 for field in pedigree_form:
                     for error in field.errors:
                         print(f'{field.label} - {error}')
                         print('  -')
+                        # add field error to variable
+                        errors['field_errors'][field.label] = error
                 # print('###############    errors in form errors')
                 # for error in pedigree_form.errors:
                 #     print(error)
@@ -427,8 +434,9 @@ def new_pedigree_form(request):
                 for non_field_error in pedigree_form.non_field_errors():
                     print(non_field_error)
                     print('  -')
-
-            return HttpResponse(json.dumps({'result': 'fail'}))
+                    errors['non_field_errors'].append(non_field_error)
+                print(errors)
+            return HttpResponse(json.dumps({'result': 'fail', 'errors': errors}))
     else:
         pedigree_form = PedigreeForm()
 
