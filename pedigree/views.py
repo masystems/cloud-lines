@@ -494,7 +494,7 @@ def edit_pedigree_form(request, id):
                 approvals = Approval.objects.filter(pedigree=pedigree)
                 for approval in approvals:
                     approval.delete()
-            return redirect('pedigree_search')
+            return HttpResponse(json.dumps({'result': 'success', 'action': 'delete'}))
 
         # check whether it's valid:
         if pedigree_form['reg_no'].value().strip() != pedigree.reg_no:
