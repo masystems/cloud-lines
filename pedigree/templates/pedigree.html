@@ -71,7 +71,7 @@ vertical-align: middle;
                 <ul class="nav nav-tabs customtab" role="tablist">
                     <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#profile" role="tab"><span class="hidden-sm-up"><i class="ti-info"></i></span> <span class="hidden-xs-down">Profile</span></a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#images" role="tab"><span class="hidden-sm-up"><i class="ti-image"></i></span> <span class="hidden-xs-down">Images</span></a> </li>
-                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#children" role="tab"><span class="hidden-sm-up"><i class="mdi mdi-human-child"></i></span> <span class="hidden-xs-down">Children</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#children" role="tab"><span class="hidden-sm-up"><i class="mdi mdi-human-child"></i></span> <span class="hidden-xs-down">Offspring</span></a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#cert" role="tab"><span class="hidden-sm-up"><i class="mdi mdi-human-child"></i></span> <span class="hidden-xs-down">Certificate</span></a> </li>
                 </ul>
                 <!-- Tab panes -->
@@ -191,14 +191,14 @@ vertical-align: middle;
                                 </div>
                             {% endfor %}
                         {% else %}
-                        <h4>No children for this {% if service.site_mode == 'mammal' %}pedigree{% else %}bird{% endif %}, add one?</h4>
+                        <h4>No offspring for this {% if service.site_mode == 'mammal' %}pedigree{% else %}bird{% endif %}, add one?</h4>
                         {% endif %}
                         <!-- Add existing Child-->
                         <div id="existing" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="existing" aria-hidden="true" style="display: none;">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h4 class="modal-title float-left">Choose existing {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %} (Child)</h4>
+                                        <h4 class="modal-title float-left">Choose existing {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird{% endif %} (Offspring)</h4>
                                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                     </div>
                                     <div class="modal-body">
