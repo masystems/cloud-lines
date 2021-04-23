@@ -28,3 +28,4 @@ class StudAdvisorQueue(models.Model):
     mother = models.ForeignKey(Pedigree, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Mother")
     file = models.CharField(max_length=250)
     email_sent = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
