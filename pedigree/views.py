@@ -632,7 +632,7 @@ def edit_pedigree_form(request, id):
                     else:
                         image.delete()
 
-            return redirect('pedigree', pedigree.id)
+            return HttpResponse(json.dumps({'result': 'success', 'action': 'edit'}))
     else:
         pedigree_form = PedigreeForm()
 

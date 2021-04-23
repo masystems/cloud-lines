@@ -427,7 +427,67 @@
         $('.confirmSaveBtn').click(function (e) {
             e.preventDefault();
 
-            $('#editPedigreeForm').submit();
+            $.ajax({
+                url: "{% url 'edit_pedigree_form' pedigree.id %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#editPedigreeForm').serialize(),
+                success: function(data) {
+                    var result = JSON.parse(data);
+                    if (result.result == 'success' && result.action == 'edit') {
+                        // redirect to pedigree page
+                        window.location.replace("{% url 'pedigree' pedigree.id %}");
+                    } else {
+                        // create html to display what fields were erroneous
+                        var errorHtml = "";
+                        if (result.errors) {
+                            errorHtml = errorHtml + '<h5 class="text-danger">Your form had the following errors:</h5>';
+                            console.log(Object.keys(result.errors.field_errors).length)
+                            // go through field errors
+                            if (Object.keys(result.errors.field_errors).length > 0) {
+                                errorHtml = errorHtml + '<br/><ul>';
+
+                                // add each field and error to the errors
+                                result.errors.field_errors.forEach( error => {
+                                    errorHtml = errorHtml + '<li>' + error.field + ': ' + error.error + '</li>';
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+
+                            // go through invalid fields
+                            if (result.errors.non_field_errors.length > 0) {
+                                errorHtml = errorHtml + '<br/><ul>';
+
+                                result.errors.non_field_errors.forEach( error => {
+                                    errorHtml = errorHtml + '<li>' + error + '</li>';
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+                        }
+                        // add html to section
+                        $('#errors').html(errorHtml);
+
+                        // display errors section
+                        $('#errors').removeClass('d-none');
+
+                        // remove modal
+                        $('#save_ped_modal').modal('hide');
+                        
+                        // display error message
+                        errorMsg("Your form had errors!");
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
         });
         $('.confirmDeleteBtn').click(function (e) {
             e.preventDefault();
@@ -436,7 +496,7 @@
                 .attr("name", "delete")
                .attr("type", "hidden").val("delete");
             $('#editPedigreeForm').append(input);
-            
+
             //$('#editPedigreeForm').submit();
             $.ajax({
                 url: "{% url 'edit_pedigree_form' pedigree.id %}",
@@ -446,8 +506,8 @@
                 success: function(data) {
                     var result = JSON.parse(data);
                     if (result.result == 'success' && result.action == 'delete') {
-                        // redirect to breeders page
-                        window.location.replace("/pedigree/search");
+                        // redirect to pedigree search page
+                        window.location.replace("{% url 'pedigree_search' %}");
                     } else {
                         // create html to display what fields were erroneous
                         var errorHtml = "";
