@@ -415,7 +415,7 @@ def new_pedigree_form(request):
             # variable to store form errors to be passed to template
             errors = {}
             if pedigree_form.errors:
-                errors['field_errors'] = {}
+                errors['field_errors'] = []
                 errors['non_field_errors'] = []
                 
                 print('|||||||||||||||')
@@ -424,8 +424,11 @@ def new_pedigree_form(request):
                     for error in field.errors:
                         print(f'{field.label} - {error}')
                         print('  -')
-                        # add field error to variable
-                        errors['field_errors'][field.label] = error
+                        # add field label and error to dictionary
+                        errors['field_errors'].append({
+                            'field': field.label,
+                            'error': error
+                        })
                 # print('###############    errors in form errors')
                 # for error in pedigree_form.errors:
                 #     print(error)
