@@ -434,7 +434,7 @@
                 data: $('#editPedigreeForm').serialize(),
                 success: function(data) {
                     var result = JSON.parse(data);
-                    if (result.result == 'success' && result.action == 'edit') {
+                    if (result.result == 'success') {
                         // redirect to pedigree page
                         window.location.replace("{% url 'pedigree' pedigree.id %}");
                     } else {
