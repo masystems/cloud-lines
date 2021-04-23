@@ -633,6 +633,26 @@ def edit_pedigree_form(request, id):
                         image.delete()
 
             return HttpResponse(json.dumps({'result': 'success'}))
+        # form invalid
+        else:
+            # variable to store form errors to be passed to template
+            errors = {}
+            if pedigree_form.errors:
+                errors['field_errors'] = []
+                errors['non_field_errors'] = []
+                
+                for field in pedigree_form:
+                    for error in field.errors:
+                        # add field label and error to dictionary
+                        errors['field_errors'].append({
+                            'field': field.label,
+                            'error': error
+                        })
+
+                for non_field_error in pedigree_form.non_field_errors():
+                    errors['non_field_errors'].append(non_field_error)
+            
+            return HttpResponse(json.dumps({'result': 'fail', 'errors': errors}))
     else:
         pedigree_form = PedigreeForm()
 
