@@ -299,31 +299,30 @@ def new_pedigree_form(request):
     if request.method == 'POST':
         # check whether it's valid:
         if Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['reg_no'].value().strip()).exists():
-            pedigree_form.add_error('reg_no', 'Selected reg number already exists')
+            pedigree_form.add_error('reg_no', 'Selected reg number already exists.')
             pre_checks = False
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
-            pedigree_form.add_error('breeder', 'Selected breeder does not exist')
+            pedigree_form.add_error('breeder', 'Selected breeder does not exist.')
             pre_checks = False
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value()).exists() and pedigree_form['current_owner'].value() not in ['Current Owner', '', 'None', None]:
-            pedigree_form.add_error('current_owner', 'Selected owner does not exist')
+            pedigree_form.add_error('current_owner', 'Selected owner does not exist.')
             pre_checks = False
         try:
             if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['mother'].value().strip()).exists() and pedigree_form['mother'].value().strip() not in ['Mother', '', 'None', None]:
-                pedigree_form.add_error('mother', 'Selected mother does not exist')
+                pedigree_form.add_error('mother', 'Selected mother does not exist.')
                 pre_checks = False
         except AttributeError:
             # ends up here if a breed group is added, so pedigree_form['mother'] doesn't exist in the post request
             pass
         if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['father'].value().strip()).exists() and pedigree_form['father'].value() not in ['Father', '', 'None', None]:
-            pedigree_form.add_error('father', 'Selected father does not exist')
+            pedigree_form.add_error('father', 'Selected father does not exist.')
             pre_checks = False
         if not BreedGroup.objects.filter(account=attached_service, group_name=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
-            pedigree_form.add_error('breed_group', 'Selected breed group does not exist')
+            pedigree_form.add_error('breed_group', 'Selected breed group does not exist.')
             pre_checks = False
         if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
-            pedigree_form.add_error('breed', 'Selected breed does not exist')
+            pedigree_form.add_error('breed', 'Selected breed does not exist.')
             pre_checks = False
-
         if pedigree_form.is_valid() and pre_checks:
             new_pedigree = Pedigree()
             new_pedigree.creator = request.user
@@ -410,7 +409,27 @@ def new_pedigree_form(request):
 
 
             new_pedigree.save()
-            return redirect('pedigree', new_pedigree.id)
+            return HttpResponse(json.dumps({'result': 'success', 'ped_id': new_pedigree.id}))
+        # form invalid
+        else:
+            # variable to store form errors to be passed to template
+            errors = {}
+            if pedigree_form.errors:
+                errors['field_errors'] = []
+                errors['non_field_errors'] = []
+                
+                for field in pedigree_form:
+                    for error in field.errors:
+                        # add field label and error to dictionary
+                        errors['field_errors'].append({
+                            'field': field.label,
+                            'error': error
+                        })
+
+                for non_field_error in pedigree_form.non_field_errors():
+                    errors['non_field_errors'].append(non_field_error)
+            
+            return HttpResponse(json.dumps({'result': 'fail', 'errors': errors}))
     else:
         pedigree_form = PedigreeForm()
 
@@ -475,34 +494,34 @@ def edit_pedigree_form(request, id):
                 approvals = Approval.objects.filter(pedigree=pedigree)
                 for approval in approvals:
                     approval.delete()
-            return redirect('pedigree_search')
+            return HttpResponse()
 
         # check whether it's valid:
         if pedigree_form['reg_no'].value().strip() != pedigree.reg_no:
             if Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['reg_no'].value().strip()).exists():
-                pedigree_form.add_error('reg_no', 'Selected reg number already exists')
+                pedigree_form.add_error('reg_no', 'Selected reg number already exists.')
                 pre_checks = False
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
-            pedigree_form.add_error('breeder', 'Selected breeder does not exist')
+            pedigree_form.add_error('breeder', 'Selected breeder does not exist.')
             pre_checks = False
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value()).exists() and pedigree_form['current_owner'].value() not in ['Current Owner', '', 'None', None]:
-            pedigree_form.add_error('current_owner', 'Selected owner does not exist')
+            pedigree_form.add_error('current_owner', 'Selected owner does not exist.')
             pre_checks = False
         try:
             if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['mother'].value().strip()).exists() and pedigree_form['mother'].value() not in ['Mother', '', 'None', None]:
-                pedigree_form.add_error('mother', 'Selected mother does not exist')
+                pedigree_form.add_error('mother', 'Selected mother does not exist.')
                 pre_checks = False
         except AttributeError:
             # ends up here if a breed group is added, so pedigree_form['mother'] doesn't exist in the post request
             pass
         if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['father'].value().strip()).exists() and pedigree_form['father'].value() not in ['Father', '', 'None', None]:
-            pedigree_form.add_error('father', 'Selected father does not exist')
+            pedigree_form.add_error('father', 'Selected father does not exist.')
             pre_checks = False
         if not BreedGroup.objects.filter(account=attached_service, group_name=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
-            pedigree_form.add_error('breed_group', 'Selected breed group does not exist')
+            pedigree_form.add_error('breed_group', 'Selected breed group does not exist.')
             pre_checks = False
         if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
-            pedigree_form.add_error('breed', 'Selected breed does not exist')
+            pedigree_form.add_error('breed', 'Selected breed does not exist.')
             pre_checks = False
 
         if pedigree_form.is_valid() and image_form.is_valid() and pre_checks:
@@ -613,7 +632,27 @@ def edit_pedigree_form(request, id):
                     else:
                         image.delete()
 
-            return redirect('pedigree', pedigree.id)
+            return HttpResponse(json.dumps({'result': 'success'}))
+        # form invalid
+        else:
+            # variable to store form errors to be passed to template
+            errors = {}
+            if pedigree_form.errors:
+                errors['field_errors'] = []
+                errors['non_field_errors'] = []
+                
+                for field in pedigree_form:
+                    for error in field.errors:
+                        # add field label and error to dictionary
+                        errors['field_errors'].append({
+                            'field': field.label,
+                            'error': error
+                        })
+
+                for non_field_error in pedigree_form.non_field_errors():
+                    errors['non_field_errors'].append(non_field_error)
+            
+            return HttpResponse(json.dumps({'result': 'fail', 'errors': errors}))
     else:
         pedigree_form = PedigreeForm()
 

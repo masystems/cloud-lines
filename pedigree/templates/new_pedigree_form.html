@@ -8,20 +8,7 @@
     </div>
 {% endif %}
 <hr class="mt-0 mb-5">
-{% if pedigree_form.errors %}
-    {% for field in pedigree_form %}
-        {% for error in field.errors %}
-            <div class="alert alert-danger">
-                <strong>{{ field.label }}: {{ error }}</strong>
-            </div>
-        {% endfor %}
-    {% endfor %}
-    {% for error in pedigree_form.non_field_errors %}
-        <div class="alert alert-danger">
-            <strong>{{ error|escape }}</strong>
-        </div>
-    {% endfor %}
-{% endif %}
+<div id="errors" class="alert alert-danger d-none"></div>
 <div class="row">
     {% for hidden in pedigree_form.hidden_fields %}
         {{ hidden }}
