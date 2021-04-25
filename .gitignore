@@ -15,4 +15,3 @@ pangocairo-1.0
 zappa_settings.json
 testing/chromedriver
 data/*
-*/migrations/*

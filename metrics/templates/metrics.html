@@ -124,7 +124,7 @@
                                 </div>
                             </div>
                         </form>
-                        <h4 id="saMsg"></h4>
+                        <h5 id="saMsg"></h5>
                     </div>
                 </div>
             </div>
@@ -286,7 +286,7 @@
                             </tr>
                         </thead>
                         <tbody id="resultsTableBody">
-                        {% for item in sa_queue %}
+                        {% for item in sa_queue reversed %}
                             <tr>
                                 <td>{{ item.user.get_full_name }}</td>
                                 <td>Stud Advisor: {{ item.mother.reg_no }}</td>
@@ -306,7 +306,7 @@
 
 {% block footer %}
 <script>
-    var breed_mean_coi;
+
     $('#saBtn').click( function() {
         $.ajax({
             url: '{% url 'stud_advisor' %}',
@@ -315,10 +315,36 @@
             dataType: 'text',
             data: $('#saForm').serialize(),
             beforeSend: function() {
-                $('#saTbody').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+
+                $('#saMsg').html($('#sa_mother').val() + ' added to results queue below!');
+                var dt = new Date();
+                // month array
+                var month = new Array();
+                month[0] = "Jan";
+                month[1] = "Feb";
+                month[2] = "Mar";
+                month[3] = "Apr";
+                month[4] = "May";
+                month[5] = "Jun";
+                month[6] = "Jul";
+                month[7] = "Aug";
+                month[8] = "Sep";
+                month[9] = "Oct";
+                month[10] = "Nov";
+                month[11] = "Dec";
+                // am pm
+                var hours = dt.getHours();
+                var ampm = hours >= 12 ? ' p.m.' : ' a.m.';
+                // create time string
+                var datetime = dt.getDate() + " "
+                + (month[dt.getMonth()+1])  + " "
+                + dt.getFullYear() + ", "
+                + dt.getHours() + ":"
+                + dt.getMinutes() + ampm;
+                $('#resultsTable > tbody:last-child').prepend('<tr><td>{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td><i class="fas fa-cog fa-spin text-info"></i></td><td><button class="btn btn-info" disabled>View</button></td></tr>');
+
             },
             success: function(data, global) {
-
             }
         });
     });
