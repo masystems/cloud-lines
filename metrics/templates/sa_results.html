@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block header %}
+
+    <script src="{% static 'assets/plugins/jsPDF-1.3.2/dist/jspdf.min.js' %}"></script>
+    <script src="https://unpkg.com/jspdf-autotable"></script>
+{% endblock %}
+
+
+{% block content %}
+<style>
+    table th {
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+<!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Metrics</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'metrics' %}">Metrics</a></li>
+                <li class="breadcrumb-item active">Stud Advisor Results</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Stud Advisor</h3>
+                    <div id="pdfArea">
+                        <form id="saForm" class="pb-4">
+                            <div class="form-row align-items-center">
+                                <div class="col-md-3">
+                                    <div id="motherDetails">
+                                        <h4 class="card-title">{{ service.mother_title }} Details</h4>
+                                        <ul class="list-icons">
+                                            <li id="mdRegID"><i class="ti-angle-right"></i></li>
+                                            <li id="mdName"><i class="ti-angle-right"></i></li>
+                                            <li id="mdMeanKinship"><i class="ti-angle-right"></i></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div id="breedDetails">
+                                        <h4 class="card-title">Breed Details</h4>
+                                        <ul class="list-icons">
+                                            <li id="breedName"><i class="ti-angle-right"></i></li>
+                                            <li id="breedThreshold"><i class="ti-angle-right"></i></li>
+                                            <li id="breedMeanCoi"><i class="ti-angle-right"></i></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div>
+                            <p><i class='fad fa-circle' style='color:green'></i> This male would be a good match for the selected female, based on the close Mean-Kinship value of both individuals, and the offspring COI being no higher than the breed average COI.</p>
+                            <p><i class='fad fa-circle' style='color:orange'></i> This male may not be the first choice as a mate for the selected female, but it is still relatively close in terms of Mean-Kinship, and the COI of the offspring would be no higher than the breed average COI.</p>
+                            <p><i class='fad fa-circle' style='color:red'></i> This male would not be an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.</p>
+                        </div>
+
+                        <button id="pdfDownloadBtn" class="btn btn-dark mt-2 mb-2">Export to PDF</button>
+                        <table id="saTable" class="table table-bordered table-striped">
+                            <thead id="saHeadings">
+                                <tr>
+                                    <th scope="col" id="regNo">Reg No. <i class="fad fa-sort text-muted"></i></th>
+                                    <th scope="col" id="name">Name <i class="fad fa-sort text-muted"></i></th>
+                                    <th scope="col" id="meanKinship">Mean Kinship <i class="fad fa-sort text-muted"></i></th>
+                                    <th scope="col" id="kinship">COI of Offspring <i class="fad fa-sort text-muted"></i></th>
+                                    <th scope="col" id="score">Score <i class="fad fa-sort text-muted"></i></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="saTbody">
+                                {% for pedigree, values in stud_data.items %}
+                                <tr>
+                                    <td>{{ values.reg_no }}</td>
+                                    <td>{{ values.name }}</td>
+                                    <td>{{ values.mean_kinship }}</td>
+                                    <td>{{ values.kinship }}</td>
+                                    <td align='center'><p style="visibility: hidden;"><i class='fad fa-circle' style='visibility: visible;color:{{ values.color }}'></i>{{ values.color }}</p></td>
+                                    <td align='center'><a href='/pedigree/{{ values.id }}'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block footer %}
+<script>
+    $(document).ready(function() {
+        var fade = 1000
+        $('#mdRegID').hide().html('<i class="ti-angle-right"></i> {{ service.mother_title }}: ' + "{{ sa_queue_item.mother.reg_no }}").fadeIn(fade);
+        $('#mdName').hide().html('<i class="ti-angle-right"></i> Name: ' + "{{ sa_queue_item.mother.name }}").fadeIn(fade);
+        $('#mdMeanKinship').hide().html('<i class="ti-angle-right"></i> Mean Kinship: ' + "{{ mother_details.mk }}").fadeIn(fade);
+        $('#breedDetails').removeClass('d-none');
+        $('#breedName').hide().html('<i class="ti-angle-right"></i> Name: ' + "{{ sa_queue_item.mother.breed }}").fadeIn(fade);
+        $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Threshold: ' + "{{ mother_details.threshold }}").fadeIn(fade);
+        if ({{ mother_details.breed_mean_coi }} != "0.0000") {
+            $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat({{ mother_details.breed_mean_coi }}).toFixed(2))).fadeIn(fade);
+        } else {
+            $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + {{ mother_details.breed_mean_coi }}).fadeIn(fade);
+        }
+    });
+
+
+
+    var table = $('#saTable');
+    $('#regNo, #name, #meanKinship, #kinship, #score')
+        .wrapInner('<span title="sort this column"/>')
+        .each(function(){
+
+            var th = $(this),
+                thIndex = th.index(),
+                inverse = false;
+
+            th.click(function(){
+
+                table.find('td').filter(function(){
+
+                    return $(this).index() === thIndex;
+
+                }).sortElements(function(a, b){
+
+                    return $.text([a]) > $.text([b]) ?
+                        inverse ? -1 : 1
+                        : inverse ? 1 : -1;
+
+                }, function(){
+
+                    // parentNode is the element we want to move
+                    return this.parentNode;
+
+                });
+
+                inverse = !inverse;
+
+            });
+
+        });
+</script>
+<script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
+
+<script>
+    $('#pdfDownloadBtn').click( function() {
+        pdf = new jsPDF('p', 'pt', [612, 791]);
+
+        //header
+        pdf.setTextColor(40)
+        pdf.setFontStyle('normal')
+        // if (base64Img) {
+        //     doc.addImage(base64Img, 'JPEG', data.settings.margin.left, 15, 10, 10)
+        // }
+        pdf.setFontSize(12);
+        pdf.text(35, 20, " Mother Details");
+        pdf.setFontSize(10);
+        pdf.text(35, 35, $('#mdRegID').text());
+        pdf.text(35, 50, $('#mdName').text());
+        pdf.text(35, 65, $('#mdMeanKinship').text());
+
+        pdf.setFontSize(12);
+        pdf.text(300, 20, " Breed Details");
+        pdf.setFontSize(10);
+        pdf.text(300, 35, $('#breedName').text());
+        pdf.text(300, 50, $('#breedThreshold').text());
+        pdf.text(300, 65, $('#breedMeanCoi').text());
+
+        pdf.setFontSize(10);
+        pdf.setLineWidth(0.1);
+
+        pdf.setFillColor(0, 255, 0)
+        pdf.circle(35, 76, 4, 'F');
+        pdf.text(45, 80, "Good match, close Mean-Kinship value, and the offspring COI being no higher than the breed average COI.")
+
+        pdf.setFillColor(255, 165, 0)
+        pdf.circle(35, 88, 4, 'F');
+        pdf.text(45, 92, "Not the first choice, relatively close in terms of Mean-Kinship, COI of offspring lower than the breed average COI.")
+
+        pdf.setFillColor(255, 0, 0)
+        pdf.circle(35, 100, 4, 'F');
+        pdf.text(45, 104, "Not an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.")
+
+        //body
+        var rows = []
+        $('#saTable > tbody  > tr').each(function() {
+            rows.push([$(this).find("td").eq(0).html(),
+                $(this).find("td").eq(1).html(),
+                $(this).find("td").eq(2).html(),
+                $(this).find("td").eq(3).html(),
+                $(this).find("td").eq(4).html()])
+        })
+        pdf.autoTable({head: [['Reg No.', 'Name', 'Mean Kinship', 'COI of Offspring', 'Score']],
+            body: rows,
+            startY: 115,
+            theme: 'striped',
+
+            didParseCell: function(data) {
+                if (data.section === 'head') {
+                    data.cell.styles.fillColor = [21,136,138];
+                  }
+                if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
+                    data.cell.text = "";
+                }
+            },
+            didDrawCell: function(data) {
+                if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
+                    // cell.raw contains the cell data
+                    if (data.cell.raw.indexOf('green') >= 0) {
+                        pdf.setFillColor(0, 255, 0)
+                        pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
+                    } else if (data.cell.raw.indexOf('orange') >= 0) {
+                        pdf.setFillColor(255, 165, 0)
+                        pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
+                    } else if (data.cell.raw.indexOf('red') >= 0) {
+                        pdf.setFillColor(255, 0, 0)
+                        pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
+                    } else {
+                        pdf.setFillColor(255, 0, 0)
+                        pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
+                    }
+                  }
+            },
+            didDrawPage: function (data) {
+                pdf.setTextColor(40)
+                pdf.setFontStyle('normal')
+
+                // Footer
+                var str = 'Page ' + pdf.internal.getNumberOfPages() + " | Stud adviser metrics generated by "
+
+                pdf.setFontSize(10)
+
+                var pageSize = pdf.internal.pageSize
+                var pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight()
+                pdf.text(str, data.settings.margin.left, pageHeight - 10)
+                pdf.setFontSize(12)
+                pdf.setFontType("bold");
+                pdf.setTextColor(21,136,138)
+                pdf.textWithLink('cloud-lines.com', data.settings.margin.left + 195, pageHeight - 10, { url: 'https://cloud-lines.com' });
+            },
+        });
+
+        pdf.save($('#mdRegID').text());
+    });
+</script>
+
+{% endblock %}

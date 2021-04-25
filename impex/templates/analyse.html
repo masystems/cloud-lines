@@ -31,14 +31,42 @@
                     <div id="errors" class="d-none alert alert-danger"></div>
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs profile-tab" role="tablist">
-                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#pedigrees" role="tab">Pedigrees</a> </li>
-                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#breeders" role="tab">Breeders/Owners</a> </li>
+                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#breeders" role="tab">Breeders/Owners</a> </li>
+                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#pedigrees" role="tab">Pedigrees</a> </li>
                     </ul>
                     <!-- Tab panes -->
                     <div class="tab-content">
-                        <div class="tab-pane active" id="pedigrees" role="tabpanel">
+                        <div class="tab-pane  active" id="breeders" role="tabpanel">
                             <div class="card-body">
-                                <form action="{% url 'import_pedigree_data' %}" method="POST" enctype="multipart/form-data">
+                                <form action="{% url 'import_breeder_data' %}" method="POST" enctype="multipart/form-data" id="breeders-form">
+                                    {% csrf_token %}
+                                        {% for breeder_heading in breeder_headings %}
+                                            {% if breeder_heading.verbose_name != None %}
+                                                <div class="row mx-lg-n5">
+                                                    <div class="col bg-light border">
+                                                        <p class="mt-2"><strong>{{ breeder_heading.verbose_name|title }}</strong></p>
+                                                        <p><small>{{ breeder_heading.help_text }}</small></p>
+                                                    </div>
+                                                    <div class="col bg-light border">
+                                                        <div class="dropdown bootstrap-select mb-3 mr-2">
+                                                            <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-99">
+                                                                    <option data-tokens="" selected>---</option>
+                                                                    {% for imported_heading in imported_headings %}
+                                                                        <option data-tokens="{{ breeder_heading.name }}">{{ imported_heading }}</option>
+                                                                    {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    <button id="import-breeders" class="btn btn-block btn-outline-info">Import Data</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="pedigrees" role="tabpanel">
+                            <div class="card-body">
+                                <form action="{% url 'import_pedigree_data' %}" method="POST" enctype="multipart/form-data" id="pedigrees-form">
                                     {% csrf_token %}
                                     {% for pedigree_heading in pedigree_headings %}
                                         {% if pedigree_heading.verbose_name != None %}
@@ -49,7 +77,7 @@
                                                 </div>
                                                 <div class="col bg-light border">
                                                     <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                        <select class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-98">
+                                                        <select id="select-{{ pedigree_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-98">
                                                                 <option data-tokens="" selected>---</option>
                                                                 {% for imported_heading in imported_headings %}
                                                                     <option data-tokens="{{ pedigree_heading.name }}">{{ imported_heading }}</option>
@@ -78,35 +106,15 @@
                                             </div>
                                         </div>
                                     {% endfor %}
-                                    <button class="btn btn-block btn-outline-info">Import Data</button>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="breeders" role="tabpanel">
-                            <div class="card-body">
-                                <form action="{% url 'import_breeder_data' %}" method="POST" enctype="multipart/form-data" id="breeders-form">
-                                    {% csrf_token %}
-                                        {% for breeder_heading in breeder_headings %}
-                                            {% if breeder_heading.verbose_name != None %}
-                                                <div class="row mx-lg-n5">
-                                                    <div class="col bg-light border">
-                                                        <p class="mt-2"><strong>{{ breeder_heading.verbose_name|title }}</strong></p>
-                                                        <p><small>{{ breeder_heading.help_text }}</small></p>
-                                                    </div>
-                                                    <div class="col bg-light border">
-                                                        <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                            <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-99">
-                                                                    <option data-tokens="" selected>---</option>
-                                                                    {% for imported_heading in imported_headings %}
-                                                                        <option data-tokens="{{ breeder_heading.name }}">{{ imported_heading }}</option>
-                                                                    {% endfor %}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    <button id="import-breeders" class="btn btn-block btn-outline-info">Import Data</button>
+                                    <!-- don't show import button if there are no breeds -->
+                                    {% if has_breeds %}
+                                        <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
+                                    {% else %}
+                                        <div class="alert alert-danger">
+                                            You need to create a breed from the <a href="{% url 'breeds' %}">Breed</a> page before you can import your pedigrees.
+                                        </div>
+                                    {% endif %}
+                                    <input type="hidden" name="update" value="no" id="update">
                                 </form>
                             </div>
                         </div>
@@ -119,6 +127,9 @@
     </div>
 </div>
 
+<!-- modal to check that user wants to update existing pedigrees -->
+{% include 'update_modal.html' %}
+
 {% endblock %}
 
 {% block footer %}
@@ -126,6 +137,167 @@
 <!-- importing data data -->
 <script>
     // importing pedigrees
+    $('#import-pedigrees').click( function(e){
+        e.preventDefault();
+
+        // check required headings have been matched
+        if ( ($('#select-reg_no').val() == '---') || ($('#select-sex').val() == '---') || ($('#select-breeder').val() == '---') || ($('#select-status').val() == '---') ) {
+            if ($('#select-reg_no').val() == '---') {
+                errorMsg("You must match Registration Number!");
+            }
+            if ($('#select-sex').val() == '---') {
+                errorMsg("You must match Sex!");
+            }
+            if ($('#select-breeder').val() == '---') {
+                errorMsg("You must match Breeder!");
+            }
+            if ($('#select-status').val() == '---') {
+                errorMsg("You must match Status!");
+            }
+            if (('{{ breed_required }}' == 'yes') && (($('#select-breed').val() == '---'))) {
+                errorMsg("You must match Breed!");
+            }
+        } else {
+            $.ajax({
+                url: "{% url 'import_pedigree_data' %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#pedigrees-form').serialize(),
+                success: function(data) {
+                    var result = JSON.parse(data);
+                    if (result.result == 'success') {
+                        // redirect to breeders page
+                        window.location.replace("{% url 'pedigree_search' %}");
+                    } else if (result.result == 'existing') {
+                        // warn users that they're about to change existing pedigrees
+                        // list the existing pedigrees
+                        var pedigreesHtml = "";
+                        if (result.existing) {
+                            pedigreesHtml = '<ul>';
+
+                            result.existing.forEach( existingPed => {
+                                if (existingPed.name.length > 0) {
+                                    pedigreesHtml = pedigreesHtml + '<li>' + existingPed.name + ' with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
+                                } else {
+                                    pedigreesHtml = pedigreesHtml + '<li>Pedigree with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
+                                }
+                            });
+
+                            pedigreesHtml = pedigreesHtml + '</ul>';
+
+                            $('#pedigrees-list').html(pedigreesHtml);
+                        }
+
+                        // pass in each created object to be deleted if cancel is clicked
+                        if (result.created.length > 0) {
+                            var createdHtml = '';
+                            result.created.forEach( id => {
+                                createdHtml = createdHtml + id + ',';
+                            });
+                            $('#created').html(createdHtml);
+                        }
+                        // display modal
+                        $('#update-modal').modal('show');
+                    } else {
+                        errorMsg("Your data had errors!");
+                        $('#errors').removeClass('d-none');
+
+                        // create html to display what fields were erroneous
+                        var errorHtml = "";
+                        if (result.errors) {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+
+                            // go through missing fields
+                            if (result.errors.missing.length > 0) {
+                                errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
+
+                                result.errors.missing.forEach( missingField => {
+                                    if (missingField.name.length > 0) {
+                                        errorHtml = errorHtml + '<li>' + missingField.col + ' for pedigree named ' + missingField.name + ' (row ' + missingField.row + ')</li>';
+                                    } else {
+                                        errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
+                                    }
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+
+                            // go through invalid fields
+                            if (result.errors.invalid.length > 0) {
+                                errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
+
+                                result.errors.invalid.forEach( invalidField => {
+                                    if (invalidField.name.length > 0) {
+                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' for pedigree named ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                    } else {
+                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                    }
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+                        }
+                        $('#errors').html(errorHtml);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
+        }
+    })
+
+    // update modal - cancel button clicked
+    $('#modal-cancel').click( function(e){
+        $.ajax({
+            url: "{% url 'import_pedigree_data' %}",
+            type: 'post',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            // pass in ids of created objects to be deleted
+            data: {'created': $('#created').html()},
+            // hide modal on success, when created objects have been deleted
+            success: function(data) { $('#update-modal').modal('hide'); },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
+    })
+
+    // update modal - update button clicked
+    $('#modal-update').click( function(e){
+        // set hidden input to indicate user confirms update
+        $('#update').val('yes');
+
+        $.ajax({
+            url: "{% url 'import_pedigree_data' %}",
+            type: 'post',
+            dataType: 'text',
+            data: $('#pedigrees-form').serialize(),
+            success: function(data) {
+                // redirect to breeders page
+                window.location.replace("{% url 'pedigree_search' %}");
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
+    })
 
     // importing breeders
     $('#import-breeders').click( function(e){

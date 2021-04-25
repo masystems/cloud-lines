@@ -80,7 +80,7 @@
 <!-- ============================================================== -->
 
 <!-- Confirm submission moal -->
-<div class="modal fade confirmForm" tabindex="-1" role="dialog" aria-labelledby="confirmForm" aria-hidden="true" style="display: none;">
+<div id="save_ped_modal" class="modal fade confirmForm" tabindex="-1" role="dialog" aria-labelledby="confirmForm" aria-hidden="true" style="display: none;">
      <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -114,7 +114,7 @@
                 <div class="form-body">
                     <h3 class="box-title">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Info</h3>
                     <hr class="mt-0 mb-5">
-                    {% if pedigree_form.errors %}
+                    <!-- {% if pedigree_form.errors %}
                         {% for field in pedigree_form %}
                             {% for error in field.errors %}
                                 <div class="alert alert-danger">
@@ -127,7 +127,8 @@
                                 <strong>{{ error|escape }}</strong>
                             </div>
                         {% endfor %}
-                    {% endif %}
+                    {% endif %} -->
+                    <div id="errors" class="alert alert-danger d-none"></div>
                     <div class="row">
                         {% for hidden in pedigree_form.hidden_fields %}
                             {{ hidden }}
@@ -180,6 +181,12 @@
                                                 <small>Leave blank if using a breed group</small>
                                             {% endif %}
                                         </div>
+                                        <!-- hidden note which will show name of mother if reg number has a match -->
+                                        <ul class="list-icons d-none" id="mother-info">
+                                            <li class="text-muted">
+                                                <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="mother-name"></span>
+                                            </li>
+                                        </ul>
                                     {% elif field.label == 'Mother notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_mother_notes %}
                                     {% elif field.label == 'Breed group' %}
@@ -190,8 +197,14 @@
                                         {% endif %}
                                     {% elif field.label == 'Father' %}
                                         <div id="fathers">
-                                            <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_father != None %}{{ pedigree.parent_father }}{% endif %}">
+                                            <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_father != None %}{{ pedigree.parent_father }}{% endif %}">
                                         </div>
+                                        <!-- hidden note which will show name of mother if reg number has a match -->
+                                        <ul class="list-icons d-none" id="father-info">
+                                            <li class="text-muted">
+                                                <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="father-name"></span>
+                                            </li>
+                                        </ul>
                                     {% elif field.label == 'Father notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_father_notes %}
 
@@ -407,16 +420,102 @@
 
 {% block footer %}
 
+    <!-- javascript to display mother/father name -->
+    {% include 'parent_info.html' %}
+
     <script>
-        $('.confirmSaveBtn').click(function () {
-            $('#editPedigreeForm').submit();
+        $('.confirmSaveBtn').click(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{% url 'edit_pedigree_form' pedigree.id %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#editPedigreeForm').serialize(),
+                success: function(data) {
+                    var result = JSON.parse(data);
+                    if (result.result == 'success') {
+                        // redirect to pedigree page
+                        window.location.replace("{% url 'pedigree' pedigree.id %}");
+                    } else {
+                        // create html to display what fields were erroneous
+                        var errorHtml = "";
+                        if (result.errors) {
+                            errorHtml = errorHtml + '<h5 class="text-danger">Your form had the following errors:</h5>';
+                            console.log(Object.keys(result.errors.field_errors).length)
+                            // go through field errors
+                            if (Object.keys(result.errors.field_errors).length > 0) {
+                                errorHtml = errorHtml + '<br/><ul>';
+
+                                // add each field and error to the errors
+                                result.errors.field_errors.forEach( error => {
+                                    errorHtml = errorHtml + '<li>' + error.field + ': ' + error.error + '</li>';
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+
+                            // go through invalid fields
+                            if (result.errors.non_field_errors.length > 0) {
+                                errorHtml = errorHtml + '<br/><ul>';
+
+                                result.errors.non_field_errors.forEach( error => {
+                                    errorHtml = errorHtml + '<li>' + error + '</li>';
+                                });
+
+                                errorHtml = errorHtml + '</ul>';
+                            }
+                        }
+                        // add html to section
+                        $('#errors').html(errorHtml);
+
+                        // display errors section
+                        $('#errors').removeClass('d-none');
+
+                        // remove modal
+                        $('#save_ped_modal').modal('hide');
+                        
+                        // display error message
+                        errorMsg("Your form had errors!");
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
         });
-        $('.confirmDeleteBtn').click(function () {
+        $('.confirmDeleteBtn').click(function (e) {
+            e.preventDefault();
+
             var input = $("<input>")
                 .attr("name", "delete")
                .attr("type", "hidden").val("delete");
             $('#editPedigreeForm').append(input);
-            $('#editPedigreeForm').submit();
+
+            //$('#editPedigreeForm').submit();
+            $.ajax({
+                url: "{% url 'edit_pedigree_form' pedigree.id %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#editPedigreeForm').serialize(),
+                success: function(data) {
+                    // redirect to pedigree search page
+                    window.location.replace("{% url 'pedigree_search' %}");
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
         });
     </script>
 

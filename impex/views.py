@@ -141,10 +141,21 @@ def importx(request):
             for field in custom_fields:
                 custom_field_names.append(field['fieldName'])
 
+            # see if any breeds have been set up
+            has_breeds = Breed.objects.filter(account=attached_service).count() > 0
+
+            # breed is required if org account with multiple breeds
+            if attached_service.service.service_name == 'Organisation' and Breed.objects.filter(account=attached_service).count() > 1:
+                breed_required = 'yes'
+            else:
+                breed_required = 'no'
+
             return render(request, 'analyse.html', {'imported_headings': imported_headings,
                                                     'pedigree_headings': pedigree_headings,
                                                     'breeder_headings': breeder_headings,
-                                                    'custom_fields': custom_field_names})
+                                                    'custom_fields': custom_field_names,
+                                                    'has_breeds': has_breeds,
+                                                    'breed_required': breed_required})
         return render(request, 'import.html')
     else:
         return redirect('dashboard')
@@ -154,276 +165,542 @@ def importx(request):
 @user_passes_test(is_editor)
 def import_pedigree_data(request):
     if request.method == 'POST':
-        attached_service = get_main_account(request.user)
-        db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
-        decoded_file = db.database.file.read().decode('utf-8').splitlines()
-        database_items = csv.DictReader(decoded_file)
-        date_fields = ['date_of_registration', 'dob', 'dod']
-        post_data = {}
-        
-        # get custom fields of account
-        try:
-            acc_custom_fields = loads(attached_service.custom_fields)
-        except json.decoder.JSONDecodeError:
-            acc_custom_fields = {}
-        # get names of custom fields
-        field_names = []
-        for key, field in acc_custom_fields.items():
-            field_names.append(field['fieldName'])
-        custom_fields_in = []
+        # check if this is import or cancel - created not passed in if it's import
+        if 'created' not in request.POST.keys():
+            attached_service = get_main_account(request.user)
+            db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
+            decoded_file = db.database.file.read().decode('utf-8').splitlines()
+            database_items = csv.DictReader(decoded_file)
+            date_fields = ['date_of_registration', 'dob', 'dod']
+            post_data = {}
 
-        # iterate through columns
-        for key, val in request.POST.items():
-            # add custom field columns
-            if key in field_names:
-                custom_fields_in.append(key)
-            
-            # remove blank ('---') entries ###################
-            elif val == '---':
-                if key in date_fields:
-                    post_data[key] = None
-                post_data[key] = ''
-            else:
-                post_data[key] = val
-
-        # get all options ###################
-        breeder = post_data['breeder'] or ''
-        current_owner = post_data['current_owner'] or ''
-        breed = post_data['breed'] or ''
-        reg_no = post_data['reg_no'] or ''
-        tag_no = post_data['tag_no'] or ''
-        name = post_data['name'] or ''
-        description = post_data['description'] or ''
-        date_of_registration = post_data['date_of_registration'] or ''
-        dob = post_data['dob'] or ''
-        dod = post_data['dod'] or ''
-        sex = post_data['sex'] or ''
-        born_as = post_data['born_as'] or ''
-        status = post_data['status'] or ''
-        father = post_data['parent_father'] or ''
-        father_notes = post_data['parent_father_notes'] or ''
-        mother = post_data['parent_mother'] or ''
-        mother_notes = post_data['parent_mother_notes'] or ''
-
-        for row in database_items:
-            # create breeder if it doesn't exist ###################
+            # get custom fields of account
             try:
-                if row[breeder] not in ('', None):
-                    breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                acc_custom_fields = loads(attached_service.custom_fields)
+            except json.decoder.JSONDecodeError:
+                acc_custom_fields = {}
+            # get names of custom fields
+            field_names = []
+            for key, field in acc_custom_fields.items():
+                field_names.append(field['fieldName'])
+            custom_fields_in = []
+
+            # iterate through columns
+            for key, val in request.POST.items():
+                # add custom field columns
+                if key in field_names:
+                    custom_fields_in.append(key)
+                
+                # remove blank ('---') entries ###################
+                elif val == '---':
+                    if key in date_fields:
+                        post_data[key] = None
+                    post_data[key] = ''
                 else:
-                    breeder_obj = None
-            except KeyError:
-                breeder_obj = None
+                    post_data[key] = val
 
-            # create current owner if it doesn't exist ###################
-            try:
-                if row[current_owner] not in ('', None):
-                    current_owner_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[current_owner].rstrip())
+            # get all options ###################
+            breeder = post_data['breeder'] or ''
+            current_owner = post_data['current_owner'] or ''
+            breed = post_data['breed'] or ''
+            reg_no = post_data['reg_no'] or ''
+            tag_no = post_data['tag_no'] or ''
+            name = post_data['name'] or ''
+            description = post_data['description'] or ''
+            date_of_registration = post_data['date_of_registration'] or ''
+            dob = post_data['dob'] or ''
+            dod = post_data['dod'] or ''
+            sex = post_data['sex'] or ''
+            born_as = post_data['born_as'] or ''
+            status = post_data['status'] or ''
+            father = post_data['parent_father'] or ''
+            father_notes = post_data['parent_father_notes'] or ''
+            mother = post_data['parent_mother'] or ''
+            mother_notes = post_data['parent_mother_notes'] or ''
+
+            # errors is a dictionary to keep track of missing and invalid fields
+            errors = {}
+            # only mandatory fields are added to 
+            errors['missing'] = []
+            # only fields that need to be in a certain format are added to invalid fields
+            errors['invalid'] = []
+
+            # existing pedigrees can be added, but with a warning
+            existing = []
+
+            # list to store created objects so they can be deleted if there are errors
+            created_objects = []
+
+            row_number = 1
+            for row in database_items:
+                row_number += 1
+                
+                # variable to store pedigree name or empty string
+                if name:
+                    ped_name = row[name]
                 else:
-                    current_owner_obj = None
-            except KeyError:
-                current_owner_obj = None
-
-            # get or create parents ###################
-            def get_or_create_parent(parent):
-                if parent not in ('', None):
-                    if Pedigree.objects.filter(account=attached_service, reg_no=parent).count() <= 1:
-                        pedigree_object, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=parent)
-                        return pedigree_object
-                    else:
-                        return Pedigree.objects.filter(account=attached_service, reg_no=parent).first()
-                else:
-                    return None
-
-            try:
-                father_obj = get_or_create_parent(row[father])
-            except KeyError:
-                father_obj = None
-
-            try:
-                mother_obj = get_or_create_parent(row[mother])
-            except KeyError:
-                mother_obj = None
-
-            # convert dates ###################
-            def convert_date(date):
-                from django.utils.dateparse import parse_date
-                if date not in ('', None):
-                    try:
-                        date = datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                    try:
-                        date = datetime.strptime(date, '%y-%m-%d').strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                    try:
-                        date = datetime.strptime(date, '%d-%m-%y').strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                    try:
-                        date = datetime.strptime(date, '%d-%m-%Y').strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                    try:
-                        date = datetime.strptime(date, '%Y/%m/%d').strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                    try:
-                        date = datetime.strptime(date, '%y/%m/%d').strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                    try:
-                        date = datetime.strptime(date, '%d/%m/%y').strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                    try:
-                        date = datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                    return parse_date(date)
-                else:
-                    return None
-
-            try:
-                date_of_registration_converted = convert_date(row[date_of_registration])
-            except KeyError:
-                date_of_registration_converted = None
-
-            try:
-                dob_converted = convert_date(row[dob])
-            except KeyError:
-                dob_converted = None
-
-            try:
-                dod_converted = convert_date(row[dod])
-            except KeyError:
-                dod_converted = None
-
-            # create each new pedigree ###################
-            pedigree, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=row[reg_no].strip())
-            pedigree.creator = request.user
-            try:
-                pedigree.breeder = breeder_obj
-            except ValueError:
-                pass
-            except UnboundLocalError:
-                pass
-            #############################
-            try:
-                pedigree.current_owner = current_owner_obj
-            except ValueError:
-                pass
-            except UnboundLocalError:
-                pass
-            #############################
-            try:
-                pedigree.tag_no = row[tag_no]
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.name = row[name]
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.description = row[description]
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.date_of_registration = date_of_registration_converted
-            except ValidationError:
-                pass
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.dob = dob_converted
-            except ValidationError:
-                pass
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.dod = dod_converted
-            except ValidationError:
-                pass
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.sex = row[sex]
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.born_as = row[born_as]
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.status = row[status]
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.parent_father = father_obj
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.parent_mother = mother_obj
-            except KeyError:
-                pass
-            #############################
-            try:
-                pedigree.parent_father_notes = row[father_notes]
-            except KeyError:
-                pedigree.parent_father_notes = ''
-            #############################
-            try:
-                pedigree.parent_mother_notes = row[mother_notes]
-            except KeyError:
-                pedigree.parent_mother_notes = ''
-            #############################
-
-            # create breed if it doesn't exist ###################
-
-            if attached_service.service.service_name != 'Organisation':
-                if Breed.objects.filter(account=attached_service).count() == 0:
-                    breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
-                else:
-                    breed_obj = Breed.objects.filter(account=attached_service).first()
-
-            elif breed != '---':
+                    ped_name = ''
+                
+                # get breeder. error if breeder doesn't exist or missing ###################
                 try:
-                    breed_obj, created = Breed.objects.get_or_create(account=attached_service, breed_name=row[breed])
-                    #print(created)
+                    if row[breeder] not in ('', None):
+                        breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                        # error if breeder doesn't exist
+                        if not breeder_obj.exists():
+                            errors['invalid'].append({
+                                'col': 'Breeder',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
+                            })
+                        # get the breeder
+                        else:
+                            breeder_obj = breeder_obj.first()
+                    else:
+                        breeder_obj = None
+                        # error if missing
+                        errors['missing'].append({
+                            'col': 'Breeder',
+                            'row': row_number,
+                            'name': ped_name
+                        })
                 except KeyError:
+                    breeder_obj = None
+
+                # get current owner - error if if it doesn't exist ###################
+                try:
+                    if row[current_owner] not in ('', None):
+                        current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[current_owner].rstrip())
+                        # error if owner doesn't exist
+                        if not current_owner_obj.exists():
+                            errors['invalid'].append({
+                                'col': 'Current Owner',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
+                            })
+                    else:
+                        current_owner_obj = None
+                except KeyError:
+                    current_owner_obj = None
+
+                # get or create pedigrees ###################
+                def get_or_create_pedigree(pedigree, is_parent):
+                    if pedigree not in ('', None):
+                        if Pedigree.objects.filter(account=attached_service, reg_no=pedigree).count() < 1:
+                            # pedigree doesn't exist, so create one
+                            pedigree_obj =  Pedigree.objects.create(account=attached_service, reg_no=pedigree)
+                            created_objects.append(pedigree_obj)
+                            return pedigree_obj
+                        else:
+                            # if user has confirmed updates, update existing pedigree, or the pedigree is also a parent that was created because none existed
+                            if request.POST.get('update') == 'yes' or is_parent or not Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first().breeder:
+                                # pedigree does exist, so get it
+                                return Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first()
+                            else:
+                                return None
+                    else:
+                        return None
+
+                try:
+                    father_obj = get_or_create_pedigree(row[father], True)
+                except KeyError:
+                    father_obj = None
+
+                try:
+                    mother_obj = get_or_create_pedigree(row[mother], True)
+                except KeyError:
+                    mother_obj = None
+
+                # convert dates ###################
+                def convert_date(date):
+                    from django.utils.dateparse import parse_date
+                    if date not in ('', None):
+                        try:
+                            date = datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
+                        except ValueError:
+                            pass
+                        try:
+                            date = datetime.strptime(date, '%y-%m-%d').strftime('%Y-%m-%d')
+                        except ValueError:
+                            pass
+                        try:
+                            date = datetime.strptime(date, '%d-%m-%y').strftime('%Y-%m-%d')
+                        except ValueError:
+                            pass
+                        try:
+                            date = datetime.strptime(date, '%d-%m-%Y').strftime('%Y-%m-%d')
+                        except ValueError:
+                            pass
+                        try:
+                            date = datetime.strptime(date, '%Y/%m/%d').strftime('%Y-%m-%d')
+                        except ValueError:
+                            pass
+                        try:
+                            date = datetime.strptime(date, '%y/%m/%d').strftime('%Y-%m-%d')
+                        except ValueError:
+                            pass
+                        try:
+                            date = datetime.strptime(date, '%d/%m/%y').strftime('%Y-%m-%d')
+                        except ValueError:
+                            pass
+                        try:
+                            date = datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        except ValueError:
+                            pass
+                        return parse_date(date)
+                    else:
+                        return None
+
+                try:
+                    date_of_registration_converted = convert_date(row[date_of_registration])
+                except KeyError:
+                    date_of_registration_converted = None
+
+                try:
+                    dob_converted = convert_date(row[dob])
+                except KeyError:
+                    dob_converted = None
+
+                try:
+                    dod_converted = convert_date(row[dod])
+                except KeyError:
+                    dod_converted = None
+                ############################# reg_no
+                if row[reg_no] == '':
+                    errors['missing'].append({
+                        'col': 'Registration Number',
+                        'row': row_number,
+                        'name': ped_name
+                    })
+
+                # create each new pedigree if no errors found in file ###################
+                if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+                    # add to existing if this pedigree already exists, and if it's not a parent that was created because it didn't exist
+                    if Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).count() > 0 and Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).first().breeder:
+                        existing.append({
+                            'row': row_number,
+                            'name': ped_name,
+                            'reg_no': row[reg_no]
+                        })
+                    
+                    # get or create pedigree
+                    pedigree = get_or_create_pedigree(row[reg_no], False)
+
+                try:
+                    pedigree.creator = request.user
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                
+                try:
+                    pedigree.breeder = breeder_obj
+                except ValueError:
+                    pass
+                except UnboundLocalError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# owner
+                try:
+                    pedigree.current_owner = current_owner_obj
+                except ValueError:
+                    pass
+                except UnboundLocalError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# tag_no
+                try:
+                    pedigree.tag_no = row[tag_no]
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# name
+                try:
+                    pedigree.name = row[name]
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# description
+                try:
+                    pedigree.description = row[description]
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# dor
+                try:
+                    pedigree.date_of_registration = date_of_registration_converted
+                except ValidationError:
+                    pass
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# dob
+                try:
+                    pedigree.dob = dob_converted
+                except ValidationError:
+                    pass
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# dod
+                try:
+                    pedigree.dod = dod_converted
+                except ValidationError:
+                    pass
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# sex
+                try:
+                    # if sex given
+                    if row[sex] != '':
+                        # if it's valid, save it
+                        if row[sex].lower() in ('male', 'female', 'castrated'):
+                            pedigree.sex = row[sex]
+                        # invalid, so add error
+                        else:
+                            errors['invalid'].append({
+                                'col': 'Sex',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
+                            })
+                            # delete pedigree if one was created
+                            if pedigree.id:
+                                pedigree.delete()
+                    # error if missing
+                    else:
+                        errors['missing'].append({
+                            'col': 'Sex',
+                            'row': row_number,
+                            'name': ped_name
+                        })
+                        # delete pedigree if one was created
+                        if pedigree.id:
+                            pedigree.delete()
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# born as
+                try:
+                    # if born_as given
+                    if row[born_as] != '':
+                        # if it's valid, save it
+                        if row[born_as].lower() in ('single', 'twin', 'triplet', 'quad'):
+                            pedigree.born_as = row[born_as]
+                        # invalid, so add error
+                        else:
+                            errors['invalid'].append({
+                                'col': 'Born As',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
+                            })
+                            # delete pedigree if one was created
+                            if pedigree.id:
+                                pedigree.delete()
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# status
+                try:
+                    # if status given
+                    if row[status] != '':
+                        # if it's valid, save it
+                        if row[status].lower() in ('dead', 'alive', 'unknown'):
+                            pedigree.status = row[status]
+                        # invalid, so add error
+                        else:
+                            errors['invalid'].append({
+                                'col': 'Status',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': 'the input for status, if given, must be one of "dead", "alive", or "unknown"'
+                            })
+                            # delete pedigree if one was created
+                            if pedigree.id:
+                                pedigree.delete()
+                    # error if missing
+                    else:
+                        errors['missing'].append({
+                            'col': 'Status',
+                            'row': row_number,
+                            'name': ped_name
+                        })
+                        # delete pedigree if one was created
+                        if pedigree.id:
+                            pedigree.delete()
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# father
+                try:
+                    pedigree.parent_father = father_obj
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# mother
+                try:
+                    pedigree.parent_mother = mother_obj
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# father notes
+                try:
+                    pedigree.parent_father_notes = row[father_notes]
+                except KeyError:
+                    try:
+                        pedigree.parent_father_notes = ''
+                    except AttributeError:
+                        pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                ############################# mother notes
+                try:
+                    pedigree.parent_mother_notes = row[mother_notes]
+                except KeyError:
+                    try:
+                        pedigree.parent_mother_notes = ''
+                    except AttributeError:
+                        pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                #############################
+
+                #################### breed
+                # not organisation
+                if attached_service.service.service_name != 'Organisation':
+                    breed_obj = Breed.objects.filter(account=attached_service).first()
+                    # error if given breed doesn't match account breed, if given
+                    if breed != '':
+                        if breed_obj.breed_name != row[breed] and row[breed] != '':
+                            errors['invalid'].append({
+                                'col': 'Breed',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
+                            })
+                # organisation
+                elif breed != '---':
+                    try:
+                        # check if breed exists
+                        if Breed.objects.filter(account=attached_service, breed_name=row[breed]).count() > 0:
+                            breed_obj = Breed.objects.filter(account=attached_service, breed_name=row[breed]).first()
+                        # error if breed not been created
+                        else:
+                            breed_obj = None
+                            if row[breed] != '':
+                                errors['invalid'].append({
+                                    'col': 'Breed',
+                                    'row': row_number,
+                                    'name': ped_name,
+                                    'reason': 'the input for breed must be one of the breeds created for your account - you can create more breeds via the <a href="/breeds">Breed</a> page'
+                                })
+                    except KeyError:
+                        breed_obj = None
+                else:
                     breed_obj = None
+
+                try:
+                    pedigree.breed = breed_obj
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+
+                ############################# custom
+                for cf_col in custom_fields_in:
+                    # iterate through account custom fields
+                    for id, field in acc_custom_fields.items():
+                        if acc_custom_fields[id]['fieldName'] == cf_col:
+                            # populate with value from the imported csv file
+                            acc_custom_fields[id]['field_value'] = row[cf_col]
+                
+                try:
+                    pedigree.custom_fields = dumps(acc_custom_fields)
+                    
+                    pedigree.save()
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+
+            # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
+            # , and redirect back to analyse page
+            if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
+                for created_object in created_objects:
+                    if created_object.id:
+                        created_object.delete()
+
+                return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+            # need to warn user if they specified any pedigrees that already exist, unless they have confirmed updates
+            elif len(existing) > 0 and request.POST.get('update') == 'no':
+                # get and pass in ids of created objects so it is known what to delete if user cancels
+                created = []
+                for created_object in created_objects:
+                    if created_object.id:
+                        created.append(created_object.id)
+
+                return HttpResponse(dumps({'result': 'existing', 'existing': existing, 'created': created}))
             else:
-                breed_obj = None
+                return HttpResponse(dumps({'result': 'success'}))
 
+        
+        # cancel import by deleting the created objects
+        else:
+            for obj_id in list(request.POST.get('created').split(',')):
+                if obj_id:
+                    if Pedigree.objects.filter(id=int(obj_id)).count() > 0:
+                        Pedigree.objects.filter(id=int(obj_id)).first().delete()
 
-            try:
-                pedigree.breed = breed_obj
-            except KeyError:
-                pass
-
-            #############################
-            for cf_col in custom_fields_in:
-                # iterate through account custom fields
-                for id, field in acc_custom_fields.items():
-                    if acc_custom_fields[id]['fieldName'] == cf_col:
-                        # populate with value from the imported csv file
-                        acc_custom_fields[id]['field_value'] = row[cf_col]
-
-            pedigree.custom_fields = dumps(acc_custom_fields)
-            
-            pedigree.save()
-
+            return HttpResponse()
+    
     return redirect('pedigree_search')
 
 
@@ -578,7 +855,8 @@ def import_breeder_data(request):
         # , and redirect back to analyse page
         if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
             for saved_breeder in saved_breeders:
-                saved_breeder.delete()
+                if saved_breeder.id:
+                    saved_breeder.delete()
 
             return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
         else:

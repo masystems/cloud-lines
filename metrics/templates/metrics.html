@@ -74,7 +74,6 @@
                         </div>
                     </form>
                     <p id="ksResults" class="mt-2 d-none text-center"></p>
-
                     <script>
                         $('#ksBtn').click( function() {
                             $.ajax({
@@ -107,6 +106,26 @@
                             });
                         });
                     </script>
+
+                    <hr>
+
+                    <h4 class="card-title">Stud Advisor</h4>
+                    <p id="studIntroText">Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
+                    <div id="pdfArea">
+                        <form id="saForm" class="pb-4">
+                            <div class="form-row align-items-center">
+                                <div class="col-md-5">
+                                    <div id="mothers-alive">
+                                        <input id="sa_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button id="saBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
+                                </div>
+                            </div>
+                        </form>
+                        <h5 id="saMsg"></h5>
+                    </div>
                 </div>
             </div>
         </div>
@@ -254,64 +273,30 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Stud Selector</h4>
-                    <p id="studIntroText">Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
-                    <div id="pdfArea">
-                        <form id="saForm" class="pb-4">
-                            <div class="form-row align-items-center">
-                                <div class="col-md-3">
-                                    <div id="mothers-alive">
-                                        <input id="sa_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <button id="saBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
-                                </div>
-                                <div class="col-md-3">
-                                    <div id="motherDetails" class="d-none">
-                                        <h3 class="card-title">{{ service.mother_title }} Details</h3>
-                                        <ul class="list-icons">
-                                            <li id="mdRegID"><i class="ti-angle-right"></i></li>
-                                            <li id="mdName"><i class="ti-angle-right"></i></li>
-                                            <li id="mdMeanKinship"><i class="ti-angle-right"></i></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div id="breedDetails" class="d-none">
-                                        <h3 class="card-title">Breed Details</h3>
-                                        <ul class="list-icons">
-                                            <li id="breedName"><i class="ti-angle-right"></i></li>
-                                            <li id="breedThreshold"><i class="ti-angle-right"></i></li>
-                                            <li id="breedMeanCoi"><i class="ti-angle-right"></i></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                        <div>
-                            <p><i class='fad fa-circle' style='color:green'></i> This male would be a good match for the selected female, based on the close Mean-Kinship value of both individuals, and the offspring COI being no higher than the breed average COI.</p>
-                            <p><i class='fad fa-circle' style='color:orange'></i> This male may not be the first choice as a mate for the selected female, but it is still relatively close in terms of Mean-Kinship, and the COI of the offspring would be no higher than the breed average COI.</p>
-                            <p><i class='fad fa-circle' style='color:red'></i> This male would not be an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.</p>
-                        </div>
-
-                        <button id="pdfDownloadBtn" class="btn btn-dark d-none mt-2 mb-2">Export to PDF</button>
-
-                        <table id="saTable" class="table table-bordered table-striped">
-                            <thead id="saHeadings">
-                                <tr>
-                                    <th scope="col" id="regNo">Reg No. <i class="fad fa-sort text-muted"></i></th>
-                                    <th scope="col" id="name">Name <i class="fad fa-sort text-muted"></i></th>
-                                    <th scope="col" id="meanKinship">Mean Kinship <i class="fad fa-sort text-muted"></i></th>
-                                    <th scope="col" id="kinship">COI of Offspring <i class="fad fa-sort text-muted"></i></th>
-                                    <th scope="col" id="score">Score <i class="fad fa-sort text-muted"></i></th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="saTbody">
-                            </tbody>
-                        </table>
-                    </div>
+                    <h4 class="card-title">Results</h4>
+                    <p id="kinshipText">This table displays the results of the generated metrics.</p>
+                    <table id="resultsTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col" id="generated">Generated by <i class="fad fa-sort text-muted"></i></th>
+                                <th scope="col" id="metric">Metric Type <i class="fad fa-sort text-muted"></i></th>
+                                <th scope="col" id="created">Created <i class="fad fa-sort text-muted"></i></th>
+                                <th scope="col">State</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                        {% for item in sa_queue reversed %}
+                            <tr>
+                                <td>{{ item.user.get_full_name }}</td>
+                                <td>Stud Advisor: {{ item.mother.reg_no }}</td>
+                                <td>{{ item.created }}</td>
+                                <td>{% if item.complete %}<i class="fad fa-check text-success"></i>{% else %}<i class="fas fa-cog fa-spin text-info"></i>{% endif %}</td>
+                                <td><a href="{% url 'stud_advisor_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -321,7 +306,7 @@
 
 {% block footer %}
 <script>
-    var breed_mean_coi;
+
     $('#saBtn').click( function() {
         $.ajax({
             url: '{% url 'stud_advisor' %}',
@@ -330,66 +315,43 @@
             dataType: 'text',
             data: $('#saForm').serialize(),
             beforeSend: function() {
-                $('#saTbody').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
-                $.ajax({
-                    url: '{% url 'stud_advisor_mother_details' %}',
-                    type: 'post',
-                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                    dataType: 'text',
-                    data: $('#saForm').serialize(),
-                    beforeSend: function() {
-                    },
-                    success: function(data) {
-                        try {
-                                var result = JSON.parse(data);
-                                breed_mean_coi = result.breed_mean_coi;
-                                var fade = 1000
-                                $('#motherDetails').removeClass('d-none');
-                                $('#mdRegID').hide().html('<i class="ti-angle-right"></i> {{ service.mother_title }}: ' + result.reg_no).fadeIn(fade);
-                                $('#mdName').hide().html('<i class="ti-angle-right"></i> Name: ' + result.name).fadeIn(fade);
-                                $('#mdMeanKinship').hide().html('<i class="ti-angle-right"></i> Mean Kinship: ' + result.mk).fadeIn(fade);
-                                $('#breedDetails').removeClass('d-none');
-                                $('#breedName').hide().html('<i class="ti-angle-right"></i> Name: ' + result.breed).fadeIn(fade);
-                                $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Threshold: ' + result.threshold).fadeIn(fade);
-                                if (result.breed_mean_coi != "0.0000") {
-                                    $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat(result.breed_mean_coi).toFixed(2))).fadeIn(fade);
-                                } else {
-                                    $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + result.breed_mean_coi).fadeIn(fade);
-                                }
-                                $('#pdfDownloadBtn').removeClass('d-none');
-                            }
-                        catch(err) {
-                                  // not returned anything
-                                }
-                     },
-                    error: function(jqXHR, textStatus, errorThrown){
-                    }
-                });
+
+                $('#saMsg').html($('#sa_mother').val() + ' added to results queue below!');
+                var dt = new Date();
+                // month array
+                var month = new Array();
+                month[0] = "Jan";
+                month[1] = "Feb";
+                month[2] = "Mar";
+                month[3] = "Apr";
+                month[4] = "May";
+                month[5] = "Jun";
+                month[6] = "Jul";
+                month[7] = "Aug";
+                month[8] = "Sep";
+                month[9] = "Oct";
+                month[10] = "Nov";
+                month[11] = "Dec";
+                // am pm
+                var hours = dt.getHours();
+                var ampm = hours >= 12 ? ' p.m.' : ' a.m.';
+                // create time string
+                var datetime = dt.getDate() + " "
+                + (month[dt.getMonth()+1])  + " "
+                + dt.getFullYear() + ", "
+                + dt.getHours() + ":"
+                + dt.getMinutes() + ampm;
+                $('#resultsTable > tbody:last-child').prepend('<tr><td>{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td><i class="fas fa-cog fa-spin text-info"></i></td><td><button class="btn btn-info" disabled>View</button></td></tr>');
 
             },
             success: function(data, global) {
-                $('#saTbody').html('');
-                try {
-                        var saResults = JSON.parse(data);
-                        $("#saTable tbody").empty();
-                        $.each(saResults, function(index, element) {
-                            var tr = "<tr><td>" + element.reg_no + "</td><td>" + element.name + "</td><td>" + element.mean_kinship + "</td><td>" + element.kinship + "</td><td align='center'><p style=\"visibility: hidden;\"><i class='fad fa-circle' style='visibility: visible;color:" + element.color + "'></i>" + element.color + "</p></td><td align='center'><a href='/pedigree/" + element.id + "'><button id='pedigreeBtn' class='btn btn-outline-info'>View</button></a></td></tr>";
-                            $('#saTable tbody').append(tr);
-                        });
-                        $('#kinship').click();
-                    }
-                catch(err) {
-                          // not returned anything
-                        }
-             },
-            error: function(jqXHR, textStatus, errorThrown){
             }
         });
     });
 
-    var table = $('#saTable');
+    var table = $('#resultsTable');
 
-    $('#regNo, #name, #meanKinship, #kinship, #score')
+    $('#benerated, #mame, #created')
         .wrapInner('<span title="sort this column"/>')
         .each(function(){
 
@@ -423,107 +385,5 @@
         });
 </script>
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
-
-<script>
-    $('#pdfDownloadBtn').click( function() {
-        pdf = new jsPDF('p', 'pt', [612, 791]);
-
-        //header
-        pdf.setTextColor(40)
-        pdf.setFontStyle('normal')
-        // if (base64Img) {
-        //     doc.addImage(base64Img, 'JPEG', data.settings.margin.left, 15, 10, 10)
-        // }
-        pdf.setFontSize(12);
-        pdf.text(35, 20, " Mother Details");
-        pdf.setFontSize(10);
-        pdf.text(35, 35, $('#mdRegID').text());
-        pdf.text(35, 50, $('#mdName').text());
-        pdf.text(35, 65, $('#mdMeanKinship').text());
-
-        pdf.setFontSize(12);
-        pdf.text(300, 20, " Breed Details");
-        pdf.setFontSize(10);
-        pdf.text(300, 35, $('#breedName').text());
-        pdf.text(300, 50, $('#breedThreshold').text());
-        pdf.text(300, 65, $('#breedMeanCoi').text());
-
-        pdf.setFontSize(10);
-        pdf.setLineWidth(0.1);
-
-        pdf.setFillColor(0, 255, 0)
-        pdf.circle(35, 76, 4, 'F');
-        pdf.text(45, 80, "Good match, close Mean-Kinship value, and the offspring COI being no higher than the breed average COI.")
-
-        pdf.setFillColor(255, 165, 0)
-        pdf.circle(35, 88, 4, 'F');
-        pdf.text(45, 92, "Not the first choice, relatively close in terms of Mean-Kinship, COI of offspring lower than the breed average COI.")
-
-        pdf.setFillColor(255, 0, 0)
-        pdf.circle(35, 100, 4, 'F');
-        pdf.text(45, 104, "Not an ideal mating choice for the selected female, as any offspring would have a COI above the breed average COI.")
-
-        //body
-        var rows = []
-        $('#saTable > tbody  > tr').each(function() {
-            rows.push([$(this).find("td").eq(0).html(),
-                $(this).find("td").eq(1).html(),
-                $(this).find("td").eq(2).html(),
-                $(this).find("td").eq(3).html(),
-                $(this).find("td").eq(4).html()])
-        })
-        pdf.autoTable({head: [['Reg No.', 'Name', 'Mean Kinship', 'COI of Offspring', 'Score']],
-            body: rows,
-            startY: 115,
-            theme: 'striped',
-
-            didParseCell: function(data) {
-                if (data.section === 'head') {
-                    data.cell.styles.fillColor = [21,136,138];
-                  }
-                if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
-                    data.cell.text = "";
-                }
-            },
-            didDrawCell: function(data) {
-                if (data.column.index === 4 && data.cell.section === 'body') { // count startrs from 0
-                    // cell.raw contains the cell data
-                    if (data.cell.raw.indexOf('green') >= 0) {
-                        pdf.setFillColor(0, 255, 0)
-                        pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
-                    } else if (data.cell.raw.indexOf('orange') >= 0) {
-                        pdf.setFillColor(255, 165, 0)
-                        pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
-                    } else if (data.cell.raw.indexOf('red') >= 0) {
-                        pdf.setFillColor(255, 0, 0)
-                        pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
-                    } else {
-                        pdf.setFillColor(255, 0, 0)
-                        pdf.circle(data.cell.x + 30, data.cell.y + 10, 5, 'FD');
-                    }
-                  }
-            },
-            didDrawPage: function (data) {
-                pdf.setTextColor(40)
-                pdf.setFontStyle('normal')
-
-                // Footer
-                var str = 'Page ' + pdf.internal.getNumberOfPages() + " | Stud adviser metrics generated by "
-
-                pdf.setFontSize(10)
-
-                var pageSize = pdf.internal.pageSize
-                var pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight()
-                pdf.text(str, data.settings.margin.left, pageHeight - 10)
-                pdf.setFontSize(12)
-                pdf.setFontType("bold");
-                pdf.setTextColor(21,136,138)
-                pdf.textWithLink('cloud-lines.com', data.settings.margin.left + 195, pageHeight - 10, { url: 'https://cloud-lines.com' });
-            },
-        });
-
-        pdf.save($('#mdRegID').text());
-    });
-</script>
 
 {% endblock %}
