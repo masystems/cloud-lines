@@ -59,9 +59,11 @@ def metrics(request):
     sa_queue = StudAdvisorQueue.objects.filter(account=attached_service)
     tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
     for item in sa_queue:
-        results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
-        if results_file.status_code == 200:
-            item.complete = True
+        if not item.complete:
+            results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
+            if results_file.status_code == 200:
+                item.complete = True
+                item.save()
 
     return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
                                             'coi_date': coi_date,
