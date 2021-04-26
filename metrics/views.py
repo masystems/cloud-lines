@@ -280,9 +280,11 @@ def stud_advisor(request):
         coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
                                 json=dumps(data, cls=DjangoJSONEncoder), stream=True, timeout=1)
     except requests.exceptions.ReadTimeout:
-        StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name)
+        sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name)
         response = {'status': 'message',
-                    'msg': "Your request will be complete in a few minutes. We'll email you with the results."}
+                    'msg': "Your request will be complete in a few minutes. We'll email you with the results.",
+                    'item_id': sa.id
+                    }
         return HttpResponse(dumps(response))
     except requests.exceptions.ConnectionError:
         response = {'status': 'message',
