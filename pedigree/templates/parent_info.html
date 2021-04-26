@@ -1,6 +1,6 @@
 <!-- display pop up for parent info -->
 <script>
-    $('#id_mother').bind('keyup change', function(event) {
+    $('#id_mother').bind('keyup change click', function(event) {
         // variable to track whether there has been a match
         var noneMatched = true;
 
@@ -23,7 +23,7 @@
         }
     });
 
-    $('#id_father').bind('keyup change', function(event) {
+    $('#id_father').bind('keyup change click', function(event) {
         var noneMatched = true;
 
         // iterate through pedigrees
