@@ -287,7 +287,7 @@
                         </thead>
                         <tbody id="resultsTableBody">
                         {% for item in sa_queue reversed %}
-                            <tr>
+                            <tr class="results-row" id="item-{{ item.id }}">
                                 <td>{{ item.user.get_full_name }}</td>
                                 <td>Stud Advisor: {{ item.mother.reg_no }}</td>
                                 <td>{{ item.created }}</td>
@@ -384,8 +384,13 @@
 
         });
     
+    // function called every 10 seconds to update results table
     window.setInterval(function(){
-        console.log('hello')
+        // iterate through each row of results table
+        $('.results-row').each(function (i, row) {
+            console.log($(row).attr('id'));
+        });
+
     }, 10000);
 </script>
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
