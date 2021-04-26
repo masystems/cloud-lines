@@ -287,7 +287,7 @@
                         </thead>
                         <tbody id="resultsTableBody">
                         {% for item in sa_queue reversed %}
-                            <tr class="results-row" id="item-{{ item.id }}">
+                            <tr class="results-row" id="{{ item.id }}" complete="{{ item.complete }}">
                                 <td>{{ item.user.get_full_name }}</td>
                                 <td>Stud Advisor: {{ item.mother.reg_no }}</td>
                                 <td>{{ item.created }}</td>
@@ -341,10 +341,22 @@
                 + dt.getFullYear() + ", "
                 + dt.getHours() + ":"
                 + dt.getMinutes() + ampm;
-                $('#resultsTable > tbody:last-child').prepend('<tr><td>{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td><i class="fas fa-cog fa-spin text-info"></i></td><td><button class="btn btn-info" disabled>View</button></td></tr>');
+                $('#resultsTable > tbody:last-child').prepend('<tr class="results-row" complete="False"><td>{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td><i class="fas fa-cog fa-spin text-info"></i></td><td><button class="btn btn-info" disabled>View</button></td></tr>');
 
             },
             success: function(data, global) {
+                result = JSON.parse(data);
+
+                // if timeout, the queue item has been created
+                if (result.hasOwnProperty('item_id')) {
+                    // iterate through the rows, starting from the first
+                    $('.results-row').each( function (i, row) {
+                        // if creator is request.user and there isn't an id
+                        
+                        // add id to new row, and break
+
+                    });
+                }
             }
         });
     });
@@ -388,7 +400,10 @@
     window.setInterval(function(){
         // iterate through each row of results table
         $('.results-row').each(function (i, row) {
-            console.log($(row).attr('id'));
+            // get id of sa queue item
+            var itemId = $(row).attr('id');
+
+            //console.log($(row).attr('complete'));
         });
 
     }, 10000);
