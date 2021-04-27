@@ -420,11 +420,22 @@
                 // get id of sa queue item
                 var itemId = $(row).attr('id');
 
-                //console.log($(row).attr('complete'));
+                // do ajax call to see if item is complete
                 console.log(itemId);
-            }
-        });
+                $.ajax({
+                    url: "{% url 'stud_advisor_complete' %}",
+                    type: 'post',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    dataType: 'text',
+                    data: {'item_id': itemId},
+                    success: function(data) {
+                        // update item in frontend
 
+                        // update item in backend
+                    }
+                });
+            }
+        })
     }, 10000);
 </script>
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
