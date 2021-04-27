@@ -357,9 +357,6 @@
                 if (result.hasOwnProperty('item_id')) {
                     // iterate through the rows, starting from the first
                     $('.results-row').each( function (i, row) {
-                        // console.log(datetimesecs);
-                        // console.log($(row).attr('dts'));
-                        
                         // if creator is request.user, and there isn't an id, and dts matches datetimeseconds
                         if ( ($(row).find('td[class*="full-name"]').html() == '{{ request.user.get_full_name }}')
                                         && ($(row).attr('id') == undefined)
@@ -370,9 +367,9 @@
                             // remove datetimeseconds (dts) class
                             $(row).removeAttr('dts');
 
-                            // set id for the new row, and break
+                            // set id for the new row, and break out of the loop
                             $(row).attr('id', result.item_id);
-                            //break
+                            return false;
                         }
                     });
                 }
