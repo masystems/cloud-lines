@@ -316,6 +316,11 @@ def stud_advisor_results(request, id):
                                                'mother_details': mother_details})
 
 
+def stud_advisor_complete(request):
+    print(request.POST.get('item_id'))
+    return HttpResponse()
+
+
 def calculate_sa_thresholds(studs_raw, attached_service, mother, mother_details):
     studs_data = {}
     for stud, kinship in studs_raw[str(mother.id)][0].items():
