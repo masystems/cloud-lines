@@ -317,8 +317,23 @@ def stud_advisor_results(request, id):
 
 
 def stud_advisor_complete(request):
-    print(request.POST.get('item_id'))
-    return HttpResponse()
+    # get queue item
+    item = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'))
+    if item.count() > 0:
+        item = item[0]
+
+        # check if item is complete
+        tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
+        results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
+        # set item to complete if it's true
+        if results_file.status_code == 200:
+            item.complete = True
+            item.save()
+
+        return HttpResponse(dumps({'result': 'success', 'complete': item.complete}))
+    # queue item not found
+    else:
+        return HttpResponse(dumps({'result': 'fail'}))
 
 
 def calculate_sa_thresholds(studs_raw, attached_service, mother, mother_details):
