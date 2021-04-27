@@ -416,10 +416,13 @@
     window.setInterval(function(){
         // iterate through each row of results table
         $('.results-row').each(function (i, row) {
-            // get id of sa queue item
-            var itemId = $(row).attr('id');
+            if ($(row).attr('complete') == 'False') {
+                // get id of sa queue item
+                var itemId = $(row).attr('id');
 
-            //console.log($(row).attr('complete'));
+                //console.log($(row).attr('complete'));
+                console.log(itemId);
+            }
         });
 
     }, 10000);
