@@ -347,7 +347,7 @@
                 // set time string with seconds
                 datetimesecs = datetime + dt.getSeconds();
 
-                $('#resultsTable > tbody:last-child').prepend('<tr class="results-row" complete="False"><td>{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td><i class="fas fa-cog fa-spin text-info"></i></td><td><button class="btn btn-info" disabled>View</button></td></tr>');
+                $('#resultsTable > tbody:last-child').prepend('<tr class="results-row" complete="False" dts="' + datetimesecs + '"><td class="full-name">{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td><i class="fas fa-cog fa-spin text-info"></i></td><td><button class="btn btn-info" disabled>View</button></td></tr>');
 
             },
             success: function(data, global) {
@@ -357,7 +357,14 @@
                 if (result.hasOwnProperty('item_id')) {
                     // iterate through the rows, starting from the first
                     $('.results-row').each( function (i, row) {
-                        // if creator is request.user and there isn't an id
+                        // console.log($(row).find('td[class*="full-name"]').html());
+                        // console.log('{{ request.user.get_full_name }}');
+                        // if creator is request.user and there isn't an id and dts matches datetimeseconds
+                        if ($(row).find('td[class*="full-name"]').html() == '{{ request.user.get_full_name }}') {
+                            console.log('hello');
+
+                            $(row).find('td[class*="full-name"]').removeClass('full-name');
+                        }
                         
                         // add id to new row, and break
 
