@@ -360,8 +360,11 @@
                         // console.log($(row).find('td[class*="full-name"]').html());
                         // console.log('{{ request.user.get_full_name }}');
                         // if creator is request.user and there isn't an id and dts matches datetimeseconds
-                        if ($(row).find('td[class*="full-name"]').html() == '{{ request.user.get_full_name }}') {
-                            console.log('hello');
+                        if ( ($(row).find('td[class*="full-name"]').html() == '{{ request.user.get_full_name }}')
+                                        && ($(row).attr('id') == undefined) ) {
+                            console.log($(row).attr('id'));
+                            $(row).attr('id', result.item_id);
+                            console.log($(row).attr('id'));
 
                             $(row).find('td[class*="full-name"]').removeClass('full-name');
                         }
