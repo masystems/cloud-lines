@@ -306,6 +306,8 @@
 
 {% block footer %}
 <script>
+    // variable to store datetime including seconds, so that we know we've got the right row
+    var datetimesecs = '';
 
     $('#saBtn').click( function() {
         $.ajax({
@@ -341,6 +343,10 @@
                 + dt.getFullYear() + ", "
                 + dt.getHours() + ":"
                 + dt.getMinutes() + ampm;
+
+                // set time string with seconds
+                datetimesecs = datetime + dt.getSeconds();
+
                 $('#resultsTable > tbody:last-child').prepend('<tr class="results-row" complete="False"><td>{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td><i class="fas fa-cog fa-spin text-info"></i></td><td><button class="btn btn-info" disabled>View</button></td></tr>');
 
             },
