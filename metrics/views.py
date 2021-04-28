@@ -59,9 +59,11 @@ def metrics(request):
     sa_queue = StudAdvisorQueue.objects.filter(account=attached_service)
     tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
     for item in sa_queue:
-        results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
-        if results_file.status_code == 200:
-            item.complete = True
+        if not item.complete:
+            results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
+            if results_file.status_code == 200:
+                item.complete = True
+                item.save()
 
     return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
                                             'coi_date': coi_date,
@@ -278,9 +280,11 @@ def stud_advisor(request):
         coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
                                 json=dumps(data, cls=DjangoJSONEncoder), stream=True, timeout=1)
     except requests.exceptions.ReadTimeout:
-        StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name)
+        sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name)
         response = {'status': 'message',
-                    'msg': "Your request will be complete in a few minutes. We'll email you with the results."}
+                    'msg': "Your request will be complete in a few minutes. We'll email you with the results.",
+                    'item_id': sa.id
+                    }
         return HttpResponse(dumps(response))
     except requests.exceptions.ConnectionError:
         response = {'status': 'message',
@@ -310,6 +314,26 @@ def stud_advisor_results(request, id):
     return render(request, 'sa_results.html', {'stud_data': studs_data,
                                                'sa_queue_item': sa_queue_item,
                                                'mother_details': mother_details})
+
+
+def stud_advisor_complete(request):
+    # get queue item
+    item = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'))
+    if item.count() > 0:
+        item = item[0]
+
+        # check if item is complete
+        tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
+        results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
+        # set item to complete if it's true
+        if results_file.status_code == 200:
+            item.complete = True
+            item.save()
+
+        return HttpResponse(dumps({'result': 'success', 'complete': item.complete}))
+    # queue item not found
+    else:
+        return HttpResponse(dumps({'result': 'fail'}))
 
 
 def calculate_sa_thresholds(studs_raw, attached_service, mother, mother_details):

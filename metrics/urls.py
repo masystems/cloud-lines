@@ -9,6 +9,6 @@ urlpatterns = [
     path('stud_advisor', views.stud_advisor, name='stud_advisor'),
     path('stud_advisor_mother_details', views.stud_advisor_mother_details, name='stud_advisor_mother_details'),
     path('stud_advisor_results/<int:id>', views.stud_advisor_results, name='stud_advisor_results'),
+    path('stud_advisor_complete', views.stud_advisor_complete, name='stud_advisor_complete'),
     path('poprep-export', views.poprep_export, name='poprep_export')
-
 ]
