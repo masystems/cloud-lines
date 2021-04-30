@@ -352,7 +352,6 @@
             },
             success: function(data, global) {
                 result = JSON.parse(data);
-
                 // if timeout, the queue item has been created
                 if (result.hasOwnProperty('item_id')) {
                     // iterate through the rows, starting from the first
@@ -361,7 +360,7 @@
                         if ( ($(row).find('td[class*="full-name"]').html() == '{{ request.user.get_full_name }}')
                                         && ($(row).attr('id') == undefined)
                                         && ($(row).attr('dts') == datetimesecs) ) {
-                            
+
                             // remove full name class
                             $(row).find('td[class*="full-name"]').removeClass('full-name');
                             // remove datetimeseconds (dts) class

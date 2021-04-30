@@ -276,26 +276,14 @@ def stud_advisor(request):
     data = {'data_path': remote_output,
             'file_name': file_name}
 
-    try:
-        coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
-                                json=dumps(data, cls=DjangoJSONEncoder), stream=True, timeout=1)
-    except requests.exceptions.ReadTimeout:
-        sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name)
-        response = {'status': 'message',
-                    'msg': "Your request will be complete in a few minutes. We'll email you with the results.",
-                    'item_id': sa.id
-                    }
-        return HttpResponse(dumps(response))
-    except requests.exceptions.ConnectionError:
-        response = {'status': 'message',
-                    'msg': "Your connection timed out. Please try again or contact support if it continues."}
-        return HttpResponse(dumps(response))
-
-    # this can be removed soon
-    studs_raw = loads(coi_raw.json())
-    studs_data = calculate_sa_thresholds(studs_raw, attached_service, mother, mother_details)
-
-    return HttpResponse(dumps(studs_data))
+    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
+                            json=dumps(data, cls=DjangoJSONEncoder), stream=True)
+    sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name)
+    response = {'status': 'message',
+                'msg': "Your request will be complete in a few minutes. We'll email you with the results.",
+                'item_id': sa.id
+                }
+    return HttpResponse(dumps(response))
 
 
 def stud_advisor_results(request, id):
@@ -321,7 +309,6 @@ def stud_advisor_complete(request):
     item = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'))
     if item.count() > 0:
         item = item[0]
-
         # check if item is complete
         tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
         results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
