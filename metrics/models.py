@@ -29,3 +29,4 @@ class StudAdvisorQueue(models.Model):
     file = models.CharField(max_length=250)
     email_sent = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False)

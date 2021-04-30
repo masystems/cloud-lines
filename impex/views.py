@@ -177,7 +177,7 @@ def import_pedigree_data(request):
             # get custom fields of account
             try:
                 acc_custom_fields = loads(attached_service.custom_fields)
-            except json.decoder.JSONDecodeError:
+            except JSONDecodeError:
                 acc_custom_fields = {}
             # get names of custom fields
             field_names = []

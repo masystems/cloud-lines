@@ -287,12 +287,12 @@
                         </thead>
                         <tbody id="resultsTableBody">
                         {% for item in sa_queue reversed %}
-                            <tr>
+                            <tr class="results-row" id="{{ item.id }}" complete="{{ item.complete }}">
                                 <td>{{ item.user.get_full_name }}</td>
                                 <td>Stud Advisor: {{ item.mother.reg_no }}</td>
                                 <td>{{ item.created }}</td>
-                                <td>{% if item.complete %}<i class="fad fa-check text-success"></i>{% else %}<i class="fas fa-cog fa-spin text-info"></i>{% endif %}</td>
-                                <td><a href="{% url 'stud_advisor_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                                <td class="complete">{% if item.complete %}<i class="fad fa-check text-success"></i>{% else %}<i class="fas fa-cog fa-spin text-info"></i>{% endif %}</td>
+                                <td class="results"><a href="{% url 'stud_advisor_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -306,6 +306,8 @@
 
 {% block footer %}
 <script>
+    // variable to store datetime including seconds, so that we know we've got the right row
+    var datetimesecs = '';
 
     $('#saBtn').click( function() {
         $.ajax({
@@ -341,10 +343,35 @@
                 + dt.getFullYear() + ", "
                 + dt.getHours() + ":"
                 + dt.getMinutes() + ampm;
-                $('#resultsTable > tbody:last-child').prepend('<tr><td>{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td><i class="fas fa-cog fa-spin text-info"></i></td><td><button class="btn btn-info" disabled>View</button></td></tr>');
+
+                // set time string with seconds
+                datetimesecs = datetime + dt.getSeconds();
+
+                $('#resultsTable > tbody:last-child').prepend('<tr class="results-row" complete="False" dts="' + datetimesecs + '"><td class="full-name">{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td class="complete"><i class="fas fa-cog fa-spin text-info"></i></td><td class="results"><button class="btn btn-info" disabled>View</button></td></tr>');
 
             },
             success: function(data, global) {
+                result = JSON.parse(data);
+                // if timeout, the queue item has been created
+                if (result.hasOwnProperty('item_id')) {
+                    // iterate through the rows, starting from the first
+                    $('.results-row').each( function (i, row) {
+                        // if creator is request.user, and there isn't an id, and dts matches datetimeseconds
+                        if ( ($(row).find('td[class*="full-name"]').html() == '{{ request.user.get_full_name }}')
+                                        && ($(row).attr('id') == undefined)
+                                        && ($(row).attr('dts') == datetimesecs) ) {
+
+                            // remove full name class
+                            $(row).find('td[class*="full-name"]').removeClass('full-name');
+                            // remove datetimeseconds (dts) class
+                            $(row).removeAttr('dts');
+
+                            // set id for the new row, and break out of the loop
+                            $(row).attr('id', result.item_id);
+                            return false;
+                        }
+                    });
+                }
             }
         });
     });
@@ -383,6 +410,45 @@
             });
 
         });
+    
+    // function called every 10 seconds to update results table
+    window.setInterval(function(){
+        // iterate through each row of results table
+        $('.results-row').each(function (i, row) {
+            // ignore if row is complete
+            if ($(row).attr('complete') == 'False') {
+                // get id of sa queue item
+                var itemId = $(row).attr('id');
+                
+                // do ajax call to see if item is complete
+                $.ajax({
+                    url: "{% url 'stud_advisor_complete' %}",
+                    type: 'post',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    dataType: 'text',
+                    data: {'item_id': itemId},
+                    success: function(data) {
+                        result = JSON.parse(data);
+
+                        if (result.result == 'success') {
+                            // if item is complete
+                            if (result.complete) {
+                                // set complete to True for the row
+                                $(row).attr('complete', 'True');
+                                // change spinning cog to tick
+                                $(row).find('td[class*="complete"]').html('<i class="fad fa-check text-success"></i>');
+                                // enable the results button
+                                $(row).find('td[class*="results"]').html('<a href="stud_advisor_results/' + itemId + '"><button class="btn btn-info">View</button> </a> ');
+                            }
+                        } else {
+                            // queue item with the given id doesn't exist
+                            errorMsg('failed to update results table');
+                        }
+                    }
+                });
+            }
+        })
+    }, 10000);
 </script>
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
 
