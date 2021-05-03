@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CoiLastRun, MeanKinshipLastRun, StudAdvisorQueue
+from .models import CoiLastRun, MeanKinshipLastRun, KinshipQueue, StudAdvisorQueue
 
 
 class CoiAdmin(admin.ModelAdmin):
@@ -26,7 +26,7 @@ class MeaKinshipAdmin(admin.ModelAdmin):
 admin.site.register(MeanKinshipLastRun, MeaKinshipAdmin)
 
 
-class StudAdvisorAdmin(admin.ModelAdmin):
+class KinshipAdmin(admin.ModelAdmin):
     list_display = ('account', 'user', 'file')
     list_display_links = ['account']
     list_filter = ('account', 'user', 'file')
@@ -34,5 +34,15 @@ class StudAdvisorAdmin(admin.ModelAdmin):
     ordering = ['account']
     empty_value_display = '-empty-'
 
+admin.site.register(KinshipQueue, KinshipAdmin)
+
+
+class StudAdvisorAdmin(admin.ModelAdmin):
+    list_display = ('account', 'user', 'file')
+    list_display_links = ['account']
+    list_filter = ('account', 'user', 'file')
+    search_fields = ['account', 'user', 'file']
+    ordering = ['account']
+    empty_value_display = '-empty-'
 
 admin.site.register(StudAdvisorQueue, StudAdvisorAdmin)
