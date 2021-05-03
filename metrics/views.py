@@ -5,7 +5,7 @@ from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
 from breed.models import Breed
 from django.core.serializers.json import DjangoJSONEncoder
-from .models import CoiLastRun, MeanKinshipLastRun, StudAdvisorQueue
+from .models import CoiLastRun, MeanKinshipLastRun, StudAdvisorQueue, KinshipQueue
 from json import dumps, loads, load
 from datetime import datetime, timedelta
 import logging
@@ -138,6 +138,8 @@ def coi(request):
 
 def kinship(request):
     attached_service = get_main_account(request.user)
+    epoch = int(time())
+
     pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
                                                                          'parent_father__id',
                                                                          'parent_mother__id',
@@ -145,19 +147,31 @@ def kinship(request):
                                                                          'breed__breed_name',
                                                                          'status')
 
-    mother = Pedigree.objects.get(reg_no=request.POST['mother']).id
-    father = Pedigree.objects.get(reg_no=request.POST['father']).id
+    try:
+        mother = Pedigree.objects.get(reg_no=request.POST['mother']).id
+    except Pedigree.DoesNotExist:
+        response = {'status': 'error',
+                    'msg': f"Mother ({request.POST['mother']}) does not exist!"
+                    }
+        return HttpResponse(dumps(response))
+    try:
+        father = Pedigree.objects.get(reg_no=request.POST['father']).id
+    except Pedigree.DoesNotExist:
+        response = {'status': 'error',
+                    'msg': f"Mother ({request.POST['mother']}) does not exist!"
+                    }
+        return HttpResponse(dumps(response))
 
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
         subdomain = host.partition('.')[0]
-        local_output = f"/tmp/mk_{subdomain}_output.json"
-        remote_output = f"metrics/mk_{subdomain}_output.json"
-        file_name = f"mk_{subdomain}_output.json"
+        local_output = f"/tmp/k_{subdomain}-{epoch}_output.json"
+        remote_output = f"metrics/k_{subdomain}-{epoch}_output.json"
+        file_name = f"k_{subdomain}-{epoch}_output.json"
     else:
-        local_output = f"/tmp/mk_{attached_service.id}_output.json"
-        remote_output = f"metrics/mk_{attached_service.id}_output.json"
-        file_name = f"mk_{attached_service.id}_output.json"
+        local_output = f"/tmp/k_{attached_service.id}-{epoch}_output.json"
+        remote_output = f"metrics/k_{attached_service.id}-{epoch}_output.json"
+        file_name = f"k_{attached_service.id}-{epoch}_output.json"
 
     with open(local_output, 'w') as file:
         file.write(dumps(list(pedigrees)))
@@ -169,7 +183,12 @@ def kinship(request):
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother}/{father}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-    return HttpResponse(coi_raw.json())
+    kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father, file=file_name)
+    response = {'status': 'message',
+                'msg': "",
+                'item_id': kin.id
+                }
+    return HttpResponse(dumps(response))
 
 
 def run_mean_kinship(request):
@@ -246,8 +265,6 @@ def stud_advisor(request):
 
     mother = request.POST['mother']
     mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
-    mother_details = stud_advisor_mother_details(request, mother)
-    mother_details = eval(mother_details.content.decode())
 
     pedigrees = Pedigree.objects.filter(account=attached_service,
                                         breed=mother.breed).values('id',
@@ -276,11 +293,11 @@ def stud_advisor(request):
     data = {'data_path': remote_output,
             'file_name': file_name}
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/{}/stud_advisor/'.format(mother.id),
+    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/stud_advisor/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
     sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name)
     response = {'status': 'message',
-                'msg': "Your request will be complete in a few minutes. We'll email you with the results.",
+                'msg': "",
                 'item_id': sa.id
                 }
     return HttpResponse(dumps(response))
