@@ -253,13 +253,21 @@
                             </tr>
                         </thead>
                         <tbody id="resultsTableBody">
-                        {% for item in sa_queue reversed %}
+                        {% for item in queue_items reversed %}
                             <tr class="results-row" id="{{ item.id }}" complete="{{ item.complete }}">
                                 <td>{{ item.user.get_full_name }}</td>
-                                <td>Stud Advisor: {{ item.mother.reg_no }}</td>
+                                {% if item.father %}
+                                    <td>Kinship: {{ item.mother.reg_no }} + {{ item.father.reg_no }}</td>
+                                {% else %}
+                                    <td>Stud Advisor: {{ item.mother.reg_no }}</td>
+                                {% endif %}
                                 <td>{{ item.created }}</td>
                                 <td class="complete">{% if item.complete %}<i class="fad fa-check text-success"></i>{% else %}<i class="fas fa-cog fa-spin text-info"></i>{% endif %}</td>
-                                <td class="results"><a href="{% url 'stud_advisor_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                                {% if item.father %}
+                                    <td class="results"><a href="{% url 'kinship_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                                {% else %}
+                                    <td class="results"><a href="{% url 'stud_advisor_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -416,7 +424,7 @@
 
     var table = $('#resultsTable');
 
-    $('#benerated, #mame, #created')
+    $('#generated, #name, #created')
         .wrapInner('<span title="sort this column"/>')
         .each(function(){
 
@@ -460,7 +468,7 @@
                 
                 // do ajax call to see if item is complete
                 $.ajax({
-                    url: "{% url 'stud_advisor_complete' %}",
+                    url: "{% url 'results_complete' %}",
                     type: 'post',
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
                     dataType: 'text',

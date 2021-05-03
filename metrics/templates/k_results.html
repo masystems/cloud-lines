@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block header %}
+
+    <script src="{% static 'assets/plugins/jsPDF-1.3.2/dist/jspdf.min.js' %}"></script>
+    <script src="https://unpkg.com/jspdf-autotable"></script>
+{% endblock %}
+
+
+{% block content %}
+<style>
+    table th {
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+<!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Metrics</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'metrics' %}">Metrics</a></li>
+                <li class="breadcrumb-item active">Kinship Results</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Kinship Results</h3>
+                    <div class="row">
+                        <div class="col-6">
+                            <div>
+                                <h4 class="card-title">{{ service.mother_title }} Details</h4>
+                                <ul class="list-icons">
+                                    <li><i class="ti-angle-right"></i> {{ k_queue_item.mother.reg_no }}</li>
+                                    <li><i class="ti-angle-right"></i> {{ k_queue_item.mother.name }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div>
+                                <h4 class="card-title">{{ service.father_title }} Details</h4>
+                                <ul class="list-icons">
+                                    <li id="breedName"><i class="ti-angle-right"></i> {{ k_queue_item.father.reg_no }}</li>
+                                    <li id="breedThreshold"><i class="ti-angle-right"></i> {{ k_queue_item.father.name }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h5 class="align-center">Kinship</h5>
+                            <p class="align-center">{{ kinship_result }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}

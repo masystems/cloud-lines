@@ -8,7 +8,8 @@ urlpatterns = [
     path('run_coi', views.run_coi, name='run_coi'),
     path('stud_advisor', views.stud_advisor, name='stud_advisor'),
     path('stud_advisor_mother_details', views.stud_advisor_mother_details, name='stud_advisor_mother_details'),
+    path('kinship_results/<int:id>', views.kinship_results, name='kinship_results'),
     path('stud_advisor_results/<int:id>', views.stud_advisor_results, name='stud_advisor_results'),
-    path('stud_advisor_complete', views.stud_advisor_complete, name='stud_advisor_complete'),
+    path('results_complete', views.results_complete, name='results_complete'),
     path('poprep-export', views.poprep_export, name='poprep_export')
 ]

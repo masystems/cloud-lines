@@ -16,6 +16,7 @@ import urllib.parse
 from time import time
 from boto3.s3.transfer import TransferConfig
 from threading import Thread
+from itertools import chain
 
 
 logger = logging.getLogger(__name__)
@@ -57,8 +58,13 @@ def metrics(request):
 
     # queue
     sa_queue = StudAdvisorQueue.objects.filter(account=attached_service)
+    k_queue = KinshipQueue.objects.filter(account=attached_service)
     tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
-    for item in sa_queue:
+
+    queue_items = sorted(
+        chain(sa_queue, k_queue),
+        key=lambda instance: instance.created)
+    for item in queue_items:
         if not item.complete:
             results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
             if results_file.status_code == 200:
@@ -69,7 +75,7 @@ def metrics(request):
                                             'coi_date': coi_date,
                                             'mean_kinship_date': mean_kinship_date,
                                             'breeds': Breed.objects.filter(account=attached_service),
-                                            'sa_queue': sa_queue})
+                                            'queue_items': queue_items})
 
 
 def multi_part_upload_with_s3(file_path, key_path):
@@ -148,14 +154,14 @@ def kinship(request):
                                                                          'status')
 
     try:
-        mother = Pedigree.objects.get(reg_no=request.POST['mother']).id
+        mother = Pedigree.objects.get(reg_no=request.POST['mother'])
     except Pedigree.DoesNotExist:
         response = {'status': 'error',
                     'msg': f"Mother ({request.POST['mother']}) does not exist!"
                     }
         return HttpResponse(dumps(response))
     try:
-        father = Pedigree.objects.get(reg_no=request.POST['father']).id
+        father = Pedigree.objects.get(reg_no=request.POST['father'])
     except Pedigree.DoesNotExist:
         response = {'status': 'error',
                     'msg': f"Mother ({request.POST['mother']}) does not exist!"
@@ -181,7 +187,7 @@ def kinship(request):
     data = {'data_path': remote_output,
             'file_name': file_name}
 
-    coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother}/{father}/kinship/',
+    coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother.id}/{father.id}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
     kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father, file=file_name)
     response = {'status': 'message',
@@ -189,6 +195,22 @@ def kinship(request):
                 'item_id': kin.id
                 }
     return HttpResponse(dumps(response))
+
+
+def kinship_results(request, id):
+    attached_service = get_main_account(request.user)
+    k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)
+    resource = boto3.resource('s3')
+    bucket = resource.Bucket(settings.AWS_S3_CUSTOM_DOMAIN)
+    bucket.download_file(f"metrics/results-{k_queue_item.file}", f'/tmp/results-{k_queue_item.file}')
+
+    with open(f'/tmp/results-{k_queue_item.file}') as results_file:
+        kinship_raw = load(results_file)
+
+    kinship_result = kinship_raw[str(k_queue_item.mother.id)][0][str(k_queue_item.father.id)]
+
+    return render(request, 'k_results.html', {'k_queue_item': k_queue_item,
+                                              'kinship_result': kinship_result})
 
 
 def run_mean_kinship(request):
@@ -321,11 +343,14 @@ def stud_advisor_results(request, id):
                                                'mother_details': mother_details})
 
 
-def stud_advisor_complete(request):
+def results_complete(request):
     # get queue item
-    item = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'))
-    if item.count() > 0:
-        item = item[0]
+    stud_item = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
+    kin_item = KinshipQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
+    queue_items = sorted(chain(stud_item, kin_item))
+    if len(queue_items) > 0:
+        # process only the first item in the queue list
+        item = queue_items[0]
         # check if item is complete
         tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
         results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
