@@ -486,21 +486,7 @@ $(document).ready(function() {
 
     var reg_numbers = [{% for pedigree in pedigrees.all %}'{{ pedigree.reg_no }}', {% endfor %}];
     var mothers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
-    var mothersAlive = [{% for pedigree in pedigrees.all %}
-                            {% if pedigree.sex == 'female' %}
-                                {% if pedigree.status == 'alive' %}
-                                    '{{ pedigree.reg_no }}',
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}];
     var fathers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'male' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
-    var fathersAlive = [{% for pedigree in pedigrees.all %}
-                            {% if pedigree.sex == 'male' %}
-                                {% if pedigree.status == 'alive' %}
-                                    '{{ pedigree.reg_no }}',
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}];
     breeders = [{% for breeder in breeders.all %}'{{ breeder.breeding_prefix }}', {% endfor %}];
     breeds = [{% for breed in breeds.all %}'{{ breed.breed_name }}', {% endfor %}];
     var breed_groups = [{% for group in breed_groups.all %}'{{ group.group_name }}', {% endfor %}];
@@ -525,16 +511,6 @@ $(document).ready(function() {
       source: substringMatcher(mothers)
     });
 
-    $('#mothers-alive .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'mother',
-      source: substringMatcher(mothersAlive)
-    });
-
     $('#fathers .typeahead').typeahead({
       hint: true,
       highlight: true,
@@ -543,16 +519,6 @@ $(document).ready(function() {
     {
       name: 'fathers',
       source: substringMatcher(fathers)
-    });
-
-    $('#fathers-alive .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'father',
-      source: substringMatcher(fathersAlive)
     });
 
     $('#breeders .typeahead').typeahead({
