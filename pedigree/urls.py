@@ -13,4 +13,5 @@ urlpatterns = [
     path('<int:pedigree_id>/add_existing_parent', views.add_existing_parent, name='add_existing_parent'),
     path('<int:pedigree_id>/certificate', views.GeneratePDF.as_view(), name='cert'),
     path('get-pedigrees>', tabledata.get_pedigrees, name="get_pedigrees"),
+    path('get_pedigree_details', views.get_pedigree_details, name="get_pedigree_details")
 ]
