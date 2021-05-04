@@ -756,3 +756,17 @@ def create_approval(request, pedigree, attached_service, state, type):
                             type=type,
                             pedigree=pedigree,
                             data=data)
+
+
+@login_required(login_url="/account/login")
+@user_passes_test(is_editor)
+@never_cache
+def get_pedigree_details(request):
+    attached_service = get_main_account(request.user)
+    try:
+        pedigree = Pedigree.objects.get(account=attached_service, reg_no=request.GET['id'])
+    except Pedigree.DoesNotExist:
+        return HttpResponse(json.dumps({'result': 'fail'}))
+    pedigree = serializers.serialize('json', [pedigree], ensure_ascii=False)
+    return HttpResponse(json.dumps({'result': 'success',
+                                    'pedigree': pedigree}))
