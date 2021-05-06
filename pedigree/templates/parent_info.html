@@ -11,11 +11,25 @@
                 result = JSON.parse(data);
 
                 if (result.result == 'success') {
-                    mother_array = JSON.parse(result.pedigree)
-                    mother = mother_array[0].fields
-                    // if item is complete
-                    $('#mother-name').html(mother.name);
-                    $('#mother-info').removeClass('d-none');
+                    // display full match
+                    if (result.pedigree) {
+                        mother_array = JSON.parse(result.pedigree)
+                        mother = mother_array[0].fields
+                        // if item is complete
+                        $('#mother-name').html(mother.name);
+                        $('#mother-info').removeClass('d-none');
+                    }
+                    // display partial matches
+                    else if (result.pedigrees) {
+                        mother_array = JSON.parse(result.pedigrees)
+                        console.log(mother_array)
+                        infoHtml = ''
+                        mother_array.forEach( mother => {
+                            infoHtml = infoHtml + mother.fields.name
+                        })
+                        $('#mother-name').html(infoHtml);
+                        $('#mother-info').removeClass('d-none');
+                    }
                 } else {
                     // hide info
                     $('#mother-info').addClass('d-none');
