@@ -14,9 +14,9 @@
                     // display full match
                     if (result.pedigree) {
                         mother_array = JSON.parse(result.pedigree)
-                        mother = mother_array[0].fields
+                        mother = mother_array[0]
                         // if item is complete
-                        $('#mother-name').html(mother.name);
+                        $('#mother-name').html('<li class="text-muted row"><div class="col"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</div><div class="col"><strong class="ml-2">Reg:</strong> ' + mother.fields.reg_no + '</div></li>');
                         $('#mother-info').removeClass('d-none');
                     }
                     // display partial matches
