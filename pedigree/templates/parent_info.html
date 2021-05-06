@@ -16,6 +16,9 @@
                     // if item is complete
                     $('#mother-name').html(mother.name);
                     $('#mother-info').removeClass('d-none');
+                } else {
+                    // hide info
+                    $('#mother-info').addClass('d-none');
                 }
             }
         });
@@ -37,6 +40,9 @@
                     // if item is complete
                     $('#father-name').html(father.name);
                     $('#father-info').removeClass('d-none');
+                } else {
+                    // hide info
+                    $('#father-info').addClass('d-none');
                 }
             }
         });
