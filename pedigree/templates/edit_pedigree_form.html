@@ -176,7 +176,7 @@
                                         </div>
                                     {% elif field.label == 'Mother' %}
                                         <div id="mothers">
-                                            <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
+                                            <input id="id_mother" class="form-control" name='{{ field.name }}' type="text" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
                                             {% if service.site_mode == 'poultry' %}
                                                 <small>Leave blank if using a breed group</small>
                                             {% endif %}

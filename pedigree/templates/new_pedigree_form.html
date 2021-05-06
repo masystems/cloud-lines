@@ -79,7 +79,7 @@
                         <input class="form-control" name='{{ field.name }}' type="text" value="{{ suggested_reg }}">
                 {% elif field.label == 'Mother' %}
                     <div id="mothers">
-                        <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}">
+                        <input id="id_mother" class="form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}">
                         {% if service.site_mode == 'poultry' %}
                             <small>Leave blank if using a breed group</small>
                         {% endif %}
