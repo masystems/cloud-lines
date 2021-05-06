@@ -84,11 +84,9 @@
                             <small>Leave blank if using a breed group</small>
                         {% endif %}
                     </div>
-                    <!-- hidden note which will show name of mother if reg number has a match -->
+                    <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
                     <ul class="list-icons d-none" id="mother-info">
-                        <li class="text-muted">
-                            <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="mother-name"></span>
-                        </li>
+                        <li id="mother-name" class="text-muted"></li>
                     </ul>
                 {% elif field.label == 'Father'  %}
                     <div id="fathers">
