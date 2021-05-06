@@ -23,11 +23,11 @@
                     else if (result.pedigrees) {
                         mother_array = JSON.parse(result.pedigrees)
                         console.log(mother_array)
-                        infoHtml = ''
+                        motherInfoHtml = ''
                         mother_array.forEach( mother => {
-                            infoHtml = infoHtml + mother.fields.name
+                            motherInfoHtml = motherInfoHtml + '<li class="text-muted row"><div class="col"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</div><div class="col"><strong class="ml-2">Reg:</strong> ' + mother.fields.reg_no + '</div></li>'
                         })
-                        $('#mother-name').html(infoHtml);
+                        $('#mother-name').html(motherInfoHtml);
                         $('#mother-info').removeClass('d-none');
                     }
                 } else {

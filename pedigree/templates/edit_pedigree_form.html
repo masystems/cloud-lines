@@ -183,9 +183,7 @@
                                         </div>
                                         <!-- hidden note which will show name of mother if reg number has a match -->
                                         <ul class="list-icons d-none" id="mother-info">
-                                            <li class="text-muted">
-                                                <i class="ti-angle-right"></i> <strong>Name:</strong> <span id="mother-name"></span>
-                                            </li>
+                                            <li id="mother-name" class="text-muted"></li>
                                         </ul>
                                     {% elif field.label == 'Mother notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_mother_notes %}
