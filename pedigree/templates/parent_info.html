@@ -82,7 +82,34 @@
         });
     });
 
-    $('#id_father').bind('keyup change click', function(event) {
+    var fathersEdit = [{% for ped in pedigrees.all %}{% if ped.sex == 'male' and ped.reg_no != pedigree.reg_no %}'{{ ped.reg_no }}', {% endif %}{% endfor %}];
+    var fathersNew = [{% for ped in pedigrees.all %}{% if ped.sex == 'male' %}'{{ ped.reg_no }}', {% endif %}{% endfor %}];
+
+    $('#fathers_edit .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'fathers',
+            source: substringMatcher(fathersEdit),
+        }
+    );
+
+    $('#fathers_new .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'fathers',
+            source: substringMatcher(fathersNew),
+        }
+    );
+
+    $('#id_father').bind('keyup change click typeahead:select', function(event) {
         $.ajax({
             url: "{% url 'get_pedigree_details' %}",
             type: 'GET',
@@ -90,14 +117,23 @@
             dataType: 'text',
             data: {'id': $(this).val()},
             success: function(data) {
-                result = JSON.parse(data);
+                result = JSON.parse(data)
 
                 if (result.result == 'success') {
-                    father_array = JSON.parse(result.pedigree)
-                    father = father_array[0].fields
-                    // if item is complete
-                    $('#father-name').html(father.name);
-                    $('#father-info').removeClass('d-none');
+                    // don't display names if no text in field
+                    if ($('#id_father').val() != '') {
+                        // display full match
+                        if (result.pedigree) {
+                            father_array = JSON.parse(result.pedigree)
+                            father = father_array[0]
+                            // if item is complete
+                            $('#father-info').html('<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + father.fields.name + '</li>');
+                            $('#father-info').removeClass('d-none');
+                        }
+                    } else {
+                        // hide info
+                        $('#father-info').addClass('d-none');
+                    }
                 } else {
                     // hide info
                     $('#father-info').addClass('d-none');
@@ -105,4 +141,37 @@
             }
         });
     });
+
+
+
+
+
+
+
+
+
+
+    // $('#id_father').bind('keyup change click', function(event) {
+    //     $.ajax({
+    //         url: "{% url 'get_pedigree_details' %}",
+    //         type: 'GET',
+    //         headers: {'X-CSRFToken': '{{ csrf_token }}'},
+    //         dataType: 'text',
+    //         data: {'id': $(this).val()},
+    //         success: function(data) {
+    //             result = JSON.parse(data);
+
+    //             if (result.result == 'success') {
+    //                 father_array = JSON.parse(result.pedigree)
+    //                 father = father_array[0].fields
+    //                 // if item is complete
+    //                 $('#father-name').html(father.name);
+    //                 $('#father-info').removeClass('d-none');
+    //             } else {
+    //                 // hide info
+    //                 $('#father-info').addClass('d-none');
+    //             }
+    //         }
+    //     });
+    // });
 </script>
