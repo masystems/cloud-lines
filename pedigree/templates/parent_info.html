@@ -22,9 +22,10 @@
         };
     };
 
-    var motherVals = [{% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}'{{ ped.reg_no }}', {% endif %}{% endfor %}];
+    var mothersEdit = [{% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}'{{ ped.reg_no }}', {% endif %}{% endfor %}];
+    var mothersNew = [{% for ped in pedigrees.all %}{% if ped.sex == 'female' %}'{{ ped.reg_no }}', {% endif %}{% endfor %}];
 
-    $('#mothers_div .typeahead').typeahead(
+    $('#mothers_edit .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
@@ -32,7 +33,19 @@
         },
         {
             name: 'mothers',
-            source: substringMatcher(motherVals),
+            source: substringMatcher(mothersEdit),
+        }
+    );
+
+    $('#mothers_new .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'mothers',
+            source: substringMatcher(mothersNew),
         }
     );
 

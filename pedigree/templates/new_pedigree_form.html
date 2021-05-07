@@ -78,7 +78,7 @@
                 {% elif field.label == 'Registration Number' %}
                         <input class="form-control" name='{{ field.name }}' type="text" value="{{ suggested_reg }}">
                 {% elif field.label == 'Mother' %}
-                    <div id="mothers_div">
+                    <div id="mothers_new">
                         <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}">
                         {% if service.site_mode == 'poultry' %}
                             <small>Leave blank if using a breed group</small>
@@ -209,5 +209,7 @@
 <!--{% endif %}-->
 
 {% block footer %}
+    <!-- Typehead Plugin JavaScript -->
+    <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
     {% include 'parent_info.html' %}
 {% endblock %}
