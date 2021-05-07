@@ -1,5 +1,13 @@
 <!-- display pop up for parent info -->
 <script>
+    
+    $('#mother-info').on('click', '.suggested-mother', function() {
+        // display reg number in input field
+        $('#id_mother').val($(this).attr('id'))
+        // just display the info of that pedigree
+        $('#mother-info').html('<li class="text-muted row"><div class="col-1"><i class="ti-angle-right"></i></div><div class="col-11"><strong>Name:</strong> ' + $(this).attr('name') + '<strong><br/>Reg #:</strong> ' + $(this).attr('id') + '</div></li>');
+    })
+
     $('#id_mother').bind('keyup change click', function(event) {
         $.ajax({
             url: "{% url 'get_pedigree_details' %}",
@@ -9,7 +17,6 @@
             data: {'id': $(this).val()},
             success: function(data) {
                 result = JSON.parse(data);
-
                 if (result.result == 'success') {
                     // don't display names if no text in field
                     if ($('#id_mother').val() != '') {
@@ -18,7 +25,7 @@
                             mother_array = JSON.parse(result.pedigree)
                             mother = mother_array[0]
                             // if item is complete
-                            $('#mother-name').html('<li class="text-muted row"><div class="col-1"><i class="ti-angle-right"></i></div><div class="col-11"><strong>Name:</strong> ' + mother.fields.name + '<strong><br/>Reg #:</strong> ' + mother.fields.reg_no + '</div></li>');
+                            $('#mother-info').html('<li class="text-muted row"><div class="col-1"><i class="ti-angle-right"></i></div><div class="col-11"><strong>Name:</strong> ' + mother.fields.name + '<strong><br/>Reg #:</strong> ' + mother.fields.reg_no + '</div></li>');
                             $('#mother-info').removeClass('d-none');
                         }
                         // display partial matches
@@ -26,10 +33,10 @@
                             mother_array = JSON.parse(result.pedigrees)
                             motherInfoHtml = ''
                             mother_array.forEach( mother => {
-                                motherInfoHtml = motherInfoHtml + '<li class="text-muted row"><div class="col-1"><i class="ti-angle-right"></i></div><div class="col-11"><strong>Name:</strong> ' + mother.fields.name + '<strong><br/>Reg #:</strong> ' + mother.fields.reg_no + '</div></li>'
+                                motherInfoHtml = motherInfoHtml + '<li id="' + mother.fields.reg_no + '" name="' + mother.fields.name + '" class="text-muted row suggested-mother" style="cursor: pointer"><div class="col-1"><i class="ti-angle-right"></i></div><div class="col-11"><strong>Name:</strong> ' + mother.fields.name + '<strong><br/>Reg #:</strong> ' + mother.fields.reg_no + '</div></li>'
                             })
-                            $('#mother-name').html(motherInfoHtml);
-                            $('#mother-info').removeClass('d-none');
+                            $('#mother-info').html(motherInfoHtml)
+                            $('#mother-info').removeClass('d-none')
                         }
                     } else {
                         // hide info

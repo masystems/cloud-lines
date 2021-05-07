@@ -85,9 +85,7 @@
                         {% endif %}
                     </div>
                     <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
-                    <ul class="list-icons d-none" id="mother-info">
-                        <li id="mother-name" class="text-muted"></li>
-                    </ul>
+                    <ul class="list-icons d-none" id="mother-info"></ul>
                 {% elif field.label == 'Father'  %}
                     <div id="fathers">
                         <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.father_title }}">

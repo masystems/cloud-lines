@@ -182,9 +182,7 @@
                                             {% endif %}
                                         </div>
                                         <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
-                                        <ul class="list-icons d-none" id="mother-info">
-                                            <li id="mother-name" class="text-muted"></li>
-                                        </ul>
+                                        <ul class="list-icons d-none" id="mother-info"></ul>
                                     {% elif field.label == 'Mother notes' %}
                                         {% render_field field class="form-control" value=pedigree.parent_mother_notes %}
                                     {% elif field.label == 'Breed group' %}
