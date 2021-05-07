@@ -1,5 +1,44 @@
 <!-- display pop up for parent info -->
+
 <script>
+
+    var substringMatcher = function(strs) {
+        return function findMatches(q, cb) {
+            var matches, substringRegex;
+
+            // an array that will be populated with substring matches
+            matches = [];
+
+            // regex used to determine if a string contains the substring `q`
+            substrRegex = new RegExp(q, 'i');
+
+            // iterate through the pool of strings and for any string that
+            // contains the substring `q`, add it to the `matches` array
+            $.each(strs, function(i, str) {
+                if (substrRegex.test(str)) {
+                    matches.push(str);
+                }
+            });
+
+            cb(matches);
+        };
+    };
+
+    var mothersHelp = [{% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}'{{ ped.reg_no }}', {% endif %}{% endfor %}];
+    $('#mothers_div .typeahead').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+    },
+    {
+        name: 'mothers',
+        source: substringMatcher(mothersHelp)
+    });
+
+    console.log(mothersHelp)
+</script>
+
+<!-- <script>
     
     $('#mother-info').on('click', '.suggested-mother', function() {
         // display reg number in input field
@@ -73,4 +112,4 @@
             }
         });
     });
-</script>
+</script> -->
