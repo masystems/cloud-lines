@@ -36,7 +36,7 @@
         }
     );
 
-    $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
+    $('#id_mother').bind('keyup change click typeahead:select', function(event) {
         $.ajax({
             url: "{% url 'get_pedigree_details' %}",
             type: 'GET',
@@ -44,45 +44,30 @@
             dataType: 'text',
             data: {'id': $(this).val()},
             success: function(data) {
-                successFunction(JSON.parse(data))
-            }
-        });
-    });
+                result = JSON.parse(data)
 
-    $('#id_mother').bind('keyup change click', function(event) {
-        $.ajax({
-            url: "{% url 'get_pedigree_details' %}",
-            type: 'GET',
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            dataType: 'text',
-            data: {'id': $(this).val()},
-            success: function(data) {
-                successFunction(JSON.parse(data))
-            }
-        });
-    });
-
-    function successFunction(result) {
-        if (result.result == 'success') {
-            // don't display names if no text in field
-            if ($('#id_mother').val() != '') {
-                // display full match
-                if (result.pedigree) {
-                    mother_array = JSON.parse(result.pedigree)
-                    mother = mother_array[0]
-                    // if item is complete
-                    $('#mother-info').html('<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</li>');
-                    $('#mother-info').removeClass('d-none');
+                if (result.result == 'success') {
+                    // don't display names if no text in field
+                    if ($('#id_mother').val() != '') {
+                        // display full match
+                        if (result.pedigree) {
+                            mother_array = JSON.parse(result.pedigree)
+                            mother = mother_array[0]
+                            // if item is complete
+                            $('#mother-info').html('<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</li>');
+                            $('#mother-info').removeClass('d-none');
+                        }
+                    } else {
+                        // hide info
+                        $('#mother-info').addClass('d-none');
+                    }
+                } else {
+                    // hide info
+                    $('#mother-info').addClass('d-none');
                 }
-            } else {
-                // hide info
-                $('#mother-info').addClass('d-none');
             }
-        } else {
-            // hide info
-            $('#mother-info').addClass('d-none');
-        }
-    }
+        });
+    });
 
     $('#id_father').bind('keyup change click', function(event) {
         $.ajax({
