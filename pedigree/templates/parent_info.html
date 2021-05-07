@@ -59,7 +59,7 @@
             type: 'GET',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
-            data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg},
+            data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'mother'},
             success: function(data) {
                 result = JSON.parse(data)
 
@@ -123,7 +123,7 @@
             type: 'GET',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
-            data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg},
+            data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'father'},
             success: function(data) {
                 result = JSON.parse(data)
 
