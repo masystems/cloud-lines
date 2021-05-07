@@ -764,28 +764,9 @@ def create_approval(request, pedigree, attached_service, state, type):
 def get_pedigree_details(request):
     attached_service = get_main_account(request.user)
     try:
-        # get completely matching pedigree
         pedigree = Pedigree.objects.get(account=attached_service, reg_no=request.GET['id'])
-    
-    # not a full match
     except Pedigree.DoesNotExist:
-        # get partially matching pedigrees
-        pedigrees = Pedigree.objects.filter(account=attached_service, reg_no__icontains=request.GET['id'])
-        
-        # fail if none match
-        if pedigrees.count() == 0:
-            return HttpResponse(json.dumps({'result': 'fail'}))
-        
-        # return up to first 5 partial matches
-        else:
-            pedigrees_to_serialize = []
-            for index in range(pedigrees.count()):
-                pedigrees_to_serialize.append(pedigrees[index])
-            pedigrees = serializers.serialize('json', pedigrees_to_serialize, ensure_ascii=False)
-            return HttpResponse(json.dumps({'result': 'success',
-                                            'pedigrees': pedigrees}))
-    
-    # return the full match
+        return HttpResponse(json.dumps({'result': 'fail'}))
     pedigree = serializers.serialize('json', [pedigree], ensure_ascii=False)
     return HttpResponse(json.dumps({'result': 'success',
                                     'pedigree': pedigree}))

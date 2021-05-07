@@ -1,7 +1,5 @@
 <!-- display pop up for parent info -->
-
 <script>
-
     var substringMatcher = function(strs) {
         return function findMatches(q, cb) {
             var matches, substringRegex;
@@ -24,28 +22,32 @@
         };
     };
 
-    var mothersHelp = [{% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}'{{ ped.reg_no }}', {% endif %}{% endfor %}];
-    $('#mothers_div .typeahead').typeahead({
-        hint: true,
-        highlight: true,
-        minLength: 1
-    },
-    {
-        name: 'mothers',
-        source: substringMatcher(mothersHelp)
+    var motherVals = [{% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}'{{ ped.reg_no }}', {% endif %}{% endfor %}];
+
+    $('#mothers_div .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'mothers',
+            source: substringMatcher(motherVals),
+        }
+    );
+
+    $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
+        $.ajax({
+            url: "{% url 'get_pedigree_details' %}",
+            type: 'GET',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'id': $(this).val()},
+            success: function(data) {
+                successFunction(JSON.parse(data))
+            }
+        });
     });
-
-    console.log(mothersHelp)
-</script>
-
-<!-- <script>
-    
-    $('#mother-info').on('click', '.suggested-mother', function() {
-        // display reg number in input field
-        $('#id_mother').val($(this).attr('id'))
-        // just display the info of that pedigree
-        $('#mother-info').html('<li class="text-muted row"><div class="col-1"><i class="ti-angle-right"></i></div><div class="col-11"><strong>Name:</strong> ' + $(this).attr('name') + '<strong><br/>Reg #:</strong> ' + $(this).attr('id') + '</div></li>');
-    })
 
     $('#id_mother').bind('keyup change click', function(event) {
         $.ajax({
@@ -55,39 +57,32 @@
             dataType: 'text',
             data: {'id': $(this).val()},
             success: function(data) {
-                result = JSON.parse(data);
-                if (result.result == 'success') {
-                    // don't display names if no text in field
-                    if ($('#id_mother').val() != '') {
-                        // display full match
-                        if (result.pedigree) {
-                            mother_array = JSON.parse(result.pedigree)
-                            mother = mother_array[0]
-                            // if item is complete
-                            $('#mother-info').html('<li class="text-muted row"><div class="col-1"><i class="ti-angle-right"></i></div><div class="col-11"><strong>Name:</strong> ' + mother.fields.name + '<strong><br/>Reg #:</strong> ' + mother.fields.reg_no + '</div></li>');
-                            $('#mother-info').removeClass('d-none');
-                        }
-                        // display partial matches
-                        else if (result.pedigrees) {
-                            mother_array = JSON.parse(result.pedigrees)
-                            motherInfoHtml = ''
-                            mother_array.forEach( mother => {
-                                motherInfoHtml = motherInfoHtml + '<li id="' + mother.fields.reg_no + '" name="' + mother.fields.name + '" class="text-muted row suggested-mother" style="cursor: pointer"><div class="col-1"><i class="ti-angle-right"></i></div><div class="col-11"><strong>Name:</strong> ' + mother.fields.name + '<strong><br/>Reg #:</strong> ' + mother.fields.reg_no + '</div></li>'
-                            })
-                            $('#mother-info').html(motherInfoHtml)
-                            $('#mother-info').removeClass('d-none')
-                        }
-                    } else {
-                        // hide info
-                        $('#mother-info').addClass('d-none');
-                    }
-                } else {
-                    // hide info
-                    $('#mother-info').addClass('d-none');
-                }
+                successFunction(JSON.parse(data))
             }
         });
     });
+
+    function successFunction(result) {
+        if (result.result == 'success') {
+            // don't display names if no text in field
+            if ($('#id_mother').val() != '') {
+                // display full match
+                if (result.pedigree) {
+                    mother_array = JSON.parse(result.pedigree)
+                    mother = mother_array[0]
+                    // if item is complete
+                    $('#mother-info').html('<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</li>');
+                    $('#mother-info').removeClass('d-none');
+                }
+            } else {
+                // hide info
+                $('#mother-info').addClass('d-none');
+            }
+        } else {
+            // hide info
+            $('#mother-info').addClass('d-none');
+        }
+    }
 
     $('#id_father').bind('keyup change click', function(event) {
         $.ajax({
@@ -112,4 +107,4 @@
             }
         });
     });
-</script> -->
+</script>
