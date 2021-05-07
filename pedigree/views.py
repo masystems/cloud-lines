@@ -763,6 +763,12 @@ def create_approval(request, pedigree, attached_service, state, type):
 @never_cache
 def get_pedigree_details(request):
     attached_service = get_main_account(request.user)
+    # if this was called from edit form and parent given is the same as pedigree being editted, return fail
+    if request.GET.get('form_type') and request.GET.get('pedigree'):
+        if request.GET['form_type'] == 'edit':
+            if request.GET['id'] == request.GET['pedigree']:
+                return HttpResponse(json.dumps({'result': 'fail'}))
+    
     try:
         pedigree = Pedigree.objects.get(account=attached_service, reg_no=request.GET['id'])
     except Pedigree.DoesNotExist:
