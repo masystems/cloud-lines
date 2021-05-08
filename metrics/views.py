@@ -13,6 +13,7 @@ import requests
 import pytz
 import boto3
 import urllib.parse
+import urllib.request
 from time import time
 from boto3.s3.transfer import TransferConfig
 from threading import Thread
@@ -330,12 +331,10 @@ def stud_advisor_results(request, id):
     sa_queue_item = StudAdvisorQueue.objects.get(account=attached_service, id=id)
     mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
     mother_details = eval(mother_details.content.decode())
-    resource = boto3.resource('s3')
-    bucket = resource.Bucket(settings.AWS_S3_CUSTOM_DOMAIN)
-    bucket.download_file(f"metrics/results-{sa_queue_item.file}", f'/tmp/results-{sa_queue_item.file}')
 
-    with open(f'/tmp/results-{sa_queue_item.file}') as results_file:
-        studs_raw = load(results_file)
+    with urllib.request.urlopen(f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/metrics/results-{sa_queue_item.file}") as results_file:
+        studs_raw = loads(results_file.read().decode())
+
     studs_data = calculate_sa_thresholds(studs_raw, attached_service, sa_queue_item.mother, mother_details)
 
     return render(request, 'sa_results.html', {'stud_data': studs_data,
