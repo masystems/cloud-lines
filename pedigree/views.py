@@ -763,10 +763,23 @@ def create_approval(request, pedigree, attached_service, state, type):
 @never_cache
 def get_pedigree_details(request):
     attached_service = get_main_account(request.user)
+    
     try:
         pedigree = Pedigree.objects.get(account=attached_service, reg_no=request.GET['id'])
     except Pedigree.DoesNotExist:
         return HttpResponse(json.dumps({'result': 'fail'}))
+    
+    # if this was called from edit form and parent given is the same as pedigree being editted, return fail
+    if request.GET.get('form_type') and request.GET.get('pedigree'):
+        if request.GET['form_type'] == 'edit':
+            if pedigree.reg_no == request.GET['pedigree']:
+                return HttpResponse(json.dumps({'result': 'fail'}))
+
+    # if the input field is a mother/father field, return fail if the input pedigree is the wrong sex
+    if request.GET.get('parent_type'):
+        if (request.GET['parent_type'] == 'father' and pedigree.sex != 'male') or (request.GET['parent_type'] == 'mother' and pedigree.sex != 'female'):
+            return HttpResponse(json.dumps({'result': 'fail'}))
+    
     pedigree = serializers.serialize('json', [pedigree], ensure_ascii=False)
     return HttpResponse(json.dumps({'result': 'success',
                                     'pedigree': pedigree}))
