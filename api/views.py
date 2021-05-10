@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.authentication import BasicAuthentication, TokenAuthentication
 from .serializers import ApiUpdatesSerializer, \
     ApiAttachedServiceSerializer, \
     ApiPedigreeSerializer, \
@@ -54,6 +55,7 @@ class AttachedServiceViews(viewsets.ModelViewSet):
 
 
 class PedigreeViews(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication)
     serializer_class = ApiPedigreeSerializer
     filter_backends = [SearchFilter]
     permission_classes = [IsAuthenticated]
@@ -120,6 +122,8 @@ class Authenticate(viewsets.ModelViewSet):
     serializer_class = ApiAuthentication
 
 
+
+########## Auth ###########
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
