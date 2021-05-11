@@ -96,7 +96,7 @@ def run_coi(request):
     obj.last_run = datetime.now()
     obj.save()
 
-    Thread(target=coi, args=(request, )).start()
+    coi(request)
 
     obj.last_run = calc_last_run(attached_service, obj)
 
@@ -138,10 +138,7 @@ def coi(request):
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
                             json=dumps(data, cls=DjangoJSONEncoder))
 
-    # coi_dict = loads(coi_raw.json())
-    #
-    # for pedigree in coi_dict:
-    #     Pedigree.objects.filter(account=attached_service, id=pedigree['Indiv']).update(coi=pedigree['Inbr'])
+    #coi_dict = loads(coi_raw.json())
 
 
 def kinship(request):
