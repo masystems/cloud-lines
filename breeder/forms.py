@@ -14,10 +14,10 @@ class BreederForm(forms.ModelForm):
             'active': _('Is the breeder currently active?'),
         }
         widgets = {
-            'breeding_prefix': forms.TextInput(attrs={'required': True, 'class': 'form-control', 'id': 'breeding_prefix'}),
-            'contact_name': forms.TextInput(attrs={'class': 'form-control', 'id': 'contact_name'}),
-            'address': forms.TextInput(attrs={'class': 'form-control', 'id': 'address'}),
-            'phone_number1': forms.TextInput(attrs={'class': 'form-control', 'id': 'phone_number1'}),
-            'phone_number2': forms.TextInput(attrs={'class': 'form-control', 'id': 'phone_number2'}),
-            'email': forms.TextInput(attrs={'class': 'form-control', 'id': 'email'}),
+            'breeding_prefix': forms.TextInput(attrs={'required': True, 'class': 'form-control', 'id': 'id_breeding_prefix'}),
+            'contact_name': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_contact_name'}),
+            'address': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_address'}),
+            'phone_number1': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_phone_number1'}),
+            'phone_number2': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_phone_number2'}),
+            'email': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_email'}),
         }
