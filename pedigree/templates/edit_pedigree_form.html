@@ -168,11 +168,11 @@
                                 <div class="col-md-9">
                                     {% if field.label == 'Breeder' %}
                                         <div id="breeders">
-                                            <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.breeder != None %}{{ pedigree.breeder }}{% endif %}">
+                                            <input id="id_breeder" class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.breeder != None %}{{ pedigree.breeder }}{% endif %}">
                                         </div>
                                     {% elif field.label == 'Current owner'%}
                                         <div id="breeders">
-                                            <input class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.current_owner != None %}{{ pedigree.current_owner }}{% endif %}">
+                                            <input id="id_current_owner" class="typeahead form-control" name='{{ field.name }}' type="text" value="{% if pedigree.current_owner != None %}{{ pedigree.current_owner }}{% endif %}">
                                         </div>
                                     {% elif field.label == 'Mother' %}
                                         <div id="mothers_edit">
@@ -184,7 +184,7 @@
                                         <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
                                         <ul class="list-icons d-none" id="mother-info"></ul>
                                     {% elif field.label == 'Mother notes' %}
-                                        {% render_field field class="form-control" value=pedigree.parent_mother_notes %}
+                                        {% render_field field class="form-control" value=pedigree.parent_mother_notes id="id_mother_notes" %}
                                     {% elif field.label == 'Breed group' %}
                                         {% if service.site_mode == 'poultry' %}
                                             <div id="breed_groups">
@@ -198,20 +198,20 @@
                                         <!-- hidden note which will show name of mother if reg number has a match -->
                                         <ul class="list-icons d-none" id="father-info"></ul>
                                     {% elif field.label == 'Father notes' %}
-                                        {% render_field field class="form-control" value=pedigree.parent_father_notes %}
+                                        {% render_field field class="form-control" value=pedigree.parent_father_notes id="id_father_notes" %}
 
                                     {% elif field.label == 'Registration Number' %}
-                                        {% render_field field class="form-control" value=pedigree.reg_no %}
+                                        {% render_field field class="form-control" value=pedigree.reg_no id="id_reg_no" %}
                                     {% elif field.label == 'Tag Number' %}
-                                        {% render_field field class="form-control" value=pedigree.tag_no %}
+                                        {% render_field field class="form-control" value=pedigree.tag_no id="id_tag_no" %}
                                     {% elif field.label == 'Name' %}
-                                        {% render_field field class="form-control" value=pedigree.name %}
+                                        {% render_field field class="form-control" value=pedigree.name id="id_name" %}
                                     {% elif field.label == 'Date of registration' %}
-                                         {% render_field field class="form-control" type="date" value=pedigree.date_of_registration %}
+                                         {% render_field field class="form-control" type="date" value=pedigree.date_of_registration id="id_dor" %}
                                     {% elif field.label == 'Date of birth' %}
-                                        {% render_field field class="form-control" type="date" value=pedigree.dob %}
+                                        {% render_field field class="form-control" type="date" value=pedigree.dob id="id_dob" %}
                                     {% elif field.label == 'Dod' %}
-                                        {% render_field field class="form-control" type="date" value=pedigree.dod%}
+                                        {% render_field field class="form-control" type="date" value=pedigree.dod id="id_dod" %}
                                     {% elif field.label == 'Status' %}
                                         <div class="radio radio-info pt-2">
                                             {% for option in field %}
@@ -238,15 +238,15 @@
                                     {% elif field.label == 'Breed' %}
                                         {% if service.service.multi_breed %}
                                             <div id="breeds">
-                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ pedigree.breed.breed_name }}" value="{{ pedigree.breed.breed_name }}">
+                                                <input id="id_breed" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ pedigree.breed.breed_name }}" value="{{ pedigree.breed.breed_name }}">
                                             </div>
                                         {% else %}
-                                            <input name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
+                                            <input id="id_breed" name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
                                             <input class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
                                         {% endif %}
                                     {% elif field.label == 'Sale or hire' %}
                                         <div>
-                                            <input name='{{ field.name }}' type="checkbox"  class="mt-2" {% if pedigree.sale_or_hire %}checked{% endif %}>
+                                            <input id="id_sale_or_hire" name='{{ field.name }}' type="checkbox"  class="mt-2" {% if pedigree.sale_or_hire %}checked{% endif %}>
                                         </div>
                                     {% elif field.label == 'Custom fields' %}
                                         {% if custom_fields %}
