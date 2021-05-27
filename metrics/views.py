@@ -218,8 +218,9 @@ def run_mean_kinship(request):
 
     obj.last_run = datetime.now()
     obj.save()
-    mk_thread = Thread(target=mean_kinship, args=(request, ))
-    mk_thread.start()
+    # mk_thread = Thread(target=mean_kinship, args=(request, ))
+    # mk_thread.start()
+    mean_kinship(request)
     obj.last_run = calc_last_run(attached_service, obj)
     mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     return HttpResponse(dumps({'mean_kinship_date': mean_kinship_date}))
