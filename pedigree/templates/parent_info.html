@@ -1,5 +1,5 @@
 <!-- display pop up for parent info -->
-<script>
+<!-- <script>
     var substringMatcher = function(strs) {
         return function findMatches(q, cb) {
             var matches, substringRegex;
@@ -148,5 +148,51 @@
                 }
             }
         });
+    });
+</script> -->
+
+<script>
+    var pedData = [
+        {
+            "name": "name1",
+            "reg_no": "reg1",
+        },
+        {
+            "name": "name2",
+            "reg_no": "reg2",
+        },
+        {
+            "name": "name3",
+            "reg_no": "reg3",
+        },
+        {
+            "name": "name4",
+            "reg_no": "reg4",
+        },
+        {
+            "name": "name5",
+            "reg_no": "reg5",
+        },
+    ];
+
+    var peds = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        local: pedData
+    });
+
+    peds.initialize();
+
+    $('.typeahead').typeahead(null, {
+        name: 'peds',
+        // the text entered in the field after typeahead selected
+        displayKey: 'reg_no',
+        source: peds.ttAdapter(),
+        templates: {
+            suggestion: function (ped) {
+                console.log(ped)
+                return '<p>' + ped.reg_no + '</p>';
+            }
+        }
     });
 </script>
