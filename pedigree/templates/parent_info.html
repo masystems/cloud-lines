@@ -152,29 +152,12 @@
 </script> -->
 
 <script>
-    var pedData = [
-        {
-            "name": "name1",
-            "reg_no": "reg1",
-        },
-        {
-            "name": "name2",
-            "reg_no": "reg2",
-        },
-        {
-            "name": "name3",
-            "reg_no": "reg3",
-        },
-        {
-            "name": "name4",
-            "reg_no": "reg4",
-        },
-        {
-            "name": "name5",
-            "reg_no": "reg5",
-        },
-    ];
+    var pedData = []
 
+    pedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' %}
+        {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
+    {% endif %}{% endfor %})
+    console.log(pedData)
     var peds = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
