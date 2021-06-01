@@ -27,6 +27,7 @@ class KinshipQueue(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
     mother = models.ForeignKey(Pedigree, on_delete=models.CASCADE, blank=True, null=True, related_name="kmotherq", verbose_name="Mother")
     father = models.ForeignKey(Pedigree, on_delete=models.CASCADE, blank=True, null=True, related_name="kfatherq", verbose_name="Father")
+    result = models.CharField(max_length=250, blank=True)
     file = models.CharField(max_length=250)
     email_sent = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)

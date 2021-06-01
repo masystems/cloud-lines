@@ -6,6 +6,7 @@ from breed.models import Breed
 from breed_group.models import BreedGroup
 from cloud_lines.models import Service, Faq
 from account.models import AttachedService
+from metrics.models import KinshipQueue
 from django.contrib.auth.models import User
 
 
@@ -74,3 +75,9 @@ class ApiServiceSerializer(serializers.ModelSerializer):
                   'number_of_animals',
                   'multi_breed',
                   'active')
+
+
+class ApiKinshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = KinshipQueue
+        fields = '__all__'
