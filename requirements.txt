@@ -88,7 +88,7 @@ tqdm==4.19.1
 troposphere==2.5.3
 ujson==1.35
 Unidecode==1.1.1
-urllib3==1.25.8
+urllib3==1.26.5
 virtualenv==16.7.9
 WeasyPrint==51
 webencodings==0.5.1
