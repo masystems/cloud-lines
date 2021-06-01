@@ -184,7 +184,8 @@ def kinship(request):
     multi_part_upload_with_s3(local_output, remote_output)
 
     data = {'data_path': remote_output,
-            'file_name': file_name}
+            'file_name': file_name,
+            'domain': attached_service.domain}
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother.id}/{father.id}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
