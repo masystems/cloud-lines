@@ -203,8 +203,8 @@ def kinship_results(request, id):
     bucket = resource.Bucket(settings.AWS_S3_CUSTOM_DOMAIN)
     bucket.download_file(f"metrics/results-{k_queue_item.file}", f'/tmp/results-{k_queue_item.file}')
 
-    with open(f'/tmp/results-{k_queue_item.file}') as results_file:
-        kinship_raw = load(results_file)
+    with urllib.request.urlopen(f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/metrics/results-{k_queue_item.file}") as results_file:
+        kinship_raw = loads(results_file.read().decode())
 
     kinship_result = kinship_raw[str(k_queue_item.mother.id)][0][str(k_queue_item.father.id)]
 
