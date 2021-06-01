@@ -218,7 +218,9 @@ def run_mean_kinship(request):
 
     obj.last_run = datetime.now()
     obj.save()
-    Thread(target=mean_kinship, args=(request, ))
+    # mk_thread = Thread(target=mean_kinship, args=(request, ))
+    # mk_thread.start()
+    mean_kinship(request)
     obj.last_run = calc_last_run(attached_service, obj)
     mean_kinship_date = obj.last_run.strftime("%b %d, %Y %H:%M:%S")
     return HttpResponse(dumps({'mean_kinship_date': mean_kinship_date}))
@@ -253,14 +255,15 @@ def mean_kinship(request):
             multi_part_upload_with_s3(local_output, remote_output)
 
             data = {'data_path': remote_output,
-                    'file_name': file_name}
+                    'file_name': file_name,
+                    'domain': attached_service.domain}
 
             coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
                                     json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
-            coi_dict = loads(coi_raw.json())
-            for pedigree, value in coi_dict.items():
-                Pedigree.objects.filter(account=attached_service, id=pedigree.strip('X')).update(mean_kinship=value['1'])
+            # coi_dict = loads(coi_raw.json())
+            # for pedigree, value in coi_dict.items():
+            #     Pedigree.objects.filter(account=attached_service, id=pedigree.strip('X')).update(mean_kinship=value['1'])
 
 
 def stud_advisor_mother_details(request, mother):
