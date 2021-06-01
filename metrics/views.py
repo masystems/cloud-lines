@@ -144,7 +144,6 @@ def coi(request):
 def kinship(request):
     attached_service = get_main_account(request.user)
     epoch = int(time())
-
     pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
                                                                          'parent_father__id',
                                                                          'parent_mother__id',
@@ -183,13 +182,17 @@ def kinship(request):
 
     multi_part_upload_with_s3(local_output, remote_output)
 
+    kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father,
+                                      file=file_name)
+
     data = {'data_path': remote_output,
             'file_name': file_name,
-            'domain': attached_service.domain}
+            'domain': attached_service.domain,
+            'kin_q_id': kin.id}
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother.id}/{father.id}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-    kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father, file=file_name)
+
     response = {'status': 'message',
                 'msg': "",
                 'item_id': kin.id
