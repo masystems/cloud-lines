@@ -204,13 +204,7 @@ def kinship_results(request, id):
     attached_service = get_main_account(request.user)
     k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)
 
-    with urllib.request.urlopen(f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/metrics/results-{k_queue_item.file}") as results_file:
-        kinship_raw = loads(results_file.read().decode())
-
-    kinship_result = kinship_raw[str(k_queue_item.mother.id)][0][str(k_queue_item.father.id)]
-
-    return render(request, 'k_results.html', {'k_queue_item': k_queue_item,
-                                              'kinship_result': kinship_result})
+    return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
 
 
 def run_mean_kinship(request):
