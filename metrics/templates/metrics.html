@@ -465,7 +465,7 @@
             if ($(row).attr('complete') == 'False') {
                 // get id of sa queue item
                 var itemId = $(row).attr('id');
-                
+
                 // do ajax call to see if item is complete
                 $.ajax({
                     url: "{% url 'results_complete' %}",
@@ -484,7 +484,11 @@
                                 // change spinning cog to tick
                                 $(row).find('td[class*="complete"]').html('<i class="fad fa-check text-success"></i>');
                                 // enable the results button
-                                $(row).find('td[class*="results"]').html('<a href="stud_advisor_results/' + itemId + '"><button class="btn btn-info">View</button> </a> ');
+                                if ($(row)[0]['innerText'].includes('Kinship:') > 0) {
+                                    $(row).find('td[class*="results"]').html('<a href="kinship_results/' + itemId + '"><button class="btn btn-info">View</button> </a> ');
+                                } else if ($(row)[0]['innerText'].includes('Stud Advisor:') > 0) {
+                                    $(row).find('td[class*="results"]').html('<a href="stud_advisor_results/' + itemId + '"><button class="btn btn-info">View</button> </a> ');
+                                }
                             }
                         } else {
                             // queue item with the given id doesn't exist
