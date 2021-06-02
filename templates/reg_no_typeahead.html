@@ -5,7 +5,6 @@
     addPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' %}
         {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
     {% endif %}{% endfor %})
-    console.log(addPedData)
     var addPeds = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -48,7 +47,6 @@
     editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}
         {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
     {% endif %}{% endfor %})
-    console.log(editPedData)
     var editPeds = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -138,7 +136,6 @@
     addPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' %}
         {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
     {% endif %}{% endfor %})
-    console.log(addPedData)
     var peds = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -148,7 +145,7 @@
     peds.initialize();
 
     // use the data to set up typeahead
-    $('#fathers_new .typeahead').typeahead(
+    $('#fathers_new .typeahead, #fathers .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
@@ -181,7 +178,6 @@
     editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' and ped.reg_no != pedigree.reg_no %}
         {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
     {% endif %}{% endfor %})
-    console.log(editPedData)
     var peds = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
