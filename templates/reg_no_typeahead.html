@@ -14,7 +14,7 @@
     addPeds.initialize();
 
     // use the data to set up typeahead for add pedigree form
-    $('#mothers_new .typeahead, #mothers .typeahead').typeahead(
+    $('#mothers_new .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
@@ -44,9 +44,19 @@
 
     // get an array of dictionaries of female pedigrees for edit pedigree form
     var editPedData = []
-    editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}
-        {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-    {% endif %}{% endfor %})
+    
+    // check what context variable we have for pedigree
+    if ('{{ pedigree.reg_no }}' != '') {
+        editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}
+            {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
+        {% endif %}{% endfor %})
+    }
+    else {
+        editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != lvl1.reg_no %}
+            {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
+        {% endif %}{% endfor %})
+    }
+
     var editPeds = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -56,7 +66,7 @@
     editPeds.initialize();
 
     // use the data to set up typeahead for edit pedigree form
-    $('#mothers_edit .typeahead').typeahead(
+    $('#mothers_edit .typeahead, #mothers .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
@@ -136,26 +146,26 @@
     addPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' %}
         {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
     {% endif %}{% endfor %})
-    var peds = new Bloodhound({
+    var addPeds = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         local: addPedData,
         identify: function(ped) { return ped.reg_no },
     });
-    peds.initialize();
+    addPeds.initialize();
 
     // use the data to set up typeahead
-    $('#fathers_new .typeahead, #fathers .typeahead').typeahead(
+    $('#fathers_new .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
             minLength: 1,
         },
         {
-        name: 'peds',
+        name: 'addPeds',
         // the text entered in the field after typeahead selected
         displayKey: 'reg_no',
-        source: peds.ttAdapter(),
+        source: addPeds.ttAdapter(),
         templates: {
             // this returns each suggestion for the dropdown
             suggestion: function (ped) {
@@ -175,29 +185,39 @@
 
     // get an array of dictionaries of male pedigrees
     var editPedData = []
-    editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' and ped.reg_no != pedigree.reg_no %}
-        {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-    {% endif %}{% endfor %})
-    var peds = new Bloodhound({
+    
+    // check what context variable we have for pedigree
+    if ('{{ pedigree.reg_no }}' != '') {
+        editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' and ped.reg_no != pedigree.reg_no %}
+            {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
+        {% endif %}{% endfor %})
+    }
+    else {
+        editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' and ped.reg_no != lvl1.reg_no %}
+            {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
+        {% endif %}{% endfor %})
+    }
+    
+    var editPeds = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         local: editPedData,
         identify: function(ped) { return ped.reg_no },
     });
-    peds.initialize();
+    editPeds.initialize();
 
     // use the data to set up typeahead
-    $('#fathers_edit .typeahead').typeahead(
+    $('#fathers_edit .typeahead, #fathers .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
             minLength: 1,
         },
         {
-        name: 'peds',
+        name: 'editPeds',
         // the text entered in the field after typeahead selected
         displayKey: 'reg_no',
-        source: peds.ttAdapter(),
+        source: editPeds.ttAdapter(),
         templates: {
             // this returns each suggestion for the dropdown
             suggestion: function (ped) {
