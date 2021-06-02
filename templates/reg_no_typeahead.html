@@ -97,9 +97,15 @@
     // Ajax call to get and display name if a full female reg number is in the field
     $('#id_mother').bind('keyup change click typeahead:select', function(event) {
         var ped_reg = ''
+        
+        // check which context variable we need to use for pedigree
         if ($(this).attr('form_type') == 'edit') {
             ped_reg = '{{ pedigree.reg_no }}'
         }
+        else if ($(this).attr('form_type') == 'view') {
+            ped_reg = '{{ lvl1.reg_no }}'
+        }
+        
         $.ajax({
             url: "{% url 'get_pedigree_details' %}",
             type: 'GET',
@@ -238,9 +244,15 @@
     // Ajax call to get and display name if a full male reg number is in the field
     $('#id_father').bind('keyup change click typeahead:select', function(event) {
         var ped_reg = ''
+        
+        // check which context variable we need to use for pedigree
         if ($(this).attr('form_type') == 'edit') {
             ped_reg = '{{ pedigree.reg_no }}'
         }
+        else if ($(this).attr('form_type') == 'view') {
+            ped_reg = '{{ lvl1.reg_no }}'
+        }
+
         $.ajax({
             url: "{% url 'get_pedigree_details' %}",
             type: 'GET',
