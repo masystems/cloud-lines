@@ -184,7 +184,7 @@ def kinship(request):
 
     kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father,
                                       file=file_name)
-
+    kin.save()
     data = {'data_path': remote_output,
             'file_name': file_name,
             'domain': attached_service.domain,
