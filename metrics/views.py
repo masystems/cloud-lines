@@ -144,7 +144,6 @@ def coi(request):
 def kinship(request):
     attached_service = get_main_account(request.user)
     epoch = int(time())
-
     pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
                                                                          'parent_father__id',
                                                                          'parent_mother__id',
@@ -183,12 +182,17 @@ def kinship(request):
 
     multi_part_upload_with_s3(local_output, remote_output)
 
+    kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father,
+                                      file=file_name)
+    kin.save()
     data = {'data_path': remote_output,
-            'file_name': file_name}
+            'file_name': file_name,
+            'domain': attached_service.domain,
+            'kin_q_id': kin.id}
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother.id}/{father.id}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-    kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father, file=file_name)
+
     response = {'status': 'message',
                 'msg': "",
                 'item_id': kin.id
@@ -199,17 +203,8 @@ def kinship(request):
 def kinship_results(request, id):
     attached_service = get_main_account(request.user)
     k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)
-    resource = boto3.resource('s3')
-    bucket = resource.Bucket(settings.AWS_S3_CUSTOM_DOMAIN)
-    bucket.download_file(f"metrics/results-{k_queue_item.file}", f'/tmp/results-{k_queue_item.file}')
 
-    with open(f'/tmp/results-{k_queue_item.file}') as results_file:
-        kinship_raw = load(results_file)
-
-    kinship_result = kinship_raw[str(k_queue_item.mother.id)][0][str(k_queue_item.father.id)]
-
-    return render(request, 'k_results.html', {'k_queue_item': k_queue_item,
-                                              'kinship_result': kinship_result})
+    return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
 
 
 def run_mean_kinship(request):
@@ -355,7 +350,16 @@ def results_complete(request):
         # check if item is complete
         tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
         results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
+
         # set item to complete if it's true
+        try:
+            # for kinship queue items that don't create a result file on s3
+            if item.result:
+                item.complete = True
+                item.save()
+        except AttributeError:
+            pass
+
         if results_file.status_code == 200:
             item.complete = True
             item.save()
