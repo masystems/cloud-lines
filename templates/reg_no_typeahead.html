@@ -95,7 +95,7 @@
     });
 
     // Ajax call to get and display name if a full female reg number is in the field
-    $('#id_mother').bind('keyup change click typeahead:select', function(event) {
+    $('#id_mother').bind('keyup change click typeahead:select', function() {
         var ped_reg = ''
         
         // check which context variable we need to use for pedigree
@@ -242,7 +242,7 @@
     });
 
     // Ajax call to get and display name if a full male reg number is in the field
-    $('#id_father').bind('keyup change click typeahead:select', function(event) {
+    $('#id_father').bind('keyup change click typeahead:select', function() {
         var ped_reg = ''
         
         // check which context variable we need to use for pedigree
@@ -336,7 +336,7 @@
     });
 
     // Ajax call to get and display name if a full female reg number is in the field
-    $('#id_reg_no').bind('keyup change click typeahead:select', function(event) {
+    $('#id_reg_no').bind('keyup change click typeahead:select', function() {
         var ped_reg = ''
         
         // check which context variable we need to use for pedigree
@@ -470,7 +470,7 @@
     });
 
     // Ajax call to get and display name if a full living male/female is in any of the fields
-    $('#id_mother, #id_father, #sa_mother').bind('keyup change click typeahead:select', function(event) {
+    $('#id_mother, #id_father, #sa_mother').bind('keyup change click typeahead:select', function() {
         // there is no single pedigree we are editing, as this is metrics page
         var ped_reg = ''
         // get the element that has triggered this function
