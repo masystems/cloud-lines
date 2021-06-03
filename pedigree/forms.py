@@ -56,18 +56,19 @@ class PedigreeForm(forms.Form):
     mother_notes = forms.CharField(required=False)
     mother_notes.widget.attrs['class'] = 'form-control'
 
-    date_of_death = forms.DateField(required=False, widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-    date_of_death.widget.attrs['class'] = 'form-control'
-    date_of_death.widget.attrs['placeholder'] = 'dd/mm/yyyy'
-
     breed_group = forms.CharField(required=False)
 
     description = forms.CharField(widget=forms.Textarea, required=False)
     description.widget.attrs['class'] = 'form-control'
 
-    breed = forms.CharField(required=True)
+    date_of_death = forms.DateField(required=False, widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    date_of_death.widget.attrs['class'] = 'form-control'
+    date_of_death.widget.attrs['placeholder'] = 'dd/mm/yyyy'
+
     custom_fields = forms.CharField(widget=forms.Textarea, required=False)
     custom_fields.widget.attrs['class'] = 'form-control'
+
+    breed = forms.CharField(required=True)
 
     sale_or_hire = forms.BooleanField(required=False)
     sale_or_hire.widget.attrs['class'] = 'form-control'
