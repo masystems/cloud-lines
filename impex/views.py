@@ -188,7 +188,7 @@ def import_pedigree_data(request):
             # iterate through columns
             for key, val in request.POST.items():
                 # add custom field columns
-                if key in field_names:
+                if key in field_names and val != '---':
                     custom_fields_in.append(key)
                 
                 # remove blank ('---') entries ###################
