@@ -279,6 +279,8 @@ def import_pedigree_data(request):
                                 'name': ped_name,
                                 'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
                             })
+                        else:
+                            current_owner_obj = current_owner_obj.first()
                     else:
                         current_owner_obj = None
                 except KeyError:
