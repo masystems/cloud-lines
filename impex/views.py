@@ -67,6 +67,13 @@ def export(request):
                             except ObjectDoesNotExist:
                                 breed_prefix = ""
                             row.append('{}'.format(breed_prefix))
+                        elif key == 'current_owner_id':
+                            try:
+                                current_owner = Breeder.objects.get(id=val)
+                                current_owner_prefix = current_owner.breeding_prefix
+                            except ObjectDoesNotExist:
+                                current_owner_prefix = ""
+                            row.append('{}'.format(current_owner_prefix))
                         elif key == 'breed_id':
                             try:
                                 breed = Breed.objects.get(id=val)
