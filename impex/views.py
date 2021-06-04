@@ -217,6 +217,7 @@ def import_pedigree_data(request):
             father_notes = post_data['parent_father_notes'] or ''
             mother = post_data['parent_mother'] or ''
             mother_notes = post_data['parent_mother_notes'] or ''
+            sale_or_hire = post_data['sale_or_hire'] or ''
 
             # errors is a dictionary to keep track of missing and invalid fields
             errors = {}
@@ -611,7 +612,33 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
-                #############################
+                ############################# sale or hire
+                try:
+                    # if sale_or_hire given
+                    if row[sale_or_hire] != '':
+                        # if it's valid, save it
+                        if row[sale_or_hire].lower() in ('yes', 'no'):
+                            if row[sale_or_hire].lower() == 'yes':
+                                pedigree.sale_or_hire = True
+                            else:
+                                pedigree.sale_or_hire = False
+                        # invalid, so add error
+                        else:
+                            errors['invalid'].append({
+                                'col': 'For Sale/Hire',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': 'the input for sale/hire, if given, must be "yes" or "no"'
+                            })
+                            # delete pedigree if one was created
+                            if pedigree.id:
+                                pedigree.delete()
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
 
                 #################### breed
                 # not organisation
