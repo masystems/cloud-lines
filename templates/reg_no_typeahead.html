@@ -281,24 +281,63 @@
         },
     });
 
+    var ped_reg = ''
+    // check which context variable we need to use for pedigree
+    if ($('#id_father').attr('form_type') == 'edit') {
+        ped_reg = '{{ pedigree.reg_no }}'
+    }
+    else if ($('#id_father').attr('form_type') == 'view') {
+        ped_reg = '{{ lvl1.reg_no }}'
+    }
+
     // Ajax call to get and display name if a full male reg number is in the field
     $('#id_father').bind('keyup change click typeahead:select', function() {
-        var ped_reg = ''
-        
-        // check which context variable we need to use for pedigree
-        if ($(this).attr('form_type') == 'edit') {
-            ped_reg = '{{ pedigree.reg_no }}'
-        }
-        else if ($(this).attr('form_type') == 'view') {
-            ped_reg = '{{ lvl1.reg_no }}'
-        }
-
         $.ajax({
             url: "{% url 'get_pedigree_details' %}",
             type: 'GET',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
             data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'father'},
+            success: function(data) {
+                result = JSON.parse(data)
+
+                if (result.result == 'success') {
+                    // don't display names if no text in field
+                    if ($('#id_father').val() != '') {
+                        // display full match
+                        if (result.pedigree) {
+                            father_array = JSON.parse(result.pedigree)
+                            father = father_array[0]
+                            // append father name
+                            $('#father-info').html(
+                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + father.fields.name + '</li>'
+                            );
+                            // if one exists, append father tag number
+                            if (father.fields.tag_no != '') {
+                                $('#father-info').html($('#father-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + father.fields.tag_no + '</li>')
+                            }
+                            $('#father-info').removeClass('d-none');
+                        }
+                    } else {
+                        // hide info
+                        $('#father-info').addClass('d-none');
+                    }
+                } else {
+                    // hide info
+                    $('#father-info').addClass('d-none');
+                }
+            }
+        });
+    });
+
+    // Ajax call to get and display name if a full male reg number is in the field
+    $(document).ready( function() {
+        $.ajax({
+            url: "{% url 'get_pedigree_details' %}",
+            type: 'GET',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'id': $('#id_father').val(), 'form_type': $('#id_father').attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'father'},
             success: function(data) {
                 result = JSON.parse(data)
 
