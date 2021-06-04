@@ -541,7 +541,7 @@ def import_pedigree_data(request):
                     if row[status] != '':
                         # if it's valid, save it
                         if row[status].lower() in ('dead', 'alive', 'unknown'):
-                            pedigree.status = row[status]
+                            pedigree.status = row[status].lower()
                         # invalid, so add error
                         else:
                             errors['invalid'].append({
