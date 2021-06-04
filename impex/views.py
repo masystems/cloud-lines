@@ -81,6 +81,11 @@ def export(request):
                                     row.append(field['field_value'])
                                 else:
                                     row.append('')
+                        elif key == 'sale_or_hire':
+                            if pedigree.sale_or_hire:
+                                row.append('yes')
+                            else:
+                                row.append('no')
                         else:
                             row.append('{}'.format(val))
                 if not header:
