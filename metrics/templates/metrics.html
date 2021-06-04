@@ -60,16 +60,26 @@
                         <div class="form-row align-items-center">
                             <div class="col-md-5">
                                 <div id="mothers-alive">
-                                    <input id="id_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                    <input id="id_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}" form_type="metrics">
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div id="fathers-alive">
-                                    <input id="id_father" class="typeahead form-control mt-2" name='father' type="text" placeholder="{{ service.father_title }}">
+                                    <input id="id_father" class="typeahead form-control mt-2" name='father' type="text" placeholder="{{ service.father_title }}" form_type="metrics">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <button id="ksBtn" class="btn btn-info mt-2" name='Submit' type="button" >Calculate Kinship</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <!-- hidden note which will show name and tag number of female if reg number has a match -->
+                                <ul class="list-icons d-none" id="mother-info"></ul>
+                            </div>
+                            <div class="col-md-5">
+                                <!-- hidden note which will show name and tag number of male if reg number has a match -->
+                                <ul class="list-icons d-none" id="father-info"></ul>
                             </div>
                         </div>
                     </form>
@@ -83,11 +93,17 @@
                             <div class="form-row align-items-center">
                                 <div class="col-md-5">
                                     <div id="mothers-alive">
-                                        <input id="sa_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}">
+                                        <input id="sa_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}" form_type="metrics">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <button id="saBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <!-- hidden note which will show name and tag number of female if reg number has a match -->
+                                    <ul class="list-icons d-none" id="sa-info"></ul>
                                 </div>
                             </div>
                         </form>

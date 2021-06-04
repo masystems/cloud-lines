@@ -208,8 +208,10 @@ vertical-align: middle;
                                                 <div class="form-group row">
                                                     <div class="col-8">
                                                         <div id="reg_numbers">
-                                                            <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter registration number">
+                                                            <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter reg no, tag no, or name" id='id_reg_no' form_type='view'>
                                                         </div>
+                                                        <!-- hidden note which will show name and tag number of mother if reg number has a match -->
+                                                        <ul class="list-icons d-none" id="offspring-info"></ul>
                                                     </div>
                                                     <div class="col-4">
                                                         <button type="submit" class="btn btn-success">Submit</button>
@@ -248,8 +250,10 @@ vertical-align: middle;
                                                     <div class="form-group row">
                                                         <div class="col-8">
                                                             <div id="mothers">
-                                                                <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter registration number">
+                                                                <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter reg no, tag no, or name" id="id_mother" form_type="view">
                                                             </div>
+                                                            <!-- hidden note which will show name and tag number of mother if reg number has a match -->
+                                                            <ul class="list-icons d-none" id="mother-info"></ul>
                                                         </div>
                                                         <div class="col-4">
                                                             <button type="submit" class="btn btn-success">Submit</button>
@@ -278,8 +282,10 @@ vertical-align: middle;
                                                     <div class="form-group row">
                                                         <div class="col-8">
                                                             <div id="fathers">
-                                                                <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter registration number">
+                                                                <input class="typeahead form-control" name='reg_no' type="text" placeholder="Enter reg no, tag no, or name" id="id_father" form_type="view">
                                                             </div>
+                                                            <!-- hidden note which will show name and tag number of father if reg number has a match -->
+                                                            <ul class="list-icons d-none" id="father-info"></ul>
                                                         </div>
                                                         <div class="col-4">
                                                             <button type="submit" class="btn btn-success">Submit</button>

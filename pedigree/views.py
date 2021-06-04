@@ -771,7 +771,7 @@ def get_pedigree_details(request):
     
     # if this was called from edit form and parent given is the same as pedigree being editted, return fail
     if request.GET.get('form_type') and request.GET.get('pedigree'):
-        if request.GET['form_type'] == 'edit':
+        if request.GET['form_type'] in ('edit', 'view'):
             if pedigree.reg_no == request.GET['pedigree']:
                 return HttpResponse(json.dumps({'result': 'fail'}))
 

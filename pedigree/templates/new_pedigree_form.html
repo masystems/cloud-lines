@@ -15,155 +15,172 @@
     {% endfor %}
 
     {% for field in pedigree_form.visible_fields %}
-    <div class="col-lg-6 col-md-12">
-        <div class="form-group row">
-            <label class="col-sm-3 text-right col-form-label">{% if service.site_mode == 'mammal' %}
-                                                                <!--make sure you don't show mother and father fields!-->
-                                                                {% if field.label|title == 'Breed Group' %}
-                                                                {% elif field.label|title == 'Mother' %}
-                                                                    {{ service.mother_title }}
-                                                                {% elif field.label|title == 'Mother Notes' %}
-                                                                    {{ service.mother_title }} Notes
-                                                                {% elif field.label|title == 'Father' %}
-                                                                    {{ service.father_title }}
-                                                                {% elif field.label|title == 'Father Notes' %}
-                                                                    {{ service.father_title }} Notes
-                                                                {% else %}
-                                                                    {{ field.label|title }}
-                                                                {% endif %}
-                                                              {% else %}
-                                                                {% if field.label == 'Tag Number' %}
-                                                                    Ring Number
-                                                                {% elif field.label == 'Mother' %}
-                                                                    {{ service.mother_title }}
-                                                                {% elif field.label|title == 'Mother Notes' %}
-                                                                    {{ service.mother_title }} Notes
-                                                                {% elif field.label|title == 'Father' %}
-                                                                    {{ service.father_title }}
-                                                                {% elif field.label|title == 'Father Notes' %}
-                                                                    {{ service.father_title }} Notes
-                                                                {% else %}
-                                                                    {{ field.label|title }}
-                                                                {% endif %}
-                                                              {% endif %}</label>
-            <div class="col-md-9">
-                {% if field.label == 'Breeder' %}
-                    {% if 'setup' in request.path %}
-                        <input id="hid_breeder" type="hidden" name='{{ field.name }}' value="">
-                        <input id="id_breeder" class="typeahead form-control" type="text" placeholder="{{ field.label|title }}">
-                    {% else %}
-                        <div id="breeders">
-                            <input id="id_breeder" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
-                        </div>
-                    {% endif %}
-                    {% if 'setup' not in request.get_full_path %}
-                        {% if editor %}
-                            <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breeder</button>
-                        {% endif %}
-                    {% endif %}
-                {% elif field.label == 'Current owner' %}
-                    {% if 'setup' in request.path %}
-                        <input id="hid_current_owner" type="hidden" name='{{ field.name }}' value="">
-                        <input id="id_current_owner" class="typeahead form-control" type="text" placeholder="{{ field.label|title }}">
-                    {% else %}
-                        <div id="breeders">
-                            <input id="id_current_owner" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
-                        </div>
-                    {% endif %}
-                    {% if 'setup' not in request.get_full_path %}
-                        {% if editor %}
-                            <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Owner</button>
-                        {% endif %}
-                    {% endif %}
-                {% elif field.label == 'Registration Number' %}
-                        <input class="form-control" name='{{ field.name }}' type="text" value="{{ suggested_reg }}">
-                {% elif field.label == 'Mother' %}
-                    <div id="mothers_new">
-                        <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}">
-                        {% if service.site_mode == 'poultry' %}
-                            <small>Leave blank if using a breed group</small>
-                        {% endif %}
-                    </div>
-                    <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
-                    <ul class="list-icons d-none" id="mother-info"></ul>
-                {% elif field.label == 'Father'  %}
-                    <div id="fathers_new">
-                        <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.father_title }}">
-                    </div>
-                    <!-- hidden note which will show name of mother if reg number has a match -->
-                    <ul class="list-icons d-none" id="father-info"></ul>
-                {% elif field.label == 'Breed group' %}
-                    {% if service.site_mode == 'poultry' %}
-                        <div id="breed_groups">
-                            <input id="id_breed_group" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
-                        </div>
-                    {% endif %}
-                {% elif field.label == 'Status' %}
-                    <div class="radio radio-info pt-2">
-                        {% for option in field %}
-                            <input type="radio" name="status" class="radio radio-info" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if option.choice_label == 'Alive' %}checked{% endif %}>
-                            <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
-                        {% endfor %}
-                    </div>
-                {% elif field.label == 'Sex' %}
-                    <div class="radio radio-info pt-2">
-                        {% for option in field %}
-                            <input type="radio" name="sex" class="radio radio-info" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if option.choice_label == 'Female' %}checked{% endif %}>
-                            <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
-                        {% endfor %}
-                    </div>
-                {% elif field.label == 'Born as' %}
-                    <div class="radio radio-info pt-2">
-                        {% for option in field %}
-                            <input type="radio" name="born_as" class="radio radio-info" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if option.choice_label == 'Single' %}checked{% endif %}>
-                            <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
-                        {% endfor %}
-                    </div>
-                {% elif field.label == 'Breed' %}
-                    {% if add_breed %}
-                        <div id="breeds">
-                            <input id="id_breed" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
-                        </div>
-                    {% else %}
-                            <input id="hid_breed" class="typeahead form-control" name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
-                            <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
-                    {% endif %}
-                    {% if 'setup' not in request.get_full_path %}
-                        <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="{% if add_breed %}#newBreedModal{% else %}#upgrade{% endif %}" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breed</button>
-                    {% endif %}
-                {% elif field.label == 'Sale or hire' %}
-                    <div>
-                        <input name='{{ field.name }}' type="checkbox"  class="mt-2">
-                    </div>
-                {% elif field.label == 'Custom fields' %}
-                    {% if custom_fields %}
-                        {% for field_key, field_vals in custom_fields.items %}
-                            {% if field_vals.location == 'pedigree' %}
-                                {% if field_vals.fieldType == 'textField' %}
-                                    <label class="col-form-label">{{ field_vals.fieldName }}</label>
-                                    <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' type="text">
-                                {% elif field_vals.fieldType == 'textBox' %}
-                                    <label class="col-form-label">{{ field_vals.fieldName }}</label>
-                                    <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control"></textarea>
+        <!-- check whether to show nothing (if the field is breed group and the mode isn't poultry) -->
+        {% if field.label == 'Breed group' and service.site_mode != 'poultry' %}
+            <!-- don't display field -->
+        {% else %}
+            {% if field.label != 'Breed group' %}
+                <div class="col-lg-6 col-md-12">
+            {% else %}
+                <!-- make breed group field take up whole row -->
+                <div class="col-lg-12 col-md-12">
+                <div class="row">
+                <div class="col-lg-6 col-md-12">
+            {% endif %}
+                <div class="form-group row">
+                    <label class="col-sm-3 text-right col-form-label">{% if service.site_mode == 'mammal' %}
+                                                                        <!--make sure you don't show mother and father fields!-->
+                                                                        {% if field.label|title == 'Breed Group' %}
+                                                                        {% elif field.label|title == 'Mother' %}
+                                                                            {{ service.mother_title }}
+                                                                        {% elif field.label|title == 'Mother Notes' %}
+                                                                            {{ service.mother_title }} Notes
+                                                                        {% elif field.label|title == 'Father' %}
+                                                                            {{ service.father_title }}
+                                                                        {% elif field.label|title == 'Father Notes' %}
+                                                                            {{ service.father_title }} Notes
+                                                                        {% else %}
+                                                                            {{ field.label|title }}
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        {% if field.label == 'Tag Number' %}
+                                                                            Ring Number
+                                                                        {% elif field.label == 'Mother' %}
+                                                                            {{ service.mother_title }}
+                                                                        {% elif field.label|title == 'Mother Notes' %}
+                                                                            {{ service.mother_title }} Notes
+                                                                        {% elif field.label|title == 'Father' %}
+                                                                            {{ service.father_title }}
+                                                                        {% elif field.label|title == 'Father Notes' %}
+                                                                            {{ service.father_title }} Notes
+                                                                        {% else %}
+                                                                            {{ field.label|title }}
+                                                                        {% endif %}
+                                                                    {% endif %}</label>
+                    <div class="col-md-9">
+                        {% if field.label == 'Breeder' %}
+                            {% if 'setup' in request.path %}
+                                <input id="hid_breeder" type="hidden" name='{{ field.name }}' value="">
+                                <input id="id_breeder" class="typeahead form-control" type="text" placeholder="{{ field.label|title }}">
+                            {% else %}
+                                <div id="breeders">
+                                    <input id="id_breeder" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                </div>
+                            {% endif %}
+                            {% if 'setup' not in request.get_full_path %}
+                                {% if editor %}
+                                    <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breeder</button>
                                 {% endif %}
                             {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        {% if 'account/setup' not in request.path %}
-                            <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
+                        {% elif field.label == 'Current owner' %}
+                            {% if 'setup' in request.path %}
+                                <input id="hid_current_owner" type="hidden" name='{{ field.name }}' value="">
+                                <input id="id_current_owner" class="typeahead form-control" type="text" placeholder="{{ field.label|title }}">
+                            {% else %}
+                                <div id="breeders">
+                                    <input id="id_current_owner" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                </div>
+                            {% endif %}
+                            {% if 'setup' not in request.get_full_path %}
+                                {% if editor %}
+                                    <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Owner</button>
+                                {% endif %}
+                            {% endif %}
+                        {% elif field.label == 'Registration Number' %}
+                                <input class="form-control" name='{{ field.name }}' type="text" value="{{ suggested_reg }}">
+                        {% elif field.label == 'Mother' %}
+                            <div id="mothers_new">
+                                <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}">
+                                {% if service.site_mode == 'poultry' %}
+                                    <small>Leave blank if using a breed group</small>
+                                {% endif %}
+                            </div>
+                            <!-- hidden note which will show name and tag number of mother if reg number has a match -->
+                            <ul class="list-icons d-none" id="mother-info"></ul>
+                        {% elif field.label == 'Father'  %}
+                            <div id="fathers_new">
+                                <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.father_title }}">
+                            </div>
+                            <!-- hidden note which will show name and tag number of father if reg number has a match -->
+                            <ul class="list-icons d-none" id="father-info"></ul>
+                        {% elif field.label == 'Breed group' %}
+                            {% if service.site_mode == 'poultry' %}
+                                <div id="breed_groups">
+                                    <input id="id_breed_group" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                </div>
+                            {% endif %}
+                        {% elif field.label == 'Status' %}
+                            <div class="radio radio-info pt-2">
+                                {% for option in field %}
+                                    <input type="radio" name="status" class="radio radio-info" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if option.choice_label == 'Alive' %}checked{% endif %}>
+                                    <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        {% elif field.label == 'Sex' %}
+                            <div class="radio radio-info pt-2">
+                                {% for option in field %}
+                                    <input type="radio" name="sex" class="radio radio-info" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if option.choice_label == 'Female' %}checked{% endif %}>
+                                    <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        {% elif field.label == 'Born as' %}
+                            <div class="radio radio-info pt-2">
+                                {% for option in field %}
+                                    <input type="radio" name="born_as" class="radio radio-info" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if option.choice_label == 'Single' %}checked{% endif %}>
+                                    <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
+                                {% endfor %}
+                            </div>
+                        {% elif field.label == 'Breed' %}
+                            {% if add_breed %}
+                                <div id="breeds">
+                                    <input id="id_breed" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                </div>
+                            {% else %}
+                                    <input id="hid_breed" class="typeahead form-control" name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
+                                    <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
+                            {% endif %}
+                            {% if 'setup' not in request.get_full_path %}
+                                <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="{% if add_breed %}#newBreedModal{% else %}#upgrade{% endif %}" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breed</button>
+                            {% endif %}
+                        {% elif field.label == 'Sale or hire' %}
+                            <div>
+                                <input name='{{ field.name }}' type="checkbox"  class="mt-2">
+                            </div>
+                        {% elif field.label == 'Custom fields' %}
+                            {% if custom_fields %}
+                                {% for field_key, field_vals in custom_fields.items %}
+                                    {% if field_vals.location == 'pedigree' %}
+                                        {% if field_vals.fieldType == 'textField' %}
+                                            <label class="col-form-label">{{ field_vals.fieldName }}</label>
+                                            <input id="{{ field_vals.id }}" class="form-control" name='{{ field_vals.fieldName }}' type="text">
+                                        {% elif field_vals.fieldType == 'textBox' %}
+                                            <label class="col-form-label">{{ field_vals.fieldName }}</label>
+                                            <textarea id="{{ field_vals.id }}" name='{{ field_vals.fieldName }}' class="form-control"></textarea>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {% if 'account/setup' not in request.path %}
+                                    <small>No custom fields added, <a href="{% url 'settings' %}">add some</a>?</small>
+                                {% else %}
+                                    <small>Make sure you add some custom fields in the 'Site Settings' section after this!</small>
+                                {% endif %}
+                            {% endif %}
                         {% else %}
-                            <small>Make sure you add some custom fields in the 'Site Settings' section after this!</small>
+                            {{ field }}
                         {% endif %}
-                    {% endif %}
-                {% else %}
-                    {{ field }}
-                {% endif %}
-                {% for error in field.errors %}
-                  <span class="help-block text-danger">{{ error }}</span>
-                {% endfor %}
+                        {% for error in field.errors %}
+                        <span class="help-block text-danger">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% if field.label == 'Breed group' %}
+                </div><!-- end column for field -->
+                <div class="col-md-6 col-lg-0"></div><!-- blank space to right of field -->
+                </div><!-- end row for field -->
+            {% endif %}
             </div>
-        </div>
-    </div>
+        {% endif %}
     {% endfor %}
     <script>
         $('#id_mother').bind('keyup change', function(event) {
@@ -207,5 +224,5 @@
 {% block footer %}
     <!-- Typehead Plugin JavaScript -->
     <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
-    {% include 'parent_info.html' %}
+    
 {% endblock %}
