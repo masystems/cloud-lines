@@ -110,6 +110,7 @@ def get_pedigrees(request):
 
 
 def get_ta_pedigrees(request, sex, state):
+    attached_service = get_main_account(request.user)
     query = request.GET['query']
 
     if sex not in ["male", "female", "castrated"]:
@@ -122,6 +123,7 @@ def get_ta_pedigrees(request, sex, state):
     all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
                                        Q(name__icontains=query) |
                                        Q(tag_no__icontains=query),
+                                       account=attached_service,
                                        sex=sex,
                                        status__icontains=state)[:10]
 
