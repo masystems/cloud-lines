@@ -333,7 +333,7 @@ def stud_advisor_results(request, id):
     attached_service = get_main_account(request.user)
     sa_queue_item = StudAdvisorQueue.objects.get(account=attached_service, id=id)
     mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
-    mother_details = eval(mother_details.content.decode())
+    #mother_details = eval(mother_details.content.decode())
 
 
     with urllib.request.urlopen(f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/metrics/results-{sa_queue_item.file}") as results_file:
