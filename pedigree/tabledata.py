@@ -1,5 +1,6 @@
 from django.shortcuts import HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.core.serializers import serialize
 from django.db.models import Q
 from .models import Pedigree
 from account.views import is_editor, get_main_account
@@ -106,3 +107,24 @@ def get_pedigrees(request):
             "data": []
         }
     return HttpResponse(dumps(complete_data))
+
+
+def get_ta_pedigrees(request, sex, state):
+    query = request.GET['query']
+
+    if sex not in ["male", "female", "castrated"]:
+        sex = ""
+
+    if state not in ["alive", "dead", "unknown"]:
+        state = ""
+
+
+    all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
+                                       Q(name__icontains=query) |
+                                       Q(tag_no__icontains=query),
+                                       sex=sex,
+                                       status__icontains=state)
+
+    data = serialize('json', list(all_peds), fields=('reg_no', 'name', 'tag_no'))
+    return HttpResponse(data)
+

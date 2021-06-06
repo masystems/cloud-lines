@@ -1,20 +1,7 @@
 <!-- mother field of add pedigree, edit pedigree, and existing parent mother forms -->
 <script>
-    // get an array of dictionaries of female pedigrees for add pedigree form
-    var addPedData = []
-    addPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' %}
-        {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-    {% endif %}{% endfor %})
-    var addPeds = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: addPedData,
-        identify: function(ped) { return ped.reg_no },
-    });
-    addPeds.initialize();
-
     // use the data to set up typeahead for add pedigree form
-    $('#mothers_new .typeahead').typeahead(
+    $('#mothers_new .typeahead, #mothers_edit .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
@@ -23,72 +10,28 @@
         {
         name: 'addPeds',
         // the text entered in the field after typeahead selected
-        displayKey: 'reg_no',
-        source: addPeds.ttAdapter(),
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'female' 'any' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
         templates: {
             // this returns each suggestion for the dropdown
             suggestion: function (ped) {
                 // check which pedigree attribute matches the input
-                if (ped.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.name + '</p>'
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
                 }
-                else if (ped.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.reg_no + '</p>'
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
                 }
-                else if (ped.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.tag_no + '</p>'
-                }
-            }
-        },
-    });
-
-    // get an array of dictionaries of female pedigrees for edit pedigree form
-    var editPedData = []
-    
-    // check what context variable we have for pedigree
-    if ('{{ pedigree.reg_no }}' != '') {
-        editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != pedigree.reg_no %}
-            {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-        {% endif %}{% endfor %})
-    }
-    else {
-        editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.reg_no != lvl1.reg_no %}
-            {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-        {% endif %}{% endfor %})
-    }
-
-    var editPeds = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: editPedData,
-        identify: function(ped) { return ped.reg_no },
-    });
-    editPeds.initialize();
-
-    // use the data to set up typeahead for edit pedigree form
-    $('#mothers_edit .typeahead, #mothers .typeahead').typeahead(
-        {
-            hint: false,
-            highlight: true,
-            minLength: 1,
-        },
-        {
-        name: 'editPeds',
-        // the text entered in the field after typeahead selected
-        displayKey: 'reg_no',
-        source: editPeds.ttAdapter(),
-        templates: {
-            // this returns each suggestion for the dropdown
-            suggestion: function (ped) {
-                // check which pedigree attribute matches the input
-                if (ped.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.name + '</p>'
-                }
-                else if (ped.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.reg_no + '</p>'
-                }
-                else if (ped.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.tag_no + '</p>'
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
                 }
             }
         },
@@ -114,7 +57,6 @@
             data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'mother'},
             success: function(data) {
                 result = JSON.parse(data)
-
                 if (result.result == 'success') {
                     // don't display names if no text in field
                     if ($('#id_mother').val() != '') {
@@ -187,21 +129,8 @@
 
 <!-- father field of add pedigree, edit pedigree, and existing parent father forms -->
 <script>
-    // get an array of dictionaries of male pedigrees for new pedigree form
-    var addPedData = []
-    addPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' %}
-        {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-    {% endif %}{% endfor %})
-    var addPeds = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: addPedData,
-        identify: function(ped) { return ped.reg_no },
-    });
-    addPeds.initialize();
-
     // use the data to set up typeahead
-    $('#fathers_new .typeahead').typeahead(
+    $('#fathers_new .typeahead, #fathers_edit .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
@@ -210,76 +139,33 @@
         {
         name: 'addPeds',
         // the text entered in the field after typeahead selected
-        displayKey: 'reg_no',
-        source: addPeds.ttAdapter(),
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'male' 'any' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
         templates: {
             // this returns each suggestion for the dropdown
             suggestion: function (ped) {
                 // check which pedigree attribute matches the input
-                if (ped.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.name + '</p>'
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
                 }
-                else if (ped.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.reg_no + '</p>'
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
                 }
-                else if (ped.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.tag_no + '</p>'
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
                 }
             }
         },
     });
 
-    // get an array of dictionaries of male pedigrees
-    var editPedData = []
-    
-    // check what context variable we have for pedigree
-    if ('{{ pedigree.reg_no }}' != '') {
-        editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' and ped.reg_no != pedigree.reg_no %}
-            {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-        {% endif %}{% endfor %})
-    }
-    else {
-        editPedData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' and ped.reg_no != lvl1.reg_no %}
-            {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-        {% endif %}{% endfor %})
-    }
-    
-    var editPeds = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: editPedData,
-        identify: function(ped) { return ped.reg_no },
-    });
-    editPeds.initialize();
-
-    // use the data to set up typeahead
-    $('#fathers_edit .typeahead, #fathers .typeahead').typeahead(
-        {
-            hint: false,
-            highlight: true,
-            minLength: 1,
-        },
-        {
-        name: 'editPeds',
-        // the text entered in the field after typeahead selected
-        displayKey: 'reg_no',
-        source: editPeds.ttAdapter(),
-        templates: {
-            // this returns each suggestion for the dropdown
-            suggestion: function (ped) {
-                // check which pedigree attribute matches the input
-                if (ped.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.name + '</p>'
-                }
-                else if (ped.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.reg_no + '</p>'
-                }
-                else if (ped.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.tag_no + '</p>'
-                }
-            }
-        },
-    });
 
     var ped_reg = ''
     // check which context variable we need to use for pedigree
@@ -373,18 +259,6 @@
 
 <!-- add existing offspring field -->
 <script>
-    // get an array of dictionaries of female pedigrees for add pedigree form
-    var allPedData = []
-    allPedData.push({% for ped in pedigrees.all %}{% if ped.reg_no != lvl1.reg_no %}
-        {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-    {% endif %}{% endfor %})
-    var allPeds = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: allPedData,
-        identify: function(ped) { return ped.reg_no },
-    });
-    allPeds.initialize();
     // use the data to set up typeahead
     $('#reg_numbers .typeahead').typeahead(
         {
@@ -395,20 +269,28 @@
         {
         name: 'allPeds',
         // the text entered in the field after typeahead selected
-        displayKey: 'reg_no',
-        source: allPeds.ttAdapter(),
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'any' 'any' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
         templates: {
             // this returns each suggestion for the dropdown
             suggestion: function (ped) {
                 // check which pedigree attribute matches the input
-                if (ped.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.name + '</p>'
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
                 }
-                else if (ped.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.reg_no + '</p>'
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
                 }
-                else if (ped.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.tag_no + '</p>'
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
                 }
             }
         },
@@ -466,18 +348,6 @@
 
 <!-- living females and males for metrics page -->
 <script>
-    // get an array of dictionaries of living female pedigrees
-    var livingFemalesData = []
-    livingFemalesData.push({% for ped in pedigrees.all %}{% if ped.sex == 'female' and ped.status|lower == 'alive' %}
-        {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-    {% endif %}{% endfor %})
-    var livingFemales = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: livingFemalesData,
-        identify: function(ped) { return ped.reg_no },
-    });
-    livingFemales.initialize();
     // use the data to set up typeahead
     $('#mothers-alive .typeahead').typeahead(
         {
@@ -488,37 +358,34 @@
         {
         name: 'livingFemales',
         // the text entered in the field after typeahead selected
-        displayKey: 'reg_no',
-        source: livingFemales.ttAdapter(),
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'female' 'alive' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
         templates: {
             // this returns each suggestion for the dropdown
             suggestion: function (ped) {
                 // check which pedigree attribute matches the input
-                if (ped.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.name + '</p>'
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
                 }
-                else if (ped.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.reg_no + '</p>'
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
                 }
-                else if (ped.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.tag_no + '</p>'
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
                 }
             }
         },
     });
 
-    // get an array of dictionaries of living male pedigrees
-    var livingMalesData = []
-    livingMalesData.push({% for ped in pedigrees.all %}{% if ped.sex == 'male' and ped.status|lower == 'alive' %}
-        {'name': '{{ ped.name }}', 'reg_no': '{{ ped.reg_no }}', 'tag_no': '{{ ped.tag_no }}'},
-    {% endif %}{% endfor %})
-    var livingMales = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name', 'reg_no', 'tag_no'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        local: livingMalesData,
-        identify: function(ped) { return ped.reg_no },
-    });
-    livingMales.initialize();
+
     // use the data to set up typeahead
     $('#fathers-alive .typeahead').typeahead(
         {
@@ -529,20 +396,28 @@
         {
         name: 'livingMales',
         // the text entered in the field after typeahead selected
-        displayKey: 'reg_no',
-        source: livingMales.ttAdapter(),
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'male' 'alive' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
         templates: {
             // this returns each suggestion for the dropdown
             suggestion: function (ped) {
                 // check which pedigree attribute matches the input
-                if (ped.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.name + '</p>'
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
                 }
-                else if (ped.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.reg_no + '</p>'
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
                 }
-                else if (ped.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
-                    return '<p>' + ped.tag_no + '</p>'
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
                 }
             }
         },
