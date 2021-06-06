@@ -484,44 +484,9 @@ $(document).ready(function() {
       };
     };
 
-    var reg_numbers = [{% for pedigree in pedigrees.all %}'{{ pedigree.reg_no }}', {% endfor %}];
-    var mothers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
-    var fathers = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'male' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
     breeders = [{% for breeder in breeders.all %}'{{ breeder.breeding_prefix }}', {% endfor %}];
     breeds = [{% for breed in breeds.all %}'{{ breed.breed_name }}', {% endfor %}];
     var breed_groups = [{% for group in breed_groups.all %}'{{ group.group_name }}', {% endfor %}];
-    var mothers_alive = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'female' and pedigree.status == 'alive' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
-    var fathers_alive = [{% for pedigree in pedigrees.all %}{% if pedigree.sex == 'male' and pedigree.status == 'alive' %}'{{ pedigree.reg_no }}', {% endif %}{% endfor %}];
-
-    $('#reg_numbers .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'reg_numbers',
-      source: substringMatcher(reg_numbers)
-    });
-
-    $('#mothers .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'mothers',
-      source: substringMatcher(mothers)
-    });
-
-    $('#fathers .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'fathers',
-      source: substringMatcher(fathers)
-    });
 
     $('#breeders .typeahead').typeahead({
       hint: true,
@@ -551,26 +516,6 @@ $(document).ready(function() {
     {
       name: 'breed_groups',
       source: substringMatcher(breed_groups)
-    });
-
-    $('#mothers-alive .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'mothers_alive',
-      source: substringMatcher(mothers_alive)
-    });
-
-    $('#fathers-alive .typeahead').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'fathers_alive',
-      source: substringMatcher(fathers_alive)
     });
 });
 </script>

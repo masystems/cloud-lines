@@ -67,6 +67,13 @@ def export(request):
                             except ObjectDoesNotExist:
                                 breed_prefix = ""
                             row.append('{}'.format(breed_prefix))
+                        elif key == 'current_owner_id':
+                            try:
+                                current_owner = Breeder.objects.get(id=val)
+                                current_owner_prefix = current_owner.breeding_prefix
+                            except ObjectDoesNotExist:
+                                current_owner_prefix = ""
+                            row.append('{}'.format(current_owner_prefix))
                         elif key == 'breed_id':
                             try:
                                 breed = Breed.objects.get(id=val)
@@ -81,6 +88,11 @@ def export(request):
                                     row.append(field['field_value'])
                                 else:
                                     row.append('')
+                        elif key == 'sale_or_hire':
+                            if pedigree.sale_or_hire:
+                                row.append('yes')
+                            else:
+                                row.append('no')
                         else:
                             row.append('{}'.format(val))
                 if not header:
@@ -188,7 +200,7 @@ def import_pedigree_data(request):
             # iterate through columns
             for key, val in request.POST.items():
                 # add custom field columns
-                if key in field_names:
+                if key in field_names and val != '---':
                     custom_fields_in.append(key)
                 
                 # remove blank ('---') entries ###################
@@ -217,6 +229,7 @@ def import_pedigree_data(request):
             father_notes = post_data['parent_father_notes'] or ''
             mother = post_data['parent_mother'] or ''
             mother_notes = post_data['parent_mother_notes'] or ''
+            sale_or_hire = post_data['sale_or_hire'] or ''
 
             # errors is a dictionary to keep track of missing and invalid fields
             errors = {}
@@ -279,6 +292,8 @@ def import_pedigree_data(request):
                                 'name': ped_name,
                                 'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
                             })
+                        else:
+                            current_owner_obj = current_owner_obj.first()
                     else:
                         current_owner_obj = None
                 except KeyError:
@@ -539,7 +554,7 @@ def import_pedigree_data(request):
                     if row[status] != '':
                         # if it's valid, save it
                         if row[status].lower() in ('dead', 'alive', 'unknown'):
-                            pedigree.status = row[status]
+                            pedigree.status = row[status].lower()
                         # invalid, so add error
                         else:
                             errors['invalid'].append({
@@ -609,7 +624,33 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
-                #############################
+                ############################# sale or hire
+                try:
+                    # if sale_or_hire given
+                    if row[sale_or_hire] != '':
+                        # if it's valid, save it
+                        if row[sale_or_hire].lower() in ('yes', 'no'):
+                            if row[sale_or_hire].lower() == 'yes':
+                                pedigree.sale_or_hire = True
+                            else:
+                                pedigree.sale_or_hire = False
+                        # invalid, so add error
+                        else:
+                            errors['invalid'].append({
+                                'col': 'For Sale/Hire',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': 'the input for sale/hire, if given, must be "yes" or "no"'
+                            })
+                            # delete pedigree if one was created
+                            if pedigree.id:
+                                pedigree.delete()
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
 
                 #################### breed
                 # not organisation
