@@ -123,7 +123,7 @@ def get_ta_pedigrees(request, sex, state):
                                        Q(name__icontains=query) |
                                        Q(tag_no__icontains=query),
                                        sex=sex,
-                                       status__icontains=state)
+                                       status__icontains=state)[:10]
 
     data = serialize('json', list(all_peds), fields=('reg_no', 'name', 'tag_no'))
     return HttpResponse(data)
