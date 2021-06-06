@@ -275,7 +275,7 @@ def stud_advisor_mother_details(request, mother):
                       'breed': mother.breed.breed_name,
                       'threshold': str(mother.breed.mk_threshold),
                       'breed_mean_coi': str(breed_mean_coi)}
-    return HttpResponse(dumps(mother_details))
+    return mother_details
 
 
 def stud_advisor(request):
@@ -313,7 +313,9 @@ def stud_advisor(request):
 
     data = {'data_path': remote_output,
             'file_name': file_name,
+            'domain': attached_service.domain,
             'mother_id': mother.id,
+            'mother_mk': mother.mean_kinship,
             'mother_breed_mean_coi': mother_details['breed_mean_coi'],
             'mother_breed_mk_threshold': mother.breed.mk_threshold}
 
