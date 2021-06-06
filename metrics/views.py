@@ -309,8 +309,13 @@ def stud_advisor(request):
 
     multi_part_upload_with_s3(local_output, remote_output)
 
+    mother_details = stud_advisor_mother_details(request, mother)
+
     data = {'data_path': remote_output,
-            'file_name': file_name}
+            'file_name': file_name,
+            'mother_id': mother.id,
+            'mother_breed_mean_coi': mother_details['breed_mean_coi'],
+            'mother_breed_mk_threshold': mother.breed.mk_threshold}
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/stud_advisor/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
@@ -330,11 +335,11 @@ def stud_advisor_results(request, id):
 
 
     with urllib.request.urlopen(f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/metrics/results-{sa_queue_item.file}") as results_file:
-        studs_raw = loads(results_file.read().decode())
+        results_raw = loads(results_file.read().decode())
 
-    studs_data = calculate_sa_thresholds(studs_raw, attached_service, sa_queue_item.mother, mother_details)
+    #studs_data = calculate_sa_thresholds(studs_raw, attached_service, sa_queue_item.mother, mother_details)
 
-    return render(request, 'sa_results.html', {'stud_data': studs_data,
+    return render(request, 'sa_results.html', {'results_raw': results_raw,
                                                'sa_queue_item': sa_queue_item,
                                                'mother_details': mother_details})
 
@@ -370,39 +375,39 @@ def results_complete(request):
         return HttpResponse(dumps({'result': 'fail'}))
 
 
-def calculate_sa_thresholds(studs_raw, attached_service, mother, mother_details):
-    studs_data = {}
-    for stud, kinship in studs_raw[str(mother.id)][0].items():
-        try:
-            male = Pedigree.objects.get(account=attached_service, id=stud, sex='male', status='alive')
-            mk_minus_mk_thresh = mother.mean_kinship - mother.breed.mk_threshold
-            mk_plus_mk_thresh = mother.mean_kinship + mother.breed.mk_threshold
-            mk_minus_mk_thresh_2 = mother.mean_kinship - (mother.breed.mk_threshold*2)
-            mk_plus_mk_thresh_2 = mother.mean_kinship + (mother.breed.mk_threshold*2)
-
-            if mk_minus_mk_thresh <= male.mean_kinship <= mk_plus_mk_thresh\
-                    and kinship <= float(mother_details['breed_mean_coi']):
-                color = 'green'
-            elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
-                    and kinship <= float(mother_details['breed_mean_coi']):
-                color = 'orange'
-            elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
-                    and kinship > float(mother_details['breed_mean_coi']):
-                color = 'red'
-            else:
-                color = None
-
-            if color:
-                studs_data[stud] = {'id': male.id,
-                                    'reg_no': male.reg_no,
-                                    'name': male.name,
-                                    'mean_kinship': str(male.mean_kinship),
-                                    'kinship': kinship,
-                                    'color': color}
-        except ObjectDoesNotExist:
-            continue
-
-    return studs_data
+# def calculate_sa_thresholds(studs_raw, attached_service, mother, mother_details):
+#     studs_data = {}
+#     for stud, kinship in studs_raw[str(mother.id)][0].items():
+#         try:
+#             male = Pedigree.objects.get(account=attached_service, id=stud, sex='male', status='alive')
+#             mk_minus_mk_thresh = mother.mean_kinship - mother.breed.mk_threshold
+#             mk_plus_mk_thresh = mother.mean_kinship + mother.breed.mk_threshold
+#             mk_minus_mk_thresh_2 = mother.mean_kinship - (mother.breed.mk_threshold*2)
+#             mk_plus_mk_thresh_2 = mother.mean_kinship + (mother.breed.mk_threshold*2)
+#
+#             if mk_minus_mk_thresh <= male.mean_kinship <= mk_plus_mk_thresh\
+#                     and kinship <= float(mother_details['breed_mean_coi']):
+#                 color = 'green'
+#             elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
+#                     and kinship <= float(mother_details['breed_mean_coi']):
+#                 color = 'orange'
+#             elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
+#                     and kinship > float(mother_details['breed_mean_coi']):
+#                 color = 'red'
+#             else:
+#                 color = None
+#
+#             if color:
+#                 studs_data[stud] = {'id': male.id,
+#                                     'reg_no': male.reg_no,
+#                                     'name': male.name,
+#                                     'mean_kinship': str(male.mean_kinship),
+#                                     'kinship': kinship,
+#                                     'color': color}
+#         except ObjectDoesNotExist:
+#             continue
+#
+#     return studs_data
 
 
 def poprep_export(request):
