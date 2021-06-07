@@ -296,23 +296,35 @@
 						</form>
 						<script>
 							$('#selectService').click( function() {
-								// check that both service and payment increment have been selected
+								// string to display errors
+								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following fields and try submitting again:<ul class="ml-4">'
+								// bool to know whether to submit form
+								var errors = false
+								
+								// add each error to the error message
 								if ($('#checkout-form-service').val() == 'None') {
-									if ($('#checkout-form-payment-inc').val() == 'None') {
-										// they haven't selected either
-										$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Select a service and a payment increment and try submitting again.</div>');
-									}
-									else {
-										// they haven't selected service
-										$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Select a service and try submitting again.</div>');
+									errorsHtml += '<li>Service</li>'
+									errors = true
+								}
+								if ($('#checkout-form-payment-inc').val() == 'None') {
+									errorsHtml += '<li>Payment Increment</li>'
+									errors = true
+								}
+								if (['20.00', '40.00', '60.00'].includes($('#checkout-form-service').val())) {
+									if ($('#checkout-form-sub-domain').val() == '') {
+										errorsHtml += '<li>Domain Prefix</li>'
+										errors = true
 									}
 								}
-								else if ($('#checkout-form-payment-inc').val() == 'None') {
-									// they haven't selected payment increment
-									$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Select a payment increment and try submitting again.</div>');
+								
+								errorsHtml += '</ul></div>'
+								
+								// display errors if there were any
+								if (errors) {
+									$('#serviceErrors').html(errorsHtml);
 								}
+								// allow form to be submitted if there weren'y any errors
 								else {
-									// allow form to be submitted
 									$.ajax({
 										url: "{% url 'order_service' %}",
 										type: 'post',
