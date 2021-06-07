@@ -296,29 +296,47 @@
 						</form>
 						<script>
 							$('#selectService').click( function() {
-								$.ajax({
-									url: '{% url 'order_service' %}',
-									type: 'post',
-									dataType: 'text',
-									headers: {'X-CSRFToken': '{{ csrf_token }}'},
-									data: $('#serviceForm').serialize(),
-									beforeSend: function() {
-										$('#serviceErrors').html('');
-									},
-									success: function(data) {
-										$('#attached_service_id').val(data)
-										$('#selectServiceButton').click();
-									 },
-									error: function(jqXHR, textStatus, errorThrown){
-										$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Change your options and try submitting again.</div>');
-										console.log('jqXHR:');
-										console.log(jqXHR.responseText);
-										console.log('textStatus:');
-										console.log(textStatus);
-										console.log('errorThrown:');
-										console.log(errorThrown);
+								// check that both service and payment increment have been selected
+								if ($('#checkout-form-service').val() == 'None') {
+									if ($('#checkout-form-payment-inc').val() == 'None') {
+										// they haven't selected either
+										$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Select a service and a payment increment and try submitting again.</div>');
 									}
-								});
+									else {
+										// they haven't selected service
+										$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Select a service and try submitting again.</div>');
+									}
+								}
+								else if ($('#checkout-form-payment-inc').val() == 'None') {
+									// they haven't selected payment increment
+									$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Select a payment increment and try submitting again.</div>');
+								}
+								else {
+									// allow form to be submitted
+									$.ajax({
+										url: "{% url 'order_service' %}",
+										type: 'post',
+										dataType: 'text',
+										headers: {'X-CSRFToken': '{{ csrf_token }}'},
+										data: $('#serviceForm').serialize(),
+										beforeSend: function() {
+											$('#serviceErrors').html('');
+										},
+										success: function(data) {
+											$('#attached_service_id').val(data)
+											$('#selectServiceButton').click();
+										},
+										error: function(jqXHR, textStatus, errorThrown){
+											$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Change your options and try submitting again.</div>');
+											console.log('jqXHR:');
+											console.log(jqXHR.responseText);
+											console.log('textStatus:');
+											console.log(textStatus);
+											console.log('errorThrown:');
+											console.log(errorThrown);
+										}
+									});
+								}
 							});
 						</script>
 					</div>
