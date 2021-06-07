@@ -83,7 +83,7 @@ def get_pedigrees(request):
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
             row = {}
-            row['action'] = f"<a href='{pedigree.id}'><button class='btn btn-info'>View</button></a>"
+            row['action'] = f"<a href='/pedigree/{pedigree.id}'><button class='btn btn-info'>View</button></a>"
             for col in columns:
                 for data in column_data:
                     if col == column_data[data]['db_id']:
