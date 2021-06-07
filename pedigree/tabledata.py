@@ -6,6 +6,7 @@ from .models import Pedigree
 from account.views import is_editor, get_main_account
 from .functions import get_site_pedigree_column_headings
 from json import dumps
+from django.urls import reverse
 
 
 @login_required(login_url='/accounts/login/')
@@ -83,7 +84,7 @@ def get_pedigrees(request):
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
             row = {}
-            row['action'] = f"<a href='{pedigree.id}'><button class='btn btn-info'>View</button></a>"
+            row['action'] = f"""<a href='{reverse("pedigree", args=[pedigree.id])}'><button class='btn btn-info'>View</button></a>"""
             for col in columns:
                 for data in column_data:
                     if col == column_data[data]['db_id']:
