@@ -108,7 +108,7 @@
 							<div class="row form-billing">
 								<input type="hidden" name="checkout-form-upgrade" id="checkout-form-upgrade" value="{{ attached_service_upgrade }}">
 								<div class="col-6 form-group">
-									<label>Service:</label>
+									<label>Service (required):</label>
 									<select class="form-control required" name="checkout-form-service" id="checkout-form-service" required>
 										<option value="None">------</option>
 										{% for service in services %}
@@ -120,7 +120,7 @@
 
 								</div>
 								<div class="col-6 form-group">
-									<label>Payment Increment:</label>
+									<label>Payment Increment (required):</label>
 									<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc" required>
 										<option value="None">------</option>
 										<option value="Monthly" {% if attached_service_upgrade and service.increment == 'monthly' %}selected{% endif %}>Monthly</option>
@@ -131,7 +131,7 @@
 
 							<div class="row form-billing ">
 								<div id="subDomainDiv" class="col-6 form-group d-none">
-									<label>Domain Prefix:</label>
+									<label>Domain Prefix (required):</label>
 									<input type="text" class="form-control required" name="checkout-form-sub-domain" id="checkout-form-sub-domain" placeholder="e.g. rbst">
 									<span><code>https://<i id="subDomain">rbst</i>.cloud-lines.com</code> <i id="subdomain_message"></i></span>
 								</div>
