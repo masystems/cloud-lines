@@ -297,7 +297,7 @@
 						<script>
 							$('#selectService').click( function() {
 								// string to display errors
-								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following fields and try submitting again:<ul class="ml-4">'
+								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following field(s) and try submitting again:<ul class="ml-4">'
 								// bool to know whether to submit form
 								var errors = false
 								
@@ -325,6 +325,7 @@
 								}
 								// allow form to be submitted if there weren'y any errors
 								else {
+									$('#serviceErrors').html('')
 									$.ajax({
 										url: "{% url 'order_service' %}",
 										type: 'post',
@@ -364,11 +365,11 @@
 							<div class="col-lg-12">
 								<div class="row form-billing">
 									<div class="col-6 form-group">
-										<label>Name:</label>
+										<label>Name(required):</label>
 										<input type="text" name="checkout-form-billing-name" id="checkout-form-billing-name" class="form-control required" value="{{ user.first_name }} {{ user.last_name }}">
 									</div>
 									<div class="col-6 form-group">
-										<label>Email:</label>
+										<label>Email(required):</label>
 										<input type="email" name="checkout-form-billing-email" id="checkout-form-billing-email" class="form-control required" value="{{ user.email }}">
 									</div>
 									<div class="col-6 form-group">
@@ -656,36 +657,61 @@
 
 						<script>
 							$('#selectBilling').click( function() {
-								$.ajax({
-									url: '{% url 'order_billing' %}',
-									type: 'post',
-									dataType: 'text',
-									headers: {'X-CSRFToken': '{{ csrf_token }}'},
-									data: $('#billingForm').serialize(),
-									beforeSend: function() {
-										$('#billingSpinner').removeClass('d-none');
-										$('#billingSpinnerText').removeClass('d-none');
-										$('#billingForm').addClass('d-none');
-									},
-									success: function(data) {
-										$('#billingErrors').html('');
-										$('#selectBillingButton').click();
-										$('#billingSpinner').addClass('d-none');
-										$('#billingSpinnerText').addClass('d-none');
-										$('#billingForm').removeClass('d-none');
-									 },
-									error: function(jqXHR, textStatus, errorThrown){
-										$('#billingLoader').addClass('d-none');
-										$('#billingForm').removeClass('d-none');
-										$('#billingErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Check your information and try submitting again.</div>');
-										console.log('jqXHR:');
-										console.log(jqXHR);
-										console.log('textStatus:');
-										console.log(textStatus);
-										console.log('errorThrown:');
-										console.log(errorThrown);
-									}
-								});
+								// string to display errors
+								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following field(s) and try submitting again:<ul class="ml-4">'
+								// bool to know whether to submit form
+								var errors = false
+								
+								// add each error to the error message
+								if ($('#checkout-form-billing-name').val() == '') {
+									errorsHtml += '<li>Name</li>'
+									errors = true
+								}
+								if ($('#checkout-form-billing-email').val() == '') {
+									errorsHtml += '<li>Email</li>'
+									errors = true
+								}
+								
+								errorsHtml += '</ul></div>'
+								
+								// display errors if there were any
+								if (errors) {
+									$('#billingErrors').html(errorsHtml);
+								}
+								// allow form to be submitted if there weren'y any errors
+								else {
+									$('#billingErrors').html('');
+									$.ajax({
+										url: "{% url 'order_billing' %}",
+										type: 'post',
+										dataType: 'text',
+										headers: {'X-CSRFToken': '{{ csrf_token }}'},
+										data: $('#billingForm').serialize(),
+										beforeSend: function() {
+											$('#billingSpinner').removeClass('d-none');
+											$('#billingSpinnerText').removeClass('d-none');
+											$('#billingForm').addClass('d-none');
+										},
+										success: function(data) {
+											$('#billingErrors').html('');
+											$('#selectBillingButton').click();
+											$('#billingSpinner').addClass('d-none');
+											$('#billingSpinnerText').addClass('d-none');
+											$('#billingForm').removeClass('d-none');
+										},
+										error: function(jqXHR, textStatus, errorThrown){
+											$('#billingLoader').addClass('d-none');
+											$('#billingForm').removeClass('d-none');
+											$('#billingErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Check your information and try submitting again.</div>');
+											console.log('jqXHR:');
+											console.log(jqXHR);
+											console.log('textStatus:');
+											console.log(textStatus);
+											console.log('errorThrown:');
+											console.log(errorThrown);
+										}
+									});
+								}
 							});
 						</script>
 					</div>
