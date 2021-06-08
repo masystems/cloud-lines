@@ -658,6 +658,14 @@
 									errorsHtml += '<li>Email</li>'
 									errors = true
 								}
+								if ($('#checkout-form-billing-phone').val() == '') {
+									errorsHtml += '<li>Phone</li>'
+									errors = true
+								}
+								if ($('#checkout-form-billing-post-code').val() == '') {
+									errorsHtml += '<li>Post Code</li>'
+									errors = true
+								}
 								
 								errorsHtml += '</ul></div>'
 								
