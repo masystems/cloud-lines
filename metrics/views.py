@@ -167,11 +167,12 @@ def kinship(request):
                     }
         return HttpResponse(dumps(response))
     
+    # check father exists
     try:
         father = Pedigree.objects.get(reg_no=request.POST['father'])
     except Pedigree.DoesNotExist:
         response = {'status': 'error',
-                    'msg': f"Mother ({request.POST['mother']}) does not exist!"
+                    'msg': f"Father ({request.POST['father']}) does not exist!"
                     }
         return HttpResponse(dumps(response))
 
