@@ -374,7 +374,7 @@
 
     $('#saBtn').click( function() {
         $.ajax({
-            url: '{% url 'stud_advisor' %}',
+            url: "{% url 'stud_advisor' %}",
             type: 'post',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
@@ -418,19 +418,28 @@
                 if (result.hasOwnProperty('item_id')) {
                     // iterate through the rows, starting from the first
                     $('.results-row').each( function (i, row) {
-                        // if creator is request.user, and there isn't an id, and dts matches datetimeseconds
+                        // if creator is request.user, and there isn't an id, and dts matches datetimeseconds (this is the row)
                         if ( ($(row).find('td[class*="full-name"]').html() == '{{ request.user.get_full_name }}')
                                         && ($(row).attr('id') == undefined)
                                         && ($(row).attr('dts') == datetimesecs) ) {
 
-                            // remove full name class
-                            $(row).find('td[class*="full-name"]').removeClass('full-name');
-                            // remove datetimeseconds (dts) class
-                            $(row).removeAttr('dts');
+                            // if result was successful, change the row to indicate completion
+                            if (result.status != 'fail') {
+                                // remove full name class
+                                $(row).find('td[class*="full-name"]').removeClass('full-name');
+                                // remove datetimeseconds (dts) class
+                                $(row).removeAttr('dts');
 
-                            // set id for the new row, and break out of the loop
-                            $(row).attr('id', result.item_id);
-                            return false;
+                                // set id for the new row, and break out of the loop
+                                $(row).attr('id', result.item_id);
+                                return false;
+                            }
+                            // if result fails, remove the row, and display the error
+                            else {
+                                $(row).remove()
+                                errorMsg($('#sa_mother').val() + ' ' + result.msg)
+                                $('#saMsg').html('<div class="text-danger"><strong>Oh snap!</strong> ' + $('#sa_mother').val() + ' ' + result.msg + '</div>');
+                            }
                         }
                     });
                 }
