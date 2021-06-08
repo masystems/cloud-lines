@@ -306,7 +306,7 @@ def stud_advisor(request):
     except Pedigree.DoesNotExist:
         response = {
             'status': 'fail',
-            'msg': "does not exist",
+            'msg': f"Mother ({request.POST['mother']}) does not exist",
             'item_id': ''
         }
         return HttpResponse(dumps(response))
@@ -315,7 +315,7 @@ def stud_advisor(request):
     if mother.sex.lower() != 'female' or mother.status.lower() != 'alive':
         response = {
             'status': 'fail',
-            'msg': "is not a living female",
+            'msg': f"Mother ({request.POST['mother']}) is not a living female!",
             'item_id': ''
         }
         return HttpResponse(dumps(response))
