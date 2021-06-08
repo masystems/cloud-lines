@@ -151,6 +151,7 @@ def kinship(request):
                                                                          'breed__breed_name',
                                                                          'status')
 
+    # check mother exists
     try:
         mother = Pedigree.objects.get(reg_no=request.POST['mother'])
     except Pedigree.DoesNotExist:
@@ -158,6 +159,14 @@ def kinship(request):
                     'msg': f"Mother ({request.POST['mother']}) does not exist!"
                     }
         return HttpResponse(dumps(response))
+    
+    # check mother is a living female
+    if mother.sex.lower() != 'female' or mother.status.lower() != 'alive':
+        response = {'status': 'error',
+                    'msg': f"Mother ({request.POST['mother']}) is not a living female!"
+                    }
+        return HttpResponse(dumps(response))
+    
     try:
         father = Pedigree.objects.get(reg_no=request.POST['father'])
     except Pedigree.DoesNotExist:
