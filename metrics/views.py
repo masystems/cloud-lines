@@ -176,6 +176,13 @@ def kinship(request):
                     }
         return HttpResponse(dumps(response))
 
+    # check that father is a living male
+    if father.sex.lower() != 'male' or father.status.lower() != 'alive':
+        response = {'status': 'error',
+                    'msg': f"Father ({request.POST['father']}) is not a living male!"
+                    }
+        return HttpResponse(dumps(response))
+
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
         subdomain = host.partition('.')[0]
