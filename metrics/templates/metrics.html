@@ -107,7 +107,7 @@
                                 </div>
                             </div>
                         </form>
-                        <h5 id="saMsg"></h5>
+                        <p id="saMsg" class="mt-2 text-center"></p>
                     </div>
                 </div>
             </div>
@@ -302,7 +302,7 @@
 
     $('#ksBtn').click( function() {
         $.ajax({
-            url: '{% url 'kinship' %}',
+            url: "{% url 'kinship' %}",
             type: 'post',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
@@ -345,7 +345,8 @@
                 result = JSON.parse(data);
                 $('#ksBtn').attr("disabled", false);
                 if (result.status == "error"){
-                    $('#ksMsg').html("<strong>" + result.msg + "</strong>");
+                    errorMsg(result.msg)
+                    $('#ksMsg').html("<div class='text-danger'><strong>" + result.msg + "</strong></div>");
                     $("tr:eq(1)").remove();
                 }
                 // if timeout, the queue item has been created
@@ -437,8 +438,8 @@
                             // if result fails, remove the row, and display the error
                             else {
                                 $(row).remove()
-                                errorMsg($('#sa_mother').val() + ' ' + result.msg)
-                                $('#saMsg').html('<div class="text-danger"><strong>Oh snap!</strong> ' + $('#sa_mother').val() + ' ' + result.msg + '</div>');
+                                errorMsg(result.msg)
+                                $('#saMsg').html('<div class="text-danger"><strong>' + result.msg + '</strong></div>');
                             }
                         }
                     });
