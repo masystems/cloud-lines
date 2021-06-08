@@ -283,7 +283,25 @@ def stud_advisor(request):
     epoch = int(time())
 
     mother = request.POST['mother']
-    mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
+    
+    try:
+        mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
+    except Pedigree.DoesNotExist:
+        response = {
+            'status': 'fail',
+            'msg': "does not exist",
+            'item_id': ''
+        }
+        return HttpResponse(dumps(response))
+
+    # check that mother is a living female
+    if mother.sex.lower() != 'female' or mother.status.lower() != 'alive':
+        response = {
+            'status': 'fail',
+            'msg': "is not a living female",
+            'item_id': ''
+        }
+        return HttpResponse(dumps(response))
 
     pedigrees = Pedigree.objects.filter(account=attached_service,
                                         breed=mother.breed).values('id',
