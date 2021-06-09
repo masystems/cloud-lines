@@ -139,13 +139,13 @@
 
 							<div class="row form-billing">
 								<div class="col-6 form-group">
-									<label>Animal Type (plural):</label>
+									<label>Animal Type (optional, plural):</label>
 									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if attached_service_upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}"{% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
 									</select>
 
 								</div>
 								<div class="col-6 form-group">
-									<label>Animal Category:</label>
+									<label>Animal Category (optional):</label>
 									<select class="form-control required" name="checkout-form-site-mode" id="checkout-form-site-mode" required>
 										<option value="None">------</option>
 										<option value="mammal" {% if attached_service_upgrade and service.site_mode == 'mammal' %}selected{% endif %}>Mammal</option>
@@ -296,29 +296,60 @@
 						</form>
 						<script>
 							$('#selectService').click( function() {
-								$.ajax({
-									url: '{% url 'order_service' %}',
-									type: 'post',
-									dataType: 'text',
-									headers: {'X-CSRFToken': '{{ csrf_token }}'},
-									data: $('#serviceForm').serialize(),
-									beforeSend: function() {
-										$('#serviceErrors').html('');
-									},
-									success: function(data) {
-										$('#attached_service_id').val(data)
-										$('#selectServiceButton').click();
-									 },
-									error: function(jqXHR, textStatus, errorThrown){
-										$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Change your options and try submitting again.</div>');
-										console.log('jqXHR:');
-										console.log(jqXHR.responseText);
-										console.log('textStatus:');
-										console.log(textStatus);
-										console.log('errorThrown:');
-										console.log(errorThrown);
+								// string to display errors
+								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following field(s) and try submitting again:<ul class="ml-4">'
+								// bool to know whether to submit form
+								var errors = false
+								
+								// add each error to the error message
+								if ($('#checkout-form-service').val() == 'None') {
+									errorsHtml += '<li>Service</li>'
+									errors = true
+								}
+								if ($('#checkout-form-payment-inc').val() == 'None') {
+									errorsHtml += '<li>Payment Increment</li>'
+									errors = true
+								}
+								if (['20.00', '40.00', '60.00'].includes($('#checkout-form-service').val())) {
+									if ($('#checkout-form-sub-domain').val() == '') {
+										errorsHtml += '<li>Domain Prefix</li>'
+										errors = true
 									}
-								});
+								}
+								
+								errorsHtml += '</ul></div>'
+								
+								// display errors if there were any
+								if (errors) {
+									$('#serviceErrors').html(errorsHtml);
+								}
+								// allow form to be submitted if there weren'y any errors
+								else {
+									$('#serviceErrors').html('')
+									$.ajax({
+										url: "{% url 'order_service' %}",
+										type: 'post',
+										dataType: 'text',
+										headers: {'X-CSRFToken': '{{ csrf_token }}'},
+										data: $('#serviceForm').serialize(),
+										beforeSend: function() {
+											$('#serviceErrors').html('');
+										},
+										success: function(data) {
+											$('#attached_service_id').val(data)
+											$('#selectServiceButton').click();
+										},
+										error: function(jqXHR, textStatus, errorThrown){
+											$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Change your options and try submitting again.</div>');
+											console.log('jqXHR:');
+											console.log(jqXHR.responseText);
+											console.log('textStatus:');
+											console.log(textStatus);
+											console.log('errorThrown:');
+											console.log(errorThrown);
+										}
+									});
+								}
 							});
 						</script>
 					</div>
@@ -334,11 +365,11 @@
 							<div class="col-lg-12">
 								<div class="row form-billing">
 									<div class="col-6 form-group">
-										<label>Name:</label>
+										<label>Name(required):</label>
 										<input type="text" name="checkout-form-billing-name" id="checkout-form-billing-name" class="form-control required" value="{{ user.first_name }} {{ user.last_name }}">
 									</div>
 									<div class="col-6 form-group">
-										<label>Email:</label>
+										<label>Email(required):</label>
 										<input type="email" name="checkout-form-billing-email" id="checkout-form-billing-email" class="form-control required" value="{{ user.email }}">
 									</div>
 									<div class="col-6 form-group">
@@ -594,23 +625,10 @@
 											<option value="ZW">Zimbabwe</option>
 										</select>
 									</div>
-									<div class="col-12 form-group">
-										<label>Address Line 1:</label>
-										<input type="text" name="checkout-form-billing-add1" id="checkout-form-billing-add1" class="form-control required" value="{{ customer.address.line1 }}">
-									</div>
-									<div class="col-12 form-group">
-										<label>Address Line 2:</label>
-										<input type="text" name="checkout-form-billing-add2" id="checkout-form-billing-add2" class="form-control required" value="{{ customer.address.line2 }}">
-									</div>
-									<div class="col-12 form-group">
-										<label>City:</label>
-										<input type="text" name="checkout-form-billing-city" id="checkout-form-billing-city" class="form-control required" value="{{ customer.address.city }}">
-									</div>
-									<div class="col-12 form-group">
+									<div class="col-6 form-group">
 										<label>Post Code:</label>
 										<input type="text" name="checkout-form-billing-post-code" id="checkout-form-billing-post-code" class="form-control required" value="{{ customer.address.postal_code }}">
 									</div>
-
 								</div>
 							</div>
 						</form>
@@ -626,36 +644,69 @@
 
 						<script>
 							$('#selectBilling').click( function() {
-								$.ajax({
-									url: '{% url 'order_billing' %}',
-									type: 'post',
-									dataType: 'text',
-									headers: {'X-CSRFToken': '{{ csrf_token }}'},
-									data: $('#billingForm').serialize(),
-									beforeSend: function() {
-										$('#billingSpinner').removeClass('d-none');
-										$('#billingSpinnerText').removeClass('d-none');
-										$('#billingForm').addClass('d-none');
-									},
-									success: function(data) {
-										$('#billingErrors').html('');
-										$('#selectBillingButton').click();
-										$('#billingSpinner').addClass('d-none');
-										$('#billingSpinnerText').addClass('d-none');
-										$('#billingForm').removeClass('d-none');
-									 },
-									error: function(jqXHR, textStatus, errorThrown){
-										$('#billingLoader').addClass('d-none');
-										$('#billingForm').removeClass('d-none');
-										$('#billingErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Check your information and try submitting again.</div>');
-										console.log('jqXHR:');
-										console.log(jqXHR);
-										console.log('textStatus:');
-										console.log(textStatus);
-										console.log('errorThrown:');
-										console.log(errorThrown);
-									}
-								});
+								// string to display errors
+								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following field(s) and try submitting again:<ul class="ml-4">'
+								// bool to know whether to submit form
+								var errors = false
+								
+								// add each error to the error message
+								if ($('#checkout-form-billing-name').val() == '') {
+									errorsHtml += '<li>Name</li>'
+									errors = true
+								}
+								if ($('#checkout-form-billing-email').val() == '') {
+									errorsHtml += '<li>Email</li>'
+									errors = true
+								}
+								if ($('#checkout-form-billing-phone').val() == '') {
+									errorsHtml += '<li>Phone</li>'
+									errors = true
+								}
+								if ($('#checkout-form-billing-post-code').val() == '') {
+									errorsHtml += '<li>Post Code</li>'
+									errors = true
+								}
+								
+								errorsHtml += '</ul></div>'
+								
+								// display errors if there were any
+								if (errors) {
+									$('#billingErrors').html(errorsHtml);
+								}
+								// allow form to be submitted if there weren'y any errors
+								else {
+									$('#billingErrors').html('');
+									$.ajax({
+										url: "{% url 'order_billing' %}",
+										type: 'post',
+										dataType: 'text',
+										headers: {'X-CSRFToken': '{{ csrf_token }}'},
+										data: $('#billingForm').serialize(),
+										beforeSend: function() {
+											$('#billingSpinner').removeClass('d-none');
+											$('#billingSpinnerText').removeClass('d-none');
+											$('#billingForm').addClass('d-none');
+										},
+										success: function(data) {
+											$('#billingErrors').html('');
+											$('#selectBillingButton').click();
+											$('#billingSpinner').addClass('d-none');
+											$('#billingSpinnerText').addClass('d-none');
+											$('#billingForm').removeClass('d-none');
+										},
+										error: function(jqXHR, textStatus, errorThrown){
+											$('#billingLoader').addClass('d-none');
+											$('#billingForm').removeClass('d-none');
+											$('#billingErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Check your information and try submitting again.</div>');
+											console.log('jqXHR:');
+											console.log(jqXHR);
+											console.log('textStatus:');
+											console.log(textStatus);
+											console.log('errorThrown:');
+											console.log(errorThrown);
+										}
+									});
+								}
 							});
 						</script>
 					</div>

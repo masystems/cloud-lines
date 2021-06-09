@@ -325,11 +325,7 @@ def order_billing(request):
                 email=request.POST.get('checkout-form-billing-email'),
 
                 phone=request.POST.get('checkout-form-billing-phone'),
-                address={'line1': request.POST.get('checkout-form-billing-add1'),
-                         'city': request.POST.get('checkout-form-billing-city'),
-                         'country': request.POST.get('checkout-form-billing-country'),
-                         'line2': request.POST.get('checkout-form-billing-add2'),
-                         'postal_code': request.POST.get('checkout-form-billing-post-code')}
+                address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
             )
             customer_id = customer['id']
             # update user datail
@@ -341,11 +337,7 @@ def order_billing(request):
                 email=request.POST.get('checkout-form-billing-email'),
 
                 phone=request.POST.get('checkout-form-billing-phone'),
-                address={'line1': request.POST.get('checkout-form-billing-add1'),
-                         'city': request.POST.get('checkout-form-billing-city'),
-                         'country': request.POST.get('checkout-form-billing-country'),
-                         'line2': request.POST.get('checkout-form-billing-add2'),
-                         'postal_code': request.POST.get('checkout-form-billing-post-code')}
+                address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
             )
 
     return HttpResponse('done')
