@@ -1,0 +1,347 @@
+<!-- mother field of add pedigree, edit pedigree, and existing parent mother forms -->
+<script>
+    // use the data to set up typeahead for add pedigree form
+    $('#mothers_new .typeahead, #mothers_edit .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+        name: 'addPeds',
+        // the text entered in the field after typeahead selected
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'female' 'any' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
+        templates: {
+            // this returns each suggestion for the dropdown
+            suggestion: function (ped) {
+                // check which pedigree attribute matches the input
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
+                }
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
+                }
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
+                }
+            }
+        },
+    });
+
+    // reg number of pedigree we're on (not applicable for add pedigree form)
+    var ped_reg = ''
+    // check which context variable we need to use for pedigree
+    if ($('#id_mother').attr('form_type') == 'edit') {
+        ped_reg = '{{ pedigree.reg_no }}'
+    }
+    else if ($('#id_mother').attr('form_type') == 'view') {
+        ped_reg = '{{ lvl1.reg_no }}'
+    }
+
+    // Ajax call to get and display name if a full female reg number is in the field
+    $('#id_mother').bind('keyup change click typeahead:select', function() {
+        $.ajax({
+            url: "{% url 'get_pedigree_details' %}",
+            type: 'GET',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'mother'},
+            success: function(data) {
+                result = JSON.parse(data)
+                if (result.result == 'success') {
+                    // don't display names if no text in field
+                    if ($('#id_mother').val() != '') {
+                        // display full match
+                        if (result.pedigree) {
+                            mother_array = JSON.parse(result.pedigree)
+                            mother = mother_array[0]
+                            // append mother name
+                            $('#mother-info').html(
+                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</li>'
+                            );
+                            // if one exists, append mother tag number
+                            if (mother.fields.tag_no != '') {
+                                $('#mother-info').html($('#mother-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + mother.fields.tag_no + '</li>')
+                            }
+                            $('#mother-info').removeClass('d-none');
+                        }
+                    } else {
+                        // hide info
+                        $('#mother-info').addClass('d-none');
+                    }
+                } else {
+                    // hide info
+                    $('#mother-info').addClass('d-none');
+                }
+            }
+        });
+    });
+
+    // ajax request to display pedigree info on page load
+    $(document).ready( function() {
+        $.ajax({
+            url: "{% url 'get_pedigree_details' %}",
+            type: 'GET',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'id': $('#id_mother').val(), 'form_type': $('#id_mother').attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'mother'},
+            success: function(data) {
+                result = JSON.parse(data)
+
+                if (result.result == 'success') {
+                    // don't display names if no text in field
+                    if ($('#id_mother').val() != '') {
+                        // display full match
+                        if (result.pedigree) {
+                            mother_array = JSON.parse(result.pedigree)
+                            mother = mother_array[0]
+                            // append mother name
+                            $('#mother-info').html(
+                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</li>'
+                            );
+                            // if one exists, append mother tag number
+                            if (mother.fields.tag_no != '') {
+                                $('#mother-info').html($('#mother-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + mother.fields.tag_no + '</li>')
+                            }
+                            $('#mother-info').removeClass('d-none');
+                        }
+                    } else {
+                        // hide info
+                        $('#mother-info').addClass('d-none');
+                    }
+                } else {
+                    // hide info
+                    $('#mother-info').addClass('d-none');
+                }
+            }
+        });
+    });
+</script>
+
+<!-- father field of add pedigree, edit pedigree, and existing parent father forms -->
+<script>
+    // use the data to set up typeahead
+    $('#fathers_new .typeahead, #fathers_edit .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+        name: 'addPeds',
+        // the text entered in the field after typeahead selected
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'male' 'any' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
+        templates: {
+            // this returns each suggestion for the dropdown
+            suggestion: function (ped) {
+                // check which pedigree attribute matches the input
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
+                }
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
+                }
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
+                }
+            }
+        },
+    });
+
+
+    var ped_reg = ''
+    // check which context variable we need to use for pedigree
+    if ($('#id_father').attr('form_type') == 'edit') {
+        ped_reg = '{{ pedigree.reg_no }}'
+    }
+    else if ($('#id_father').attr('form_type') == 'view') {
+        ped_reg = '{{ lvl1.reg_no }}'
+    }
+
+    // Ajax call to get and display name if a full male reg number is in the field
+    $('#id_father').bind('keyup change click typeahead:select', function() {
+        $.ajax({
+            url: "{% url 'get_pedigree_details' %}",
+            type: 'GET',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'father'},
+            success: function(data) {
+                result = JSON.parse(data)
+
+                if (result.result == 'success') {
+                    // don't display names if no text in field
+                    if ($('#id_father').val() != '') {
+                        // display full match
+                        if (result.pedigree) {
+                            father_array = JSON.parse(result.pedigree)
+                            father = father_array[0]
+                            // append father name
+                            $('#father-info').html(
+                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + father.fields.name + '</li>'
+                            );
+                            // if one exists, append father tag number
+                            if (father.fields.tag_no != '') {
+                                $('#father-info').html($('#father-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + father.fields.tag_no + '</li>')
+                            }
+                            $('#father-info').removeClass('d-none');
+                        }
+                    } else {
+                        // hide info
+                        $('#father-info').addClass('d-none');
+                    }
+                } else {
+                    // hide info
+                    $('#father-info').addClass('d-none');
+                }
+            }
+        });
+    });
+
+    // Ajax call to get and display name if a full male reg number is in the field
+    $(document).ready( function() {
+        $.ajax({
+            url: "{% url 'get_pedigree_details' %}",
+            type: 'GET',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'id': $('#id_father').val(), 'form_type': $('#id_father').attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'father'},
+            success: function(data) {
+                result = JSON.parse(data)
+
+                if (result.result == 'success') {
+                    // don't display names if no text in field
+                    if ($('#id_father').val() != '') {
+                        // display full match
+                        if (result.pedigree) {
+                            father_array = JSON.parse(result.pedigree)
+                            father = father_array[0]
+                            // append father name
+                            $('#father-info').html(
+                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + father.fields.name + '</li>'
+                            );
+                            // if one exists, append father tag number
+                            if (father.fields.tag_no != '') {
+                                $('#father-info').html($('#father-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + father.fields.tag_no + '</li>')
+                            }
+                            $('#father-info').removeClass('d-none');
+                        }
+                    } else {
+                        // hide info
+                        $('#father-info').addClass('d-none');
+                    }
+                } else {
+                    // hide info
+                    $('#father-info').addClass('d-none');
+                }
+            }
+        });
+    });
+</script>
+
+<!-- add existing offspring field -->
+<script>
+    // use the data to set up typeahead
+    $('#reg_numbers .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+        name: 'allPeds',
+        // the text entered in the field after typeahead selected
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'any' 'any' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
+        templates: {
+            // this returns each suggestion for the dropdown
+            suggestion: function (ped) {
+                // check which pedigree attribute matches the input
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
+                }
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
+                }
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
+                }
+            }
+        },
+    });
+
+    // Ajax call to get and display name if a full female reg number is in the field
+    $('#id_reg_no').bind('keyup change click typeahead:select', function() {
+        var ped_reg = ''
+        
+        // check which context variable we need to use for pedigree
+        if ($(this).attr('form_type') == 'edit') {
+            ped_reg = '{{ pedigree.reg_no }}'
+        }
+        else if ($(this).attr('form_type') == 'view') {
+            ped_reg = '{{ lvl1.reg_no }}'
+        }
+        $.ajax({
+            url: "{% url 'get_pedigree_details' %}",
+            type: 'GET',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg},
+            success: function(data) {
+                result = JSON.parse(data)
+
+                if (result.result == 'success') {
+                    // don't display names if no text in field
+                    if ($('#id_reg_no').val() != '') {
+                        // display full match
+                        if (result.pedigree) {
+                            offspring_array = JSON.parse(result.pedigree)
+                            offspring = offspring_array[0]
+                            // append offspring name
+                            $('#offspring-info').html(
+                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + offspring.fields.name + '</li>'
+                            );
+                            // if one exists, append offspring tag number
+                            if (offspring.fields.tag_no != '') {
+                                $('#offspring-info').html($('#offspring-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + offspring.fields.tag_no + '</li>')
+                            }
+                            $('#offspring-info').removeClass('d-none');
+                        }
+                    } else {
+                        // hide info
+                        $('#offspring-info').addClass('d-none');
+                    }
+                } else {
+                    // hide info
+                    $('#offspring-info').addClass('d-none');
+                }
+            }
+        });
+    });
+</script>
