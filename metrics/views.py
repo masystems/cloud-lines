@@ -151,6 +151,7 @@ def kinship(request):
                                                                          'breed__breed_name',
                                                                          'status')
 
+    # check mother exists
     try:
         mother = Pedigree.objects.get(reg_no=request.POST['mother'])
     except Pedigree.DoesNotExist:
@@ -158,11 +159,27 @@ def kinship(request):
                     'msg': f"Mother ({request.POST['mother']}) does not exist!"
                     }
         return HttpResponse(dumps(response))
+    
+    # check mother is a living female
+    if mother.sex.lower() != 'female' or mother.status.lower() != 'alive':
+        response = {'status': 'error',
+                    'msg': f"Mother ({request.POST['mother']}) is not a living female!"
+                    }
+        return HttpResponse(dumps(response))
+    
+    # check father exists
     try:
         father = Pedigree.objects.get(reg_no=request.POST['father'])
     except Pedigree.DoesNotExist:
         response = {'status': 'error',
-                    'msg': f"Mother ({request.POST['mother']}) does not exist!"
+                    'msg': f"Father ({request.POST['father']}) does not exist!"
+                    }
+        return HttpResponse(dumps(response))
+
+    # check that father is a living male
+    if father.sex.lower() != 'male' or father.status.lower() != 'alive':
+        response = {'status': 'error',
+                    'msg': f"Father ({request.POST['father']}) is not a living male!"
                     }
         return HttpResponse(dumps(response))
 
@@ -283,7 +300,25 @@ def stud_advisor(request):
     epoch = int(time())
 
     mother = request.POST['mother']
-    mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
+    
+    try:
+        mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
+    except Pedigree.DoesNotExist:
+        response = {
+            'status': 'fail',
+            'msg': f"Mother ({request.POST['mother']}) does not exist",
+            'item_id': ''
+        }
+        return HttpResponse(dumps(response))
+
+    # check that mother is a living female
+    if mother.sex.lower() != 'female' or mother.status.lower() != 'alive':
+        response = {
+            'status': 'fail',
+            'msg': f"Mother ({request.POST['mother']}) is not a living female!",
+            'item_id': ''
+        }
+        return HttpResponse(dumps(response))
 
     pedigrees = Pedigree.objects.filter(account=attached_service,
                                         breed=mother.breed).values('id',
