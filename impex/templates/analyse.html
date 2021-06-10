@@ -141,7 +141,7 @@
         e.preventDefault();
 
         // check required headings have been matched
-        if ( ($('#select-reg_no').val() == '---') || ($('#select-sex').val() == '---') || ($('#select-breeder').val() == '---') || ($('#select-status').val() == '---') ) {
+        if ( ($('#select-reg_no').val() == '---') || ($('#select-sex').val() == '---') || ($('#select-breeder').val() == '---') || ($('#select-current_owner').val() == '---') || ($('#select-status').val() == '---') ) {
             if ($('#select-reg_no').val() == '---') {
                 errorMsg("You must match Registration Number!");
             }
@@ -150,6 +150,9 @@
             }
             if ($('#select-breeder').val() == '---') {
                 errorMsg("You must match Breeder!");
+            }
+            if ($('#select-current_owner').val() == '---') {
+                errorMsg("You must match Current Owner!");
             }
             if ($('#select-status').val() == '---') {
                 errorMsg("You must match Status!");
