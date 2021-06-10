@@ -441,6 +441,14 @@ def new_pedigree_form(request):
         suggested_reg = latest_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1).zfill(len(reg_ints_re.group(0))))
     except Pedigree.DoesNotExist:
         suggested_reg = 'REG123456'
+    except AttributeError:
+        suggested_reg = 'REG123456'
+
+    # if reg taken, increment until not taken
+    if suggested_reg == 'REG123456':
+        while Pedigree.objects.filter(account=attached_service, reg_no=suggested_reg).exists():
+            reg_ints_re = re.search("[0-9]+", suggested_reg)
+            suggested_reg = suggested_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1).zfill(len(reg_ints_re.group(0))))
 
     return render(request, 'new_pedigree_form_base.html', {'pedigree_form': pedigree_form,
                                                            'pedigrees': Pedigree.objects.filter(account=attached_service),
