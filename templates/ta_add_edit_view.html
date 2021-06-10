@@ -418,7 +418,7 @@
         // the text entered in the field after typeahead selected
         displayKey: 'display',
         source: function (query, sync, async) {
-            return $.getJSON("{% url 'get_ta_pedigrees' 'any' 'any' 'any' %}", { query: query }, function (data) {
+            return $.getJSON("{% if lvl1.id%}{% url 'get_ta_pedigrees' 'any' 'any' lvl1.id %}{% endif %}", { query: query }, function (data) {
                 data = data.map(function(item) {
                     item.display = item.fields.reg_no;
                     return item;
