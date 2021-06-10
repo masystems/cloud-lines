@@ -1,7 +1,7 @@
 <!-- mother field of add pedigree, edit pedigree, and existing parent mother forms -->
 <script>
     // use the data to set up typeahead for add pedigree form
-    $('#mothers_new .typeahead, #mothers_edit .typeahead').typeahead(
+    $('#mothers_new .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
@@ -12,7 +12,81 @@
         // the text entered in the field after typeahead selected
         displayKey: 'display',
         source: function (query, sync, async) {
-            return $.getJSON("{% url 'get_ta_pedigrees' 'female' 'any' %}", { query: query }, function (data) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'female' 'any' 'any' %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
+        templates: {
+            // this returns each suggestion for the dropdown
+            suggestion: function (ped) {
+                // check which pedigree attribute matches the input
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
+                }
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
+                }
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
+                }
+            }
+        },
+    });
+
+    // use the data to set up typeahead for edit pedigree form
+    $('#mothers_edit .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+        name: 'addPeds',
+        // the text entered in the field after typeahead selected
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% if pedigree.id %}{% url 'get_ta_pedigrees' 'female' 'any' pedigree.id %}{% endif %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
+        templates: {
+            // this returns each suggestion for the dropdown
+            suggestion: function (ped) {
+                // check which pedigree attribute matches the input
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
+                }
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
+                }
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
+                }
+            }
+        },
+    });
+
+    // use the data to set up typeahead for existing parent mother form
+    $('#mothers .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+        name: 'addPeds',
+        // the text entered in the field after typeahead selected
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% if lvl1.id %}{% url 'get_ta_pedigrees' 'female' 'any' lvl1.id %}{% endif %}", { query: query }, function (data) {
                 data = data.map(function(item) {
                     item.display = item.fields.reg_no;
                     return item;
@@ -130,7 +204,7 @@
 <!-- father field of add pedigree, edit pedigree, and existing parent father forms -->
 <script>
     // use the data to set up typeahead
-    $('#fathers_new .typeahead, #fathers_edit .typeahead').typeahead(
+    $('#fathers_new .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
@@ -141,7 +215,7 @@
         // the text entered in the field after typeahead selected
         displayKey: 'display',
         source: function (query, sync, async) {
-            return $.getJSON("{% url 'get_ta_pedigrees' 'male' 'any' %}", { query: query }, function (data) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'male' 'any' 'any' %}", { query: query }, function (data) {
                 data = data.map(function(item) {
                     item.display = item.fields.reg_no;
                     return item;
@@ -166,6 +240,79 @@
         },
     });
 
+    // use the data to set up typeahead
+    $('#fathers_edit .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+        name: 'addPeds',
+        // the text entered in the field after typeahead selected
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% if pedigree.id %}{% url 'get_ta_pedigrees' 'male' 'any' pedigree.id %}{% endif %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
+        templates: {
+            // this returns each suggestion for the dropdown
+            suggestion: function (ped) {
+                // check which pedigree attribute matches the input
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
+                }
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
+                }
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
+                }
+            }
+        },
+    });
+
+    // use the data to set up typeahead
+    $('#fathers .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+        name: 'addPeds',
+        // the text entered in the field after typeahead selected
+        displayKey: 'display',
+        source: function (query, sync, async) {
+            return $.getJSON("{% if lvl1.id %}{% url 'get_ta_pedigrees' 'male' 'any' lvl1.id %}{% endif %}", { query: query }, function (data) {
+                data = data.map(function(item) {
+                    item.display = item.fields.reg_no;
+                    return item;
+                })
+                async(data);
+            });
+        },
+        templates: {
+            // this returns each suggestion for the dropdown
+            suggestion: function (ped) {
+                // check which pedigree attribute matches the input
+                if (ped.fields.name.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.name + '</p>'
+                }
+                else if (ped.fields.reg_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.reg_no + '</p>'
+                }
+                else if (ped.fields.tag_no.toLowerCase().indexOf(ped._query.toLowerCase()) >= 0) {
+                    return '<p>' + ped.fields.tag_no + '</p>'
+                }
+            }
+        },
+    });
 
     var ped_reg = ''
     // check which context variable we need to use for pedigree
@@ -271,7 +418,7 @@
         // the text entered in the field after typeahead selected
         displayKey: 'display',
         source: function (query, sync, async) {
-            return $.getJSON("{% url 'get_ta_pedigrees' 'any' 'any' %}", { query: query }, function (data) {
+            return $.getJSON("{% url 'get_ta_pedigrees' 'any' 'any' 'any' %}", { query: query }, function (data) {
                 data = data.map(function(item) {
                     item.display = item.fields.reg_no;
                     return item;

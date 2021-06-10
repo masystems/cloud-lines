@@ -110,7 +110,7 @@ def get_pedigrees(request):
     return HttpResponse(dumps(complete_data))
 
 
-def get_ta_pedigrees(request, sex, state):
+def get_ta_pedigrees(request, sex, state, avoid):
     attached_service = get_main_account(request.user)
     query = request.GET['query']
 
@@ -120,13 +120,22 @@ def get_ta_pedigrees(request, sex, state):
     if state not in ["alive", "dead", "unknown"]:
         state = ""
 
-
-    all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
+    if avoid == "any":
+        # don't need to avoid any self pedigrees
+        all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
                                        Q(name__icontains=query) |
                                        Q(tag_no__icontains=query),
                                        account=attached_service,
                                        sex=sex,
                                        status__icontains=state)[:10]
+    else:
+        # need to avoid a self pedigree
+        all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
+                                       Q(name__icontains=query) |
+                                       Q(tag_no__icontains=query),
+                                       account=attached_service,
+                                       sex=sex,
+                                       status__icontains=state).exclude(id=avoid)[:10]
 
     data = serialize('json', list(all_peds), fields=('reg_no', 'name', 'tag_no'))
     return HttpResponse(data)
