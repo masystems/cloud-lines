@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CoiLastRun, MeanKinshipLastRun, KinshipQueue, StudAdvisorQueue
+from .models import CoiLastRun, MeanKinshipLastRun, KinshipQueue, StudAdvisorQueue, DataValidatorQueue
 
 
 class CoiAdmin(admin.ModelAdmin):
@@ -46,3 +46,14 @@ class StudAdvisorAdmin(admin.ModelAdmin):
     empty_value_display = '-empty-'
 
 admin.site.register(StudAdvisorQueue, StudAdvisorAdmin)
+
+
+class DataValidatorAdmin(admin.ModelAdmin):
+    list_display = ('account', 'user', 'result')
+    list_display_links = ['account']
+    list_filter = ('account', 'user', 'result')
+    search_fields = ['account', 'user', 'result']
+    ordering = ['account']
+    empty_value_display = '-empty-'
+
+admin.site.register(DataValidatorQueue, DataValidatorAdmin)

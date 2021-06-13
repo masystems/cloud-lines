@@ -42,3 +42,11 @@ class StudAdvisorQueue(models.Model):
     email_sent = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
+
+
+class DataValidatorQueue(models.Model):
+    account = models.ForeignKey(AttachedService, on_delete=models.CASCADE, verbose_name="Account")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
+    result = models.TextField(blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    complete = models.BooleanField(default=False)

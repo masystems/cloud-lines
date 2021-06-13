@@ -115,6 +115,34 @@
         <div class="col-xl-3 col-lg-3">
             <div class="card">
                 <div class="card-body">
+                    {% if not read_only %}
+                        <button id="validateDataBtn" type="button" class="btn btn-block btn-warning ml-1">Check My Data</button>
+                        <p id="dvLastRun" class="mt-1">Last validated: {{ dv_queue.created }}</p>
+                        <p id="dvResult">{{ dv_queue.result }}</p>
+                        <hr>
+                        <script>
+                            $('#validateDataBtn').click( function() {
+                                $.ajax({
+                                    url: '{% url 'data_validation' %}',
+                                    type: 'post',
+                                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                    dataType: 'text',
+                                    async: true,
+                                    data: [],
+                                    beforeSend: function() {
+                                        //$('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                                    },
+                                    success: function(data) {
+                                        var result = JSON.parse(data);
+                                        $('#dvLastRun').html("Last validated: " + result.created)
+                                     },
+                                    error: function(jqXHR, textStatus, errorThrown){
+                                    }
+                                });
+                            });
+                        </script>
+                    {% endif %}
+
                     <h4 class="card-title">Calculations</h4>
                     <p id="coiTimer" class="text-center"></p>
                     {% if not read_only %}
