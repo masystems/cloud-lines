@@ -123,7 +123,8 @@ def data_validation(request):
 
     data = {'data_path': remote_output,
             'file_name': file_name,
-            'domain': attached_service.domain}
+            'domain': attached_service.domain,
+            'dv_q_id': dv.id}
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/data_validator/',
                             json=dumps(data, cls=DjangoJSONEncoder))
