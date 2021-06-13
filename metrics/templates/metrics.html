@@ -116,9 +116,16 @@
             <div class="card">
                 <div class="card-body">
                     {% if not read_only %}
-                        <button id="validateDataBtn" type="button" class="btn btn-block btn-warning ml-1">Check My Data</button>
-                        <p id="dvLastRun" class="mt-1">Last validated: {{ dv_queue.created }}</p>
-                        <p id="dvResult">{{ dv_queue.result }}</p>
+                        <button id="validateDataBtn" type="button" class="btn btn-block btn-warning ml-1 mb-1" {% if dv_queue and not dv_queue.complete %}disabled{% endif %}>Check My Data</button>
+                        {% if dv_queue.complete %}
+                            <p id="dvLastRun">Last validated: {{ dv_queue.created }}</p>
+                            <p>{{ dv_queue.result }}</p>
+                        {% else %}
+                            {% if dv_queue %}
+                                <p id="dvPlsWait">Results still calculating, please check back later.</p>
+                            {% endif %}
+                        {% endif %}
+                        <p id="dvResult"></p>
                         <hr>
                         <script>
                             $('#validateDataBtn').click( function() {
@@ -134,7 +141,8 @@
                                     },
                                     success: function(data) {
                                         var result = JSON.parse(data);
-                                        $('#dvLastRun').html("Last validated: " + result.created)
+                                        $('#dvResult').html("Calculating, please check back later")
+                                        $('#validateDataBtn').prop('disabled', true);
                                      },
                                     error: function(jqXHR, textStatus, errorThrown){
                                     }

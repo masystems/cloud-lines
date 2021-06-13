@@ -129,9 +129,7 @@ def data_validation(request):
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/data_validator/',
                             json=dumps(data, cls=DjangoJSONEncoder))
 
-    response = {'status': 'success',
-                'created': dv.created.strftime('%d %b %Y, %H:%M %p')
-                }
+    response = {'status': 'success'}
     return HttpResponse(dumps(response))
 
 
