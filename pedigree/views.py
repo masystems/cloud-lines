@@ -55,6 +55,9 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
         # get all pedigrees for typeahead fields
         context['pedigrees'] = Pedigree.objects.filter(account=context['attached_service']).exclude(state='unapproved')
 
+        # update custom fields of pedigree if needed
+        update_pedigree_cf(context['attached_service'], context['lvl1'])
+
         # get custom fields
         try:
             context['custom_fields'] = json.loads(context['lvl1'].custom_fields)
@@ -73,6 +76,9 @@ class ShowPedigree(PedigreeBase):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        
+        
         return context
 
 
