@@ -5,7 +5,7 @@ from django.db.models import Q
 from .models import Pedigree
 from account.views import is_editor, get_main_account
 from .functions import get_site_pedigree_column_headings
-from json import dumps
+from json import dumps, loads
 from django.urls import reverse
 
 
@@ -83,6 +83,51 @@ def get_pedigrees(request):
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
+            # check custom fields are correct
+            ped_custom_fields = loads(pedigree.custom_fields)
+            acc_custom_fields = loads(attached_service.custom_fields)
+
+            # variable to keep track of whether the field has been updated
+            changed = False
+
+            # go through account custom fields
+            for key, val in acc_custom_fields.items():
+                # add the field to pedigree custom fields if not already there
+                if key not in ped_custom_fields.keys():
+                    ped_custom_fields[key] = {'id': val['id'],
+                                            'location': val['location'],
+                                            'fieldName': val['fieldName'],
+                                            'fieldType': val['fieldType']}
+                    changed = True
+                # update custom fields if they have been edited
+                else:
+                    if ped_custom_fields[key]['id'] != val['id']:
+                        ped_custom_fields[key]['id'] = val['id']
+                        changed = True
+                    if ped_custom_fields[key]['location'] != val['location']:
+                        ped_custom_fields[key]['location'] = val['location']
+                        changed = True
+                    if ped_custom_fields[key]['fieldName'] != val['fieldName']:
+                        ped_custom_fields[key]['fieldName'] = val['fieldName']
+                        changed = True
+                    if ped_custom_fields[key]['fieldType'] != val['fieldType']:
+                        ped_custom_fields[key]['fieldType'] = val['fieldType']
+                        changed = True
+
+            # go through pedigree custom fields
+            to_delete = []
+            for key, val in ped_custom_fields.items():
+                # remove custom field if it has been deleted from account
+                if key not in acc_custom_fields.keys():
+                    to_delete.append(key)
+                    changed = True
+            for key in to_delete:
+                ped_custom_fields.pop(key, None)
+            
+            if changed:
+                # pedigree.custom_fields = dumps(ped_custom_fields)
+                pass
+            
             row = {}
             row['action'] = f"""<a href='{reverse("pedigree", args=[pedigree.id])}'><button class='btn btn-info'>View</button></a>"""
             for col in columns:
