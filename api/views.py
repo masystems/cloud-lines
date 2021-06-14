@@ -10,6 +10,7 @@ from .serializers import ApiUpdatesSerializer, \
     ApiBreedGroupSerializer, \
     ApiFaqSerializer, \
     ApiKinshipSerializer, \
+    ApiDataValidationSerializer, \
     ApiServiceSerializer, \
     ApiAuthentication
 from cloud_lines.models import Update
@@ -19,7 +20,7 @@ from breed.models import Breed
 from breed_group.models import BreedGroup
 from cloud_lines.models import Service, Faq
 from account.models import UserDetail, AttachedService
-from metrics.models import KinshipQueue
+from metrics.models import KinshipQueue, DataValidatorQueue
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import authentication_classes, permission_classes
@@ -134,6 +135,18 @@ class KinshipViews(viewsets.ModelViewSet):
         user = self.request.user
         main_account = get_main_account(user)
         return KinshipQueue.objects.all()
+
+
+class DataValidatorViews(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication)
+    serializer_class = ApiDataValidationSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        main_account = get_main_account(user)
+        return DataValidatorQueue.objects.all()
 
 
 ########## Auth ###########

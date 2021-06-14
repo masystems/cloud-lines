@@ -115,6 +115,42 @@
         <div class="col-xl-3 col-lg-3">
             <div class="card">
                 <div class="card-body">
+                    {% if not read_only %}
+                        <button id="validateDataBtn" type="button" class="btn btn-block btn-warning ml-1 mb-1" {% if dv_queue and not dv_queue.complete %}disabled{% endif %}>Check My Data</button>
+                        {% if dv_queue.complete %}
+                            <p id="dvLastRun">Last validated: {{ dv_queue.created }}</p>
+                            <p>{{ dv_queue.result|safe }}</p>
+                        {% else %}
+                            {% if dv_queue %}
+                                <p id="dvPlsWait">Results still calculating, please check back later.</p>
+                            {% endif %}
+                        {% endif %}
+                        <p id="dvResult"></p>
+                        <hr>
+                        <script>
+                            $('#validateDataBtn').click( function() {
+                                $.ajax({
+                                    url: '{% url 'data_validation' %}',
+                                    type: 'post',
+                                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                    dataType: 'text',
+                                    async: true,
+                                    data: [],
+                                    beforeSend: function() {
+                                        //$('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                                    },
+                                    success: function(data) {
+                                        var result = JSON.parse(data);
+                                        $('#dvResult').html("Calculating, please check back later")
+                                        $('#validateDataBtn').prop('disabled', true);
+                                     },
+                                    error: function(jqXHR, textStatus, errorThrown){
+                                    }
+                                });
+                            });
+                        </script>
+                    {% endif %}
+
                     <h4 class="card-title">Calculations</h4>
                     <p id="coiTimer" class="text-center"></p>
                     {% if not read_only %}
@@ -529,6 +565,6 @@
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
 
     <!-- code for the reg number field typeaheads -->
-    {% include 'reg_no_typeahead.html' %}
+    {% include 'ta_metrics.html' %}
 
 {% endblock %}

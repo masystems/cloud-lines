@@ -5,7 +5,7 @@ from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
 from breed.models import Breed
 from django.core.serializers.json import DjangoJSONEncoder
-from .models import CoiLastRun, MeanKinshipLastRun, StudAdvisorQueue, KinshipQueue
+from .models import CoiLastRun, MeanKinshipLastRun, StudAdvisorQueue, KinshipQueue, DataValidatorQueue
 from json import dumps, loads, load
 from datetime import datetime, timedelta
 import logging
@@ -58,6 +58,7 @@ def metrics(request):
         mean_kinship_date = date.strftime("%b %d, %Y %H:%M:%S")
 
     # queue
+    dv_queue = DataValidatorQueue.objects.filter(account=attached_service).last()
     sa_queue = StudAdvisorQueue.objects.filter(account=attached_service)
     k_queue = KinshipQueue.objects.filter(account=attached_service)
     tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
@@ -72,11 +73,13 @@ def metrics(request):
                 item.complete = True
                 item.save()
 
+
     return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
                                             'coi_date': coi_date,
                                             'mean_kinship_date': mean_kinship_date,
                                             'breeds': Breed.objects.filter(account=attached_service),
-                                            'queue_items': queue_items})
+                                            'queue_items': queue_items,
+                                            'dv_queue': dv_queue})
 
 
 def multi_part_upload_with_s3(file_path, key_path):
@@ -88,6 +91,47 @@ def multi_part_upload_with_s3(file_path, key_path):
                             ExtraArgs={'ACL': 'public-read', 'ContentType': 'text/json'},
                             Config=config,
                             )
+
+
+def data_validation(request):
+    attached_service = get_main_account(request.user)
+    dv = DataValidatorQueue.objects.create(account=attached_service,
+                                           user=request.user,
+                                           )
+
+    pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
+                                                                         'parent_father__id',
+                                                                         'parent_mother__id',
+                                                                         'sex',
+                                                                         'breed__breed_name',
+                                                                         'status')
+    # create unique paths
+    if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
+        host = attached_service.domain.partition('://')[2]
+        subdomain = host.partition('.')[0]
+        local_output = f"/tmp/dv_{subdomain}_output.json"
+        remote_output = f"metrics/dv_{subdomain}_output.json"
+        file_name = f"dv_{subdomain}_output.json"
+    else:
+        local_output = f"/tmp/dv_{attached_service.id}_output.json"
+        remote_output = f"metrics/dv_{attached_service.id}_output.json"
+        file_name = f"dv_{attached_service.id}_output.json"
+
+    with open(local_output, 'w') as file:
+        file.write(dumps(list(pedigrees)))
+
+    multi_part_upload_with_s3(local_output, remote_output)
+
+    data = {'data_path': remote_output,
+            'file_name': file_name,
+            'domain': attached_service.domain,
+            'dv_q_id': dv.id}
+
+    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/data_validator/',
+                            json=dumps(data, cls=DjangoJSONEncoder))
+
+    response = {'status': 'success'}
+    return HttpResponse(dumps(response))
 
 
 def run_coi(request):

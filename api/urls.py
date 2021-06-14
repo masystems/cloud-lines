@@ -12,6 +12,7 @@ router.register('breed-groups', views.BreedGroupViews, basename='BreedGroup')
 router.register('services', views.ServicesViews, basename='services')
 router.register('faq', views.FaqViews, basename='faq')
 router.register('kinship', views.KinshipViews, basename='kinship')
+router.register('data_validation', views.DataValidatorViews, basename='data_validation')
 router.register('attached-service', views.AttachedServiceViews, basename='AttachedService')
 router.register('authenticate', views.Authenticate)
 

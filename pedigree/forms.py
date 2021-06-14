@@ -3,9 +3,9 @@ from django import forms
 
 class PedigreeForm(forms.Form):
 
-    breeder = forms.CharField(required=False)
+    breeder = forms.CharField(required=True)
 
-    current_owner = forms.CharField(required=False)
+    current_owner = forms.CharField(required=True)
 
     reg_no = forms.CharField(label='Registration Number', required=True)
     reg_no.widget.attrs['class'] = 'form-control'
