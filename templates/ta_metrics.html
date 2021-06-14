@@ -102,7 +102,7 @@
             type: 'GET',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
-            data: {'id': input_element.val(), 'form_type': input_element.attr('form_type'), 'pedigree': ped_reg, 'parent_type': parent_type},
+            data: {'id': input_element.val(), 'form_type': input_element.attr('form_type'), 'pedigree': ped_reg, 'parent_type': parent_type, 'status': 'alive'},
             success: function(data) {
                 result = JSON.parse(data)
 
