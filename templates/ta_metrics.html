@@ -81,24 +81,28 @@
         var ped_reg = ''
         // get the element that has triggered this function
         var input_element = $(this)
-        // get the corresponding info element
+        // get the corresponding info element and parent type
         var info_element = ''
+        var parent_type = ''
         if (input_element.attr('id') == 'id_mother') {
             info_element = $('#mother-info')
+            parent_type = 'mother'
         }
         else if (input_element.attr('id') == 'id_father') {
             info_element = $('#father-info')
+            parent_type = 'father'
         }
         else if (input_element.attr('id') == 'sa_mother') {
             info_element = $('#sa-info')
+            parent_type = 'mother'
         }
-
+        
         $.ajax({
             url: "{% url 'get_pedigree_details' %}",
             type: 'GET',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
-            data: {'id': input_element.val(), 'form_type': input_element.attr('form_type'), 'pedigree': ped_reg},
+            data: {'id': input_element.val(), 'form_type': input_element.attr('form_type'), 'pedigree': ped_reg, 'parent_type': parent_type, 'status': 'alive'},
             success: function(data) {
                 result = JSON.parse(data)
 
