@@ -119,7 +119,7 @@
                         <button id="validateDataBtn" type="button" class="btn btn-block btn-warning ml-1 mb-1" {% if dv_queue and not dv_queue.complete %}disabled{% endif %}>Check My Data</button>
                         {% if dv_queue.complete %}
                             <p id="dvLastRun">Last validated: {{ dv_queue.created }}</p>
-                            <p>{{ dv_queue.result }}</p>
+                            <p>{{ dv_queue.result|safe }}</p>
                         {% else %}
                             {% if dv_queue %}
                                 <p id="dvPlsWait">Results still calculating, please check back later.</p>

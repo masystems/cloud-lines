@@ -73,6 +73,7 @@ def metrics(request):
                 item.complete = True
                 item.save()
 
+
     return render(request, 'metrics.html', {'pedigrees': Pedigree.objects.filter(account=attached_service),
                                             'coi_date': coi_date,
                                             'mean_kinship_date': mean_kinship_date,
