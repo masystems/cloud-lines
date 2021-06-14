@@ -411,7 +411,7 @@ def custom_field_edit(request):
 
             # update the model
             if request.POST.get('location') == 'pedigree':
-                objects = Pedigree.objects.filter(account=attached_service)
+                objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename')
             elif request.POST.get('location') == 'breeder':
                 objects = Breeder.objects.filter(account=attached_service)
             elif request.POST.get('location') == 'breed':
