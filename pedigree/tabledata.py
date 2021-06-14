@@ -124,9 +124,10 @@ def get_pedigrees(request):
             for key in to_delete:
                 ped_custom_fields.pop(key, None)
             
+            # update pedigree custom fields if we need to
             if changed:
-                # pedigree.custom_fields = dumps(ped_custom_fields)
-                pass
+                pedigree.custom_fields = dumps(ped_custom_fields)
+                pedigree.save()
             
             row = {}
             row['action'] = f"""<a href='{reverse("pedigree", args=[pedigree.id])}'><button class='btn btn-info'>View</button></a>"""
