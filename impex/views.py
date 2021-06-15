@@ -408,6 +408,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 
                 try:
                     pedigree.breeder = breeder_obj
@@ -439,6 +441,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# name
                 try:
                     pedigree.name = row[name]
@@ -448,6 +452,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# description
                 try:
                     pedigree.description = row[description]
@@ -456,6 +462,8 @@ def import_pedigree_data(request):
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# dor
                 try:
@@ -468,6 +476,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# dob
                 try:
                     pedigree.dob = dob_converted
@@ -479,6 +489,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# dod
                 try:
                     pedigree.dod = dod_converted
@@ -489,6 +501,8 @@ def import_pedigree_data(request):
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# sex
                 try:
@@ -524,6 +538,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# born as
                 try:
                     # if born_as given
@@ -547,6 +563,8 @@ def import_pedigree_data(request):
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# status
                 try:
@@ -582,6 +600,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# father
                 try:
                     pedigree.parent_father = father_obj
@@ -590,6 +610,8 @@ def import_pedigree_data(request):
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# mother
                 try:
@@ -600,6 +622,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# father notes
                 try:
                     pedigree.parent_father_notes = row[father_notes]
@@ -608,9 +632,13 @@ def import_pedigree_data(request):
                         pedigree.parent_father_notes = ''
                     except AttributeError:
                         pass
+                    except UnboundLocalError:
+                        pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# mother notes
                 try:
@@ -620,9 +648,13 @@ def import_pedigree_data(request):
                         pedigree.parent_mother_notes = ''
                     except AttributeError:
                         pass
+                    except UnboundLocalError:
+                        pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# sale or hire
                 try:
@@ -650,6 +682,8 @@ def import_pedigree_data(request):
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
 
                 #################### breed
@@ -694,6 +728,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
 
                 ############################# custom
                 for cf_col in custom_fields_in:
@@ -710,6 +746,8 @@ def import_pedigree_data(request):
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
 
             # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
