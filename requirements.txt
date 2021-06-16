@@ -4,7 +4,7 @@ awacs==0.9.7
 Babel==2.8.0
 boto3==1.11.7
 boto3-stubs==1.14.33.0
-botocore==1.14.7
+botocore==1.20.95
 CacheControl==0.12.6
 cairocffi==1.1.0
 CairoSVG==2.5.1
