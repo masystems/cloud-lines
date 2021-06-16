@@ -182,7 +182,6 @@ def import_pedigree_data(request):
             attached_service = get_main_account(request.user)
             db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
             decoded_file = db.database.file.read().decode('utf-8').splitlines()
-            row_number = len(list(decoded_file)) - 1
             database_items = csv.DictReader(decoded_file)
             date_fields = ['date_of_registration', 'dob', 'dod']
             post_data = {}
