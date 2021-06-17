@@ -160,26 +160,52 @@
 <script>
     function showFile(input) {
         if ($('#uploadDatabase').val() != '') {
+            console.log(input.files)
             let file = input.files[0]
             console.log(file.name)
             let reader = new FileReader()
             reader.readAsText(file)
             reader.onload = function() {
-                console.log(reader.result.split('\n'))
-                console.log(reader.result.split('\n').slice(0, 2))
-                csvArray = reader.result.split('\n').slice(0, 2)
-                // create csv file
-                let csvContent = "data:text/csv;charset=utf-8,"
-                console.log(csvContent)
-                // go through array
-                csvArray.forEach(iterate)
-                function iterate (value) {
-                    csvContent += value + "\n"
+                // find number of lines in file
+                var totalLines = reader.result.match(/\r?\n/g).length - 1
+
+                // maximum size of slice
+                var sliceMax = 2//500
+                // the start of the first slice
+                var sliceStart = 1
+                // the line which is the end of the first slice
+                var sliceEnd = sliceMax
+                if (totalLines < sliceMax) {
+                    sliceEnd = totalLines
                 }
-                console.log(csvContent)
 
-                // send file to backend
+                // go through slices of the file
+                while (sliceEnd <= totalLines) {
+                    // get slice of file
+                    csvArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
+                    
+                    // create csv file
+                    let fileSlice = "data:text/csv;charset=utf-8,"
+                    
+                    // go through array
+                    csvArray.forEach(iterate)
+                    function iterate (value) {
+                        fileSlice += value + "\n"
+                    }
 
+                    // create form data to be sent
+                    var formData = new FormData()
+                    formData.append('uploadDatabase', encodeURI(fileSlice))
+
+                    // send file to backend
+                    
+                    // increment end and start of slice
+                    sliceStart = sliceEnd
+                    sliceEnd += sliceMax
+                    if (sliceEnd > totalLines && sliceStart < totalLines) {
+                        sliceEnd = totalLines
+                    }
+                }
             };
         }
     }
