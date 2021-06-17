@@ -118,7 +118,16 @@ def importx(request):
             print(request.POST)
             print(request.POST.getlist('uploadDatabase[]'))
             print('|||||||||||////////||||||||||||||||||')
-            database_file = request.FILES['uploadDatabase']
+            
+            for row in request.POST.getlist('uploadDatabase[]'):
+                print('HBBBBBBBBBBBHeheh')
+                print(row.split(','))
+                with open('subFile.csv', 'w') as subFile:
+                    # create the csv writer
+                    writer = csv.writer(subFile)
+                    # write a row to the csv file
+                    writer.writerow(row.split(','))
+
             imported_headings = []
 
             f_type = splitext(str(request.FILES['uploadDatabase']))[1]
