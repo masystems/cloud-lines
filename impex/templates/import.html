@@ -35,9 +35,9 @@
                                 {% if error %}
                                     <div class="alert alert-danger">{{ error }} </div>
                                 {% endif %}
-                                <form action="{% url 'import' %}" method="POST" enctype="multipart/form-data">
+                                <form>
                                     {% csrf_token %}
-                                    <input type="file" id="uploadDatabase" name="uploadDatabase" />
+                                    <input type="file" id="uploadDatabase" name="uploadDatabase" onchange="showFile(this)" />
                                     <button id="uploadDatabaseButton" class="btn btn-block btn-outline-info mt-4" disabled>Analyse File</button>
                                 </form>
                             </div>
@@ -116,10 +116,73 @@
 </script>
 
 <!-- enable analyse button when file selected -->
-<script>
+<!-- <script>
     $('#uploadDatabase').change(function(e) {
         $('#uploadDatabaseButton').removeAttr('disabled');
     })
+</script> -->
+
+<!-- <script>
+    $('#uploadDatabase').change(function(e) {
+        if ($(this).val() != '') {
+            console.log('hello')
+            var file = new XMLHttpRequest()
+            file.open("GET", $(this).val(), true);
+            // var allText = file.responseText;
+            // console.log(allText.split('\n'))
+            file.onreadystatechange = function() {
+                console.log('hello')
+                var allText = file.responseText;
+                console.log(allText)
+                //allTextLines = allText.split(/\r\n|\n/);
+            }
+        }
+    })
+</script> -->
+
+<!-- <script>
+    function processFile() {
+        if ($('#uploadDatabase').val() != '') {
+            console.log('hello')
+            var myReader = new FileReader()
+            myReader.readAsText($('#uploadDatabase').val())
+            // var content = myReader.result
+            // console.log(content)
+            myReader.onload = function(e) {
+                console.log('hello')
+                var content = myReader.result
+                console.log(content)
+            }
+        }
+    }
+</script> -->
+
+<script>
+    function showFile(input) {
+        if ($('#uploadDatabase').val() != '') {
+            let file = input.files[0]
+            console.log(file.name)
+            let reader = new FileReader()
+            reader.readAsText(file)
+            reader.onload = function() {
+                console.log(reader.result.split('\n'))
+                console.log(reader.result.split('\n').slice(0, 2))
+                csvArray = reader.result.split('\n').slice(0, 2)
+                // create csv file
+                let csvContent = "data:text/csv;charset=utf-8,"
+                console.log(csvContent)
+                // go through array
+                csvArray.forEach(iterate)
+                function iterate (value) {
+                    csvContent += value + "\n"
+                }
+                console.log(csvContent)
+
+                // send file to backend
+
+            };
+        }
+    }
 </script>
 
 {% endblock %}
