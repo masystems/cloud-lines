@@ -55,6 +55,9 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
         # get all pedigrees for typeahead fields
         context['pedigrees'] = Pedigree.objects.filter(account=context['attached_service']).exclude(state='unapproved')
 
+        # update custom fields of pedigree if needed
+        update_pedigree_cf(context['attached_service'], context['lvl1'])
+
         # get custom fields
         try:
             context['custom_fields'] = json.loads(context['lvl1'].custom_fields)
@@ -73,6 +76,9 @@ class ShowPedigree(PedigreeBase):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        
+        
         return context
 
 
@@ -797,3 +803,51 @@ def get_pedigree_details(request):
     pedigree = serializers.serialize('json', [pedigree], ensure_ascii=False)
     return HttpResponse(json.dumps({'result': 'success',
                                     'pedigree': pedigree}))
+
+
+def update_pedigree_cf(attached_service, pedigree):
+    # check custom fields are correct
+    ped_custom_fields = json.loads(pedigree.custom_fields)
+    acc_custom_fields = json.loads(attached_service.custom_fields)
+
+    # variable to keep track of whether the field has been updated
+    changed = False
+
+    # go through account custom fields
+    for key, val in acc_custom_fields.items():
+        # add the field to pedigree custom fields if not already there
+        if key not in ped_custom_fields.keys():
+            ped_custom_fields[key] = {'id': val['id'],
+                                    'location': val['location'],
+                                    'fieldName': val['fieldName'],
+                                    'fieldType': val['fieldType']}
+            changed = True
+        # update custom fields if they have been edited
+        else:
+            if ped_custom_fields[key]['id'] != val['id']:
+                ped_custom_fields[key]['id'] = val['id']
+                changed = True
+            if ped_custom_fields[key]['location'] != val['location']:
+                ped_custom_fields[key]['location'] = val['location']
+                changed = True
+            if ped_custom_fields[key]['fieldName'] != val['fieldName']:
+                ped_custom_fields[key]['fieldName'] = val['fieldName']
+                changed = True
+            if ped_custom_fields[key]['fieldType'] != val['fieldType']:
+                ped_custom_fields[key]['fieldType'] = val['fieldType']
+                changed = True
+
+    # go through pedigree custom fields
+    to_delete = []
+    for key, val in ped_custom_fields.items():
+        # remove custom field if it has been deleted from account
+        if key not in acc_custom_fields.keys():
+            to_delete.append(key)
+            changed = True
+    for key in to_delete:
+        ped_custom_fields.pop(key, None)
+    
+    # update pedigree custom fields if we need to
+    if changed:
+        pedigree.custom_fields = json.dumps(ped_custom_fields)
+        pedigree.save()
