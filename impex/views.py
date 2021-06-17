@@ -114,7 +114,10 @@ def importx(request):
     if request.user in attached_service.admin_users.all() or request.user == attached_service.user.user:
         allowed_file_types = ('.csv')
         if request.method == 'POST':
-
+            print('||||||||||||||||///////|||||||||||||')
+            print(request.POST)
+            print(request.POST.getlist('uploadDatabase[]'))
+            print('|||||||||||////////||||||||||||||||||')
             database_file = request.FILES['uploadDatabase']
             imported_headings = []
 

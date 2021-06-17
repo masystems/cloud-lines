@@ -160,11 +160,12 @@
 <script>
     function showFile(input) {
         if ($('#uploadDatabase').val() != '') {
-            console.log(input.files)
-            let file = input.files[0]
-            console.log(file.name)
+            console.log($('#uploadDatabase'))
+            console.log(input)
+            let inputFile = input.files[0]
+            console.log(inputFile.name)
             let reader = new FileReader()
-            reader.readAsText(file)
+            reader.readAsText(inputFile)
             reader.onload = function() {
                 // find number of lines in file
                 var totalLines = reader.result.match(/\r?\n/g).length - 1
@@ -182,13 +183,19 @@
                 // go through slices of the file
                 while (sliceEnd <= totalLines) {
                     // get slice of file
-                    csvArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
+                    fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
                     
                     // create csv file
                     let fileSlice = "data:text/csv;charset=utf-8,"
+
+                    // create File object
+                    fileSlice2 = new File(fileSliceArray, inputFile.name)
+                    // create FileList
+                    // fileList = new FileList()
+                    // fileList.append(fileSlice2)
                     
                     // go through array
-                    csvArray.forEach(iterate)
+                    fileSliceArray.forEach(iterate)
                     function iterate (value) {
                         fileSlice += value + "\n"
                     }
@@ -198,6 +205,14 @@
                     formData.append('uploadDatabase', encodeURI(fileSlice))
 
                     // send file to backend
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'import' %}",
+                        dataType: "text",
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data: ({'uploadDatabase[]': fileSliceArray}),
+                        success: function(result){}
+                    })
                     
                     // increment end and start of slice
                     sliceStart = sliceEnd
