@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from account.models import AttachedService
 
 
@@ -8,11 +9,21 @@ def user_directory_path(instance, filename):
 
 class DatabaseUpload(models.Model):
     account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
-    database = models.ImageField(upload_to=user_directory_path)
+    created = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='database_upload')
+
+    def __str__(self):
+        return "{}-{}".format(str(self.account), str(self.user))
+
+
+class FileSlice(models.Model):
+    file_slice = models.TextField(blank=True)
+    database_upload = models.ForeignKey(DatabaseUpload, on_delete=models.CASCADE, blank=False, null=False, related_name='file_slice')
     FILE_TYPES = (
         ('.csv', '.csv'),
     )
     file_type = models.CharField(max_length=5, choices=FILE_TYPES, default=None, null=True)
+    slice_number = models.IntegerField(null=False)
 
     def __str__(self):
-        return str(self.database)
+        return str(self.file_slice)
