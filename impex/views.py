@@ -114,40 +114,45 @@ def importx(request):
     if request.user in attached_service.admin_users.all() or request.user == attached_service.user.user:
         allowed_file_types = ('.csv')
         if request.method == 'POST':
-            print('||||||||||||||||///////|||||||||||||')
-            print(request.POST)
-            print(request.POST.getlist('uploadDatabase[]'))
+            print('((((((((())((((((())))))))))))))')
+            print(str(request.POST.getlist('uploadDatabase[]')).replace('"', ''))
             print('|||||||||||////////||||||||||||||||||')
             
-            for row in request.POST.getlist('uploadDatabase[]'):
-                print('HBBBBBBBBBBBHeheh')
-                print(row.split(','))
-                with open('subFile.csv', 'w') as subFile:
-                    # create the csv writer
-                    writer = csv.writer(subFile)
-                    # write a row to the csv file
-                    writer.writerow(row.split(','))
+            # for row in request.POST.getlist('uploadDatabase[]'):
+            #     print('HBBBBBBBBBBBHeheh')
+            #     print(row.split(','))
+            #     with open('subFile.csv', 'w') as subFile:
+            #         # create the csv writer
+            #         writer = csv.writer(subFile)
+            #         # write a row to the csv file
+            #         writer.writerow(row.split(','))
 
-            imported_headings = []
+            # imported_headings = []
 
-            f_type = splitext(str(request.FILES['uploadDatabase']))[1]
-            if f_type not in allowed_file_types:
-                return render(request, 'import.html', {'error': '{} is not an allowed file type!'.format(f_type)})
+            # f_type = splitext(str(request.FILES['uploadDatabase']))[1]
+            # if f_type not in allowed_file_types:
+            #     return render(request, 'import.html', {'error': '{} is not an allowed file type!'.format(f_type)})
 
-            if f_type == '.csv':
-                file = request.FILES['uploadDatabase']
-                decoded_file = file.read().decode('utf-8').splitlines()
-                database_items = csv.DictReader(decoded_file)
-                imported_headings = database_items.fieldnames
+            # if f_type == '.csv':
+            #     file = request.FILES['uploadDatabase']
+            #     decoded_file = file.read().decode('utf-8').splitlines()
+            #     database_items = csv.DictReader(decoded_file)
+            #     imported_headings = database_items.fieldnames
 
             # check if file is empty
-            if file.size <= 1:
-                return render(request, 'import.html', {'error': '{} is empty!'.format(request.FILES['uploadDatabase'])})
+            if len(request.POST.getlist('uploadDatabase[]')) <= 1:
+                return render(request, 'import.html', {'error': '{} is empty!'.format(request.POST.getlist('uploadDatabase[]'))})
 
             # upload file
-            upload_database = DatabaseUpload(account=attached_service, database=database_file, file_type=f_type)
-            upload_database.save(database_file)
-
+            file_slice = dumps(f"""{{slice: {str(request.POST.getlist('uploadDatabase[]')).replace('"', '')}}}""")
+            print(file_slice)
+            
+            upload_database = DatabaseUpload(account=attached_service, database=file_slice)
+            upload_database.save()
+            print('=========')
+            if upload_database.database:
+                print(loads(upload_database.database))
+            return False
             # get pedigree model headings
             pedigree_headings = get_pedigree_column_headings()
 
