@@ -40,6 +40,7 @@
                                     <input type="file" id="uploadDatabase" name="uploadDatabase" onchange="showFile(this)" />
                                     <button id="uploadDatabaseButton" class="btn btn-block btn-outline-info mt-4" disabled>Analyse File</button>
                                 </form>
+                                <div id="errors" class="d-none alert alert-danger mt-4"></div>
                             </div>
                         </div>
                         <div class="tab-pane" id="images" role="tabpanel">
@@ -160,15 +161,51 @@
 <script>
     function showFile(input) {
         if ($('#uploadDatabase').val() != '') {
-            console.log($('#uploadDatabase'))
-            console.log(input)
             let inputFile = input.files[0]
-            console.log(inputFile.name)
             let reader = new FileReader()
             reader.readAsText(inputFile)
             reader.onload = function() {
+                // variable to store whether there were errors
+                var errors = false
+                
+                // validate file type
+                fileType = inputFile.name.substr(inputFile.name.length - 4)
+                if (fileType != '.csv') {
+                    errorMsg('File type must be CSV!')
+                    
+                    // create the error message
+                    errorHtml = '<h5 class="text-danger">The selected file must be a CSV file</h5>'
+                    
+                    // display the error message
+                    $('#errors').html(errorHtml)
+                    $('#errors').removeClass('d-none')
+                    
+                    // stop the import
+                    return false
+                }
+
                 // find number of lines in file
                 var totalLines = reader.result.match(/\r?\n/g).length - 1
+
+                // validate file size
+                if (totalLines < 1) {
+                    errorMsg('File can not be empty!')
+
+                    // create the error message
+                    errorHtml = '<h5 class="text-danger">The selected file must have at least one row as well as the heading</h5>'
+                    
+                    // display the error message
+                    $('#errors').html(errorHtml)
+                    $('#errors').removeClass('d-none')
+                    
+                    // stop the import
+                    return false
+                }
+
+                // if there were no errors, ensure that the error message is not displayed
+                if (!errors && !$('#errors').hasClass('d-none')) {
+                    $('#errors').addClass('d-none')
+                }
 
                 // maximum size of slice
                 var sliceMax = 2//500
@@ -184,25 +221,8 @@
                 while (sliceEnd <= totalLines) {
                     // get slice of file
                     fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
-                    
-                    // create csv file
-                    let fileSlice = "data:text/csv;charset=utf-8,"
 
-                    // create File object
-                    fileSlice2 = new File(fileSliceArray, inputFile.name)
-                    // create FileList
-                    // fileList = new FileList()
-                    // fileList.append(fileSlice2)
                     
-                    // go through array
-                    fileSliceArray.forEach(iterate)
-                    function iterate (value) {
-                        fileSlice += value + "\n"
-                    }
-
-                    // create form data to be sent
-                    var formData = new FormData()
-                    formData.append('uploadDatabase', encodeURI(fileSlice))
 
                     // send file to backend
                     $.ajax({
@@ -210,8 +230,16 @@
                         url: "{% url 'import' %}",
                         dataType: "text",
                         headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                        data: ({'uploadDatabase[]': fileSliceArray}),
-                        success: function(result){}
+                        data: ({
+                            'uploadDatabase[]': fileSliceArray,
+                            'fileName': inputFile.name
+                        }),
+                        success: function(result){
+                            result = JSON.parse(result)
+                            if (result.error) {
+                                
+                            }
+                        }
                     })
                     
                     // increment end and start of slice
