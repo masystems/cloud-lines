@@ -254,6 +254,7 @@
                         dataType: "json",
                         headers: {'X-CSRFToken': '{{ csrf_token }}'},
                         data: ({
+                            'job': 'slices',
                             'uploadDatabase': fileSliceArray
                         }),
                         success: function(result){

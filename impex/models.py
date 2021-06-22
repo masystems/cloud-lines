@@ -12,7 +12,7 @@ class DatabaseUpload(models.Model):
     header = models.TextField(blank=False, null=False)
 
     def __str__(self):
-        return "{}-{}".format(str(self.account), str(self.user))
+        return str(self.account)
 
 
 class FileSlice(models.Model):
@@ -21,7 +21,7 @@ class FileSlice(models.Model):
     FILE_TYPES = (
         ('.csv', '.csv'),
     )
-    file_type = models.CharField(max_length=5, choices=FILE_TYPES, default=None, null=True)
+    file_type = models.CharField(max_length=5, choices=FILE_TYPES, default='.csv', null=True)
 
     def __str__(self):
         return str(self.file_slice)

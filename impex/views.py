@@ -115,12 +115,13 @@ def importx(request):
         allowed_file_types = ('.csv')
         if request.method == 'POST':
             # get header
-            print('**********')
-            print(request.POST)
             if request.POST.get('job'):
+                # if we need to save the header
                 if request.POST['job'] == 'header':
-                    print(request.POST.getlist('uploadDatabase[]'))
-                    return False
+                    # flush any database uploads for this account
+                    for database_upload in DatabaseUpload.objects.filter(account=attached_service):
+                        database_upload.delete()
+                    
                     # convert header to JSON
                     header = dumps({"header": request.POST.get('uploadDatabase')})
                     
@@ -130,37 +131,20 @@ def importx(request):
                     database_upload.save()
                     
                     return HttpResponse(dumps({'result': 'success'}))
-            
-            print('((((((((())((((((())))))))))))))')
-            print(request.POST.get('uploadDatabase'))
-            print('|||||||||||////////||||||||||||||||||')
+                
+                # if we need to save the body
+                elif request.POST['job'] == 'slices':
+                    # create the file slice
+                    file_slice = []
+                    for key in request.POST:
+                        if 'uploadDatabase' in key:
+                            file_slice.append(request.POST.getlist(key))
+                    
+                    # save file slice
+                    file_slice = FileSlice.objects.create(file_slice=dumps({"file_slice": file_slice}),
+                                                        database_upload=DatabaseUpload.get(account=attached_service))
+                    file_slice.save()
             return False
-            # for row in request.POST.getlist('uploadDatabase[]'):
-            #     print('HBBBBBBBBBBBHeheh')
-            #     print(row.split(','))
-            #     with open('subFile.csv', 'w') as subFile:
-            #         # create the csv writer
-            #         writer = csv.writer(subFile)
-            #         # write a row to the csv file
-            #         writer.writerow(row.split(','))
-
-            # imported_headings = []
-
-            # f_type = splitext(str(request.POST.get('fileName')))[1]
-            # print(f_type)
-            # if f_type not in allowed_file_types:
-            #     return render(request, 'import.html', {'error': '{} is not an allowed file type!'.format(f_type)})
-
-            # if f_type == '.csv':
-            #     file = request.FILES['uploadDatabase']
-            #     decoded_file = file.read().decode('utf-8').splitlines()
-            #     database_items = csv.DictReader(decoded_file)
-            #     imported_headings = database_items.fieldnames
-
-            # check if file is empty
-            # if len(request.POST.getlist('uploadDatabase[]')) <= 1:
-            #     return render(request, 'import.html', {'error': '{} is empty!'.format(request.POST.getlist('uploadDatabase[]'))})
-
             # upload file
             file_slice = dumps({'slice': request.POST.getlist('uploadDatabase[]')})
             print(file_slice)
