@@ -115,10 +115,14 @@ def importx(request):
         allowed_file_types = ('.csv')
         if request.method == 'POST':
             # get header
+            print('**********')
+            print(request.POST)
             if request.POST.get('job'):
                 if request.POST['job'] == 'header':
+                    print(request.POST.getlist('uploadDatabase[]'))
+                    return False
                     # convert header to JSON
-                    header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
+                    header = dumps({"header": request.POST.get('uploadDatabase')})
                     
                     # create database upload object
                     database_upload = DatabaseUpload.objects.create(account=attached_service,
@@ -126,11 +130,11 @@ def importx(request):
                     database_upload.save()
                     
                     return HttpResponse(dumps({'result': 'success'}))
-            return False
-            print('((((((((())((((((())))))))))))))')
-            print(str(request.POST.getlist('uploadDatabase[]')).replace('"', ''))
-            print('|||||||||||////////||||||||||||||||||')
             
+            print('((((((((())((((((())))))))))))))')
+            print(request.POST.get('uploadDatabase'))
+            print('|||||||||||////////||||||||||||||||||')
+            return False
             # for row in request.POST.getlist('uploadDatabase[]'):
             #     print('HBBBBBBBBBBBHeheh')
             #     print(row.split(','))
@@ -158,7 +162,7 @@ def importx(request):
             #     return render(request, 'import.html', {'error': '{} is empty!'.format(request.POST.getlist('uploadDatabase[]'))})
 
             # upload file
-            file_slice = dumps(f"""{{slice: {str(request.POST.getlist('uploadDatabase[]')).replace('"', '')}}}""")
+            file_slice = dumps({'slice': request.POST.getlist('uploadDatabase[]')})
             print(file_slice)
             
             # IF this is the first time round and the slice is too big

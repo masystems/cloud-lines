@@ -211,13 +211,12 @@
                 $.ajax({
                     type: "POST",
                     url: "{% url 'import' %}",
-                    dataType: "text",
+                    dataType: "json",
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
                     data: ({
                         'job': 'header',
                         // just get the first line, and ensure it's an array in the right format
-                        'uploadDatabase[]': reader.result.split('\n')[0].replaceAll('"', '').split(','),
-                        'fileName': inputFile.name
+                        'uploadDatabase[]': reader.result.split('\n')[0].replaceAll('"', '').split(',')
                     }),
                     success: function(result){
                         result = JSON.parse(result)
@@ -242,24 +241,28 @@
                     // get slice of file
                     fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
 
+                    // turn each row into the correct format
+                    fileSliceArray.forEach(updateSlice)
+                    function updateSlice(row, index) {
+                        fileSliceArray[index] = row.replaceAll('"', '').split(',')
+                    }
                     console.log(fileSliceArray)
-                    // // send file to backend
-                    // $.ajax({
-                    //     type: "POST",
-                    //     url: "{% url 'import' %}",
-                    //     dataType: "text",
-                    //     headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                    //     data: ({
-                    //         'uploadDatabase[]': fileSliceArray,
-                    //         'fileName': inputFile.name
-                    //     }),
-                    //     success: function(result){
-                    //         result = JSON.parse(result)
-                    //         if (result.error) {
+                    // send file to backend
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'import' %}",
+                        dataType: "json",
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data: ({
+                            'uploadDatabase': fileSliceArray
+                        }),
+                        success: function(result){
+                            result = JSON.parse(result)
+                            if (result.error) {
                                 
-                    //         }
-                    //     }
-                    // })
+                            }
+                        }
+                    })
                     
                     // increment end and start of slice
                     sliceStart = sliceEnd
