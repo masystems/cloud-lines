@@ -192,7 +192,7 @@
                     errorMsg('File can not be empty!')
 
                     // create the error message
-                    errorHtml = '<h5 class="text-danger">The selected file must have at least one row as well as the heading</h5>'
+                    errorHtml = '<h5 class="text-danger">The selected file must have at least one row as well as the header</h5>'
                     
                     // display the error message
                     $('#errors').html(errorHtml)
@@ -206,6 +206,26 @@
                 if (!errors && !$('#errors').hasClass('d-none')) {
                     $('#errors').addClass('d-none')
                 }
+
+                // post request to process the header of the uploaded file
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'import' %}",
+                    dataType: "text",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: ({
+                        'job': 'header',
+                        // just get the first line, and ensure it's an array in the right format
+                        'uploadDatabase[]': reader.result.slice(0, reader.result.indexOf("\n")).replaceAll('"', '').split(','),
+                        'fileName': inputFile.name
+                    }),
+                    success: function(result){
+                        result = JSON.parse(result)
+                        if (result.result == 'success') {
+                            console.log('yello')
+                        }
+                    }
+                })
 
                 // maximum size of slice
                 var sliceMax = 2//500

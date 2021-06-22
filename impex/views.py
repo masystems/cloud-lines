@@ -6,7 +6,7 @@ from pedigree.functions import get_pedigree_column_headings
 from breeder.models import Breeder
 from breed.models import Breed
 from account.views import is_editor, get_main_account
-from .models import DatabaseUpload
+from .models import DatabaseUpload, FileSlice
 from datetime import datetime
 from os.path import splitext
 import csv
@@ -114,6 +114,19 @@ def importx(request):
     if request.user in attached_service.admin_users.all() or request.user == attached_service.user.user:
         allowed_file_types = ('.csv')
         if request.method == 'POST':
+            # get header
+            if request.POST.get('job'):
+                if request.POST['job'] == 'header':
+                    # convert header to JSON
+                    header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
+                    
+                    # create database upload object
+                    database_upload = DatabaseUpload.objects.create(account=attached_service,
+                                                                    header=header)
+                    database_upload.save()
+                    
+                    return HttpResponse(dumps({'result': 'success'}))
+            return False
             print('((((((((())((((((())))))))))))))')
             print(str(request.POST.getlist('uploadDatabase[]')).replace('"', ''))
             print('|||||||||||////////||||||||||||||||||')
@@ -129,7 +142,8 @@ def importx(request):
 
             # imported_headings = []
 
-            # f_type = splitext(str(request.FILES['uploadDatabase']))[1]
+            # f_type = splitext(str(request.POST.get('fileName')))[1]
+            # print(f_type)
             # if f_type not in allowed_file_types:
             #     return render(request, 'import.html', {'error': '{} is not an allowed file type!'.format(f_type)})
 
@@ -140,19 +154,24 @@ def importx(request):
             #     imported_headings = database_items.fieldnames
 
             # check if file is empty
-            if len(request.POST.getlist('uploadDatabase[]')) <= 1:
-                return render(request, 'import.html', {'error': '{} is empty!'.format(request.POST.getlist('uploadDatabase[]'))})
+            # if len(request.POST.getlist('uploadDatabase[]')) <= 1:
+            #     return render(request, 'import.html', {'error': '{} is empty!'.format(request.POST.getlist('uploadDatabase[]'))})
 
             # upload file
             file_slice = dumps(f"""{{slice: {str(request.POST.getlist('uploadDatabase[]')).replace('"', '')}}}""")
             print(file_slice)
             
-            upload_database = DatabaseUpload(account=attached_service, database=file_slice)
+            # IF this is the first time round and the slice is too big
+            upload_database = DatabaseUpload(account=attached_service, user=request.user)
             upload_database.save()
+
+            # IF we're wanting to make a slice
+            file_slice = FileSlice(file_slice=file_slice, database_upload=upload_database)
+
             print('=========')
             if upload_database.database:
                 print(loads(upload_database.database))
-            return False
+            
             # get pedigree model headings
             pedigree_headings = get_pedigree_column_headings()
 

@@ -3,11 +3,11 @@ from .models import DatabaseUpload, FileSlice
 
 
 class DatabaseUploadAdmin(admin.ModelAdmin):
-    list_display = ('account', 'created', 'user')
+    list_display = ('account', 'header')
     list_display_links = ['account']
-    search_fields = ('account', 'created', 'user')
-    list_filter = ('account', 'created', 'user')
-    ordering = ['created']
+    search_fields = ('account', 'header')
+    list_filter = ('account', 'header')
+    ordering = ['account']
     empty_value_display = '-empty-'
 
     save_on_top = True
@@ -17,11 +17,11 @@ admin.site.register(DatabaseUpload, DatabaseUploadAdmin)
 
 
 class FileSliceAdmin(admin.ModelAdmin):
-    list_display = ('slice_number', 'database_upload')
-    list_display_links = ['slice_number']
-    search_fields = ('slice_number', 'database_upload')
-    list_filter = ('slice_number', 'database_upload')
-    ordering = ['slice_number']
+    list_display = ('database_upload', 'file_type')
+    list_display_links = ['database_upload']
+    search_fields = ('database_upload', 'file_type')
+    list_filter = ('database_upload', 'file_type')
+    ordering = ['database_upload']
     empty_value_display = '-empty-'
 
     save_on_top = True

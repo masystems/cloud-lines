@@ -9,8 +9,7 @@ def user_directory_path(instance, filename):
 
 class DatabaseUpload(models.Model):
     account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True)
-    created = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='database_upload')
+    header = models.TextField(blank=False, null=False)
 
     def __str__(self):
         return "{}-{}".format(str(self.account), str(self.user))
@@ -23,7 +22,6 @@ class FileSlice(models.Model):
         ('.csv', '.csv'),
     )
     file_type = models.CharField(max_length=5, choices=FILE_TYPES, default=None, null=True)
-    slice_number = models.IntegerField(null=False)
 
     def __str__(self):
         return str(self.file_slice)
