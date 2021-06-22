@@ -805,8 +805,14 @@ def get_pedigree_details(request):
 
 def update_pedigree_cf(attached_service, pedigree):
     # check custom fields are correct
-    ped_custom_fields = json.loads(pedigree.custom_fields)
-    acc_custom_fields = json.loads(attached_service.custom_fields)
+    try:
+        ped_custom_fields = json.loads(pedigree.custom_fields)
+    except json.decoder.JSONDecodeError:
+        ped_custom_fields = {}
+    try:
+        acc_custom_fields = json.loads(attached_service.custom_fields)
+    except json.decoder.JSONDecodeError:
+        acc_custom_fields = {}
 
     # variable to keep track of whether the field has been updated
     changed = False
