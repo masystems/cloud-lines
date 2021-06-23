@@ -36,6 +36,12 @@ class Service(models.Model):
         ordering = ['ordering']
 
 
+class Gallery(models.Model):
+    title = models.CharField(max_length=100, blank=True)
+    image = models.ImageField(blank=True)
+    detail = models.CharField(max_length=200, blank=True)
+
+
 class Bolton(models.Model):
     name = models.CharField(max_length=50)
     price = models.FloatField()
@@ -44,12 +50,6 @@ class Bolton(models.Model):
 
     def __str__(self):
         return str(self.name)
-
-
-class Gallery(models.Model):
-    title = models.CharField(max_length=100, blank=True)
-    image = models.ImageField(blank=True)
-    detail = models.CharField(max_length=200, blank=True)
 
 
 class Page(models.Model):

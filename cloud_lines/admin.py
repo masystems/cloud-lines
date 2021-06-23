@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Service, Bolton, Page, Gallery, Faq, Contact, Testimonial, LargeTierQueue, Blog, Update
+from .models import Service, Page, Gallery, Faq, Contact, Testimonial, LargeTierQueue, Blog, Update
 
 
 class ServicesAdmin(admin.ModelAdmin):
@@ -10,19 +10,6 @@ class ServicesAdmin(admin.ModelAdmin):
 
     save_on_top = True
 
-
-class BoltonAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'description')
-    list_display_links = ['name']
-    search_fields = ('name',)
-    list_filter = ('name',)
-    ordering = ['name']
-    empty_value_display = '-empty-'
-
-    save_on_top = True
-
-
-admin.site.register(Bolton, BoltonAdmin)
 admin.site.register(LargeTierQueue)
 admin.site.register(Service, ServicesAdmin)
 admin.site.register(Gallery)

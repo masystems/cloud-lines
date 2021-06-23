@@ -3,9 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
 from account.views import is_editor, get_main_account
 
+
 # Create your views here.
-
-
 class MembershipBase(LoginRequiredMixin, TemplateView):
     login_url = '/account/login'
 
