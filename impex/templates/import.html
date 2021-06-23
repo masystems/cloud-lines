@@ -219,7 +219,7 @@
                         'uploadDatabase[]': reader.result.split('\n')[0].replaceAll('"', '').split(',')
                     }),
                     success: function(result){
-                        result = JSON.parse(result)
+                        // result = JSON.parse(result)
                         if (result.result == 'success') {
                             // do nothing
                         }
@@ -227,7 +227,7 @@
                 })
 
                 // maximum size of slice
-                var sliceMax = 2//500
+                var sliceMax = 500
                 // the start of the first slice
                 var sliceStart = 1
                 // the line which is the end of the first slice
@@ -246,8 +246,8 @@
                     function updateSlice(row, index) {
                         fileSliceArray[index] = row.replaceAll('"', '').split(',')
                     }
-                    console.log(fileSliceArray)
-                    // send file to backend
+                    
+                    // send slice to backend
                     $.ajax({
                         type: "POST",
                         url: "{% url 'import' %}",
@@ -258,7 +258,8 @@
                             'uploadDatabase': fileSliceArray
                         }),
                         success: function(result){
-                            result = JSON.parse(result)
+                            console.log(result)
+                            // result = JSON.parse(result)
                             if (result.error) {
                                 
                             }
@@ -272,6 +273,23 @@
                         sliceEnd = totalLines
                     }
                 }
+                // go to analyse page
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'import' %}",
+                    dataType: "json",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: ({
+                        'job': 'analyse'
+                    }),
+                    success: function(result){
+                        console.log(result)
+                        // result = JSON.parse(result)
+                        if (result.error) {
+                            
+                        }
+                    }
+                })
             };
         }
     }
