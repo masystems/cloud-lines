@@ -123,7 +123,7 @@ def importx(request):
                         database_upload.delete()
                     
                     # convert header to JSON
-                    header = dumps({"header": request.POST.get('uploadDatabase')})
+                    header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
                     
                     # create database upload object
                     database_upload = DatabaseUpload.objects.create(account=attached_service,
@@ -134,16 +134,18 @@ def importx(request):
                 
                 # if we need to save the body
                 elif request.POST['job'] == 'slices':
+                    
                     # create the file slice
                     file_slice = []
                     for key in request.POST:
                         if 'uploadDatabase' in key:
                             file_slice.append(request.POST.getlist(key))
+                    database_upload = DatabaseUpload.objects.filter(account=attached_service).first()
                     
                     # save file slice
-                    file_slice = FileSlice.objects.create(file_slice=dumps({"file_slice": file_slice}),
-                                                        database_upload=DatabaseUpload.get(account=attached_service))
+                    file_slice = FileSlice.objects.create(database_upload=database_upload, file_slice=dumps({"file_slice": file_slice}))
                     file_slice.save()
+                    
             return False
             # upload file
             file_slice = dumps({'slice': request.POST.getlist('uploadDatabase[]')})
