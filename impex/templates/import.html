@@ -116,48 +116,7 @@
     });
 </script>
 
-<!-- enable analyse button when file selected -->
-<!-- <script>
-    $('#uploadDatabase').change(function(e) {
-        $('#uploadDatabaseButton').removeAttr('disabled');
-    })
-</script> -->
-
-<!-- <script>
-    $('#uploadDatabase').change(function(e) {
-        if ($(this).val() != '') {
-            console.log('hello')
-            var file = new XMLHttpRequest()
-            file.open("GET", $(this).val(), true);
-            // var allText = file.responseText;
-            // console.log(allText.split('\n'))
-            file.onreadystatechange = function() {
-                console.log('hello')
-                var allText = file.responseText;
-                console.log(allText)
-                //allTextLines = allText.split(/\r\n|\n/);
-            }
-        }
-    })
-</script> -->
-
-<!-- <script>
-    function processFile() {
-        if ($('#uploadDatabase').val() != '') {
-            console.log('hello')
-            var myReader = new FileReader()
-            myReader.readAsText($('#uploadDatabase').val())
-            // var content = myReader.result
-            // console.log(content)
-            myReader.onload = function(e) {
-                console.log('hello')
-                var content = myReader.result
-                console.log(content)
-            }
-        }
-    }
-</script> -->
-
+<!-- save the file when selected -->
 <script>
     function showFile(input) {
         if ($('#uploadDatabase').val() != '') {
@@ -208,6 +167,7 @@
                 }
 
                 // post request to process the header of the uploaded file
+                console.log('header start')
                 $.ajax({
                     type: "POST",
                     url: "{% url 'import' %}",
@@ -221,77 +181,93 @@
                     success: function(result){
                         // result = JSON.parse(result)
                         if (result.result == 'success') {
-                            // do nothing
+                            // process file slices
+                            console.log('header end')
+                            slicesJob()
                         }
                     }
                 })
 
-                // maximum size of slice
-                var sliceMax = 500
-                // the start of the first slice
-                var sliceStart = 1
-                // the line which is the end of the first slice
-                var sliceEnd = sliceMax
-                if (totalLines < sliceMax) {
-                    sliceEnd = totalLines
-                }
-
-                // go through slices of the file
-                while (sliceEnd <= totalLines) {
-                    // get slice of file
-                    fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
-
-                    // turn each row into the correct format
-                    fileSliceArray.forEach(updateSlice)
-                    function updateSlice(row, index) {
-                        fileSliceArray[index] = row.replaceAll('"', '').split(',')
-                    }
-                    
-                    // send slice to backend
-                    $.ajax({
-                        type: "POST",
-                        url: "{% url 'import' %}",
-                        dataType: "json",
-                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                        data: ({
-                            'job': 'slices',
-                            'uploadDatabase': fileSliceArray
-                        }),
-                        success: function(result){
-                            console.log(result)
-                            // result = JSON.parse(result)
-                            if (result.error) {
-                                
-                            }
-                        }
-                    })
-                    
-                    // increment end and start of slice
-                    sliceStart = sliceEnd
-                    sliceEnd += sliceMax
-                    if (sliceEnd > totalLines && sliceStart < totalLines) {
+                function slicesJob() {
+                    console.log('slices start')
+                    // maximum size of slice
+                    var sliceMax = 500
+                    // the start of the first slice
+                    var sliceStart = 1
+                    // the line which is the end of the first slice
+                    var sliceEnd = sliceMax
+                    if (totalLines < sliceMax) {
                         sliceEnd = totalLines
                     }
-                }
-                // go to analyse page
-                $.ajax({
-                    type: "POST",
-                    url: "{% url 'import' %}",
-                    dataType: "json",
-                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                    data: ({
-                        'job': 'analyse'
-                    }),
-                    success: function(result){
-                        console.log(result)
-                        // result = JSON.parse(result)
-                        if (result.error) {
-                            
+
+                    // go through slices of the file
+                    while (sliceEnd <= totalLines) {
+                        // get slice of file
+                        fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
+
+                        // turn each row into the correct format
+                        fileSliceArray.forEach(updateSlice)
+                        function updateSlice(row, index) {
+                            fileSliceArray[index] = row.replaceAll('"', '').split(',')
+                        }
+                        
+                        // send slice to backend
+                        $.ajax({
+                            type: "POST",
+                            url: "{% url 'import' %}",
+                            dataType: "json",
+                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                            data: ({
+                                'job': 'slices',
+                                'uploadDatabase': fileSliceArray
+                            }),
+                            success: function(result){
+                                // console.log(result)
+                                // result = JSON.parse(result)
+                                if (result.error) {
+                                    
+                                }
+                                enableAnalyse()
+                            }
+                        })
+                        
+                        // increment end and start of slice
+                        sliceStart = sliceEnd
+                        sliceEnd += sliceMax
+                        if (sliceEnd > totalLines && sliceStart < totalLines) {
+                            sliceEnd = totalLines
                         }
                     }
-                })
+                    console.log('slices end')
+                }
             };
         }
+
+        function enableAnalyse() {
+            // enable analyse button
+            $('#uploadDatabaseButton').removeAttr('disabled')
+        }
+    }
+
+    // go to analyse page
+    $('#uploadDatabaseButton').click( function() {
+        console.log('analyse start')
+        $.ajax({
+            type: "POST",
+            url: "{% url 'import' %}",
+            dataType: "json",
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            data: ({
+                'job': 'analyse'
+            }),
+            success: function(result){
+                console.log('analyse end')
+                // result = JSON.parse(result)
+                if (result.error) {
+                    
+                }
+            }
+        })
     }
 </script>
 
