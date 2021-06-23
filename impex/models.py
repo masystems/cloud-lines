@@ -10,6 +10,7 @@ def user_directory_path(instance, filename):
 class DatabaseUpload(models.Model):
     account = models.ForeignKey(AttachedService, on_delete=models.CASCADE)
     header = models.TextField(blank=False, null=False)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return str(self.account)
