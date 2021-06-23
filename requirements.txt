@@ -2,9 +2,9 @@ appdirs==1.4.3
 argcomplete==1.9.3
 awacs==0.9.7
 Babel==2.8.0
-boto3==1.11.7
+boto3==1.17.95
 boto3-stubs==1.14.33.0
-botocore==1.14.7
+botocore==1.20.95
 CacheControl==0.12.6
 cairocffi==1.1.0
 CairoSVG==2.5.1
@@ -21,7 +21,7 @@ defusedxml==0.6.0
 distlib==0.3.0
 distro==1.4.0
 dj-stripe==2.2.2
-Django==2.2.18
+Django==2.2.24
 django-extensions==2.2.6
 django-filter==2.2.0
 django-s3-storage==0.13.0
@@ -54,7 +54,7 @@ oyaml==0.9
 packaging==20.3
 parso==0.5.2
 pep517==0.8.2
-Pillow==8.1.1
+Pillow==8.2.0
 pip-tools==5.0.0
 placebo==0.9.0
 pluggy==0.13.1
@@ -74,10 +74,10 @@ pytoml==0.1.21
 pytz==2019.3
 PyYAML==5.4
 reportlab==3.5.34
-requests==2.22.0
+requests==2.25.1
 requests-toolbelt==0.9.1
 retrying==1.3.3
-s3transfer==0.3.1
+s3transfer==0.4.2
 six==1.14.0
 sqlparse==0.3.0
 stripe==2.42.0
@@ -88,7 +88,7 @@ tqdm==4.19.1
 troposphere==2.5.3
 ujson==1.35
 Unidecode==1.1.1
-urllib3==1.25.8
+urllib3==1.26.5
 virtualenv==16.7.9
 WeasyPrint==51
 webencodings==0.5.1

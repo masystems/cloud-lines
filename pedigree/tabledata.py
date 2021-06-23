@@ -7,6 +7,7 @@ from account.views import is_editor, get_main_account
 from .functions import get_site_pedigree_column_headings
 from json import dumps
 from django.urls import reverse
+from .views import update_pedigree_cf
 
 
 @login_required(login_url='/accounts/login/')
@@ -83,6 +84,9 @@ def get_pedigrees(request):
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
+            # update pedigree custom fields if they need updating
+            update_pedigree_cf(attached_service, pedigree)
+            
             row = {}
             row['action'] = f"""<a href='{reverse("pedigree", args=[pedigree.id])}'><button class='btn btn-info'>View</button></a>"""
             for col in columns:

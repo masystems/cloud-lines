@@ -93,6 +93,22 @@ def export(request):
                                 row.append('yes')
                             else:
                                 row.append('no')
+                        # make sure 'None' isn't given for dates, and that they're formatted well
+                        elif key == 'date_of_registration':
+                            if pedigree.date_of_registration:
+                                row.append(pedigree.date_of_registration.strftime('%d/%m/%Y'))
+                            else:
+                                row.append('')
+                        elif key == 'dob':
+                            if pedigree.dob:
+                                row.append(pedigree.dob.strftime('%d/%m/%Y'))
+                            else:
+                                row.append('')
+                        elif key == 'dod':
+                            if pedigree.dod:
+                                row.append(pedigree.dod.strftime('%d/%m/%Y'))
+                            else:
+                                row.append('')
                         else:
                             row.append('{}'.format(val))
                 if not header:

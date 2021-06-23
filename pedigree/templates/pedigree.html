@@ -120,7 +120,7 @@ vertical-align: middle;
                                     <dl>
                                         {% if custom_fields %}
                                             {% for field_key, field_vals in custom_fields.items %}
-                                                {% if field_vals.location == 'pedigree' %}
+                                                {% if field_vals.location == 'pedigree' and field_vals.field_value %}
                                                     <dt>{{ field_vals.fieldName }}</dt>
                                                     <dd>{% if field_vals.field_value %}{{ field_vals.field_value }}{% else %}<br>{% endif %}</dd>
                                                 {% endif %}
