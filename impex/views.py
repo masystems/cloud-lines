@@ -132,12 +132,12 @@ def importx(request):
         if request.method == 'POST':
             # get header
             if request.POST.get('job'):
-                # flush the database upload down the digital toilet
-                for database_upload in DatabaseUpload.objects.filter(account=attached_service, user=request.user):
-                    database_upload.delete()
-                
                 # if we need to save the header
                 if request.POST['job'] == 'header':
+                    # flush the database upload down the digital toilet
+                    for database_upload in DatabaseUpload.objects.filter(account=attached_service, user=request.user):
+                        database_upload.delete()
+
                     # convert header to JSON
                     header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
                     
@@ -169,7 +169,7 @@ def importx(request):
                 elif request.POST['job'] == 'analyse':
                     # get pedigree model headings
                     pedigree_headings = get_pedigree_column_headings()
-                    print(pedigree_headings)
+
                     # get breeder model headings
                     forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
                     breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
@@ -210,7 +210,7 @@ def importx(request):
                     #     'breed_required': breed_required
                     # }))
 
-                    return render(request, 'analyse.html', {'imported_headings': imported_headings,
+                    render(request, 'analyse.html', {'imported_headings': imported_headings,
                                                             'pedigree_headings': pedigree_headings,
                                                             'breeder_headings': breeder_headings,
                                                             'custom_fields': custom_field_names,
