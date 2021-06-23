@@ -132,13 +132,17 @@ def importx(request):
         if request.method == 'POST':
             # get header
             if request.POST.get('job'):
+                # flush the database upload down the digital toilet
+                for database_upload in DatabaseUpload.objects.filter(account=attached_service, user=request.user):
+                    database_upload.delete()
+                
                 # if we need to save the header
                 if request.POST['job'] == 'header':
                     # convert header to JSON
                     header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
                     
                     # create database upload object
-                    database_upload = DatabaseUpload.objects.create(account=attached_service, header=header)
+                    database_upload = DatabaseUpload.objects.create(account=attached_service, header=header, user=request.user)
                     database_upload.save()
                     
                     return HttpResponse(dumps({'result': 'success'}))
@@ -151,55 +155,68 @@ def importx(request):
                     for key in request.POST:
                         if 'uploadDatabase' in key:
                             file_slice.append(request.POST.getlist(key))
-                    # database_upload = DatabaseUpload.objects.get(account=attached_service)
-                    # print(database_upload.header)
                     
                     # save file slice
-                    # file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.last(), file_slice=dumps({"file_slice": file_slice}))
-                    file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.last(), file_slice='file_slice')
-                    # file_slice.database_upload = DatabaseUpload.objects.get(account=attached_service)
-                    file_slice.save()
+                    try:
+                        file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).last(), file_slice='file_slice')
+                        file_slice.save()
+                    except Exception:
+                        pass
                     
                     return HttpResponse(dumps({'result': 'success'}))
 
                 # if we need to continue to analyse
                 elif request.POST['job'] == 'analyse':
-                    # # get pedigree model headings
-                    # pedigree_headings = get_pedigree_column_headings()
+                    # get pedigree model headings
+                    pedigree_headings = get_pedigree_column_headings()
+                    print(pedigree_headings)
+                    # get breeder model headings
+                    forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
+                    breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
+                                        if field.name not in forbidden_breeeder_fields]
 
-                    # # get breeder model headings
-                    # forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
-                    # breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
-                    #                     if field.name not in forbidden_breeeder_fields]
+                    # get custom fields
+                    try:
+                        custom_fields = dict(loads(attached_service.custom_fields)).values()
+                    except JSONDecodeError:
+                        custom_fields = {}
+                    custom_field_names = []
+                    for field in custom_fields:
+                        custom_field_names.append(field['fieldName'])
 
-                    # # get custom fields
-                    # try:
-                    #     custom_fields = dict(loads(attached_service.custom_fields)).values()
-                    # except JSONDecodeError:
-                    #     custom_fields = {}
-                    # custom_field_names = []
-                    # for field in custom_fields:
-                    #     custom_field_names.append(field['fieldName'])
+                    # see if any breeds have been set up
+                    has_breeds = Breed.objects.filter(account=attached_service).count() > 0
 
-                    # # see if any breeds have been set up
-                    # has_breeds = Breed.objects.filter(account=attached_service).count() > 0
+                    # breed is required if org account with multiple breeds
+                    if attached_service.service.service_name == 'Organisation' and Breed.objects.filter(account=attached_service).count() > 1:
+                        breed_required = 'yes'
+                    else:
+                        breed_required = 'no'
 
-                    # # breed is required if org account with multiple breeds
-                    # if attached_service.service.service_name == 'Organisation' and Breed.objects.filter(account=attached_service).count() > 1:
-                    #     breed_required = 'yes'
-                    # else:
-                    #     breed_required = 'no'
-
-                    # return render(request, 'analyse.html', {'imported_headings': 'imported_headings',#imported_headings
-                    #                                         'pedigree_headings': pedigree_headings,
-                    #                                         'breeder_headings': breeder_headings,
-                    #                                         'custom_fields': custom_field_names,
-                    #                                         'has_breeds': has_breeds,
-                    #                                         'breed_required': breed_required})
-                    # flush any database uploads for this account
-                    for database_upload in DatabaseUpload.objects.filter(account=attached_service):
+                    # get imported headings
+                    imported_headings = loads(DatabaseUpload.objects.filter(account=attached_service, user=request.user).last().header)['header']
+                    
+                    # flush the database upload down the digital toilet
+                    for database_upload in DatabaseUpload.objects.filter(account=attached_service, user=request.user):
                         database_upload.delete()
-                    return HttpResponse(dumps({'result': 'success'}))
+                    
+                    # return HttpResponse(dumps({
+                    #     'result': 'success',
+                    #     'imported_headings': imported_headings,
+                    #     'pedigree_headings': pedigree_headings,
+                    #     'breeder_headings': breeder_headings,
+                    #     'custom_fields': custom_field_names,
+                    #     'has_breeds': has_breeds,
+                    #     'breed_required': breed_required
+                    # }))
+
+                    return render(request, 'analyse.html', {'imported_headings': imported_headings,
+                                                            'pedigree_headings': pedigree_headings,
+                                                            'breeder_headings': breeder_headings,
+                                                            'custom_fields': custom_field_names,
+                                                            'has_breeds': has_breeds,
+                                                            'breed_required': breed_required})
+                    
         return render(request, 'import.html')
     else:
         return redirect('dashboard')
