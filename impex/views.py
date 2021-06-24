@@ -158,7 +158,7 @@ def importx(request):
                     
                     # save file slice
                     try:
-                        file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).last(), file_slice=dumps({'file_slice': file_slice}))
+                        file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id'), file_slice=dumps({'file_slice': file_slice}))
                         file_slice.save()
                     except Exception:
                         pass
@@ -178,7 +178,7 @@ def import_pedigree_data(request):
     if request.method == 'POST':
         # check if this is import or cancel - created not passed in if it's import
         if 'created' not in request.POST.keys():
-            db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
+            db = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
             decoded_file = db.database.file.read().decode('utf-8').splitlines()
             database_items = csv.DictReader(decoded_file)
             date_fields = ['date_of_registration', 'dob', 'dod']
@@ -806,7 +806,7 @@ def import_pedigree_data(request):
             breed_required = 'no'
 
         # get imported headings
-        imported_headings = loads(DatabaseUpload.objects.filter(account=attached_service, user=request.user).last().header)['header']
+        imported_headings = loads(DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id').header)['header']
         
         return render(request, 'analyse.html', {'imported_headings': imported_headings,
                                                 'pedigree_headings': pedigree_headings,
