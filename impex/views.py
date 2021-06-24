@@ -178,9 +178,10 @@ def import_pedigree_data(request):
     if request.method == 'POST':
         # check if this is import or cancel - created not passed in if it's import
         if 'created' not in request.POST.keys():
-            db = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
-            decoded_file = db.database.file.read().decode('utf-8').splitlines()
-            database_items = csv.DictReader(decoded_file)
+            database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
+            file_slice = loads(FileSlice.objects.filter(database_upload=database_upload).earliest('id').file_slice)['file_slice']
+            # decoded_file = db.database.file.read().decode('utf-8').splitlines()
+            # database_items = csv.DictReader(decoded_file)
             date_fields = ['date_of_registration', 'dob', 'dod']
             post_data = {}
 
@@ -229,6 +230,26 @@ def import_pedigree_data(request):
             mother_notes = post_data['parent_mother_notes'] or ''
             sale_or_hire = post_data['sale_or_hire'] or ''
 
+            # get index of each heading
+            breeder = database_upload.header['header'].index(breeder)
+            current_owner = database_upload.header['header'].index(current_owner)
+            breed = database_upload.header['header'].index(breed)
+            reg_no = database_upload.header['header'].index(reg_no)
+            tag_no = database_upload.header['header'].index(tag_no)
+            name = database_upload.header['header'].index(name)
+            description = database_upload.header['header'].index(description)
+            date_of_registration = database_upload.header['header'].index(date_of_registration)
+            dob = database_upload.header['header'].index(dob)
+            dod = database_upload.header['header'].index(dod)
+            sex = database_upload.header['header'].index(sex)
+            born_as = database_upload.header['header'].index(born_as)
+            status = database_upload.header['header'].index(status)
+            father = database_upload.header['header'].index(father)
+            father_notes = database_upload.header['header'].index(father_notes)
+            mother = database_upload.header['header'].index(mother)
+            mother_notes = database_upload.header['header'].index(mother_notes)
+            sale_or_hire = database_upload.header['header'].index(sale_or_hire)
+
             # errors is a dictionary to keep track of missing and invalid fields
             errors = {}
             # only mandatory fields are added to 
@@ -243,7 +264,7 @@ def import_pedigree_data(request):
             created_objects = []
 
             row_number = 1
-            for row in database_items:
+            for row in file_slice:
                 row_number += 1
                 
                 # variable to store pedigree name or empty string
