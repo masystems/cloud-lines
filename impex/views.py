@@ -158,7 +158,7 @@ def importx(request):
                     
                     # save file slice
                     try:
-                        file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).last(), file_slice='file_slice')
+                        file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).last(), file_slice=file_slice)
                         file_slice.save()
                     except Exception:
                         pass
