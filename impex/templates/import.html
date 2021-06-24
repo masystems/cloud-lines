@@ -167,7 +167,6 @@
                 }
 
                 // post request to process the header of the uploaded file
-                console.log('header start')
                 $.ajax({
                     type: "POST",
                     url: "{% url 'import' %}",
@@ -182,14 +181,12 @@
                         // result = JSON.parse(result)
                         if (result.result == 'success') {
                             // process file slices
-                            console.log('header end')
                             slicesJob()
                         }
                     }
                 })
 
                 function slicesJob() {
-                    console.log('slices start')
                     // maximum size of slice
                     var sliceMax = 500
                     // the start of the first slice
@@ -238,7 +235,6 @@
                             sliceEnd = totalLines
                         }
                     }
-                    console.log('slices end')
                 }
             };
         }
@@ -252,23 +248,7 @@
     // go to analyse page
     $('#uploadDatabaseButton').click( function(e) {
         e.preventDefault()
-        console.log('analyse start')
-        $.ajax({
-            type: "POST",
-            url: "{% url 'import' %}",
-            dataType: "json",
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            data: ({
-                'job': 'analyse'
-            }),
-            success: function(result){
-                console.log('analyse end')
-                // result = JSON.parse(result)
-                if (result.error) {
-                    
-                }
-            }
-        })
+        window.location.href = 'import_pedigree_data'
     })
 </script>
 
