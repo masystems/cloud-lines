@@ -164,58 +164,6 @@ def importx(request):
                         pass
                     
                     return HttpResponse(dumps({'result': 'success'}))
-
-                # if we need to continue to analyse
-                elif request.POST['job'] == 'analyse':
-                    # get pedigree model headings
-                    pedigree_headings = get_pedigree_column_headings()
-
-                    # get breeder model headings
-                    forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
-                    breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
-                                        if field.name not in forbidden_breeeder_fields]
-
-                    # get custom fields
-                    try:
-                        custom_fields = dict(loads(attached_service.custom_fields)).values()
-                    except JSONDecodeError:
-                        custom_fields = {}
-                    custom_field_names = []
-                    for field in custom_fields:
-                        custom_field_names.append(field['fieldName'])
-
-                    # see if any breeds have been set up
-                    has_breeds = Breed.objects.filter(account=attached_service).count() > 0
-
-                    # breed is required if org account with multiple breeds
-                    if attached_service.service.service_name == 'Organisation' and Breed.objects.filter(account=attached_service).count() > 1:
-                        breed_required = 'yes'
-                    else:
-                        breed_required = 'no'
-
-                    # get imported headings
-                    imported_headings = loads(DatabaseUpload.objects.filter(account=attached_service, user=request.user).last().header)['header']
-                    
-                    # flush the database upload down the digital toilet
-                    for database_upload in DatabaseUpload.objects.filter(account=attached_service, user=request.user):
-                        database_upload.delete()
-                    
-                    # return HttpResponse(dumps({
-                    #     'result': 'success',
-                    #     'imported_headings': imported_headings,
-                    #     'pedigree_headings': pedigree_headings,
-                    #     'breeder_headings': breeder_headings,
-                    #     'custom_fields': custom_field_names,
-                    #     'has_breeds': has_breeds,
-                    #     'breed_required': breed_required
-                    # }))
-
-                    render(request, 'analyse.html', {'imported_headings': imported_headings,
-                                                            'pedigree_headings': pedigree_headings,
-                                                            'breeder_headings': breeder_headings,
-                                                            'custom_fields': custom_field_names,
-                                                            'has_breeds': has_breeds,
-                                                            'breed_required': breed_required})
                     
         return render(request, 'import.html')
     else:
@@ -225,10 +173,11 @@ def importx(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def import_pedigree_data(request):
+    attached_service = get_main_account(request.user)
+    
     if request.method == 'POST':
         # check if this is import or cancel - created not passed in if it's import
         if 'created' not in request.POST.keys():
-            attached_service = get_main_account(request.user)
             db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
             decoded_file = db.database.file.read().decode('utf-8').splitlines()
             database_items = csv.DictReader(decoded_file)
@@ -828,6 +777,43 @@ def import_pedigree_data(request):
                         Pedigree.objects.filter(id=int(obj_id)).first().delete()
 
             return HttpResponse()
+    # get request, so display the page
+    elif request.method == 'GET':
+        # get pedigree model headings
+        pedigree_headings = get_pedigree_column_headings()
+
+        # get breeder model headings
+        forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
+        breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
+                            if field.name not in forbidden_breeeder_fields]
+
+        # get custom fields
+        try:
+            custom_fields = dict(loads(attached_service.custom_fields)).values()
+        except JSONDecodeError:
+            custom_fields = {}
+        custom_field_names = []
+        for field in custom_fields:
+            custom_field_names.append(field['fieldName'])
+
+        # see if any breeds have been set up
+        has_breeds = Breed.objects.filter(account=attached_service).count() > 0
+
+        # breed is required if org account with multiple breeds
+        if attached_service.service.service_name == 'Organisation' and Breed.objects.filter(account=attached_service).count() > 1:
+            breed_required = 'yes'
+        else:
+            breed_required = 'no'
+
+        # get imported headings
+        imported_headings = loads(DatabaseUpload.objects.filter(account=attached_service, user=request.user).last().header)['header']
+        
+        return render(request, 'analyse.html', {'imported_headings': imported_headings,
+                                                'pedigree_headings': pedigree_headings,
+                                                'breeder_headings': breeder_headings,
+                                                'custom_fields': custom_field_names,
+                                                'has_breeds': has_breeds,
+                                                'breed_required': breed_required})
     
     return redirect('pedigree_search')
 
