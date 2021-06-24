@@ -242,15 +242,16 @@
                 }
             };
         }
+    }
 
-        function enableAnalyse() {
-            // enable analyse button
-            $('#uploadDatabaseButton').removeAttr('disabled')
-        }
+    function enableAnalyse() {
+        // enable analyse button
+        $('#uploadDatabaseButton').removeAttr('disabled')
     }
 
     // go to analyse page
-    $('#uploadDatabaseButton').click( function() {
+    $('#uploadDatabaseButton').click( function(e) {
+        e.preventDefault()
         console.log('analyse start')
         $.ajax({
             type: "POST",
@@ -268,7 +269,7 @@
                 }
             }
         })
-    }
+    })
 </script>
 
 {% endblock %}
