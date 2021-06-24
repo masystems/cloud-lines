@@ -231,24 +231,80 @@ def import_pedigree_data(request):
             sale_or_hire = post_data['sale_or_hire'] or ''
 
             # get index of each heading
-            breeder = database_upload.header['header'].index(breeder)
-            current_owner = database_upload.header['header'].index(current_owner)
-            breed = database_upload.header['header'].index(breed)
-            reg_no = database_upload.header['header'].index(reg_no)
-            tag_no = database_upload.header['header'].index(tag_no)
-            name = database_upload.header['header'].index(name)
-            description = database_upload.header['header'].index(description)
-            date_of_registration = database_upload.header['header'].index(date_of_registration)
-            dob = database_upload.header['header'].index(dob)
-            dod = database_upload.header['header'].index(dod)
-            sex = database_upload.header['header'].index(sex)
-            born_as = database_upload.header['header'].index(born_as)
-            status = database_upload.header['header'].index(status)
-            father = database_upload.header['header'].index(father)
-            father_notes = database_upload.header['header'].index(father_notes)
-            mother = database_upload.header['header'].index(mother)
-            mother_notes = database_upload.header['header'].index(mother_notes)
-            sale_or_hire = database_upload.header['header'].index(sale_or_hire)
+            thousand = 1000
+            if breeder:
+                breeder = loads(database_upload.header)['header'].index(breeder)
+            # if heading not given, make the index out of range (who's importing a thousand columns!?)
+            else:
+                breeder = thousand
+            if current_owner:
+                current_owner = loads(database_upload.header)['header'].index(current_owner)
+            else:
+                current_owner = thousand
+            if breed:
+                breed = loads(database_upload.header)['header'].index(breed)
+            else:
+                breed = thousand
+            if reg_no:
+                reg_no = loads(database_upload.header)['header'].index(reg_no)
+            else:
+                reg_no = thousand
+            if tag_no:
+                tag_no = loads(database_upload.header)['header'].index(tag_no)
+            else:
+                tag_no = thousand
+            if name:
+                name = loads(database_upload.header)['header'].index(name)
+            else:
+                name = thousand
+            if description:
+                description = loads(database_upload.header)['header'].index(description)
+            else:
+                description = thousand
+            if date_of_registration:
+                date_of_registration = loads(database_upload.header)['header'].index(date_of_registration)
+            else:
+                date_of_registration = thousand
+            if dob:
+                dob = loads(database_upload.header)['header'].index(dob)
+            else:
+                dob = thousand
+            if dod:
+                dod = loads(database_upload.header)['header'].index(dod)
+            else:
+                dod = thousand
+            if sex:
+                sex = loads(database_upload.header)['header'].index(sex)
+            else:
+                sex = thousand
+            if born_as:
+                born_as = loads(database_upload.header)['header'].index(born_as)
+            else:
+                born_as = thousand
+            if status:
+                status = loads(database_upload.header)['header'].index(status)
+            else:
+                status = thousand
+            if father:
+                father = loads(database_upload.header)['header'].index(father)
+            else:
+                father = thousand
+            if father_notes:
+                father_notes = loads(database_upload.header)['header'].index(father_notes)
+            else:
+                father_notes = thousand
+            if mother:
+                mother = loads(database_upload.header)['header'].index(mother)
+            else:
+                mother = thousand
+            if mother_notes:
+                mother_notes = loads(database_upload.header)['header'].index(mother_notes)
+            else:
+                mother_notes = thousand
+            if sale_or_hire:
+                sale_or_hire = loads(database_upload.header)['header'].index(sale_or_hire)
+            else:
+                sale_or_hire = thousand
 
             # errors is a dictionary to keep track of missing and invalid fields
             errors = {}
@@ -268,7 +324,7 @@ def import_pedigree_data(request):
                 row_number += 1
                 
                 # variable to store pedigree name or empty string
-                if name:
+                if name != 1000:
                     ped_name = row[name]
                 else:
                     ped_name = ''
@@ -296,7 +352,7 @@ def import_pedigree_data(request):
                             'row': row_number,
                             'name': ped_name
                         })
-                except KeyError:
+                except IndexError:
                     breeder_obj = None
 
                 # get current owner - error if if it doesn't exist ###################
@@ -315,7 +371,7 @@ def import_pedigree_data(request):
                             current_owner_obj = current_owner_obj.first()
                     else:
                         current_owner_obj = None
-                except KeyError:
+                except IndexError:
                     current_owner_obj = None
 
                 # get or create pedigrees ###################
@@ -338,12 +394,12 @@ def import_pedigree_data(request):
 
                 try:
                     father_obj = get_or_create_pedigree(row[father], True)
-                except KeyError:
+                except IndexError:
                     father_obj = None
 
                 try:
                     mother_obj = get_or_create_pedigree(row[mother], True)
-                except KeyError:
+                except IndexError:
                     mother_obj = None
 
                 # convert dates ###################
@@ -388,38 +444,44 @@ def import_pedigree_data(request):
 
                 try:
                     date_of_registration_converted = convert_date(row[date_of_registration])
-                except KeyError:
+                except IndexError:
                     date_of_registration_converted = None
 
                 try:
                     dob_converted = convert_date(row[dob])
-                except KeyError:
+                except IndexError:
                     dob_converted = None
 
                 try:
                     dod_converted = convert_date(row[dod])
-                except KeyError:
+                except IndexError:
                     dod_converted = None
                 ############################# reg_no
-                if row[reg_no] == '':
-                    errors['missing'].append({
-                        'col': 'Registration Number',
-                        'row': row_number,
-                        'name': ped_name
-                    })
+                try:
+                    if row[reg_no] == '':
+                        errors['missing'].append({
+                            'col': 'Registration Number',
+                            'row': row_number,
+                            'name': ped_name
+                        })
+                except IndexError:
+                    pass
 
                 # create each new pedigree if no errors found in file ###################
                 if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
-                    # add to existing if this pedigree already exists, and if it's not a parent that was created because it didn't exist
-                    if Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).count() > 0 and Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).first().breeder:
-                        existing.append({
-                            'row': row_number,
-                            'name': ped_name,
-                            'reg_no': row[reg_no]
-                        })
-                    
-                    # get or create pedigree
-                    pedigree = get_or_create_pedigree(row[reg_no], False)
+                    try:
+                        # add to existing if this pedigree already exists, and if it's not a parent that was created because it didn't exist
+                        if Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).count() > 0 and Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).first().breeder:
+                            existing.append({
+                                'row': row_number,
+                                'name': ped_name,
+                                'reg_no': row[reg_no]
+                            })
+                        
+                        # get or create pedigree
+                        pedigree = get_or_create_pedigree(row[reg_no], False)
+                    except IndexError:
+                        pass
 
                 try:
                     pedigree.creator = request.user
@@ -454,7 +516,7 @@ def import_pedigree_data(request):
                 ############################# tag_no
                 try:
                     pedigree.tag_no = row[tag_no]
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
@@ -465,7 +527,7 @@ def import_pedigree_data(request):
                 ############################# name
                 try:
                     pedigree.name = row[name]
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
@@ -476,7 +538,7 @@ def import_pedigree_data(request):
                 ############################# description
                 try:
                     pedigree.description = row[description]
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
@@ -551,7 +613,7 @@ def import_pedigree_data(request):
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
@@ -577,7 +639,7 @@ def import_pedigree_data(request):
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
@@ -613,7 +675,7 @@ def import_pedigree_data(request):
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
@@ -646,7 +708,7 @@ def import_pedigree_data(request):
                 ############################# father notes
                 try:
                     pedigree.parent_father_notes = row[father_notes]
-                except KeyError:
+                except IndexError:
                     try:
                         pedigree.parent_father_notes = ''
                     except AttributeError:
@@ -662,7 +724,7 @@ def import_pedigree_data(request):
                 ############################# mother notes
                 try:
                     pedigree.parent_mother_notes = row[mother_notes]
-                except KeyError:
+                except IndexError:
                     try:
                         pedigree.parent_mother_notes = ''
                     except AttributeError:
@@ -696,7 +758,7 @@ def import_pedigree_data(request):
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
@@ -711,13 +773,16 @@ def import_pedigree_data(request):
                     breed_obj = Breed.objects.filter(account=attached_service).first()
                     # error if given breed doesn't match account breed, if given
                     if breed != '':
-                        if breed_obj.breed_name != row[breed] and row[breed] != '':
-                            errors['invalid'].append({
-                                'col': 'Breed',
-                                'row': row_number,
-                                'name': ped_name,
-                                'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
-                            })
+                        try:
+                            if breed_obj.breed_name != row[breed] and row[breed] != '':
+                                errors['invalid'].append({
+                                    'col': 'Breed',
+                                    'row': row_number,
+                                    'name': ped_name,
+                                    'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
+                                })
+                        except IndexError:
+                            pass
                 # organisation
                 elif breed != '---':
                     try:
@@ -734,7 +799,7 @@ def import_pedigree_data(request):
                                     'name': ped_name,
                                     'reason': 'the input for breed must be one of the breeds created for your account - you can create more breeds via the <a href="/breeds">Breed</a> page'
                                 })
-                    except KeyError:
+                    except IndexError:
                         breed_obj = None
                 else:
                     breed_obj = None
@@ -755,8 +820,11 @@ def import_pedigree_data(request):
                     # iterate through account custom fields
                     for id, field in acc_custom_fields.items():
                         if acc_custom_fields[id]['fieldName'] == cf_col:
-                            # populate with value from the imported csv file
-                            acc_custom_fields[id]['field_value'] = row[cf_col]
+                            try:
+                                # populate with value from the imported csv file
+                                acc_custom_fields[id]['field_value'] = row[cf_col]
+                            except IndexError:
+                                pass
                 
                 try:
                     pedigree.custom_fields = dumps(acc_custom_fields)
