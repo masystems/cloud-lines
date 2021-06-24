@@ -194,13 +194,18 @@ def import_pedigree_data(request):
             field_names = []
             for key, field in acc_custom_fields.items():
                 field_names.append(field['fieldName'])
-            custom_fields_in = []
+            
+            # dictionary that stores name of given custom fields, and their column's index in the file header
+            custom_fields_in = {}
 
             # iterate through columns
             for key, val in request.POST.items():
                 # add custom field columns
                 if key in field_names and val != '---':
-                    custom_fields_in.append(key)
+                    # find what index of the header corresponds with this column
+                    col_index = loads(database_upload.header)['header'].index(val)
+                    # add name:index to list
+                    custom_fields_in[key] = col_index
                 
                 # remove blank ('---') entries ###################
                 elif val == '---':
@@ -816,13 +821,13 @@ def import_pedigree_data(request):
                     pass
 
                 ############################# custom
-                for cf_col in custom_fields_in:
+                for cf_name, cf_index in custom_fields_in.items():
                     # iterate through account custom fields
                     for id, field in acc_custom_fields.items():
-                        if acc_custom_fields[id]['fieldName'] == cf_col:
+                        if acc_custom_fields[id]['fieldName'] == cf_name:
                             try:
                                 # populate with value from the imported csv file
-                                acc_custom_fields[id]['field_value'] = row[cf_col]
+                                acc_custom_fields[id]['field_value'] = row[cf_index]
                             except IndexError:
                                 pass
                 
