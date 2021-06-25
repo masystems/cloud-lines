@@ -184,6 +184,10 @@
         }
     })
 
+    function sleep (time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
+
     function importPedigreeData() {
         $.ajax({
             url: "{% url 'import_pedigree_data' %}",
@@ -202,7 +206,11 @@
                     // redirect to breeders page
                     window.location.replace("{% url 'pedigree_search' %}");
                 } else if (result.result == 'existing') {
-                    $('#overlay-spinner').modal('hide')
+                    // wait 2 seconds before hiding modal because if it's too dast it doesn't work
+                    sleep(2000).then(() => {
+                        $('#overlay-spinner').modal('hide')
+                    })
+                    
                     // warn users that they're about to change existing pedigrees
                     // list the existing pedigrees
                     var pedigreesHtml = "";
@@ -230,15 +238,16 @@
                         });
                         $('#created').html(createdHtml);
                     }
-                    // display modal
-                    $('#update-modal').modal('show');
                 } else if (result.result == 'again') {
                     // recursively call this function to continue importing the data
                     importPedigreeData()
                 } else {
-                    $('#overlay-spinner').modal('hide')
-                    errorMsg("Your data had errors!");
-                    $('#errors').removeClass('d-none');
+                    // wait 2 seconds before hiding modal because if it's too fast it doesn't work
+                    sleep(2000).then(() => {
+                        $('#overlay-spinner').modal('hide')
+                        errorMsg("Your data had errors!");
+                        $('#errors').removeClass('d-none');
+                    })
 
                     // create html to display what fields were erroneous
                     var errorHtml = "";
