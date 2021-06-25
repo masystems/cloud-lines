@@ -140,9 +140,27 @@ def importx(request):
 
                     # convert header to JSON
                     header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
+
+                    # errors is a dictionary to keep track of missing and invalid fields
+                    errors = {}
+                    # only mandatory fields are added to 
+                    errors['missing'] = []
+                    # only fields that need to be in a certain format are added to invalid fields
+                    errors['invalid'] = []
+
+                    # existing pedigrees can be added, but with a warning
+                    existing = {}
+                    existing['existing'] = []
+
+                    # list to store created objects so they can be deleted if there are errors
+                    created_objects = {}
+                    created_objects['created_objects'] = []
                     
                     # create database upload object
-                    database_upload = DatabaseUpload.objects.create(account=attached_service, header=header, user=request.user)
+                    database_upload = DatabaseUpload.objects.create(account=attached_service,
+                                                                    header=header, user=request.user,
+                                                                    errors=dumps(errors), existing=dumps(existing),
+                                                                    created_objects=dumps(created_objects))
                     database_upload.save()
                     
                     return HttpResponse(dumps({'result': 'success'}))
@@ -311,19 +329,6 @@ def import_pedigree_data(request):
             else:
                 sale_or_hire = thousand
 
-            # errors is a dictionary to keep track of missing and invalid fields
-            errors = {}
-            # only mandatory fields are added to 
-            errors['missing'] = []
-            # only fields that need to be in a certain format are added to invalid fields
-            errors['invalid'] = []
-
-            # existing pedigrees can be added, but with a warning
-            existing = []
-
-            # list to store created objects so they can be deleted if there are errors
-            created_objects = []
-
             row_number = 1
             for row in file_slice:
                 row_number += 1
@@ -340,23 +345,27 @@ def import_pedigree_data(request):
                         breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[breeder].rstrip())
                         # error if breeder doesn't exist
                         if not breeder_obj.exists():
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Breeder',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
                             })
+                            database_upload.errors = dumps(errors)
                         # get the breeder
                         else:
                             breeder_obj = breeder_obj.first()
                     else:
                         breeder_obj = None
                         # error if missing
+                        errors = loads(database_upload.errors)
                         errors['missing'].append({
                             'col': 'Breeder',
                             'row': row_number,
                             'name': ped_name
                         })
+                        database_upload.errors = dumps(errors)
                 except IndexError:
                     breeder_obj = None
 
@@ -366,12 +375,14 @@ def import_pedigree_data(request):
                         current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[current_owner].rstrip())
                         # error if owner doesn't exist
                         if not current_owner_obj.exists():
+                            errors = database_upload.errors
                             errors['invalid'].append({
                                 'col': 'Current Owner',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
                             })
+                            database_upload.errors = dumps(errors)
                         else:
                             current_owner_obj = current_owner_obj.first()
                     else:
@@ -385,7 +396,9 @@ def import_pedigree_data(request):
                         if Pedigree.objects.filter(account=attached_service, reg_no=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
                             pedigree_obj =  Pedigree.objects.create(account=attached_service, reg_no=pedigree)
-                            created_objects.append(pedigree_obj)
+                            created_objects = loads(database_upload.created_objects)
+                            created_objects['created_objects'].append(pedigree_obj.id)
+                            database_upload.created_objects = dumps(created_objects)
                             return pedigree_obj
                         else:
                             # if user has confirmed updates, update existing pedigree, or the pedigree is also a parent that was created because none existed
@@ -464,24 +477,28 @@ def import_pedigree_data(request):
                 ############################# reg_no
                 try:
                     if row[reg_no] == '':
+                        errors = loads(database_upload.errors)
                         errors['missing'].append({
                             'col': 'Registration Number',
                             'row': row_number,
                             'name': ped_name
                         })
+                        database_upload.errors = dumps(errors)
                 except IndexError:
                     pass
 
                 # create each new pedigree if no errors found in file ###################
-                if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+                if len(loads(database_upload.errors)['missing']) == 0 and len(loads(database_upload.errors)['invalid']) == 0:
                     try:
                         # add to existing if this pedigree already exists, and if it's not a parent that was created because it didn't exist
                         if Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).count() > 0 and Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).first().breeder:
-                            existing.append({
+                            existing = loads(database_upload.existing)
+                            existing['existing'].append({
                                 'row': row_number,
                                 'name': ped_name,
                                 'reg_no': row[reg_no]
                             })
+                            database_upload.existing = dumps(existing)
                         
                         # get or create pedigree
                         pedigree = get_or_create_pedigree(row[reg_no], False)
@@ -599,22 +616,26 @@ def import_pedigree_data(request):
                             pedigree.sex = row[sex]
                         # invalid, so add error
                         else:
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Sex',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
                             })
+                            database_upload.errors = dumps(errors)
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
                     # error if missing
                     else:
+                        errors = loads(database_upload.errors)
                         errors['missing'].append({
                             'col': 'Sex',
                             'row': row_number,
                             'name': ped_name
                         })
+                        database_upload.errors = dumps(errors)
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
@@ -635,12 +656,14 @@ def import_pedigree_data(request):
                             pedigree.born_as = row[born_as]
                         # invalid, so add error
                         else:
-                            errors['invalid'].append({
+                            errors = loads(database_upload.errors)
+                            database_upload.errors['invalid'].append({
                                 'col': 'Born As',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
                             })
+                            database_upload.errors = dumps(errors)
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
@@ -661,22 +684,26 @@ def import_pedigree_data(request):
                             pedigree.status = row[status].lower()
                         # invalid, so add error
                         else:
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Status',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': 'the input for status, if given, must be one of "dead", "alive", or "unknown"'
                             })
+                            database_upload.errors = dumps(errors)
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
                     # error if missing
                     else:
-                        errors['missing'].append({
+                        errors = database_upload.errors
+                        database_upload.errors['missing'].append({
                             'col': 'Status',
                             'row': row_number,
                             'name': ped_name
                         })
+                        database_upload.errors = dumps(errors)
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
@@ -754,12 +781,14 @@ def import_pedigree_data(request):
                                 pedigree.sale_or_hire = False
                         # invalid, so add error
                         else:
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'For Sale/Hire',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': 'the input for sale/hire, if given, must be "yes" or "no"'
                             })
+                            database_upload.errors = dumps(errors)
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
@@ -780,12 +809,14 @@ def import_pedigree_data(request):
                     if breed != '':
                         try:
                             if breed_obj.breed_name != row[breed] and row[breed] != '':
+                                errors = loads(database_upload.errors)
                                 errors['invalid'].append({
                                     'col': 'Breed',
                                     'row': row_number,
                                     'name': ped_name,
                                     'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
                                 })
+                                database_upload.errors = dumps(errors)
                         except IndexError:
                             pass
                 # organisation
@@ -798,12 +829,14 @@ def import_pedigree_data(request):
                         else:
                             breed_obj = None
                             if row[breed] != '':
-                                errors['invalid'].append({
+                                errors = loads(database_upload.errors)
+                                database_upload.errors['invalid'].append({
                                     'col': 'Breed',
                                     'row': row_number,
                                     'name': ped_name,
                                     'reason': 'the input for breed must be one of the breeds created for your account - you can create more breeds via the <a href="/breeds">Breed</a> page'
                                 })
+                                database_upload.errors = dumps(errors)
                     except IndexError:
                         breed_obj = None
                 else:
@@ -844,21 +877,21 @@ def import_pedigree_data(request):
 
             # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
             # , and redirect back to analyse page
-            if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
-                for created_object in created_objects:
-                    if created_object.id:
-                        created_object.delete()
+            if len(loads(database_upload.errors)['missing']) > 0 or len(loads(database_upload.errors)['invalid']) > 0:
+                for created_object in loads(database_upload.created_objects)['created_objects']:
+                    if Pedigree.objects.filter(id=created_object).exists():
+                        Pedigree.objects.get(id=created_object).delete()
 
-                return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+                return HttpResponse(dumps({'result': 'fail', 'errors': loads(database_upload.errors)}))
             # need to warn user if they specified any pedigrees that already exist, unless they have confirmed updates
-            elif len(existing) > 0 and request.POST.get('update') == 'no':
+            elif len(loads(database_upload.existing)['existing']) > 0 and request.POST.get('update') == 'no':
                 # get and pass in ids of created objects so it is known what to delete if user cancels
                 created = []
-                for created_object in created_objects:
-                    if created_object.id:
-                        created.append(created_object.id)
+                for created_object in loads(database_upload.created_objects)['created_objects']:
+                    if Pedigree.objects.filter(id=created_object).exists():
+                        created.append(created_object)
 
-                return HttpResponse(dumps({'result': 'existing', 'existing': existing, 'created': created}))
+                return HttpResponse(dumps({'result': 'existing', 'existing': loads(database_upload.existing)['existing'], 'created': created}))
             else:
                 return HttpResponse(dumps({'result': 'success'}))
 
