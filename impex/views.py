@@ -988,9 +988,9 @@ def import_pedigree_data(request):
 def import_breeder_data(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
-        db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
-        decoded_file = db.database.file.read().decode('utf-8').splitlines()
-        database_items = csv.DictReader(decoded_file)
+        
+        database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
+        file_slice = loads(FileSlice.objects.filter(database_upload=database_upload).earliest('id').file_slice)['file_slice']
 
         post_data = {}
 
@@ -1010,21 +1010,46 @@ def import_breeder_data(request):
         email = post_data['email'] or ''
         active = post_data['active'] or ''
 
+        # get index of each heading
+        thousand = 1000
+        if breeding_prefix:
+            breeder = loads(database_upload.header)['header'].index(breeding_prefix)
+        # if heading not given, make the index out of range (who's importing a thousand columns!?)
+        else:
+            breeder = thousand
+        if contact_name:
+            contact_name = loads(database_upload.header)['header'].index(contact_name)
+        else:
+            contact_name = thousand
+        if address:
+            address = loads(database_upload.header)['header'].index(address)
+        else:
+            address = thousand
+        if phone_number1:
+            phone_number1 = loads(database_upload.header)['header'].index(phone_number1)
+        else:
+            phone_number1 = thousand
+        if phone_number2:
+            phone_number2 = loads(database_upload.header)['header'].index(phone_number2)
+        else:
+            phone_number2 = thousand
+        if email:
+            email = loads(database_upload.header)['header'].index(email)
+        else:
+            email = thousand
+        if active:
+            active = loads(database_upload.header)['header'].index(active)
+        else:
+            active = thousand
+
         # regex pattern used to validate email
         email_pattern = re.compile('^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-
-        # errors is a dictionary to keep track of missing and invalid fields
-        errors = {}
-        # only mandatory fields are added to 
-        errors['missing'] = []
-        # only fields that need to be in a certain format are added to invalid fields
-        errors['invalid'] = []
 
         # list of breeders saved into the DB
         saved_breeders = []
         row_number = 1
         # get or create each new pedigree ###################
-        for row in database_items:
+        for row in file_slice:
             row_number += 1
 
             # set name for error messages
@@ -1036,21 +1061,25 @@ def import_breeder_data(request):
             ################### breeding prefix
             # check it is not empty
             if row[breeding_prefix] == '':
+                errors = loads(database_upload.errors)
                 errors['missing'].append({
                     'col': 'Breeding Prefix',
                     'row': row_number,
                     'name': name
                 })
+                database_upload.errors = dumps(errors)
             # check prefix doesn't yet exist in the database
             elif Breeder.objects.filter(breeding_prefix=row[breeding_prefix]).exists():
+                errors = loads(database_upload.errors)
                 errors['invalid'].append({
                     'col': 'Breeding Prefix',
                     'row': row_number,
                     'name': name,
                     'reason': 'a breeder with this prefix already exists'
                 })
+                database_upload.errors = dumps(errors)
             # check no data is missing/invalid before creating a new breeder
-            elif len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+            elif len(loads(database_upload.errors)['missing']) == 0 and len(loads(database_upload.errors)['invalid']) == 0:
                 breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             ################### contact name
             try:
@@ -1089,12 +1118,14 @@ def import_breeder_data(request):
                         breeder.email = row[email]
                     # add to errors invalid
                     else:
+                        errors = loads(database_upload.errors)
                         errors['invalid'].append({
                             'col': 'Email',
                             'row': row_number,
                             'name': name,
                             'reason': 'the email given is invalid'
                         })
+                        database_upload.errors = dumps(errors)
                         # delete breeder if one was created
                         if breeder.id:
                             breeder.delete()
@@ -1110,12 +1141,14 @@ def import_breeder_data(request):
                     breeder.active = False
                 # add to invalid if content was invalid
                 elif row[active] != '':
+                    errors = loads(database_upload.errors)
                     errors['invalid'].append({
                         'col': 'Status',
                         'row': row_number,
                         'name': name,
                         'reason': 'status must be "Active" or "Inactive" - if left blank, it defaults to "Inactive"'
                     })
+                    database_upload.errors = dumps(errors)
                     # delete breeder if one was created
                     if breeder.id:
                         breeder.delete()
@@ -1127,17 +1160,24 @@ def import_breeder_data(request):
                 pass
             ###################
             # check that no rows are invalid before saving the breeder and adding to saved_breeders list
-            if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+            if len(loads(database_upload.errors)['missing']) == 0 and len(loads(database_upload.errors)['invalid']) == 0:
                 breeder.save()
                 saved_breeders.append(breeder)
+        
+        # delete the slice just processed
+        FileSlice.objects.filter(database_upload=database_upload).earliest('id').delete()
+        # if there are, tell the browser to go again and check whether there are any more left
+        if FileSlice.objects.filter(database_upload=database_upload):
+            return HttpResponse(dumps({'result': 'again'}))
+        
         # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
         # , and redirect back to analyse page
-        if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
+        elif len(loads(database_upload.errors)['missing']) > 0 or len(loads(database_upload.errors)['invalid']) > 0:
             for saved_breeder in saved_breeders:
                 if saved_breeder.id:
                     saved_breeder.delete()
 
-            return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+            return HttpResponse(dumps({'result': 'fail', 'errors': loads(database_upload.errors)}))
         else:
             return HttpResponse(dumps({'result': 'success'}))
 
