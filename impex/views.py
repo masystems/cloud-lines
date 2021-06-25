@@ -880,6 +880,7 @@ def import_pedigree_data(request):
             # if there are, tell the browser to go again and check whether there are any more left
             if FileSlice.objects.filter(database_upload=database_upload):
                 return HttpResponse(dumps({'result': 'again'}))
+            
             # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
             # , and redirect back to analyse page
             elif len(loads(database_upload.errors)['missing']) > 0 or len(loads(database_upload.errors)['invalid']) > 0:
@@ -887,12 +888,16 @@ def import_pedigree_data(request):
                     if Pedigree.objects.filter(id=created_object).exists():
                         Pedigree.objects.get(id=created_object).delete()
 
+                # it's over so delete DatabaseUpload
+                database_upload.delete()
+
                 # make sure we don't send so many errors that a 500 error is caused
                 errors = loads(database_upload.errors)
                 errors['invalid'] = errors['invalid'][:75]
                 errors['missing'] = errors['missing'][:75]
 
                 return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+            
             # need to warn user if they specified any pedigrees that already exist, unless they have confirmed updates
             elif len(loads(database_upload.existing)['existing']) > 0 and request.POST.get('update') == 'no':
                 # get and pass in ids of created objects so it is known what to delete if user cancels
@@ -901,11 +906,18 @@ def import_pedigree_data(request):
                     if Pedigree.objects.filter(id=created_object).exists():
                         created.append(created_object)
 
+                # it's over so delete DatabaseUpload
+                database_upload.delete()
+
                 # make sure we don't send so many existing that a 500 error is caused
                 existing = loads(database_upload.existing)['existing'][:100]
 
                 return HttpResponse(dumps({'result': 'existing', 'existing': existing, 'created': created}))
+            
             else:
+                # it's over so delete DatabaseUpload
+                database_upload.delete()
+
                 return HttpResponse(dumps({'result': 'success'}))
 
         
