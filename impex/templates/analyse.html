@@ -193,6 +193,8 @@
             beforeSend: function() {
                 // display spinner modal
                 $('#overlay-spinner').modal('show')
+                // hide the import button, because database_upload or file slices won't be there
+                $('#import-pedigrees').addClass('d-none')
             },
             success: function(data) {
                 var result = JSON.parse(data);
