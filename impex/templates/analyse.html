@@ -1,6 +1,25 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+
+<!-- Spinner Overlay -->
+<div id="overlay-spinner" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content modal-filled bg-info">
+            <div class="modal-body p-4">
+                <div class="text-center">
+                    <div id="spinner">
+                        <div class="spinner-border" role="status">
+                        </div>
+                            <h3 class="text-white mt-2">Importing Data...</h3>
+                        </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <div class="row page-titles">
     <div class="col-md-6 col-8 align-self-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Database Import</h3>
@@ -171,12 +190,17 @@
             type: 'post',
             dataType: 'text',
             data: $('#pedigrees-form').serialize(),
+            beforeSend: function() {
+                // display spinner modal
+                $('#overlay-spinner').modal('show')
+            },
             success: function(data) {
                 var result = JSON.parse(data);
                 if (result.result == 'success') {
                     // redirect to breeders page
                     window.location.replace("{% url 'pedigree_search' %}");
                 } else if (result.result == 'existing') {
+                    $('#overlay-spinner').modal('hide')
                     // warn users that they're about to change existing pedigrees
                     // list the existing pedigrees
                     var pedigreesHtml = "";
@@ -210,6 +234,7 @@
                     // recursively call this function to continue importing the data
                     importPedigreeData()
                 } else {
+                    $('#overlay-spinner').modal('hide')
                     errorMsg("Your data had errors!");
                     $('#errors').removeClass('d-none');
 
