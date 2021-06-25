@@ -11,6 +11,9 @@ class DatabaseUpload(models.Model):
     account = models.ForeignKey(AttachedService, on_delete=models.CASCADE)
     header = models.TextField(blank=False, null=False)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    errors = models.TextField(default={'missing': [], 'invalid': []})
+    existing = models.TextField(default={'existing': []})
+    created_objects = models.TextField(default={'created_objects': []})
 
     def __str__(self):
         return str(self.account)
