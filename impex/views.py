@@ -375,7 +375,7 @@ def import_pedigree_data(request):
                         current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[current_owner].rstrip())
                         # error if owner doesn't exist
                         if not current_owner_obj.exists():
-                            errors = database_upload.errors
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Current Owner',
                                 'row': row_number,
@@ -931,6 +931,10 @@ def import_pedigree_data(request):
             return HttpResponse()
     # get request, so display the page
     elif request.method == 'GET':
+        # if there is no relevant DatabaseUpload redirect to import
+        if not DatabaseUpload.objects.filter(account=attached_service, user=request.user).exists():
+            return redirect('import')
+        
         # get pedigree model headings
         pedigree_headings = get_pedigree_column_headings()
 
