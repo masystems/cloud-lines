@@ -1013,10 +1013,10 @@ def import_breeder_data(request):
         # get index of each heading
         thousand = 1000
         if breeding_prefix:
-            breeder = loads(database_upload.header)['header'].index(breeding_prefix)
+            breeding_prefix = loads(database_upload.header)['header'].index(breeding_prefix)
         # if heading not given, make the index out of range (who's importing a thousand columns!?)
         else:
-            breeder = thousand
+            breeding_prefix = thousand
         if contact_name:
             contact_name = loads(database_upload.header)['header'].index(contact_name)
         else:
@@ -1053,7 +1053,7 @@ def import_breeder_data(request):
             row_number += 1
 
             # set name for error messages
-            if contact_name:
+            if contact_name != thousand:
                 name = row[contact_name]
             else:
                 name = ''
@@ -1084,28 +1084,28 @@ def import_breeder_data(request):
             ################### contact name
             try:
                 breeder.contact_name = row[contact_name]
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
             ################### address
             try:
                 breeder.address = row[address]
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
             ################### phone_number1
             try:
                 breeder.phone_number1 = row[phone_number1]
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
             ################### phone_number2
             try:
                 breeder.phone_number2 = row[phone_number2]
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
@@ -1129,7 +1129,7 @@ def import_breeder_data(request):
                         # delete breeder if one was created
                         if breeder.id:
                             breeder.delete()
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
@@ -1154,7 +1154,7 @@ def import_breeder_data(request):
                         breeder.delete()
             except ValidationError:
                 pass
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
