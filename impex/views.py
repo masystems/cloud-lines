@@ -875,9 +875,14 @@ def import_pedigree_data(request):
                 except UnboundLocalError:
                     pass
 
+            # delete the slice just processed
+            FileSlice.objects.filter(database_upload=database_upload).earliest('id').delete()
+            # if there are, tell the browser to go again and check whether there are any more left
+            if FileSlice.objects.filter(database_upload=database_upload):
+                return HttpResponse(dumps({'result': 'again'}))
             # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
             # , and redirect back to analyse page
-            if len(loads(database_upload.errors)['missing']) > 0 or len(loads(database_upload.errors)['invalid']) > 0:
+            elif len(loads(database_upload.errors)['missing']) > 0 or len(loads(database_upload.errors)['invalid']) > 0:
                 for created_object in loads(database_upload.created_objects)['created_objects']:
                     if Pedigree.objects.filter(id=created_object).exists():
                         Pedigree.objects.get(id=created_object).delete()
