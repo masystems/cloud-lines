@@ -1177,7 +1177,12 @@ def import_breeder_data(request):
                 if saved_breeder.id:
                     saved_breeder.delete()
 
-            return HttpResponse(dumps({'result': 'fail', 'errors': loads(database_upload.errors)}))
+            # make sure we don't send so many errors that a 500 error is caused
+            errors = loads(database_upload.errors)
+            errors['invalid'] = errors['invalid'][:75]
+            errors['missing'] = errors['missing'][:75]
+
+            return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
         else:
             return HttpResponse(dumps({'result': 'success'}))
 
