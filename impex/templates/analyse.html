@@ -206,11 +206,6 @@
                     // redirect to breeders page
                     window.location.replace("{% url 'pedigree_search' %}");
                 } else if (result.result == 'existing') {
-                    // wait 2 seconds before hiding modal because if it's too dast it doesn't work
-                    sleep(2000).then(() => {
-                        $('#overlay-spinner').modal('hide')
-                    })
-
                     // warn users that they're about to change existing pedigrees
                     // list the existing pedigrees
                     var pedigreesHtml = "";
@@ -238,6 +233,13 @@
                         });
                         $('#created').html(createdHtml);
                     }
+
+                    // wait 2 seconds before hiding modal because if it's too dast it doesn't work
+                    sleep(2000).then(() => {
+                        $('#overlay-spinner').modal('hide')
+                        // display modal telling them what they are about to update
+                        $('#update-modal').modal('show')
+                    })
                 } else if (result.result == 'again') {
                     // recursively call this function to continue importing the data
                     importPedigreeData()
@@ -324,25 +326,7 @@
     $('#modal-update').click( function(e){
         // set hidden input to indicate user confirms update
         $('#update').val('yes');
-
-        $.ajax({
-            url: "{% url 'import_pedigree_data' %}",
-            type: 'post',
-            dataType: 'text',
-            data: $('#pedigrees-form').serialize(),
-            success: function(data) {
-                // redirect to breeders page
-                window.location.replace("{% url 'pedigree_search' %}");
-            },
-            error: function(jqXHR, textStatus, errorThrown){
-                console.log('jqXHR:');
-                console.log(jqXHR);
-                console.log('textStatus:');
-                console.log(textStatus);
-                console.log('errorThrown:');
-                console.log(errorThrown);
-            }
-        });
+        importPedigreeData()
     })
 
     // importing breeders
