@@ -707,7 +707,7 @@ def import_pedigree_data(request):
                         # invalid, so add error
                         else:
                             errors = loads(database_upload.errors)
-                            database_upload.errors['invalid'].append({
+                            errors['invalid'].append({
                                 'col': 'Born As',
                                 'row': row_number,
                                 'name': ped_name,
@@ -748,7 +748,7 @@ def import_pedigree_data(request):
                     # error if missing
                     else:
                         errors = database_upload.errors
-                        database_upload.errors['missing'].append({
+                        errors['missing'].append({
                             'col': 'Status',
                             'row': row_number,
                             'name': ped_name
@@ -880,7 +880,7 @@ def import_pedigree_data(request):
                             breed_obj = None
                             if row[breed] != '':
                                 errors = loads(database_upload.errors)
-                                database_upload.errors['invalid'].append({
+                                errors['invalid'].append({
                                     'col': 'Breed',
                                     'row': row_number,
                                     'name': ped_name,
@@ -927,8 +927,8 @@ def import_pedigree_data(request):
 
             # delete the slice just processed
             FileSlice.objects.filter(database_upload=database_upload).earliest('id').delete()
-            # if there are, tell the browser to go again and check whether there are any more left
-            if FileSlice.objects.filter(database_upload=database_upload):
+            # check whether there are any more left. if there are, tell the browser to go again
+            if FileSlice.objects.filter(database_upload=database_upload).exists():
                 return HttpResponse(dumps({'result': 'again'}))
             
             # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
