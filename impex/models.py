@@ -26,6 +26,7 @@ class FileSlice(models.Model):
         ('.csv', '.csv'),
     )
     file_type = models.CharField(max_length=5, choices=FILE_TYPES, default='.csv', null=True)
+    used = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.file_slice)
