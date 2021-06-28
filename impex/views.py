@@ -403,6 +403,7 @@ def import_pedigree_data(request):
                                 'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
                             })
                             database_upload.errors = dumps(errors)
+                            database_upload.save()
                         # get the breeder
                         else:
                             breeder_obj = breeder_obj.first()
@@ -416,6 +417,7 @@ def import_pedigree_data(request):
                             'name': ped_name
                         })
                         database_upload.errors = dumps(errors)
+                        database_upload.save()
                 except IndexError:
                     breeder_obj = None
 
@@ -433,6 +435,7 @@ def import_pedigree_data(request):
                                 'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
                             })
                             database_upload.errors = dumps(errors)
+                            database_upload.save()
                         else:
                             current_owner_obj = current_owner_obj.first()
                     else:
@@ -449,6 +452,7 @@ def import_pedigree_data(request):
                             created_objects = loads(database_upload.created_objects)
                             created_objects['created_objects'].append(pedigree_obj.id)
                             database_upload.created_objects = dumps(created_objects)
+                            database_upload.save()
                             return pedigree_obj
                         else:
                             # if user has confirmed updates, update existing pedigree, or the pedigree is also a parent that was created because none existed
@@ -534,6 +538,7 @@ def import_pedigree_data(request):
                             'name': ped_name
                         })
                         database_upload.errors = dumps(errors)
+                        database_upload.save()
                 except IndexError:
                     pass
 
@@ -549,6 +554,7 @@ def import_pedigree_data(request):
                                 'reg_no': row[reg_no]
                             })
                             database_upload.existing = dumps(existing)
+                            database_upload.save()
                         
                         # get or create pedigree
                         pedigree = get_or_create_pedigree(row[reg_no], False)
@@ -674,6 +680,7 @@ def import_pedigree_data(request):
                                 'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
                             })
                             database_upload.errors = dumps(errors)
+                            database_upload.save()
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
@@ -686,6 +693,7 @@ def import_pedigree_data(request):
                             'name': ped_name
                         })
                         database_upload.errors = dumps(errors)
+                        database_upload.save()
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
@@ -714,6 +722,7 @@ def import_pedigree_data(request):
                                 'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
                             })
                             database_upload.errors = dumps(errors)
+                            database_upload.save()
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
@@ -742,6 +751,7 @@ def import_pedigree_data(request):
                                 'reason': 'the input for status, if given, must be one of "dead", "alive", or "unknown"'
                             })
                             database_upload.errors = dumps(errors)
+                            database_upload.save()
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
@@ -754,6 +764,7 @@ def import_pedigree_data(request):
                             'name': ped_name
                         })
                         database_upload.errors = dumps(errors)
+                        database_upload.save()
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
@@ -839,6 +850,7 @@ def import_pedigree_data(request):
                                 'reason': 'the input for sale/hire, if given, must be "yes" or "no"'
                             })
                             database_upload.errors = dumps(errors)
+                            database_upload.save()
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
@@ -867,6 +879,7 @@ def import_pedigree_data(request):
                                     'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
                                 })
                                 database_upload.errors = dumps(errors)
+                                database_upload.save()
                         except IndexError:
                             pass
                 # organisation
@@ -887,6 +900,7 @@ def import_pedigree_data(request):
                                     'reason': 'the input for breed must be one of the breeds created for your account - you can create more breeds via the <a href="/breeds">Breed</a> page'
                                 })
                                 database_upload.errors = dumps(errors)
+                                database_upload.save()
                     except IndexError:
                         breed_obj = None
                 else:
@@ -1068,6 +1082,7 @@ def import_breeder_data(request):
                     'name': name
                 })
                 database_upload.errors = dumps(errors)
+                database_upload.save()
             # check prefix doesn't yet exist in the database
             elif Breeder.objects.filter(breeding_prefix=row[breeding_prefix]).exists():
                 errors = loads(database_upload.errors)
@@ -1078,6 +1093,7 @@ def import_breeder_data(request):
                     'reason': 'a breeder with this prefix already exists'
                 })
                 database_upload.errors = dumps(errors)
+                database_upload.save()
             # check no data is missing/invalid before creating a new breeder
             elif len(loads(database_upload.errors)['missing']) == 0 and len(loads(database_upload.errors)['invalid']) == 0:
                 breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
@@ -1126,6 +1142,7 @@ def import_breeder_data(request):
                             'reason': 'the email given is invalid'
                         })
                         database_upload.errors = dumps(errors)
+                        database_upload.save()
                         # delete breeder if one was created
                         if breeder.id:
                             breeder.delete()
@@ -1149,6 +1166,7 @@ def import_breeder_data(request):
                         'reason': 'status must be "Active" or "Inactive" - if left blank, it defaults to "Inactive"'
                     })
                     database_upload.errors = dumps(errors)
+                    database_upload.save()
                     # delete breeder if one was created
                     if breeder.id:
                         breeder.delete()
