@@ -177,7 +177,6 @@ def importx(request):
                     # save file slice
                     try:
                         file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id'), file_slice=dumps({'file_slice': file_slice}))
-                        file_slice.save()
                     except Exception:
                         pass
                     
@@ -247,7 +246,7 @@ def import_pedigree_data(request):
         # check if this is import or cancel - created not passed in if it's import
         if 'created' not in request.POST.keys():
             database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
-            file_slice = loads(FileSlice.objects.filter(database_upload=database_upload).earliest('id').file_slice)['file_slice']
+            file_slice = FileSlice.objects.filter(database_upload=database_upload, used=False).earliest('id')
             # decoded_file = db.database.file.read().decode('utf-8').splitlines()
             # database_items = csv.DictReader(decoded_file)
             date_fields = ['date_of_registration', 'dob', 'dod']
@@ -380,7 +379,7 @@ def import_pedigree_data(request):
                 sale_or_hire = thousand
 
             row_number = 1
-            for row in file_slice:
+            for row in loads(file_slice.file_slice)['file_slice']:
                 row_number += 1
                 
                 # variable to store pedigree name or empty string
@@ -939,10 +938,11 @@ def import_pedigree_data(request):
                 except UnboundLocalError:
                     pass
 
-            # delete the slice just processed
-            FileSlice.objects.filter(database_upload=database_upload).earliest('id').delete()
+            # mark the slice just processed as used
+            file_slice.used = True
+            file_slice.save()
             # check whether there are any more left. if there are, tell the browser to go again
-            if FileSlice.objects.filter(database_upload=database_upload).exists():
+            if FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
                 return HttpResponse(dumps({'result': 'again'}))
             
             # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
@@ -964,14 +964,16 @@ def import_pedigree_data(request):
             
             # need to warn user if they specified any pedigrees that already exist, unless they have confirmed updates
             elif len(loads(database_upload.existing)['existing']) > 0 and request.POST.get('update') == 'no':
+                # reset all file slices so they can be used again if user selects update
+                for f_slice in FileSlice.objects.filter(database_upload=database_upload):
+                    f_slice.used = False
+                    f_slice.save()
+                
                 # get and pass in ids of created objects so it is known what to delete if user cancels
                 created = []
                 for created_object in loads(database_upload.created_objects)['created_objects']:
                     if Pedigree.objects.filter(id=created_object).exists():
                         created.append(created_object)
-
-                # it's over so delete DatabaseUpload
-                database_upload.delete()
 
                 # make sure we don't send so many existing that a 500 error is caused
                 existing = loads(database_upload.existing)['existing'][:100]
