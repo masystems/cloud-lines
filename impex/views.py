@@ -197,6 +197,13 @@ def import_data(request):
         # if there is no relevant DatabaseUpload redirect to import
         if not DatabaseUpload.objects.filter(account=attached_service, user=request.user).exists():
             return redirect('import')
+
+        # flush errors/existing/created_objects
+        database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
+        database_upload.errors = dumps({'missing': [], 'invalid': []})
+        database_upload.existing = dumps({'existing': []})
+        database_upload.created_objects = dumps({'created_objects': []})
+        database_upload.save()
         
         # get pedigree model headings
         pedigree_headings = get_pedigree_column_headings()
