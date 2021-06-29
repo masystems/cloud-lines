@@ -249,6 +249,9 @@
                         $('#overlay-spinner').modal('hide')
                         errorMsg("Your data had errors!");
                         $('#errors').removeClass('d-none');
+
+                        // scroll to top so they can see the error
+                        window.scrollTo(0, 0)
                     })
 
                     // create html to display what fields were erroneous
