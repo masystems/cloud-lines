@@ -756,7 +756,7 @@ def import_pedigree_data(request):
                                 pedigree.delete()
                     # error if missing
                     else:
-                        errors = database_upload.errors
+                        errors = loads(database_upload.errors)
                         errors['missing'].append({
                             'col': 'Status',
                             'row': row_number,
