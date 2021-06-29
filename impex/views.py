@@ -378,9 +378,9 @@ def import_pedigree_data(request):
             else:
                 sale_or_hire = thousand
 
-            row_number = 1
             for row in loads(file_slice.file_slice)['file_slice']:
-                row_number += 1
+                # get row number, which is the last element of the row/list
+                row_number = row[-1]
                 
                 # variable to store pedigree name or empty string
                 if name != 1000:

@@ -197,15 +197,19 @@
                         sliceEnd = totalLines
                     }
 
+                    // the first row is on row 2, as it's after the header
+                    var rowCounter = 2
+
                     // go through slices of the file
                     while (sliceEnd <= totalLines) {
                         // get slice of file
                         fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
 
-                        // turn each row into the correct format
+                        // turn each row into the correct format, and add row number column
                         fileSliceArray.forEach(updateSlice)
                         function updateSlice(row, index) {
-                            fileSliceArray[index] = row.replaceAll('"', '').split(',')
+                            fileSliceArray[index] = row.replaceAll('"', '').split(',').concat([rowCounter])
+                            rowCounter += 1
                         }
                         
                         // send slice to backend
