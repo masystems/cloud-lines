@@ -1013,7 +1013,7 @@ def import_breeder_data(request):
         attached_service = get_main_account(request.user)
         
         database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
-        file_slice = loads(FileSlice.objects.filter(database_upload=database_upload).earliest('id').file_slice)['file_slice']
+        file_slice = FileSlice.objects.filter(database_upload=database_upload).earliest('id')
 
         post_data = {}
 
@@ -1070,10 +1070,9 @@ def import_breeder_data(request):
 
         # list of breeders saved into the DB
         saved_breeders = []
-        row_number = 1
         # get or create each new pedigree ###################
-        for row in file_slice:
-            row_number += 1
+        for row in loads(file_slice.file_slice['file_slice']):
+            row_number = row[-1]
 
             # set name for error messages
             if contact_name != thousand:
@@ -1191,10 +1190,11 @@ def import_breeder_data(request):
                 breeder.save()
                 saved_breeders.append(breeder)
         
-        # delete the slice just processed
-        FileSlice.objects.filter(database_upload=database_upload).earliest('id').delete()
-        # if there are, tell the browser to go again and check whether there are any more left
-        if FileSlice.objects.filter(database_upload=database_upload):
+        # set the file just processed to used
+        file_slice.used = True
+        file_slice.save()
+        # check whether there are any more left. if there are, tell the browser to go again
+        if FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
             return HttpResponse(dumps({'result': 'again'}))
         
         # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
