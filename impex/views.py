@@ -1013,7 +1013,7 @@ def import_breeder_data(request):
         attached_service = get_main_account(request.user)
         
         database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
-        file_slice = FileSlice.objects.filter(database_upload=database_upload).earliest('id')
+        file_slice = FileSlice.objects.filter(database_upload=database_upload, used=False).earliest('id')
 
         post_data = {}
 
@@ -1071,9 +1071,9 @@ def import_breeder_data(request):
         # list of breeders saved into the DB
         saved_breeders = []
         # get or create each new pedigree ###################
-        for row in loads(file_slice.file_slice['file_slice']):
+        for row in loads(file_slice.file_slice)['file_slice']:
             row_number = row[-1]
-
+            
             # set name for error messages
             if contact_name != thousand:
                 name = row[contact_name]
@@ -1204,6 +1204,9 @@ def import_breeder_data(request):
                 if saved_breeder.id:
                     saved_breeder.delete()
 
+            # it's over so delete DatabaseUpload
+            database_upload.delete()
+
             # make sure we don't send so many errors that a 500 error is caused
             errors = loads(database_upload.errors)
             errors['invalid'] = errors['invalid'][:75]
@@ -1211,6 +1214,9 @@ def import_breeder_data(request):
 
             return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
         else:
+            # it's over so delete DatabaseUpload
+            database_upload.delete()
+            
             return HttpResponse(dumps({'result': 'success'}))
 
     return redirect('breeders')
