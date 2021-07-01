@@ -144,7 +144,7 @@
                 }
 
                 // find number of lines in file
-                var totalLines = reader.result.match(/\r?\n/g).length - 1
+                var totalLines = reader.result.match(/\r?\n/g).length
 
                 // validate file size
                 if (totalLines < 1) {
@@ -218,16 +218,12 @@
                             url: "{% url 'import' %}",
                             dataType: "json",
                             headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                            async: false,
                             data: ({
                                 'job': 'slices',
                                 'uploadDatabase': fileSliceArray
                             }),
                             success: function(result){
-                                // console.log(result)
-                                // result = JSON.parse(result)
-                                if (result.error) {
-                                    
-                                }
                                 enableAnalyse()
                             }
                         })
