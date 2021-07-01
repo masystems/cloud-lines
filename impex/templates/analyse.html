@@ -68,7 +68,7 @@
                                                     </div>
                                                     <div class="col bg-light border">
                                                         <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                            <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-99">
+                                                            <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info" tabindex="-99">
                                                                     <option data-tokens="" selected>---</option>
                                                                     {% for imported_heading in imported_headings %}
                                                                         <option data-tokens="{{ breeder_heading.name }}">{{ imported_heading }}</option>
@@ -96,7 +96,7 @@
                                                 </div>
                                                 <div class="col bg-light border">
                                                     <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                        <select id="select-{{ pedigree_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info btn-outline-info" tabindex="-98">
+                                                        <select id="select-{{ pedigree_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info" tabindex="-98">
                                                                 <option data-tokens="" selected>---</option>
                                                                 {% for imported_heading in imported_headings %}
                                                                     <option data-tokens="{{ pedigree_heading.name }}">{{ imported_heading }}</option>
@@ -115,7 +115,7 @@
                                             </div>
                                             <div class="col bg-light border">
                                                 <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                    <select class="selectpicker mt-2 mb-2 mr-2" name="{{ field }}" data-style="btn-info btn-outline-info" tabindex="-98">
+                                                    <select class="selectpicker mt-2 mb-2 mr-2" name="{{ field }}" data-style="btn-info" tabindex="-98">
                                                             <option data-tokens="" selected>---</option>
                                                             {% for imported_heading in imported_headings %}
                                                                 <option data-tokens="{{ field }}">{{ imported_heading }}</option>
