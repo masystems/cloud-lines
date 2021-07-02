@@ -454,7 +454,13 @@ def import_pedigree_data(request):
                     if pedigree not in ('', None):
                         if Pedigree.objects.filter(account=attached_service, reg_no=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
-                            pedigree_obj =  Pedigree.objects.create(account=attached_service, reg_no=pedigree)
+                            # if parent, specify the sex appropriately
+                            if is_parent == 'father':
+                                pedigree_obj =  Pedigree.objects.create(account=attached_service, reg_no=pedigree, sex='male')
+                            elif is_parent == 'mother':
+                                pedigree_obj =  Pedigree.objects.create(account=attached_service, reg_no=pedigree, sex='female')
+                            else:
+                                pedigree_obj =  Pedigree.objects.create(account=attached_service, reg_no=pedigree)
                             created_objects = loads(database_upload.created_objects)
                             created_objects['created_objects'].append(pedigree_obj.id)
                             database_upload.created_objects = dumps(created_objects)
@@ -471,12 +477,12 @@ def import_pedigree_data(request):
                         return None
 
                 try:
-                    father_obj = get_or_create_pedigree(row[father], True)
+                    father_obj = get_or_create_pedigree(row[father], 'father')
                 except IndexError:
                     father_obj = None
 
                 try:
-                    mother_obj = get_or_create_pedigree(row[mother], True)
+                    mother_obj = get_or_create_pedigree(row[mother], 'mother')
                 except IndexError:
                     mother_obj = None
 
