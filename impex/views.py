@@ -959,17 +959,29 @@ def import_pedigree_data(request):
                 return HttpResponse(dumps({'result': 'again'}))
             
             # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
-            # , and redirect back to analyse page
+            # , and go back to analyse page
             elif len(loads(database_upload.errors)['missing']) > 0 or len(loads(database_upload.errors)['invalid']) > 0:
                 for created_object in loads(database_upload.created_objects)['created_objects']:
                     if Pedigree.objects.filter(id=created_object).exists():
                         Pedigree.objects.get(id=created_object).delete()
 
+                errors = loads(database_upload.errors)
+                
                 # it's over so delete DatabaseUpload
                 database_upload.delete()
-
+                print(errors)
+                # put any Breed errors (where they need to create a breed) to the top
+                breed_errors = []
+                # extract the breed errors
+                for invalid_error in errors['invalid']:
+                    if invalid_error['col'] == 'Breed':
+                        breed_errors.append(invalid_error)
+                # put the breed errors to the front of the errors
+                for breed_error in breed_errors:
+                    errors['invalid'].remove(breed_error)
+                    errors['invalid'].insert(0, breed_error)
+                print(errors)
                 # make sure we don't send so many errors that a 500 error is caused
-                errors = loads(database_upload.errors)
                 errors['invalid'] = errors['invalid'][:75]
                 errors['missing'] = errors['missing'][:75]
 
