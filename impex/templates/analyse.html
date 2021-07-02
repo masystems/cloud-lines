@@ -1,6 +1,25 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+
+<!-- Spinner Overlay -->
+<div id="overlay-spinner" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content modal-filled" style="background-color: #44aaac;">
+            <div class="modal-body p-4">
+                <div class="text-center">
+                    <div id="spinner">
+                        <div class="spinner-border" role="status">
+                        </div>
+                            <h3 class="text-white mt-2">Importing Data...</h3>
+                        </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <div class="row page-titles">
     <div class="col-md-6 col-8 align-self-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Database Import</h3>
@@ -141,7 +160,7 @@
         e.preventDefault();
 
         // check required headings have been matched
-        if ( ($('#select-reg_no').val() == '---') || ($('#select-sex').val() == '---') || ($('#select-breeder').val() == '---') || ($('#select-current_owner').val() == '---') || ($('#select-status').val() == '---') ) {
+        if ( ($('#select-reg_no').val() == '---') || ($('#select-sex').val() == '---') || ($('#select-breeder').val() == '---') || ($('#select-current_owner').val() == '---') || ($('#select-status').val() == '---') || (('{{ breed_required }}' == 'yes') && (($('#select-breed').val() == '---')))) {
             if ($('#select-reg_no').val() == '---') {
                 errorMsg("You must match Registration Number!");
             }
@@ -161,99 +180,128 @@
                 errorMsg("You must match Breed!");
             }
         } else {
-            $.ajax({
-                url: "{% url 'import_pedigree_data' %}",
-                type: 'post',
-                dataType: 'text',
-                data: $('#pedigrees-form').serialize(),
-                success: function(data) {
-                    var result = JSON.parse(data);
-                    if (result.result == 'success') {
-                        // redirect to breeders page
-                        window.location.replace("{% url 'pedigree_search' %}");
-                    } else if (result.result == 'existing') {
-                        // warn users that they're about to change existing pedigrees
-                        // list the existing pedigrees
-                        var pedigreesHtml = "";
-                        if (result.existing) {
-                            pedigreesHtml = '<ul>';
+            importPedigreeData()
+        }
+    })
 
-                            result.existing.forEach( existingPed => {
-                                if (existingPed.name.length > 0) {
-                                    pedigreesHtml = pedigreesHtml + '<li>' + existingPed.name + ' with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
-                                } else {
-                                    pedigreesHtml = pedigreesHtml + '<li>Pedigree with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
-                                }
-                            });
+    function sleep (time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+    }
 
-                            pedigreesHtml = pedigreesHtml + '</ul>';
+    function importPedigreeData() {
+        $.ajax({
+            url: "{% url 'import_pedigree_data' %}",
+            type: 'post',
+            dataType: 'text',
+            data: $('#pedigrees-form').serialize(),
+            beforeSend: function() {
+                // display spinner modal
+                $('#overlay-spinner').modal('show')
+                // hide the import button, because database_upload or file slices won't be there
+                $('#import-pedigrees').addClass('d-none')
+            },
+            success: function(data) {
+                var result = JSON.parse(data);
+                if (result.result == 'success') {
+                    // redirect to breeders page
+                    window.location.replace("{% url 'pedigree_search' %}");
+                } else if (result.result == 'existing') {
+                    // warn users that they're about to change existing pedigrees
+                    // list the existing pedigrees
+                    var pedigreesHtml = "";
+                    if (result.existing) {
+                        pedigreesHtml = '<ul>';
 
-                            $('#pedigrees-list').html(pedigreesHtml);
-                        }
+                        result.existing.forEach( existingPed => {
+                            if (existingPed.name.length > 0) {
+                                pedigreesHtml = pedigreesHtml + '<li>' + existingPed.name + ' with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
+                            } else {
+                                pedigreesHtml = pedigreesHtml + '<li>Pedigree with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
+                            }
+                        });
 
-                        // pass in each created object to be deleted if cancel is clicked
-                        if (result.created.length > 0) {
-                            var createdHtml = '';
-                            result.created.forEach( id => {
-                                createdHtml = createdHtml + id + ',';
-                            });
-                            $('#created').html(createdHtml);
-                        }
-                        // display modal
-                        $('#update-modal').modal('show');
-                    } else {
+                        pedigreesHtml = pedigreesHtml + '</ul>';
+
+                        $('#pedigrees-list').html(pedigreesHtml);
+                    }
+
+                    // pass in each created object to be deleted if cancel is clicked
+                    if (result.created.length > 0) {
+                        var createdHtml = '';
+                        result.created.forEach( id => {
+                            createdHtml = createdHtml + id + ',';
+                        });
+                        $('#created').html(createdHtml);
+                    }
+
+                    // wait 2 seconds before hiding modal because if it's too dast it doesn't work
+                    sleep(2000).then(() => {
+                        $('#overlay-spinner').modal('hide')
+                        // display modal telling them what they are about to update
+                        $('#update-modal').modal('show')
+                    })
+                } else if (result.result == 'again') {
+                    // recursively call this function to continue importing the data
+                    importPedigreeData()
+                } else {
+                    // wait 2 seconds before hiding modal because if it's too fast it doesn't work
+                    sleep(2000).then(() => {
+                        $('#overlay-spinner').modal('hide')
                         errorMsg("Your data had errors!");
                         $('#errors').removeClass('d-none');
 
-                        // create html to display what fields were erroneous
-                        var errorHtml = "";
-                        if (result.errors) {
-                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+                        // scroll to top so they can see the error
+                        window.scrollTo(0, 0)
+                    })
 
-                            // go through missing fields
-                            if (result.errors.missing.length > 0) {
-                                errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
+                    // create html to display what fields were erroneous
+                    var errorHtml = "";
+                    if (result.errors) {
+                        errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
 
-                                result.errors.missing.forEach( missingField => {
-                                    if (missingField.name.length > 0) {
-                                        errorHtml = errorHtml + '<li>' + missingField.col + ' for pedigree named ' + missingField.name + ' (row ' + missingField.row + ')</li>';
-                                    } else {
-                                        errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
-                                    }
-                                });
+                        // go through missing fields
+                        if (result.errors.missing.length > 0) {
+                            errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
 
-                                errorHtml = errorHtml + '</ul>';
-                            }
+                            result.errors.missing.forEach( missingField => {
+                                if (missingField.name.length > 0) {
+                                    errorHtml = errorHtml + '<li>' + missingField.col + ' for pedigree named ' + missingField.name + ' (row ' + missingField.row + ')</li>';
+                                } else {
+                                    errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
+                                }
+                            });
 
-                            // go through invalid fields
-                            if (result.errors.invalid.length > 0) {
-                                errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
-
-                                result.errors.invalid.forEach( invalidField => {
-                                    if (invalidField.name.length > 0) {
-                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' for pedigree named ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
-                                    } else {
-                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
-                                    }
-                                });
-
-                                errorHtml = errorHtml + '</ul>';
-                            }
+                            errorHtml = errorHtml + '</ul>';
                         }
-                        $('#errors').html(errorHtml);
+
+                        // go through invalid fields
+                        if (result.errors.invalid.length > 0) {
+                            errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
+
+                            result.errors.invalid.forEach( invalidField => {
+                                if (invalidField.name.length > 0) {
+                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' for pedigree named ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                } else {
+                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                }
+                            });
+
+                            errorHtml = errorHtml + '</ul>';
+                        }
                     }
-                },
-                error: function(jqXHR, textStatus, errorThrown){
-                    console.log('jqXHR:');
-                    console.log(jqXHR);
-                    console.log('textStatus:');
-                    console.log(textStatus);
-                    console.log('errorThrown:');
-                    console.log(errorThrown);
+                    $('#errors').html(errorHtml);
                 }
-            });
-        }
-    })
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
+    }
 
     // update modal - cancel button clicked
     $('#modal-cancel').click( function(e){
@@ -281,25 +329,7 @@
     $('#modal-update').click( function(e){
         // set hidden input to indicate user confirms update
         $('#update').val('yes');
-
-        $.ajax({
-            url: "{% url 'import_pedigree_data' %}",
-            type: 'post',
-            dataType: 'text',
-            data: $('#pedigrees-form').serialize(),
-            success: function(data) {
-                // redirect to breeders page
-                window.location.replace("{% url 'pedigree_search' %}");
-            },
-            error: function(jqXHR, textStatus, errorThrown){
-                console.log('jqXHR:');
-                console.log(jqXHR);
-                console.log('textStatus:');
-                console.log(textStatus);
-                console.log('errorThrown:');
-                console.log(errorThrown);
-            }
-        });
+        importPedigreeData()
     })
 
     // importing breeders
@@ -310,70 +340,87 @@
         if ($('#select-breeding_prefix').val() == '---') {
             errorMsg("You must match Breeding Prefix!");
         } else {
-            $.ajax({
-                url: "{% url 'import_breeder_data' %}",
-                type: 'post',
-                dataType: 'text',
-                data: $('#breeders-form').serialize(),
-                success: function(data) {
-                    var result = JSON.parse(data);
-                    if (result.result == 'success') {
-                        // redirect to breeders page
-                        window.location.replace("{% url 'breeders' %}");
-                    } else {
-                        errorMsg("Your data had errors!");
-                        $('#errors').removeClass('d-none');
-
-                        // create html to display what fields were erroneous
-                        var errorHtml = "";
-                        if (result.errors) {
-                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
-
-                            // go through missing fields
-                            if (result.errors.missing.length > 0) {
-                                errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
-
-                                result.errors.missing.forEach( missingField => {
-                                    if (missingField.name.length > 0) {
-                                        errorHtml = errorHtml + '<li>' + missingField.col + ' for breeder with contact name ' + missingField.name + ' (row ' + missingField.row + ')</li>';
-                                    } else {
-                                        errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
-                                    }
-                                });
-
-                                errorHtml = errorHtml + '</ul>';
-                            }
-
-                            // go through invalid fields
-                            if (result.errors.invalid.length > 0) {
-                                errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
-
-                                result.errors.invalid.forEach( invalidField => {
-                                    if (invalidField.name.length > 0) {
-                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' for breeder with contact name ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
-                                    } else {
-                                        errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
-                                    }
-                                });
-
-                                errorHtml = errorHtml + '</ul>';
-                            }
-                        }
-
-                        $('#errors').html(errorHtml);
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown){
-                    console.log('jqXHR:');
-                    console.log(jqXHR);
-                    console.log('textStatus:');
-                    console.log(textStatus);
-                    console.log('errorThrown:');
-                    console.log(errorThrown);
-                }
-            });
+            importBreederData()
         }
     })
+
+    function importBreederData() {
+        $.ajax({
+            url: "{% url 'import_breeder_data' %}",
+            type: 'post',
+            dataType: 'text',
+            data: $('#breeders-form').serialize(),
+            beforeSend: function() {
+                // display spinner modal
+                $('#overlay-spinner').modal('show')
+                // hide the import button, because database_upload or file slices won't be there
+                $('#import-breeders').addClass('d-none')
+            },
+            success: function(data) {
+                var result = JSON.parse(data);
+                if (result.result == 'success') {
+                    // redirect to breeders page
+                    window.location.replace("{% url 'breeders' %}");
+                } else if (result.result == 'again') {
+                    // recursively call this function to continue the import
+                    importBreederData()
+                } else {
+                    // wait 2 seconds before hiding modal because if it's too fast it doesn't work
+                    sleep(2000).then(() => {
+                        $('#overlay-spinner').modal('hide')
+                        errorMsg("Your data had errors!");
+                        $('#errors').removeClass('d-none');
+                    })
+
+                    // create html to display what fields were erroneous
+                    var errorHtml = "";
+                    if (result.errors) {
+                        errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+
+                        // go through missing fields
+                        if (result.errors.missing.length > 0) {
+                            errorHtml = errorHtml + '<br/>The following fields are required, but were missing from your file:<ul>';
+
+                            result.errors.missing.forEach( missingField => {
+                                if (missingField.name.length > 0) {
+                                    errorHtml = errorHtml + '<li>' + missingField.col + ' for breeder with contact name ' + missingField.name + ' (row ' + missingField.row + ')</li>';
+                                } else {
+                                    errorHtml = errorHtml + '<li>' + missingField.col + ' (row ' + missingField.row + ')</li>';
+                                }
+                            });
+
+                            errorHtml = errorHtml + '</ul>';
+                        }
+
+                        // go through invalid fields
+                        if (result.errors.invalid.length > 0) {
+                            errorHtml = errorHtml + '<br/>The following fields were present in your file, but were invalid:<ul>';
+
+                            result.errors.invalid.forEach( invalidField => {
+                                if (invalidField.name.length > 0) {
+                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' for breeder with contact name ' + invalidField.name + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                } else {
+                                    errorHtml = errorHtml + '<li>' + invalidField.col + ' (row ' + invalidField.row + ') because ' + invalidField.reason + '</li>';
+                                }
+                            });
+
+                            errorHtml = errorHtml + '</ul>';
+                        }
+                    }
+
+                    $('#errors').html(errorHtml);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
+    }
 </script>
 
 {% endblock %}
