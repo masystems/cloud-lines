@@ -329,6 +329,9 @@
     $('#modal-update').click( function(e){
         // set hidden input to indicate user confirms update
         $('#update').val('yes');
+        // hide update modal
+        $('#update-modal').modal('hide')
+        // import data
         importPedigreeData()
     })
 
