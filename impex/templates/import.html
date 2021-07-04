@@ -1,6 +1,30 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block header %}
+
+{% endblock %}
+
 {% block content %}
+<!-- Spinner Overlay -->
+<div id="overlay-spinner" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content modal-filled" style="background-color: #44aaac;">
+            <div class="modal-body p-4">
+                <div class="text-center">
+                    <div id="spinner">
+                        <div class="spinner-border" role="status"></div>
+                        <h3 class="text-white mt-2">Importing Data...</h3>
+                        <p class="text-white mt-2">Importing <span id="lineCount">0</span> of <span id="totalLines">0</span> lines.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <div class="row page-titles">
     <div class="col-md-6 col-8 align-self-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Database Import</h3>
@@ -38,8 +62,8 @@
                                 <form>
                                     {% csrf_token %}
                                     <input type="file" id="uploadDatabase" name="uploadDatabase" onchange="showFile(this)" />
-                                    <button id="uploadDatabaseButton" class="btn btn-block btn-outline-info mt-4" disabled>Analyse File</button>
                                 </form>
+                                <button id="uploadDatabaseButton" class="d-none"></button>
                                 <div id="errors" class="d-none alert alert-danger mt-4"></div>
                             </div>
                         </div>
@@ -120,6 +144,7 @@
 <script>
     function showFile(input) {
         if ($('#uploadDatabase').val() != '') {
+            $('#overlay-spinner').modal('show')
             let inputFile = input.files[0]
             let reader = new FileReader()
             reader.readAsText(inputFile)
@@ -130,6 +155,7 @@
                 // validate file type
                 fileType = inputFile.name.substr(inputFile.name.length - 4)
                 if (fileType != '.csv') {
+                    $('#overlay-spinner').modal('hide')
                     errorMsg('File type must be CSV!')
                     
                     // create the error message
@@ -143,11 +169,13 @@
                     return false
                 }
 
-                // find number of lines in file
+                // find number of lines in file and update modal
                 var totalLines = reader.result.match(/\r?\n/g).length
+                $('#totalLines').html(totalLines)
 
                 // validate file size
                 if (totalLines < 1) {
+                    $('#overlay-spinner').modal('hide')
                     errorMsg('File can not be empty!')
 
                     // create the error message
@@ -188,7 +216,7 @@
 
                 function slicesJob() {
                     // maximum size of slice
-                    var sliceMax = 50
+                    var sliceMax = 200
                     // the start of the first slice
                     var sliceStart = 1
                     // the line which is the end of the first slice
@@ -202,6 +230,7 @@
 
                     // go through slices of the file
                     while (sliceEnd <= totalLines) {
+                        $('#lineCount').html(sliceEnd)
                         // get slice of file
                         fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
 
@@ -235,21 +264,16 @@
                             sliceEnd = totalLines
                         }
                     }
+                    $('#overlay-spinner').modal('hide')
+                    window.location.href = 'import_data'
                 }
             };
         }
     }
-
-    function enableAnalyse() {
-        // enable analyse button
-        $('#uploadDatabaseButton').removeAttr('disabled')
-    }
-
-    // go to analyse page
-    $('#uploadDatabaseButton').click( function(e) {
-        e.preventDefault()
-        window.location.href = 'import_data'
-    })
 </script>
+
+{% endblock %}
+
+{% block footer %}
 
 {% endblock %}

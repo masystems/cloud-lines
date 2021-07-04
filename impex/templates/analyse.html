@@ -6,14 +6,14 @@
 <div id="overlay-spinner" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog"
     aria-hidden="true">
     <div class="modal-dialog modal-sm">
-        <div class="modal-content modal-filled" style="background-color: #44aaac;">
+        <div class="modal-content" style="background-color: #44aaac;">
             <div class="modal-body p-4">
                 <div class="text-center">
                     <div id="spinner">
-                        <div class="spinner-border" role="status">
-                        </div>
-                            <h3 class="text-white mt-2">Importing Data...</h3>
-                        </div>
+                        <div class="spinner-border" role="status"></div>
+                        <h3 class="text-white mt-2">Processing Data...</h3>
+                        <p class="text-white mt-2">Processing <span id="processedSlices">0</span> and <span id="totalSlices">0</span> remaining.</p>
+                    </div>
                 </div>
             </div>
         </div><!-- /.modal-content -->
@@ -71,7 +71,9 @@
                                                             <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info" tabindex="-99">
                                                                     <option data-tokens="" selected>---</option>
                                                                     {% for imported_heading in imported_headings %}
-                                                                        <option data-tokens="{{ breeder_heading.name }}">{{ imported_heading }}</option>
+                                                                        <option data-tokens="{{ breeder_heading.name }}"
+                                                                        {% if breeder_heading.verbose_name|lower == imported_heading|lower %}selected{% endif %}
+                                                                        >{{ imported_heading }}</option>
                                                                     {% endfor %}
                                                             </select>
                                                         </div>
@@ -85,6 +87,11 @@
                         </div>
                         <div class="tab-pane" id="pedigrees" role="tabpanel">
                             <div class="card-body">
+                                {% if not has_breeds %}
+                                    <div class="alert alert-danger">
+                                        You need to create a breed from the <a href="{% url 'breeds' %}">Breed</a> page before you can import your pedigrees.
+                                    </div>
+                                {% endif %}
                                 <form action="{% url 'import_pedigree_data' %}" method="POST" enctype="multipart/form-data" id="pedigrees-form">
                                     {% csrf_token %}
                                     {% for pedigree_heading in pedigree_headings %}
@@ -99,7 +106,9 @@
                                                         <select id="select-{{ pedigree_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info" tabindex="-98">
                                                                 <option data-tokens="" selected>---</option>
                                                                 {% for imported_heading in imported_headings %}
-                                                                    <option data-tokens="{{ pedigree_heading.name }}">{{ imported_heading }}</option>
+                                                                    <option data-tokens="{{ pedigree_heading.name }}"
+                                                                    {% if pedigree_heading.verbose_name|lower == imported_heading|lower %}selected{% endif %}
+                                                                    >{{ imported_heading }}</option>
                                                                 {% endfor %}
                                                         </select>
                                                     </div>
@@ -129,9 +138,7 @@
                                     {% if has_breeds %}
                                         <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
                                     {% else %}
-                                        <div class="alert alert-danger">
-                                            You need to create a breed from the <a href="{% url 'breeds' %}">Breed</a> page before you can import your pedigrees.
-                                        </div>
+                                        <!-- Don't show button -->
                                     {% endif %}
                                     <input type="hidden" name="update" value="no" id="update">
                                 </form>
@@ -194,6 +201,7 @@
             type: 'post',
             dataType: 'text',
             data: $('#pedigrees-form').serialize(),
+            async: false,
             beforeSend: function() {
                 // display spinner modal
                 $('#overlay-spinner').modal('show')
@@ -211,7 +219,6 @@
                     var pedigreesHtml = "";
                     if (result.existing) {
                         pedigreesHtml = '<ul>';
-
                         result.existing.forEach( existingPed => {
                             if (existingPed.name.length > 0) {
                                 pedigreesHtml = pedigreesHtml + '<li>' + existingPed.name + ' with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
@@ -241,6 +248,8 @@
                         $('#update-modal').modal('show')
                     })
                 } else if (result.result == 'again') {
+                    $('#totalSlices').html(result.total)
+                    $('#processedSlices').html(result.completed)
                     // recursively call this function to continue importing the data
                     importPedigreeData()
                 } else {
