@@ -153,9 +153,6 @@
     </div>
 </div>
 
-<!-- modal to check that user wants to update existing pedigrees -->
-{% include 'update_modal.html' %}
-
 {% endblock %}
 
 {% block footer %}
@@ -213,40 +210,6 @@
                 if (result.result == 'success') {
                     // redirect to breeders page
                     window.location.replace("{% url 'pedigree_search' %}");
-                } else if (result.result == 'existing') {
-                    // warn users that they're about to change existing pedigrees
-                    // list the existing pedigrees
-                    var pedigreesHtml = "";
-                    if (result.existing) {
-                        pedigreesHtml = '<ul>';
-                        result.existing.forEach( existingPed => {
-                            if (existingPed.name.length > 0) {
-                                pedigreesHtml = pedigreesHtml + '<li>' + existingPed.name + ' with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
-                            } else {
-                                pedigreesHtml = pedigreesHtml + '<li>Pedigree with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
-                            }
-                        });
-
-                        pedigreesHtml = pedigreesHtml + '</ul>';
-
-                        $('#pedigrees-list').html(pedigreesHtml);
-                    }
-
-                    // pass in each created object to be deleted if cancel is clicked
-                    if (result.created.length > 0) {
-                        var createdHtml = '';
-                        result.created.forEach( id => {
-                            createdHtml = createdHtml + id + ',';
-                        });
-                        $('#created').html(createdHtml);
-                    }
-
-                    // wait 2 seconds before hiding modal because if it's too dast it doesn't work
-                    sleep(2000).then(() => {
-                        $('#overlay-spinner').modal('hide')
-                        // display modal telling them what they are about to update
-                        $('#update-modal').modal('show')
-                    })
                 } else if (result.result == 'again') {
                     $('#totalSlices').html(result.total)
                     $('#processedSlices').html(result.completed)
