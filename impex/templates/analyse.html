@@ -1,13 +1,20 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block header %}
+
+{% endblock %}
+
 {% block content %}
 
 <!-- Spinner Overlay -->
-<div id="overlay-spinner" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog"
-    aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content" style="background-color: #44aaac;">
-            <div class="modal-body p-4">
+<div id="overlay-spinner" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="background-color: #44aaac;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Processing...</h1>
+            </div>
+            <div class="modal-body">
                 <div class="text-center">
                     <div id="spinner">
                         <div class="spinner-border" role="status"></div>
@@ -15,6 +22,11 @@
                         <p class="text-white mt-2">Processing <span id="processedSlices">0</span> and <span id="totalSlices">0</span> remaining.</p>
                     </div>
                 </div>
+<!--                <div class="progress">-->
+<!--                  <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">-->
+<!--                    <span class="sr-only">40% Complete (success)</span>-->
+<!--                  </div>-->
+<!--                </div>-->
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -153,9 +165,15 @@
     </div>
 </div>
 
+
 {% endblock %}
 
+<!-- modal to check that user wants to update existing pedigrees -->
+{% include 'update_modal.html' %}
+
 {% block footer %}
+
+{% endblock %}
 
 <!-- importing data data -->
 <script>
