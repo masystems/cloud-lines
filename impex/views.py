@@ -146,16 +146,11 @@ def importx(request):
                     errors['missing'] = []
                     # only fields that need to be in a certain format are added to invalid fields
                     errors['invalid'] = []
-
-                    # list to store created objects so they can be deleted if there are errors
-                    created_objects = {}
-                    created_objects['created_objects'] = []
                     
                     # create database upload object
                     database_upload = DatabaseUpload.objects.create(account=attached_service,
                                                                     header=header, user=request.user,
-                                                                    errors=dumps(errors),
-                                                                    created_objects=dumps(created_objects))
+                                                                    errors=dumps(errors))
                     database_upload.save()
                     
                     return HttpResponse(dumps({'result': 'success'}))
@@ -193,10 +188,9 @@ def import_data(request):
         if not DatabaseUpload.objects.filter(account=attached_service, user=request.user).exists():
             return redirect('import')
 
-        # flush errors/created_objects
+        # flush errors
         database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
         database_upload.errors = dumps({'missing': [], 'invalid': []})
-        database_upload.created_objects = dumps({'created_objects': []})
         database_upload.save()
         
         # get pedigree model headings
@@ -456,10 +450,7 @@ def import_pedigree_data(request):
                                 pedigree_obj, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=pedigree, sex='female')
                             else:
                                 pedigree_obj, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=pedigree)
-                            created_objects = loads(database_upload.created_objects)
-                            created_objects['created_objects'].append(pedigree_obj.id)
-                            database_upload.created_objects = dumps(created_objects)
-                            #database_upload.save()
+                            
                             return pedigree_obj
                         else:
                             # get existing pedigree to be updated
@@ -942,18 +933,14 @@ def import_pedigree_data(request):
                                            'total': total_slices,
                                            'completed': completed_slices}))
             
-            # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
-            # , and go back to analyse page
+            # if there were errors, go back to analyse page
             elif len(loads(database_upload.errors)['missing']) > 0 or len(loads(database_upload.errors)['invalid']) > 0:
-                for created_object in loads(database_upload.created_objects)['created_objects']:
-                    if Pedigree.objects.filter(id=created_object).exists():
-                        Pedigree.objects.get(id=created_object).delete()
 
                 errors = loads(database_upload.errors)
                 
                 # it's over so delete DatabaseUpload
                 database_upload.delete()
-                #print(errors)
+                
                 # put any Breed errors (where they need to create a breed) to the top
                 breed_errors = []
                 # extract the breed errors
@@ -964,7 +951,7 @@ def import_pedigree_data(request):
                 for breed_error in breed_errors:
                     errors['invalid'].remove(breed_error)
                     errors['invalid'].insert(0, breed_error)
-                #print(errors)
+                
                 # make sure we don't send so many errors that a 500 error is caused
                 errors['invalid'] = errors['invalid'][:75]
                 errors['missing'] = errors['missing'][:75]

@@ -275,38 +275,6 @@
         });
     }
 
-    // update modal - cancel button clicked
-    $('#modal-cancel').click( function(e){
-        $.ajax({
-            url: "{% url 'import_pedigree_data' %}",
-            type: 'post',
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            dataType: 'text',
-            // pass in ids of created objects to be deleted
-            data: {'created': $('#created').html()},
-            // hide modal on success, when created objects have been deleted
-            success: function(data) { $('#update-modal').modal('hide'); },
-            error: function(jqXHR, textStatus, errorThrown){
-                console.log('jqXHR:');
-                console.log(jqXHR);
-                console.log('textStatus:');
-                console.log(textStatus);
-                console.log('errorThrown:');
-                console.log(errorThrown);
-            }
-        });
-    })
-
-    // update modal - update button clicked
-    $('#modal-update').click( function(e){
-        // set hidden input to indicate user confirms update
-        $('#update').val('yes');
-        // hide update modal
-        $('#update-modal').modal('hide')
-        // import data
-        importPedigreeData()
-    })
-
     // importing breeders
     $('#import-breeders').click( function(e){
         e.preventDefault();
