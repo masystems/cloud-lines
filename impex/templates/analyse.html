@@ -153,9 +153,6 @@
     </div>
 </div>
 
-<!-- modal to check that user wants to update existing pedigrees -->
-{% include 'update_modal.html' %}
-
 {% endblock %}
 
 {% block footer %}
@@ -213,40 +210,6 @@
                 if (result.result == 'success') {
                     // redirect to breeders page
                     window.location.replace("{% url 'pedigree_search' %}");
-                } else if (result.result == 'existing') {
-                    // warn users that they're about to change existing pedigrees
-                    // list the existing pedigrees
-                    var pedigreesHtml = "";
-                    if (result.existing) {
-                        pedigreesHtml = '<ul>';
-                        result.existing.forEach( existingPed => {
-                            if (existingPed.name.length > 0) {
-                                pedigreesHtml = pedigreesHtml + '<li>' + existingPed.name + ' with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
-                            } else {
-                                pedigreesHtml = pedigreesHtml + '<li>Pedigree with registration number ' + existingPed.reg_no + ' (row ' + existingPed.row + ')</li>';
-                            }
-                        });
-
-                        pedigreesHtml = pedigreesHtml + '</ul>';
-
-                        $('#pedigrees-list').html(pedigreesHtml);
-                    }
-
-                    // pass in each created object to be deleted if cancel is clicked
-                    if (result.created.length > 0) {
-                        var createdHtml = '';
-                        result.created.forEach( id => {
-                            createdHtml = createdHtml + id + ',';
-                        });
-                        $('#created').html(createdHtml);
-                    }
-
-                    // wait 2 seconds before hiding modal because if it's too dast it doesn't work
-                    sleep(2000).then(() => {
-                        $('#overlay-spinner').modal('hide')
-                        // display modal telling them what they are about to update
-                        $('#update-modal').modal('show')
-                    })
                 } else if (result.result == 'again') {
                     $('#totalSlices').html(result.total)
                     $('#processedSlices').html(result.completed)
@@ -266,7 +229,12 @@
                     // create html to display what fields were erroneous
                     var errorHtml = "";
                     if (result.errors) {
-                        errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+                        // import completed without errors exceding max
+                        if (result.result == 'complete') {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>Some of the pedigrees in your file could not be imported because they had errors. All the other pedigrees were successfully imported. The errors are listed below, and must be fixed in order to complete the import.<br/>';
+                        } else {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>The import could not be completed because your file exceded the maximum amount of errors. Any valid pedigrees successfully imported before the errors were found remain in the database. The errors found before the limit was reached are listed below. Please fix these errors before retrying the import.<br/>';
+                        }
 
                         // go through invalid fields
                         if (result.errors.invalid.length > 0) {
@@ -312,38 +280,6 @@
         });
     }
 
-    // update modal - cancel button clicked
-    $('#modal-cancel').click( function(e){
-        $.ajax({
-            url: "{% url 'import_pedigree_data' %}",
-            type: 'post',
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
-            dataType: 'text',
-            // pass in ids of created objects to be deleted
-            data: {'created': $('#created').html()},
-            // hide modal on success, when created objects have been deleted
-            success: function(data) { $('#update-modal').modal('hide'); },
-            error: function(jqXHR, textStatus, errorThrown){
-                console.log('jqXHR:');
-                console.log(jqXHR);
-                console.log('textStatus:');
-                console.log(textStatus);
-                console.log('errorThrown:');
-                console.log(errorThrown);
-            }
-        });
-    })
-
-    // update modal - update button clicked
-    $('#modal-update').click( function(e){
-        // set hidden input to indicate user confirms update
-        $('#update').val('yes');
-        // hide update modal
-        $('#update-modal').modal('hide')
-        // import data
-        importPedigreeData()
-    })
-
     // importing breeders
     $('#import-breeders').click( function(e){
         e.preventDefault();
@@ -387,7 +323,12 @@
                     // create html to display what fields were erroneous
                     var errorHtml = "";
                     if (result.errors) {
-                        errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+                        // import completed without errors exceding max
+                        if (result.result == 'complete') {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>Some of the breeders in your file could not be imported because they had errors. All the other breeders were successfully imported. The errors are listed below, and must be fixed in order to complete the import.<br/>';
+                        } else {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>The import could not be completed because your file exceded the maximum amount of errors. Any valid breeders successfully imported before the errors were found remain in the database. The errors found before the limit was reached are listed below. Please fix these errors before retrying the import.<br/>';
+                        }
 
                         // go through missing fields
                         if (result.errors.missing.length > 0) {
