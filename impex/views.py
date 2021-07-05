@@ -945,8 +945,8 @@ def import_pedigree_data(request):
                     errors['invalid'].insert(0, breed_error)
                 
                 # make sure we don't send so many errors that a 500 error is caused
-                errors['invalid'] = errors['invalid'][:75]
-                errors['missing'] = errors['missing'][:75]
+                errors['invalid'] = errors['invalid'][:50]
+                errors['missing'] = errors['missing'][:50]
 
                 return HttpResponse(dumps({'result': 'incomplete', 'errors': errors}))
             
@@ -978,8 +978,8 @@ def import_pedigree_data(request):
                     errors['invalid'].insert(0, breed_error)
                 
                 # make sure we don't send so many errors that a 500 error is caused
-                errors['invalid'] = errors['invalid'][:75]
-                errors['missing'] = errors['missing'][:75]
+                errors['invalid'] = errors['invalid'][:50]
+                errors['missing'] = errors['missing'][:50]
 
                 return HttpResponse(dumps({'result': 'complete', 'errors': errors}))
             
@@ -1065,8 +1065,6 @@ def import_breeder_data(request):
         # regex pattern used to validate email
         email_pattern = re.compile('^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
 
-        # list of breeders saved into the DB
-        saved_breeders = []
         # get or create each new pedigree ###################
         for row in loads(file_slice.file_slice)['file_slice']:
             row_number = row[-1]
@@ -1088,20 +1086,8 @@ def import_breeder_data(request):
                 })
                 database_upload.errors = dumps(errors)
                 database_upload.save()
-            # check prefix doesn't yet exist in the database
-            elif Breeder.objects.filter(breeding_prefix=row[breeding_prefix]).exists():
-                errors = loads(database_upload.errors)
-                errors['invalid'].append({
-                    'col': 'Breeding Prefix',
-                    'row': row_number,
-                    'name': name,
-                    'reason': 'a breeder with this prefix already exists'
-                })
-                database_upload.errors = dumps(errors)
-                database_upload.save()
-            # check no data is missing/invalid before creating a new breeder
-            elif len(loads(database_upload.errors)['missing']) == 0 and len(loads(database_upload.errors)['invalid']) == 0:
-                breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+            # create a new breeder
+            breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             ################### contact name
             try:
                 breeder.contact_name = row[contact_name]
@@ -1182,34 +1168,45 @@ def import_breeder_data(request):
             except UnboundLocalError:
                 pass
             ###################
-            # check that no rows are invalid before saving the breeder and adding to saved_breeders list
-            if len(loads(database_upload.errors)['missing']) == 0 and len(loads(database_upload.errors)['invalid']) == 0:
+            # save the breeder
+            try:
                 breeder.save()
-                saved_breeders.append(breeder)
+            except NameError:
+                pass
         
         # set the file just processed to used
         file_slice.used = True
         file_slice.save()
-        # check whether there are any more left. if there are, tell the browser to go again
-        if FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
-            return HttpResponse(dumps({'result': 'again'}))
         
-        # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
-        # , and redirect back to analyse page
-        elif len(loads(database_upload.errors)['missing']) > 0 or len(loads(database_upload.errors)['invalid']) > 0:
-            for saved_breeder in saved_breeders:
-                if saved_breeder.id:
-                    saved_breeder.delete()
+        # if the max number of errors was exceded, stop the import and redirect back to analyse page
+        if len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 50:
 
             # it's over so delete DatabaseUpload
             database_upload.delete()
 
             # make sure we don't send so many errors that a 500 error is caused
             errors = loads(database_upload.errors)
-            errors['invalid'] = errors['invalid'][:75]
-            errors['missing'] = errors['missing'][:75]
+            errors['invalid'] = errors['invalid'][:50]
+            errors['missing'] = errors['missing'][:50]
 
-            return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+            return HttpResponse(dumps({'result': 'incomplete', 'errors': errors}))
+        
+        # check whether there are any more left. if there are, tell the browser to go again
+        elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
+            return HttpResponse(dumps({'result': 'again'}))
+        
+        # if there were errors, redirect back to analyse page
+        elif len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 0:
+
+            # it's over so delete DatabaseUpload
+            database_upload.delete()
+
+            # make sure we don't send so many errors that a 500 error is caused
+            errors = loads(database_upload.errors)
+            errors['invalid'] = errors['invalid'][:50]
+            errors['missing'] = errors['missing'][:50]
+
+            return HttpResponse(dumps({'result': 'complete', 'errors': errors}))
         else:
             # it's over so delete DatabaseUpload
             database_upload.delete()

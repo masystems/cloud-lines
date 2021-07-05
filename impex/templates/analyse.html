@@ -323,7 +323,12 @@
                     // create html to display what fields were erroneous
                     var errorHtml = "";
                     if (result.errors) {
-                        errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>';
+                        // import completed without errors exceding max
+                        if (result.result == 'complete') {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>Some of the breeders in your file could not be imported because they had errors. All the other breeders were successfully imported. The errors are listed below, and must be fixed in order to complete the import.<br/>';
+                        } else {
+                            errorHtml = errorHtml + '<h5 class="text-danger">There were errors in your data</h5>The import could not be completed because your file exceded the maximum amount of errors. Any valid breeders successfully imported before the errors were found remain in the database. The errors found before the limit was reached are listed below. Please fix these errors before retrying the import.<br/>';
+                        }
 
                         // go through missing fields
                         if (result.errors.missing.length > 0) {
