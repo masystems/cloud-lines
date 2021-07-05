@@ -948,7 +948,7 @@ def import_pedigree_data(request):
                 errors['invalid'] = errors['invalid'][:75]
                 errors['missing'] = errors['missing'][:75]
 
-                return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+                return HttpResponse(dumps({'result': 'incomplete', 'errors': errors}))
             
             # check whether there are any more file slices left. if there are, tell the browser to go again
             elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
@@ -981,7 +981,7 @@ def import_pedigree_data(request):
                 errors['invalid'] = errors['invalid'][:75]
                 errors['missing'] = errors['missing'][:75]
 
-                return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+                return HttpResponse(dumps({'result': 'complete', 'errors': errors}))
             
             # import completed with no errors
             else:
