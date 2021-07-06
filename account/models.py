@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from cloud_lines.models import Service, Bolton
+from cloud_lines.models import Service
+from cloud_lines.models import Bolton
 
 
 def user_directory_path(instance, filename):

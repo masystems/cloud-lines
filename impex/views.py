@@ -6,7 +6,7 @@ from pedigree.functions import get_pedigree_column_headings
 from breeder.models import Breeder
 from breed.models import Breed
 from account.views import is_editor, get_main_account
-from .models import DatabaseUpload
+from .models import DatabaseUpload, FileSlice
 from datetime import datetime
 from os.path import splitext
 import csv
@@ -130,60 +130,48 @@ def importx(request):
     if request.user in attached_service.admin_users.all() or request.user == attached_service.user.user:
         allowed_file_types = ('.csv')
         if request.method == 'POST':
+            # get header
+            if request.POST.get('job'):
+                # if we need to save the header
+                if request.POST['job'] == 'header':
+                    # flush the database upload down the digital toilet
+                    DatabaseUpload.objects.filter(account=attached_service, user=request.user).delete()
 
-            database_file = request.FILES['uploadDatabase']
-            imported_headings = []
+                    # convert header to JSON
+                    header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
 
-            f_type = splitext(str(request.FILES['uploadDatabase']))[1]
-            if f_type not in allowed_file_types:
-                return render(request, 'import.html', {'error': '{} is not an allowed file type!'.format(f_type)})
-
-            if f_type == '.csv':
-                file = request.FILES['uploadDatabase']
-                decoded_file = file.read().decode('utf-8').splitlines()
-                database_items = csv.DictReader(decoded_file)
-                imported_headings = database_items.fieldnames
-
-            # check if file is empty
-            if file.size <= 1:
-                return render(request, 'import.html', {'error': '{} is empty!'.format(request.FILES['uploadDatabase'])})
-
-            # upload file
-            upload_database = DatabaseUpload(account=attached_service, database=database_file, file_type=f_type)
-            upload_database.save(database_file)
-
-            # get pedigree model headings
-            pedigree_headings = get_pedigree_column_headings()
-
-            # get breeder model headings
-            forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
-            breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
-                                 if field.name not in forbidden_breeeder_fields]
-
-            # get custom fields
-            try:
-                custom_fields = dict(loads(attached_service.custom_fields)).values()
-            except JSONDecodeError:
-                custom_fields = {}
-            custom_field_names = []
-            for field in custom_fields:
-                custom_field_names.append(field['fieldName'])
-
-            # see if any breeds have been set up
-            has_breeds = Breed.objects.filter(account=attached_service).count() > 0
-
-            # breed is required if org account with multiple breeds
-            if attached_service.service.service_name == 'Organisation' and Breed.objects.filter(account=attached_service).count() > 1:
-                breed_required = 'yes'
-            else:
-                breed_required = 'no'
-
-            return render(request, 'analyse.html', {'imported_headings': imported_headings,
-                                                    'pedigree_headings': pedigree_headings,
-                                                    'breeder_headings': breeder_headings,
-                                                    'custom_fields': custom_field_names,
-                                                    'has_breeds': has_breeds,
-                                                    'breed_required': breed_required})
+                    # errors is a dictionary to keep track of missing and invalid fields
+                    errors = {}
+                    # only mandatory fields are added to 
+                    errors['missing'] = []
+                    # only fields that need to be in a certain format are added to invalid fields
+                    errors['invalid'] = []
+                    
+                    # create database upload object
+                    database_upload = DatabaseUpload.objects.create(account=attached_service,
+                                                                    header=header, user=request.user,
+                                                                    errors=dumps(errors))
+                    database_upload.save()
+                    
+                    return HttpResponse(dumps({'result': 'success'}))
+                
+                # if we need to save the body
+                elif request.POST['job'] == 'slices':
+                    
+                    # create the file slice
+                    file_slice = []
+                    for key in request.POST:
+                        if 'uploadDatabase' in key:
+                            file_slice.append(request.POST.getlist(key))
+                    
+                    # save file slice
+                    try:
+                        file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id'), file_slice=dumps({'file_slice': file_slice}))
+                    except Exception:
+                        pass
+                    
+                    return HttpResponse(dumps({'result': 'success'}))
+                    
         return render(request, 'import.html')
     else:
         return redirect('dashboard')
@@ -191,14 +179,72 @@ def importx(request):
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
+def import_data(request):
+    attached_service = get_main_account(request.user)
+    
+    # get request, so display the page
+    if request.method == 'GET':
+        # if there is no relevant DatabaseUpload redirect to import
+        if not DatabaseUpload.objects.filter(account=attached_service, user=request.user).exists():
+            return redirect('import')
+
+        # flush errors
+        database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
+        database_upload.errors = dumps({'missing': [], 'invalid': []})
+        database_upload.save()
+        
+        # get pedigree model headings
+        pedigree_headings = get_pedigree_column_headings()
+
+        # get breeder model headings
+        forbidden_breeeder_fields = ['id', 'account', 'custom_fields']
+        breeder_headings = [field for field in Breeder._meta.get_fields(include_parents=False, include_hidden=False)
+                            if field.name not in forbidden_breeeder_fields]
+
+        # get custom fields
+        try:
+            custom_fields = dict(loads(attached_service.custom_fields)).values()
+        except JSONDecodeError:
+            custom_fields = {}
+        custom_field_names = []
+        for field in custom_fields:
+            custom_field_names.append(field['fieldName'])
+
+        # see if any breeds have been set up
+        has_breeds = Breed.objects.filter(account=attached_service).count() > 0
+
+        # breed is required if org account with multiple breeds
+        if attached_service.service.service_name == 'Organisation' and Breed.objects.filter(account=attached_service).count() > 1:
+            breed_required = 'yes'
+        else:
+            breed_required = 'no'
+
+        # get imported headings
+        imported_headings = loads(DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id').header)['header']
+        
+        return render(request, 'analyse.html', {'imported_headings': imported_headings,
+                                                'pedigree_headings': pedigree_headings,
+                                                'breeder_headings': breeder_headings,
+                                                'custom_fields': custom_field_names,
+                                                'has_breeds': has_breeds,
+                                                'breed_required': breed_required})
+    
+    return redirect('dashboard')
+
+
+@login_required(login_url="/account/login")
+@user_passes_test(is_editor)
 def import_pedigree_data(request):
+    attached_service = get_main_account(request.user)
+    
     if request.method == 'POST':
         # check if this is import or cancel - created not passed in if it's import
         if 'created' not in request.POST.keys():
-            attached_service = get_main_account(request.user)
-            db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
-            decoded_file = db.database.file.read().decode('utf-8').splitlines()
-            database_items = csv.DictReader(decoded_file)
+            database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
+            file_slice = FileSlice.objects.filter(database_upload=database_upload, used=False).earliest('id')
+
+            # decoded_file = db.database.file.read().decode('utf-8').splitlines()
+            # database_items = csv.DictReader(decoded_file)
             date_fields = ['date_of_registration', 'dob', 'dod']
             post_data = {}
 
@@ -211,13 +257,18 @@ def import_pedigree_data(request):
             field_names = []
             for key, field in acc_custom_fields.items():
                 field_names.append(field['fieldName'])
-            custom_fields_in = []
+            
+            # dictionary that stores name of given custom fields, and their column's index in the file header
+            custom_fields_in = {}
 
             # iterate through columns
             for key, val in request.POST.items():
                 # add custom field columns
                 if key in field_names and val != '---':
-                    custom_fields_in.append(key)
+                    # find what index of the header corresponds with this column
+                    col_index = loads(database_upload.header)['header'].index(val)
+                    # add name:index to list
+                    custom_fields_in[key] = col_index
                 
                 # remove blank ('---') entries ###################
                 elif val == '---':
@@ -247,25 +298,88 @@ def import_pedigree_data(request):
             mother_notes = post_data['parent_mother_notes'] or ''
             sale_or_hire = post_data['sale_or_hire'] or ''
 
-            # errors is a dictionary to keep track of missing and invalid fields
-            errors = {}
-            # only mandatory fields are added to 
-            errors['missing'] = []
-            # only fields that need to be in a certain format are added to invalid fields
-            errors['invalid'] = []
+            # get index of each heading
+            thousand = 1000
+            if breeder:
+                breeder = loads(database_upload.header)['header'].index(breeder)
+            # if heading not given, make the index out of range (who's importing a thousand columns!?)
+            else:
+                breeder = thousand
+            if current_owner:
+                current_owner = loads(database_upload.header)['header'].index(current_owner)
+            else:
+                current_owner = thousand
+            if breed:
+                breed = loads(database_upload.header)['header'].index(breed)
+            else:
+                breed = thousand
+            if reg_no:
+                reg_no = loads(database_upload.header)['header'].index(reg_no)
+            else:
+                reg_no = thousand
+            if tag_no:
+                tag_no = loads(database_upload.header)['header'].index(tag_no)
+            else:
+                tag_no = thousand
+            if name:
+                name = loads(database_upload.header)['header'].index(name)
+            else:
+                name = thousand
+            if description:
+                description = loads(database_upload.header)['header'].index(description)
+            else:
+                description = thousand
+            if date_of_registration:
+                date_of_registration = loads(database_upload.header)['header'].index(date_of_registration)
+            else:
+                date_of_registration = thousand
+            if dob:
+                dob = loads(database_upload.header)['header'].index(dob)
+            else:
+                dob = thousand
+            if dod:
+                dod = loads(database_upload.header)['header'].index(dod)
+            else:
+                dod = thousand
+            if sex:
+                sex = loads(database_upload.header)['header'].index(sex)
+            else:
+                sex = thousand
+            if born_as:
+                born_as = loads(database_upload.header)['header'].index(born_as)
+            else:
+                born_as = thousand
+            if status:
+                status = loads(database_upload.header)['header'].index(status)
+            else:
+                status = thousand
+            if father:
+                father = loads(database_upload.header)['header'].index(father)
+            else:
+                father = thousand
+            if father_notes:
+                father_notes = loads(database_upload.header)['header'].index(father_notes)
+            else:
+                father_notes = thousand
+            if mother:
+                mother = loads(database_upload.header)['header'].index(mother)
+            else:
+                mother = thousand
+            if mother_notes:
+                mother_notes = loads(database_upload.header)['header'].index(mother_notes)
+            else:
+                mother_notes = thousand
+            if sale_or_hire:
+                sale_or_hire = loads(database_upload.header)['header'].index(sale_or_hire)
+            else:
+                sale_or_hire = thousand
 
-            # existing pedigrees can be added, but with a warning
-            existing = []
-
-            # list to store created objects so they can be deleted if there are errors
-            created_objects = []
-
-            row_number = 1
-            for row in database_items:
-                row_number += 1
+            for row in loads(file_slice.file_slice)['file_slice']:
+                # get row number, which is the last element of the row/list
+                row_number = row[-1]
                 
                 # variable to store pedigree name or empty string
-                if name:
+                if name != 1000:
                     ped_name = row[name]
                 else:
                     ped_name = ''
@@ -276,24 +390,30 @@ def import_pedigree_data(request):
                         breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[breeder].rstrip())
                         # error if breeder doesn't exist
                         if not breeder_obj.exists():
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Breeder',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
                             })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
                         # get the breeder
                         else:
                             breeder_obj = breeder_obj.first()
                     else:
                         breeder_obj = None
                         # error if missing
+                        errors = loads(database_upload.errors)
                         errors['missing'].append({
                             'col': 'Breeder',
                             'row': row_number,
                             'name': ped_name
                         })
-                except KeyError:
+                        database_upload.errors = dumps(errors)
+                        database_upload.save()
+                except IndexError:
                     breeder_obj = None
 
                 # get current owner - error if if it doesn't exist ###################
@@ -302,17 +422,20 @@ def import_pedigree_data(request):
                         current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[current_owner].rstrip())
                         # error if owner doesn't exist
                         if not current_owner_obj.exists():
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Current Owner',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
                             })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
                         else:
                             current_owner_obj = current_owner_obj.first()
                     else:
                         current_owner_obj = None
-                except KeyError:
+                except IndexError:
                     current_owner_obj = None
 
                 # get or create pedigrees ###################
@@ -320,27 +443,29 @@ def import_pedigree_data(request):
                     if pedigree not in ('', None):
                         if Pedigree.objects.filter(account=attached_service, reg_no=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
-                            pedigree_obj =  Pedigree.objects.create(account=attached_service, reg_no=pedigree)
-                            created_objects.append(pedigree_obj)
+                            # if parent, specify the sex appropriately
+                            if is_parent == 'father':
+                                pedigree_obj, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=pedigree, sex='male')
+                            elif is_parent == 'mother':
+                                pedigree_obj, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=pedigree, sex='female')
+                            else:
+                                pedigree_obj, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=pedigree)
+                            
                             return pedigree_obj
                         else:
-                            # if user has confirmed updates, update existing pedigree, or the pedigree is also a parent that was created because none existed
-                            if request.POST.get('update') == 'yes' or is_parent or not Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first().breeder:
-                                # pedigree does exist, so get it
-                                return Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first()
-                            else:
-                                return None
+                            # get existing pedigree to be updated
+                            return Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first()
                     else:
                         return None
 
                 try:
-                    father_obj = get_or_create_pedigree(row[father], True)
-                except KeyError:
+                    father_obj = get_or_create_pedigree(row[father], 'father')
+                except IndexError:
                     father_obj = None
 
                 try:
-                    mother_obj = get_or_create_pedigree(row[mother], True)
-                except KeyError:
+                    mother_obj = get_or_create_pedigree(row[mother], 'mother')
+                except IndexError:
                     mother_obj = None
 
                 # convert dates ###################
@@ -385,44 +510,46 @@ def import_pedigree_data(request):
 
                 try:
                     date_of_registration_converted = convert_date(row[date_of_registration])
-                except KeyError:
+                except IndexError:
                     date_of_registration_converted = None
 
                 try:
                     dob_converted = convert_date(row[dob])
-                except KeyError:
+                except IndexError:
                     dob_converted = None
 
                 try:
                     dod_converted = convert_date(row[dod])
-                except KeyError:
+                except IndexError:
                     dod_converted = None
                 ############################# reg_no
-                if row[reg_no] == '':
-                    errors['missing'].append({
-                        'col': 'Registration Number',
-                        'row': row_number,
-                        'name': ped_name
-                    })
-
-                # create each new pedigree if no errors found in file ###################
-                if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
-                    # add to existing if this pedigree already exists, and if it's not a parent that was created because it didn't exist
-                    if Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).count() > 0 and Pedigree.objects.filter(account=attached_service, reg_no=row[reg_no]).first().breeder:
-                        existing.append({
+                try:
+                    if row[reg_no] == '':
+                        errors = loads(database_upload.errors)
+                        errors['missing'].append({
+                            'col': 'Registration Number',
                             'row': row_number,
-                            'name': ped_name,
-                            'reg_no': row[reg_no]
+                            'name': ped_name
                         })
-                    
+                        database_upload.errors = dumps(errors)
+                        database_upload.save()
+                except IndexError:
+                    pass
+
+                # got or create each new pedigree ###################
+                try:
                     # get or create pedigree
                     pedigree = get_or_create_pedigree(row[reg_no], False)
+                except IndexError:
+                    pass
 
                 try:
                     pedigree.creator = request.user
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 
                 try:
@@ -449,29 +576,35 @@ def import_pedigree_data(request):
                 ############################# tag_no
                 try:
                     pedigree.tag_no = row[tag_no]
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# name
                 try:
                     pedigree.name = row[name]
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# description
                 try:
                     pedigree.description = row[description]
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# dor
                 try:
@@ -484,6 +617,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# dob
                 try:
                     pedigree.dob = dob_converted
@@ -494,6 +629,8 @@ def import_pedigree_data(request):
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# dod
                 try:
@@ -506,6 +643,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# sex
                 try:
                     # if sex given
@@ -515,30 +654,38 @@ def import_pedigree_data(request):
                             pedigree.sex = row[sex]
                         # invalid, so add error
                         else:
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Sex',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
                             })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
                     # error if missing
                     else:
+                        errors = loads(database_upload.errors)
                         errors['missing'].append({
                             'col': 'Sex',
                             'row': row_number,
                             'name': ped_name
                         })
+                        database_upload.errors = dumps(errors)
+                        database_upload.save()
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# born as
                 try:
@@ -549,20 +696,25 @@ def import_pedigree_data(request):
                             pedigree.born_as = row[born_as]
                         # invalid, so add error
                         else:
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Born As',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
                             })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# status
                 try:
@@ -573,30 +725,38 @@ def import_pedigree_data(request):
                             pedigree.status = row[status].lower()
                         # invalid, so add error
                         else:
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'Status',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': 'the input for status, if given, must be one of "dead", "alive", or "unknown"'
                             })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
                     # error if missing
                     else:
+                        errors = loads(database_upload.errors)
                         errors['missing'].append({
                             'col': 'Status',
                             'row': row_number,
                             'name': ped_name
                         })
+                        database_upload.errors = dumps(errors)
+                        database_upload.save()
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# father
                 try:
@@ -607,6 +767,8 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# mother
                 try:
                     pedigree.parent_mother = mother_obj
@@ -616,29 +778,39 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
                 ############################# father notes
                 try:
                     pedigree.parent_father_notes = row[father_notes]
-                except KeyError:
+                except IndexError:
                     try:
                         pedigree.parent_father_notes = ''
                     except AttributeError:
                         pass
-                except NameError:
-                    pass
-                except AttributeError:
-                    pass
-                ############################# mother notes
-                try:
-                    pedigree.parent_mother_notes = row[mother_notes]
-                except KeyError:
-                    try:
-                        pedigree.parent_mother_notes = ''
-                    except AttributeError:
+                    except UnboundLocalError:
                         pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
+                    pass
+                ############################# mother notes
+                try:
+                    pedigree.parent_mother_notes = row[mother_notes]
+                except IndexError:
+                    try:
+                        pedigree.parent_mother_notes = ''
+                    except AttributeError:
+                        pass
+                    except UnboundLocalError:
+                        pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
                 ############################# sale or hire
                 try:
@@ -652,20 +824,25 @@ def import_pedigree_data(request):
                                 pedigree.sale_or_hire = False
                         # invalid, so add error
                         else:
+                            errors = loads(database_upload.errors)
                             errors['invalid'].append({
                                 'col': 'For Sale/Hire',
                                 'row': row_number,
                                 'name': ped_name,
                                 'reason': 'the input for sale/hire, if given, must be "yes" or "no"'
                             })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
-                except KeyError:
+                except IndexError:
                     pass
                 except NameError:
                     pass
                 except AttributeError:
+                    pass
+                except UnboundLocalError:
                     pass
 
                 #################### breed
@@ -674,13 +851,19 @@ def import_pedigree_data(request):
                     breed_obj = Breed.objects.filter(account=attached_service).first()
                     # error if given breed doesn't match account breed, if given
                     if breed != '':
-                        if breed_obj.breed_name != row[breed] and row[breed] != '':
-                            errors['invalid'].append({
-                                'col': 'Breed',
-                                'row': row_number,
-                                'name': ped_name,
-                                'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
-                            })
+                        try:
+                            if breed_obj.breed_name != row[breed] and row[breed] != '':
+                                errors = loads(database_upload.errors)
+                                errors['invalid'].append({
+                                    'col': 'Breed',
+                                    'row': row_number,
+                                    'name': ped_name,
+                                    'reason': 'the input for breed, if given, must be the breed created for your account - to create more breeds, you need to <a href="/account/profile">upgrade your account</a>'
+                                })
+                                database_upload.errors = dumps(errors)
+                                database_upload.save()
+                        except IndexError:
+                            pass
                 # organisation
                 elif breed != '---':
                     try:
@@ -691,13 +874,16 @@ def import_pedigree_data(request):
                         else:
                             breed_obj = None
                             if row[breed] != '':
+                                errors = loads(database_upload.errors)
                                 errors['invalid'].append({
                                     'col': 'Breed',
                                     'row': row_number,
                                     'name': ped_name,
                                     'reason': 'the input for breed must be one of the breeds created for your account - you can create more breeds via the <a href="/breeds">Breed</a> page'
                                 })
-                    except KeyError:
+                                database_upload.errors = dumps(errors)
+                                database_upload.save()
+                    except IndexError:
                         breed_obj = None
                 else:
                     breed_obj = None
@@ -710,14 +896,19 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
 
                 ############################# custom
-                for cf_col in custom_fields_in:
+                for cf_name, cf_index in custom_fields_in.items():
                     # iterate through account custom fields
                     for id, field in acc_custom_fields.items():
-                        if acc_custom_fields[id]['fieldName'] == cf_col:
-                            # populate with value from the imported csv file
-                            acc_custom_fields[id]['field_value'] = row[cf_col]
+                        if acc_custom_fields[id]['fieldName'] == cf_name:
+                            try:
+                                # populate with value from the imported csv file
+                                acc_custom_fields[id]['field_value'] = row[cf_index]
+                            except IndexError:
+                                pass
                 
                 try:
                     pedigree.custom_fields = dumps(acc_custom_fields)
@@ -727,25 +918,76 @@ def import_pedigree_data(request):
                     pass
                 except AttributeError:
                     pass
+                except UnboundLocalError:
+                    pass
 
-            # if there were errors, delete any breeders that were saved (before invalid/missing fields were found),
-            # , and redirect back to analyse page
-            if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
-                for created_object in created_objects:
-                    if created_object.id:
-                        created_object.delete()
+            # mark the slice just processed as used
+            file_slice.used = True
+            file_slice.save()
+            
+            # if we have exceeded the max number of errors, stop the import and go back to analyse page
+            if len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 50:
 
-                return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
-            # need to warn user if they specified any pedigrees that already exist, unless they have confirmed updates
-            elif len(existing) > 0 and request.POST.get('update') == 'no':
-                # get and pass in ids of created objects so it is known what to delete if user cancels
-                created = []
-                for created_object in created_objects:
-                    if created_object.id:
-                        created.append(created_object.id)
+                errors = loads(database_upload.errors)
+                
+                # it's over so delete DatabaseUpload
+                database_upload.delete()
+                
+                # put any Breed errors (where they need to create a breed) to the top
+                breed_errors = []
+                # extract the breed errors
+                for invalid_error in errors['invalid']:
+                    if invalid_error['col'] == 'Breed':
+                        breed_errors.append(invalid_error)
+                # put the breed errors to the front of the errors
+                for breed_error in breed_errors:
+                    errors['invalid'].remove(breed_error)
+                    errors['invalid'].insert(0, breed_error)
+                
+                # make sure we don't send so many errors that a 500 error is caused
+                errors['invalid'] = errors['invalid'][:50]
+                errors['missing'] = errors['missing'][:50]
 
-                return HttpResponse(dumps({'result': 'existing', 'existing': existing, 'created': created}))
+                return HttpResponse(dumps({'result': 'incomplete', 'errors': errors}))
+            
+            # check whether there are any more file slices left. if there are, tell the browser to go again
+            elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
+                total_slices = FileSlice.objects.filter(database_upload=database_upload, used=False).count()
+                completed_slices = FileSlice.objects.filter(database_upload=database_upload, used=True).count()
+                return HttpResponse(dumps({'result': 'again',
+                                           'total': total_slices,
+                                           'completed': completed_slices}))
+            
+            # import completed with errors
+            elif len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 0:
+
+                errors = loads(database_upload.errors)
+                
+                # it's over so delete DatabaseUpload
+                database_upload.delete()
+                
+                # put any Breed errors (where they need to create a breed) to the top
+                breed_errors = []
+                # extract the breed errors
+                for invalid_error in errors['invalid']:
+                    if invalid_error['col'] == 'Breed':
+                        breed_errors.append(invalid_error)
+                # put the breed errors to the front of the errors
+                for breed_error in breed_errors:
+                    errors['invalid'].remove(breed_error)
+                    errors['invalid'].insert(0, breed_error)
+                
+                # make sure we don't send so many errors that a 500 error is caused
+                errors['invalid'] = errors['invalid'][:50]
+                errors['missing'] = errors['missing'][:50]
+
+                return HttpResponse(dumps({'result': 'complete', 'errors': errors}))
+            
+            # import completed with no errors
             else:
+                # it's over so delete DatabaseUpload
+                database_upload.delete()
+
                 return HttpResponse(dumps({'result': 'success'}))
 
         
@@ -766,9 +1008,9 @@ def import_pedigree_data(request):
 def import_breeder_data(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
-        db = DatabaseUpload.objects.filter(account=attached_service).latest('id')
-        decoded_file = db.database.file.read().decode('utf-8').splitlines()
-        database_items = csv.DictReader(decoded_file)
+        
+        database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
+        file_slice = FileSlice.objects.filter(database_upload=database_upload, used=False).earliest('id')
 
         post_data = {}
 
@@ -788,25 +1030,47 @@ def import_breeder_data(request):
         email = post_data['email'] or ''
         active = post_data['active'] or ''
 
+        # get index of each heading
+        thousand = 1000
+        if breeding_prefix:
+            breeding_prefix = loads(database_upload.header)['header'].index(breeding_prefix)
+        # if heading not given, make the index out of range (who's importing a thousand columns!?)
+        else:
+            breeding_prefix = thousand
+        if contact_name:
+            contact_name = loads(database_upload.header)['header'].index(contact_name)
+        else:
+            contact_name = thousand
+        if address:
+            address = loads(database_upload.header)['header'].index(address)
+        else:
+            address = thousand
+        if phone_number1:
+            phone_number1 = loads(database_upload.header)['header'].index(phone_number1)
+        else:
+            phone_number1 = thousand
+        if phone_number2:
+            phone_number2 = loads(database_upload.header)['header'].index(phone_number2)
+        else:
+            phone_number2 = thousand
+        if email:
+            email = loads(database_upload.header)['header'].index(email)
+        else:
+            email = thousand
+        if active:
+            active = loads(database_upload.header)['header'].index(active)
+        else:
+            active = thousand
+
         # regex pattern used to validate email
         email_pattern = re.compile('^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
 
-        # errors is a dictionary to keep track of missing and invalid fields
-        errors = {}
-        # only mandatory fields are added to 
-        errors['missing'] = []
-        # only fields that need to be in a certain format are added to invalid fields
-        errors['invalid'] = []
-
-        # list of breeders saved into the DB
-        saved_breeders = []
-        row_number = 1
         # get or create each new pedigree ###################
-        for row in database_items:
-            row_number += 1
-
+        for row in loads(file_slice.file_slice)['file_slice']:
+            row_number = row[-1]
+            
             # set name for error messages
-            if contact_name:
+            if contact_name != thousand:
                 name = row[contact_name]
             else:
                 name = ''
@@ -814,47 +1078,41 @@ def import_breeder_data(request):
             ################### breeding prefix
             # check it is not empty
             if row[breeding_prefix] == '':
+                errors = loads(database_upload.errors)
                 errors['missing'].append({
                     'col': 'Breeding Prefix',
                     'row': row_number,
                     'name': name
                 })
-            # check prefix doesn't yet exist in the database
-            elif Breeder.objects.filter(breeding_prefix=row[breeding_prefix]).exists():
-                errors['invalid'].append({
-                    'col': 'Breeding Prefix',
-                    'row': row_number,
-                    'name': name,
-                    'reason': 'a breeder with this prefix already exists'
-                })
-            # check no data is missing/invalid before creating a new breeder
-            elif len(errors['missing']) == 0 and len(errors['invalid']) == 0:
-                breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+                database_upload.errors = dumps(errors)
+                database_upload.save()
+            # create a new breeder
+            breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             ################### contact name
             try:
                 breeder.contact_name = row[contact_name]
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
             ################### address
             try:
                 breeder.address = row[address]
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
             ################### phone_number1
             try:
                 breeder.phone_number1 = row[phone_number1]
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
             ################### phone_number2
             try:
                 breeder.phone_number2 = row[phone_number2]
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
@@ -867,16 +1125,19 @@ def import_breeder_data(request):
                         breeder.email = row[email]
                     # add to errors invalid
                     else:
+                        errors = loads(database_upload.errors)
                         errors['invalid'].append({
                             'col': 'Email',
                             'row': row_number,
                             'name': name,
                             'reason': 'the email given is invalid'
                         })
+                        database_upload.errors = dumps(errors)
+                        database_upload.save()
                         # delete breeder if one was created
                         if breeder.id:
                             breeder.delete()
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
@@ -888,35 +1149,68 @@ def import_breeder_data(request):
                     breeder.active = False
                 # add to invalid if content was invalid
                 elif row[active] != '':
+                    errors = loads(database_upload.errors)
                     errors['invalid'].append({
                         'col': 'Status',
                         'row': row_number,
                         'name': name,
                         'reason': 'status must be "Active" or "Inactive" - if left blank, it defaults to "Inactive"'
                     })
+                    database_upload.errors = dumps(errors)
+                    database_upload.save()
                     # delete breeder if one was created
                     if breeder.id:
                         breeder.delete()
             except ValidationError:
                 pass
-            except KeyError:
+            except IndexError:
                 pass
             except UnboundLocalError:
                 pass
             ###################
-            # check that no rows are invalid before saving the breeder and adding to saved_breeders list
-            if len(errors['missing']) == 0 and len(errors['invalid']) == 0:
+            # save the breeder
+            try:
                 breeder.save()
-                saved_breeders.append(breeder)
-        # if there were errors, delete any breeders that were created (before invalid/missing fields were found),
-        # , and redirect back to analyse page
-        if len(errors['missing']) > 0 or len(errors['invalid']) > 0:
-            for saved_breeder in saved_breeders:
-                if saved_breeder.id:
-                    saved_breeder.delete()
+            except NameError:
+                pass
+        
+        # set the file just processed to used
+        file_slice.used = True
+        file_slice.save()
+        
+        # if the max number of errors was exceded, stop the import and redirect back to analyse page
+        if len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 50:
 
-            return HttpResponse(dumps({'result': 'fail', 'errors': errors}))
+            # it's over so delete DatabaseUpload
+            database_upload.delete()
+
+            # make sure we don't send so many errors that a 500 error is caused
+            errors = loads(database_upload.errors)
+            errors['invalid'] = errors['invalid'][:50]
+            errors['missing'] = errors['missing'][:50]
+
+            return HttpResponse(dumps({'result': 'incomplete', 'errors': errors}))
+        
+        # check whether there are any more left. if there are, tell the browser to go again
+        elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
+            return HttpResponse(dumps({'result': 'again'}))
+        
+        # if there were errors, redirect back to analyse page
+        elif len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 0:
+
+            # it's over so delete DatabaseUpload
+            database_upload.delete()
+
+            # make sure we don't send so many errors that a 500 error is caused
+            errors = loads(database_upload.errors)
+            errors['invalid'] = errors['invalid'][:50]
+            errors['missing'] = errors['missing'][:50]
+
+            return HttpResponse(dumps({'result': 'complete', 'errors': errors}))
         else:
+            # it's over so delete DatabaseUpload
+            database_upload.delete()
+            
             return HttpResponse(dumps({'result': 'success'}))
 
     return redirect('breeders')
