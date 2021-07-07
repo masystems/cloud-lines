@@ -7,7 +7,7 @@
 
 {% block content %}
 <!-- Spinner Overlay -->
-<div id="overlay-spinner" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog"
+<div id="overlay-spinner" class="modal" data-backdrop="static" tabindex="-1" role="dialog"
     aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content modal-filled" style="background-color: #44aaac;">
@@ -16,7 +16,6 @@
                     <div id="spinner">
                         <div class="spinner-border" role="status"></div>
                         <h3 class="text-white mt-2">Importing Data...</h3>
-                        <p class="text-white mt-2">Importing <span id="lineCount">0</span> of <span id="totalLines">0</span> lines.</p>
                     </div>
 
                 </div>
@@ -172,7 +171,6 @@
 
                 // find number of lines in file and update modal
                 var totalLines = reader.result.match(/\r?\n/g).length
-                $('#totalLines').html(totalLines)
 
                 // validate file size
                 if (totalLines < 1) {
@@ -203,6 +201,7 @@
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
                     data: ({
                         'job': 'header',
+                        'totalLines': totalLines,
                         // just get the first line, and ensure it's an array in the right format
                         'uploadDatabase[]': reader.result.split('\n')[0].replaceAll('"', '').split(',')
                     }),
@@ -231,7 +230,6 @@
 
                     // go through slices of the file
                     while (sliceEnd <= totalLines) {
-                        $('#lineCount').html(sliceEnd)
                         // get slice of file
                         fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
 

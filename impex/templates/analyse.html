@@ -8,7 +8,7 @@
 {% block content %}
 
 <!-- Spinner Overlay -->
-<div id="overlay-spinner" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog"
+<div id="overlay-spinner" class="modal" data-backdrop="static" tabindex="-1" role="dialog"
     aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content" style="background-color: #44aaac;">
@@ -17,7 +17,8 @@
                     <div id="spinner">
                         <div class="spinner-border" role="status"></div>
                         <h3 class="text-white mt-2">Processing Data...</h3>
-                        <p class="text-white mt-2">Processing <span id="processedSlices">0</span> and <span id="totalSlices">0</span> remaining.</p>
+                        <p id="import-progress" class="text-white mt-2">processed <span id="processedLines">0</span></br>
+                        <span id="remainingLines">-</span> remaining</p>
                     </div>
                 </div>
             </div>
@@ -139,14 +140,14 @@
                                             </div>
                                         </div>
                                     {% endfor %}
-                                    <!-- don't show import button if there are no breeds -->
-                                    {% if has_breeds %}
-                                        <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
-                                    {% else %}
-                                        <!-- Don't show button -->
-                                    {% endif %}
                                     <input type="hidden" name="update" value="no" id="update">
                                 </form>
+                                <!-- don't show import button if there are no breeds -->
+                                {% if has_breeds %}
+                                    <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
+                                {% else %}
+                                    <!-- Don't show button -->
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -170,8 +171,6 @@
 <script>
     // importing pedigrees
     $('#import-pedigrees').click( function(e){
-        e.preventDefault();
-
         // check required headings have been matched
         if ( ($('#select-reg_no').val() == '---') || ($('#select-sex').val() == '---') || ($('#select-breeder').val() == '---') || ($('#select-current_owner').val() == '---') || ($('#select-status').val() == '---') || (('{{ breed_required }}' == 'yes') && (($('#select-breed').val() == '---')))) {
             if ($('#select-reg_no').val() == '---') {
@@ -219,8 +218,8 @@
                     // redirect to breeders page
                     window.location.replace("{% url 'pedigree_search' %}");
                 } else if (result.result == 'again') {
-                    $('#totalSlices').html(result.total)
-                    $('#processedSlices').html(result.completed)
+                    $('#processedLines').html(result.completed)
+                    $('#remainingLines').html(result.remaining)
                     // recursively call this function to continue importing the data
                     importPedigreeData()
                 } else {
@@ -318,6 +317,8 @@
                     // redirect to breeders page
                     window.location.replace("{% url 'breeders' %}");
                 } else if (result.result == 'again') {
+                    $('#processedLines').html(result.completed)
+                    $('#remainingLines').html(result.remaining)
                     // recursively call this function to continue the import
                     importBreederData()
                 } else {

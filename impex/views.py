@@ -150,7 +150,8 @@ def importx(request):
                     # create database upload object
                     database_upload = DatabaseUpload.objects.create(account=attached_service,
                                                                     header=header, user=request.user,
-                                                                    errors=dumps(errors))
+                                                                    errors=dumps(errors),
+                                                                    total_lines=request.POST['totalLines'])
                     database_upload.save()
                     
                     return HttpResponse(dumps({'result': 'success'}))
@@ -952,11 +953,11 @@ def import_pedigree_data(request):
             
             # check whether there are any more file slices left. if there are, tell the browser to go again
             elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
-                total_slices = FileSlice.objects.filter(database_upload=database_upload, used=False).count()
-                completed_slices = FileSlice.objects.filter(database_upload=database_upload, used=True).count()
+                completed_lines = FileSlice.objects.filter(database_upload=database_upload, used=True).count() * 200
+                remaining_lines = database_upload.total_lines - completed_lines
                 return HttpResponse(dumps({'result': 'again',
-                                           'total': total_slices,
-                                           'completed': completed_slices}))
+                                           'completed': completed_lines,
+                                           'remaining': remaining_lines}))
             
             # import completed with errors
             elif len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 0:
@@ -1193,7 +1194,11 @@ def import_breeder_data(request):
         
         # check whether there are any more left. if there are, tell the browser to go again
         elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
-            return HttpResponse(dumps({'result': 'again'}))
+            completed_lines = FileSlice.objects.filter(database_upload=database_upload, used=True).count() * 200
+            remaining_lines = database_upload.total_lines - completed_lines
+            return HttpResponse(dumps({'result': 'again',
+                                        'completed': completed_lines,
+                                        'remaining': remaining_lines}))
         
         # if there were errors, redirect back to analyse page
         elif len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 0:
