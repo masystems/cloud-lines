@@ -317,6 +317,8 @@
                     // redirect to breeders page
                     window.location.replace("{% url 'breeders' %}");
                 } else if (result.result == 'again') {
+                    $('#processedLines').html(result.completed)
+                    $('#remainingLines').html(result.remaining)
                     // recursively call this function to continue the import
                     importBreederData()
                 } else {
