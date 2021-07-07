@@ -17,7 +17,7 @@
                     <div id="spinner">
                         <div class="spinner-border" role="status"></div>
                         <h3 class="text-white mt-2">Processing Data...</h3>
-                        <p class="text-white mt-2">Processing <span id="processedSlices">0</span> and <span id="totalSlices">0</span> remaining.</p>
+                        <p id="import-progress" class="text-white mt-2 d-none">Processed <span id="processedSlices">0</span> and <span id="totalSlices">-</span> remaining.</p>
                     </div>
                 </div>
             </div>
@@ -139,14 +139,14 @@
                                             </div>
                                         </div>
                                     {% endfor %}
-                                    <!-- don't show import button if there are no breeds -->
-                                    {% if has_breeds %}
-                                        <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
-                                    {% else %}
-                                        <!-- Don't show button -->
-                                    {% endif %}
                                     <input type="hidden" name="update" value="no" id="update">
                                 </form>
+                                <!-- don't show import button if there are no breeds -->
+                                {% if has_breeds %}
+                                    <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
+                                {% else %}
+                                    <!-- Don't show button -->
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -170,8 +170,6 @@
 <script>
     // importing pedigrees
     $('#import-pedigrees').click( function(e){
-        e.preventDefault();
-
         // check required headings have been matched
         if ( ($('#select-reg_no').val() == '---') || ($('#select-sex').val() == '---') || ($('#select-breeder').val() == '---') || ($('#select-current_owner').val() == '---') || ($('#select-status').val() == '---') || (('{{ breed_required }}' == 'yes') && (($('#select-breed').val() == '---')))) {
             if ($('#select-reg_no').val() == '---') {
