@@ -201,6 +201,7 @@
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
                     data: ({
                         'job': 'header',
+                        'totalLines': totalLines,
                         // just get the first line, and ensure it's an array in the right format
                         'uploadDatabase[]': reader.result.split('\n')[0].replaceAll('"', '').split(',')
                     }),

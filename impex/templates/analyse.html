@@ -17,7 +17,8 @@
                     <div id="spinner">
                         <div class="spinner-border" role="status"></div>
                         <h3 class="text-white mt-2">Processing Data...</h3>
-                        <p id="import-progress" class="text-white mt-2 d-none">Processed <span id="processedSlices">0</span> and <span id="totalSlices">-</span> remaining.</p>
+                        <p id="import-progress" class="text-white mt-2">Processed <span id="processedLines">0</span></br>
+                        <span id="remainingLines">-</span> remaining</p>
                     </div>
                 </div>
             </div>
@@ -217,8 +218,8 @@
                     // redirect to breeders page
                     window.location.replace("{% url 'pedigree_search' %}");
                 } else if (result.result == 'again') {
-                    $('#totalSlices').html(result.total)
-                    $('#processedSlices').html(result.completed)
+                    $('#processedLines').html(result.completed)
+                    $('#remainingLines').html(result.remaining)
                     // recursively call this function to continue importing the data
                     importPedigreeData()
                 } else {
