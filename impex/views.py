@@ -436,6 +436,15 @@ def import_pedigree_data(request):
                             current_owner_obj = current_owner_obj.first()
                     else:
                         current_owner_obj = None
+                        # error if missing
+                        errors = loads(database_upload.errors)
+                        errors['missing'].append({
+                            'col': 'Current Owner',
+                            'row': row_number,
+                            'name': ped_name
+                        })
+                        database_upload.errors = dumps(errors)
+                        database_upload.save()
                 except IndexError:
                     current_owner_obj = None
 
