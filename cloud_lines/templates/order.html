@@ -297,23 +297,31 @@
 						<script>
 							$('#selectService').click( function() {
 								// string to display errors
-								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following field(s) and try submitting again:<ul class="ml-4">'
+								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Correct the following field(s) and try submitting again:<ul class="ml-4">'
 								// bool to know whether to submit form
 								var errors = false
 								
 								// add each error to the error message
 								if ($('#checkout-form-service').val() == 'None') {
-									errorsHtml += '<li>Service</li>'
+									errorsHtml += '<li>Service - this field is required</li>'
 									errors = true
 								}
 								if ($('#checkout-form-payment-inc').val() == 'None') {
-									errorsHtml += '<li>Payment Increment</li>'
+									errorsHtml += '<li>Payment Increment - this field is required</li>'
 									errors = true
 								}
 								if (['20.00', '40.00', '60.00'].includes($('#checkout-form-service').val())) {
 									if ($('#checkout-form-sub-domain').val() == '') {
-										errorsHtml += '<li>Domain Prefix</li>'
+										errorsHtml += '<li>Domain Prefix - this field is required with the selected service</li>'
 										errors = true
+									}
+									// validate subdomain if it was given
+									else {
+										// check that the total number of characters is not over the limit
+										if ($('#checkout-form-sub-domain').val().length > 238) {
+											errorsHtml += '<li>Domain Prefix - this has a maximum length of 238 characters</li>'
+											errors = true
+										}
 									}
 								}
 								
