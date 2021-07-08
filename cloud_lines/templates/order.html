@@ -324,8 +324,8 @@
 										}
 										// check there aren't any labels over the limit
 										$('#checkout-form-sub-domain').val().split('.').forEach(label => {
-											if (label.length > 62) {
-												errorsHtml += '<li>Domain Prefix - each label (separated by a full stop) has a maximum length of 62 characters</li>'
+											if (label.length > 63) {
+												errorsHtml += '<li>Domain Prefix - each label (separated by a full stop) has a maximum length of 63 characters</li>'
 												errors = true
 											}
 										})
