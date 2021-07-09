@@ -451,7 +451,7 @@ def import_pedigree_data(request):
                 # get or create pedigrees ###################
                 def get_or_create_pedigree(pedigree, is_parent):
                     if pedigree not in ('', None):
-                        if Pedigree.objects.filter(account=attached_service, reg_no=pedigree).count() < 1:
+                        if Pedigree.objects.filter(reg_no=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
                             # if parent, specify the sex appropriately
                             if is_parent == 'father':
@@ -464,7 +464,22 @@ def import_pedigree_data(request):
                             return pedigree_obj
                         else:
                             # get existing pedigree to be updated
-                            return Pedigree.objects.filter(account=attached_service, reg_no=pedigree).first()
+                            ped = Pedigree.objects.get(reg_no=pedigree)
+                            # check that the pedigree is for this account
+                            if ped.account == attached_service:
+                                return ped
+                            # if not for account, create error, as the reg number is taken
+                            else:
+                                errors = loads(database_upload.errors)
+                                errors['invalid'].append({
+                                    'col': 'Registration Number',
+                                    'row': row_number,
+                                    'name': ped_name,
+                                    'reason': 'this registration number is being used by another account - please specify a different one'
+                                })
+                                database_upload.errors = dumps(errors)
+                                database_upload.save()
+                                return None
                     else:
                         return None
 

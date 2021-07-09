@@ -302,7 +302,7 @@ def new_pedigree_form(request):
 
     if request.method == 'POST':
         # check whether it's valid:
-        if Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['reg_no'].value().strip()).exists():
+        if Pedigree.objects.filter(reg_no=pedigree_form['reg_no'].value().strip()).exists():
             pedigree_form.add_error('reg_no', 'Selected reg number already exists.')
             pre_checks = False
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
@@ -510,7 +510,7 @@ def edit_pedigree_form(request, id):
 
         # check whether it's valid:
         if pedigree_form['reg_no'].value().strip() != pedigree.reg_no:
-            if Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['reg_no'].value().strip()).exists():
+            if Pedigree.objects.filter(reg_no=pedigree_form['reg_no'].value().strip()).exists():
                 pedigree_form.add_error('reg_no', 'Selected reg number already exists.')
                 pre_checks = False
         if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
