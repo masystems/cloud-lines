@@ -298,7 +298,7 @@ def import_pedigree_data(request):
             mother = post_data['parent_mother'] or ''
             mother_notes = post_data['parent_mother_notes'] or ''
             sale_or_hire = post_data['sale_or_hire'] or ''
-
+            
             # get index of each heading
             thousand = 1000
             if breeder:

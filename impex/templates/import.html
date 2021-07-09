@@ -193,6 +193,9 @@
                     $('#errors').addClass('d-none')
                 }
 
+                var header = reader.result.split('\n')[0].replaceAll('"', '').split(',')
+                header[header.length - 1] = header[header.length - 1].replace('\r', '')
+                
                 // post request to process the header of the uploaded file
                 $.ajax({
                     type: "POST",
@@ -203,7 +206,7 @@
                         'job': 'header',
                         'totalLines': totalLines,
                         // just get the first line, and ensure it's an array in the right format
-                        'uploadDatabase[]': reader.result.split('\n')[0].replaceAll('"', '').split(',')
+                        'uploadDatabase[]': header
                     }),
                     success: function(result){
                         // result = JSON.parse(result)
@@ -236,7 +239,10 @@
                         // turn each row into the correct format, and add row number column
                         fileSliceArray.forEach(updateSlice)
                         function updateSlice(row, index) {
-                            fileSliceArray[index] = row.replaceAll('"', '').split(',').concat([rowCounter])
+                            var row = row.replace('\r', '')
+                            row = row.replaceAll('"', '').split(',').concat([rowCounter])
+
+                            fileSliceArray[index] = row
                             rowCounter += 1
                         }
                         
