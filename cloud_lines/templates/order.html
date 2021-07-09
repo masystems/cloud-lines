@@ -83,19 +83,19 @@
 			<div id="processTabs">
 				<ul class="process-steps bottommargin clearfix">
 					<li>
-						<a href="#ptab1" class="i-circled i-bordered i-alt divcenter">1</a>
+						<a href="#ptab1" class="i-circled i-bordered i-alt divcenter" style="pointer-events: none">1</a>
 						<h5>Select Service</h5>
 					</li>
 					<li>
-						<a href="#ptab2" class="i-circled i-bordered i-alt divcenter">2</a>
+						<a href="#ptab2" class="i-circled i-bordered i-alt divcenter" style="pointer-events: none">2</a>
 						<h5>Enter Billing Info</h5>
 					</li>
 					<li>
-						<a href="#ptab3" class="i-circled i-bordered i-alt divcenter">3</a>
+						<a href="#ptab3" class="i-circled i-bordered i-alt divcenter" style="pointer-events: none">3</a>
 						<h5>Complete Payment</h5>
 					</li>
 					<li>
-						<a href="#ptab4" class="i-circled i-bordered i-alt divcenter">4</a>
+						<a href="#ptab4" class="i-circled i-bordered i-alt divcenter" style="pointer-events: none">4</a>
 						<h5>Order Complete</h5>
 					</li>
 				</ul>
@@ -297,23 +297,38 @@
 						<script>
 							$('#selectService').click( function() {
 								// string to display errors
-								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following field(s) and try submitting again:<ul class="ml-4">'
+								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Correct the following field(s) and try submitting again:<ul class="ml-4">'
 								// bool to know whether to submit form
 								var errors = false
 								
 								// add each error to the error message
 								if ($('#checkout-form-service').val() == 'None') {
-									errorsHtml += '<li>Service</li>'
+									errorsHtml += '<li>Service - this field is required</li>'
 									errors = true
 								}
 								if ($('#checkout-form-payment-inc').val() == 'None') {
-									errorsHtml += '<li>Payment Increment</li>'
+									errorsHtml += '<li>Payment Increment - this field is required</li>'
 									errors = true
 								}
 								if (['20.00', '40.00', '60.00'].includes($('#checkout-form-service').val())) {
 									if ($('#checkout-form-sub-domain').val() == '') {
-										errorsHtml += '<li>Domain Prefix</li>'
+										errorsHtml += '<li>Domain Prefix - this field is required with the selected service</li>'
 										errors = true
+									}
+									// validate subdomain if it was given
+									else {
+										// check that the total number of characters is not over the limit
+										if ($('#checkout-form-sub-domain').val().length > 238) {
+											errorsHtml += '<li>Domain Prefix - this has a maximum length of 238 characters</li>'
+											errors = true
+										}
+										// check there aren't any labels over the limit
+										$('#checkout-form-sub-domain').val().split('.').forEach(label => {
+											if (label.length > 63) {
+												errorsHtml += '<li>Domain Prefix - each label (separated by a full stop) has a maximum length of 63 characters</li>'
+												errors = true
+											}
+										})
 									}
 								}
 								

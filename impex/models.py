@@ -12,6 +12,7 @@ class DatabaseUpload(models.Model):
     header = models.TextField(blank=False, null=False)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     errors = models.TextField(default={'missing': [], 'invalid': []})
+    total_lines = models.IntegerField(null=True)
 
     def __str__(self):
         return str(self.account)
