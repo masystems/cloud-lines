@@ -468,7 +468,8 @@ vertical-align: middle;
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <a href="{% url 'cert' lvl1.id %}"><button class="btn float-right hidden-sm-down btn-outline-info">generate PDF</button></a>
+                                <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>
+                                <a href="{% url 'cert' lvl1.id 'cert' %}"><button class="btn float-right hidden-sm-down btn-outline-info">Certificate PDF</button></a>
                             </div>
                         </div>
                     </div>

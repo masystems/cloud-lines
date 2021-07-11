@@ -91,19 +91,27 @@ def render_to_pdf(template_src, context_dict):
 
 
 class GeneratePDF(View):
+    # certificate
     def get(self, request, *args, **kwargs):
         context = {}
         context['attached_service'] = get_main_account(request.user)
         context['lvl1'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
         context = generate_hirearchy(context)
 
-        pdf_filename = "{date}-{name}{pedigree}-certificate".format(
-            date=context['lvl1'].date_added.strftime('%Y-%m-%d'),
-            name=slugify(context['lvl1'].name),
-            pedigree=context['lvl1'].reg_no,
-        )
-
-        pdf = render_to_pdf('certificate.html', context)
+        if kwargs['type'] == 'cert':
+            pdf_filename = "{date}-{name}{pedigree}-certificate".format(
+                date=context['lvl1'].date_added.strftime('%Y-%m-%d'),
+                name=slugify(context['lvl1'].name),
+                pedigree=context['lvl1'].reg_no,
+            )
+            pdf = render_to_pdf('certificate.html', context)
+        elif kwargs['type'] == 'zootech':
+            pdf_filename = "{date}-{name}{pedigree}-zootechnical-certificate".format(
+                date=context['lvl1'].date_added.strftime('%Y-%m-%d'),
+                name=slugify(context['lvl1'].name),
+                pedigree=context['lvl1'].reg_no,
+            )
+            pdf = render_to_pdf('cert-zootechnical.html', context)
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "%s.pdf" % pdf_filename
