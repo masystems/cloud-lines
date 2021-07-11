@@ -44,7 +44,7 @@ vertical-align: middle;
             {% else %}
                 {% include 'login_modal.html' %}
                 <!-- /.modal -->
-                <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fad fa-pencil-alt"></i> Edi {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
                 <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
             {% endif %}
 
