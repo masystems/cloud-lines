@@ -388,7 +388,7 @@ def import_pedigree_data(request):
                 # get breeder. error if breeder doesn't exist or missing ###################
                 try:
                     if row[breeder] not in ('', None):
-                        breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                        breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeder].rstrip())
                         # error if breeder doesn't exist
                         if not breeder_obj.exists():
                             errors = loads(database_upload.errors)
