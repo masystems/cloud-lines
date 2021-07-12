@@ -24,6 +24,7 @@ import json
 from account.views import is_editor, get_main_account
 from approvals.models import Approval
 import dateutil.parser
+from django.utils.datastructures import MultiValueDictKeyError
 
 
 @login_required(login_url="/account/login")
@@ -788,6 +789,8 @@ def get_pedigree_details(request):
     try:
         pedigree = Pedigree.objects.get(account=attached_service, reg_no=request.GET['id'])
     except Pedigree.DoesNotExist:
+        return HttpResponse(json.dumps({'result': 'fail'}))
+    except MultiValueDictKeyError:
         return HttpResponse(json.dumps({'result': 'fail'}))
     
     # if this was called from edit form and parent given is the same as pedigree being editted, return fail
