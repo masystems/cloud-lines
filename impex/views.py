@@ -420,7 +420,7 @@ def import_pedigree_data(request):
                 # get current owner - error if if it doesn't exist ###################
                 try:
                     if row[current_owner] not in ('', None):
-                        current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix=row[current_owner].rstrip())
+                        current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[current_owner].rstrip())
                         # error if owner doesn't exist
                         if not current_owner_obj.exists():
                             errors = loads(database_upload.errors)
