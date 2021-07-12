@@ -451,7 +451,7 @@ def import_pedigree_data(request):
                 # get or create pedigrees ###################
                 def get_or_create_pedigree(pedigree, is_parent):
                     if pedigree not in ('', None):
-                        if Pedigree.objects.filter(reg_no=pedigree).count() < 1:
+                        if Pedigree.objects.filter(reg_no__iexact=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
                             # if parent, specify the sex appropriately
                             if is_parent == 'father':
@@ -464,7 +464,7 @@ def import_pedigree_data(request):
                             return pedigree_obj
                         else:
                             # get existing pedigree to be updated
-                            ped = Pedigree.objects.get(reg_no=pedigree)
+                            ped = Pedigree.objects.get(reg_no__iexact=pedigree)
                             # check that the pedigree is for this account
                             if ped.account == attached_service:
                                 return ped
