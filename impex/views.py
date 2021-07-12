@@ -1117,8 +1117,14 @@ def import_breeder_data(request):
                 })
                 database_upload.errors = dumps(errors)
                 database_upload.save()
-            # create a new breeder
-            breeder, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+            # get create a breeder
+            # can't do __iexact for get_or_create breeder, so will have to do a filter then a create if nothing is in the filter
+            breeder = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeding_prefix].rstrip())
+            if breeder.count() == 0:
+                breeder = Breeder.objects.create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+            else:
+                breeder = breeder.first()
+            
             ################### contact name
             try:
                 breeder.contact_name = row[contact_name]
