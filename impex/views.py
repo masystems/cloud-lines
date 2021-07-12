@@ -677,6 +677,12 @@ def import_pedigree_data(request):
                         # if it's valid, save it
                         if row[sex].lower() in ('male', 'female', 'castrated'):
                             pedigree.sex = row[sex].lower()
+                        # check if sex is one of the other valid options
+                        elif row[sex].lower() in ('m', 'f'):
+                            if row[sex].lower() == 'm':
+                                pedigree.sex = 'male'
+                            else:
+                                pedigree.sex == 'female'
                         # invalid, so add error
                         else:
                             errors = loads(database_upload.errors)
@@ -684,7 +690,7 @@ def import_pedigree_data(request):
                                 'col': 'Sex',
                                 'row': row_number,
                                 'name': ped_name,
-                                'reason': 'the input for sex, if given, must be one of "male", "female", or "castrated"'
+                                'reason': 'the input for sex, if given, must be one of "male", "female", "M", "F", or "castrated"'
                             })
                             database_upload.errors = dumps(errors)
                             database_upload.save()
