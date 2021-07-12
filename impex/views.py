@@ -883,7 +883,7 @@ def import_pedigree_data(request):
                     # error if given breed doesn't match account breed, if given
                     if breed != '':
                         try:
-                            if breed_obj.breed_name != row[breed] and row[breed] != '':
+                            if breed_obj.breed_name.lower() != row[breed].lower() and row[breed] != '':
                                 errors = loads(database_upload.errors)
                                 errors['invalid'].append({
                                     'col': 'Breed',
@@ -899,8 +899,8 @@ def import_pedigree_data(request):
                 elif breed != '---':
                     try:
                         # check if breed exists
-                        if Breed.objects.filter(account=attached_service, breed_name=row[breed]).count() > 0:
-                            breed_obj = Breed.objects.filter(account=attached_service, breed_name=row[breed]).first()
+                        if Breed.objects.filter(account=attached_service, breed_name__iexact=row[breed]).count() > 0:
+                            breed_obj = Breed.objects.filter(account=attached_service, breed_name__iexact=row[breed]).first()
                         # error if breed not been created
                         else:
                             breed_obj = None
