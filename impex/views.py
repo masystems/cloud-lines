@@ -385,22 +385,14 @@ def import_pedigree_data(request):
                 else:
                     ped_name = ''
                 
-                # get breeder. error if breeder doesn't exist or missing ###################
+                # get breeder. error if breeder missing from the row ###################
                 try:
                     if row[breeder] not in ('', None):
                         breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeder].rstrip())
-                        # error if breeder doesn't exist
+                        # make a new one if breeder doesn't exist
                         if not breeder_obj.exists():
-                            errors = loads(database_upload.errors)
-                            errors['invalid'].append({
-                                'col': 'Breeder',
-                                'row': row_number,
-                                'name': ped_name,
-                                'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
-                            })
-                            database_upload.errors = dumps(errors)
-                            database_upload.save()
-                        # get the breeder
+                            breeder_obj = Breeder.objects.create(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                        # get the breeder if does exist
                         else:
                             breeder_obj = breeder_obj.first()
                     else:
