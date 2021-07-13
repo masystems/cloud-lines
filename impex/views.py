@@ -385,22 +385,14 @@ def import_pedigree_data(request):
                 else:
                     ped_name = ''
                 
-                # get breeder. error if breeder doesn't exist or missing ###################
+                # get breeder. error if breeder missing from the row ###################
                 try:
                     if row[breeder] not in ('', None):
                         breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeder].rstrip())
-                        # error if breeder doesn't exist
+                        # make a new one if breeder doesn't exist
                         if not breeder_obj.exists():
-                            errors = loads(database_upload.errors)
-                            errors['invalid'].append({
-                                'col': 'Breeder',
-                                'row': row_number,
-                                'name': ped_name,
-                                'reason': f'breeder {row[breeder]} does not exist in the database - the breeder must be imported before you can import this pedigree'
-                            })
-                            database_upload.errors = dumps(errors)
-                            database_upload.save()
-                        # get the breeder
+                            breeder_obj = Breeder.objects.create(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                        # get the breeder if does exist
                         else:
                             breeder_obj = breeder_obj.first()
                     else:
@@ -417,21 +409,13 @@ def import_pedigree_data(request):
                 except IndexError:
                     breeder_obj = None
 
-                # get current owner - error if if it doesn't exist ###################
+                # get current owner - error if missing from row ###################
                 try:
                     if row[current_owner] not in ('', None):
                         current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[current_owner].rstrip())
-                        # error if owner doesn't exist
+                        # make a new one if current owner doesn't exist
                         if not current_owner_obj.exists():
-                            errors = loads(database_upload.errors)
-                            errors['invalid'].append({
-                                'col': 'Current Owner',
-                                'row': row_number,
-                                'name': ped_name,
-                                'reason': f'owner {row[current_owner]} does not exist in the database - the owner must be imported before you can import this pedigree'
-                            })
-                            database_upload.errors = dumps(errors)
-                            database_upload.save()
+                            current_owner_obj = Breeder.objects.create(account=attached_service, breeding_prefix=row[current_owner].rstrip())
                         else:
                             current_owner_obj = current_owner_obj.first()
                     else:
