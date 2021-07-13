@@ -291,7 +291,6 @@ def import_pedigree_data(request):
             dob = post_data['dob'] or ''
             dod = post_data['dod'] or ''
             sex = post_data['sex'] or ''
-            born_as = post_data['born_as'] or ''
             litter_size = post_data['litter_size'] or ''
             status = post_data['status'] or ''
             father = post_data['parent_father'] or ''
@@ -347,10 +346,6 @@ def import_pedigree_data(request):
                 sex = loads(database_upload.header)['header'].index(sex)
             else:
                 sex = thousand
-            if born_as:
-                born_as = loads(database_upload.header)['header'].index(born_as)
-            else:
-                born_as = thousand
             if litter_size:
                 litter_size = loads(database_upload.header)['header'].index(litter_size)
             else:
@@ -709,35 +704,6 @@ def import_pedigree_data(request):
                         # delete pedigree if one was created
                         if pedigree.id:
                             pedigree.delete()
-                except IndexError:
-                    pass
-                except NameError:
-                    pass
-                except AttributeError:
-                    pass
-                except UnboundLocalError:
-                    pass
-                ############################# born as
-                try:
-                    # if born_as given
-                    if row[born_as] != '':
-                        # if it's valid, save it
-                        if row[born_as].lower() in ('single', 'twin', 'triplet', 'quad'):
-                            pedigree.born_as = row[born_as]
-                        # invalid, so add error
-                        else:
-                            errors = loads(database_upload.errors)
-                            errors['invalid'].append({
-                                'col': 'Born As',
-                                'row': row_number,
-                                'name': ped_name,
-                                'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
-                            })
-                            database_upload.errors = dumps(errors)
-                            database_upload.save()
-                            # delete pedigree if one was created
-                            if pedigree.id:
-                                pedigree.delete()
                 except IndexError:
                     pass
                 except NameError:
