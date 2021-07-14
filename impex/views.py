@@ -488,7 +488,7 @@ def import_pedigree_data(request):
 
                 # parents ##########################
                 # error if mother is the same as father
-                if row[mother] == row[father]:
+                if row[mother].rstrip() == row[father].rstrip() and row[mother].rstrip() != '':
                     errors = loads(database_upload.errors)
                     errors['invalid'].append({
                         'col': 'Mother/Father',
