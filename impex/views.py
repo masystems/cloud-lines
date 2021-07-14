@@ -425,7 +425,12 @@ def import_pedigree_data(request):
                         current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[current_owner].rstrip())
                         # make a new one if current owner doesn't exist
                         if not current_owner_obj.exists():
-                            current_owner_obj = Breeder(account=attached_service, breeding_prefix=row[current_owner].rstrip())
+                            # check this breeder wasn't made already for breeder
+                            if breeder_obj and row[current_owner].rstrip() == row[breeder].rstrip():
+                                # if it's already made, use it, instead of duplicating breeding prefix
+                                current_owner_obj = breeder_obj
+                            else:
+                                current_owner_obj = Breeder(account=attached_service, breeding_prefix=row[current_owner].rstrip())
                         else:
                             current_owner_obj = current_owner_obj.first()
                     else:
