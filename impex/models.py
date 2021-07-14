@@ -29,3 +29,15 @@ class FileSlice(models.Model):
 
     def __str__(self):
         return str(self.file_slice)
+
+
+class ExportQueue(models.Model):
+    account = models.ForeignKey(AttachedService, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    STATUS = (
+        ('waiting', 'Waiting'),
+        ('running', 'Running'),
+        ('complete', 'Complete'),
+    )
+    status = models.CharField(max_length=10, choices=STATUS, default='waiting')
+    download_url = models.CharField(max_length=255, blank=True)
