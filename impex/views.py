@@ -486,15 +486,29 @@ def import_pedigree_data(request):
                     else:
                         return None
 
-                try:
-                    father_obj = get_or_create_pedigree(row[father], 'father')
-                except IndexError:
-                    father_obj = None
-
-                try:
-                    mother_obj = get_or_create_pedigree(row[mother], 'mother')
-                except IndexError:
-                    mother_obj = None
+                # parents ##########################
+                # error if mother is the same as father
+                if row[mother] == row[father]:
+                    errors = loads(database_upload.errors)
+                    errors['invalid'].append({
+                        'col': 'Mother/Father',
+                        'row': row_number,
+                        'name': ped_name,
+                        'reason': 'the input for mother is the same as the input for father'
+                    })
+                    database_upload.errors = dumps(errors)
+                    database_upload.save()
+                    # set has_error
+                    has_error = True
+                else:
+                    try:
+                        father_obj = get_or_create_pedigree(row[father], 'father')
+                    except IndexError:
+                        father_obj = None
+                    try:
+                        mother_obj = get_or_create_pedigree(row[mother], 'mother')
+                    except IndexError:
+                        mother_obj = None
 
                 # convert dates ###################
                 def convert_date(date):
