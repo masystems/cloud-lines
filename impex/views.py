@@ -292,6 +292,7 @@ def import_pedigree_data(request):
             dod = post_data['dod'] or ''
             sex = post_data['sex'] or ''
             born_as = post_data['born_as'] or ''
+            litter_size = post_data['litter_size'] or ''
             status = post_data['status'] or ''
             father = post_data['parent_father'] or ''
             father_notes = post_data['parent_father_notes'] or ''
@@ -350,6 +351,10 @@ def import_pedigree_data(request):
                 born_as = loads(database_upload.header)['header'].index(born_as)
             else:
                 born_as = thousand
+            if litter_size:
+                litter_size = loads(database_upload.header)['header'].index(litter_size)
+            else:
+                litter_size = thousand
             if status:
                 status = loads(database_upload.header)['header'].index(status)
             else:
@@ -723,6 +728,55 @@ def import_pedigree_data(request):
                             # delete pedigree if one was created
                             if pedigree.id:
                                 pedigree.delete()
+                except IndexError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                except UnboundLocalError:
+                    pass
+                ############################# litter size
+                try:
+                    # if litter_size given
+                    if row[litter_size] != '':
+                        # check it's an integer
+                        litter_size_int = None
+                        try:
+                            litter_size_int = int(row[litter_size])
+                        except ValueError:
+                            # add error if not an integer
+                            errors = loads(database_upload.errors)
+                            errors['invalid'].append({
+                                'col': 'Litter Size',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': 'the input for litter size, if given, must be an integer which has minimum value a of 1 and a maximum value of 50'
+                            })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
+                            # delete pedigree if one was created
+                            if pedigree.id:
+                                pedigree.delete()
+                        # an integer was given
+                        if litter_size_int:
+                            # if it's valid, save it
+                            if litter_size_int >= 1 and litter_size_int <= 50:
+                                pedigree.litter_size = litter_size_int
+                            # invalid, so add error
+                            else:
+                                errors = loads(database_upload.errors)
+                                errors['invalid'].append({
+                                    'col': 'Litter Size',
+                                    'row': row_number,
+                                    'name': ped_name,
+                                    'reason': 'the input for litter size, if given, must be an integer which has minimum value a of 1 and a maximum value of 50'
+                                })
+                                database_upload.errors = dumps(errors)
+                                database_upload.save()
+                                # delete pedigree if one was created
+                                if pedigree.id:
+                                    pedigree.delete()
                 except IndexError:
                     pass
                 except NameError:

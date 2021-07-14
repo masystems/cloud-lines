@@ -32,6 +32,13 @@ def get_pedigrees(request):
         else:
             sort_by_col = f"-reg_no"
 
+    # make an int if possible to filter for litter size
+    search_int = ''
+    try:
+        search_int = int(search)
+    except ValueError:
+        pass
+
     pedigrees = []
     if search == "":
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
@@ -48,6 +55,7 @@ def get_pedigrees(request):
             Q(status__icontains=search) |
             Q(sex__icontains=search) |
             Q(born_as__icontains=search) |
+            Q(litter_size__icontains=search_int) |
             Q(parent_father__reg_no__icontains=search) |
             Q(parent_father_notes__icontains=search) |
             Q(parent_mother__reg_no__icontains=search) |
@@ -71,6 +79,7 @@ def get_pedigrees(request):
             Q(status__icontains=search) |
             Q(sex__icontains=search) |
             Q(born_as__icontains=search) |
+            Q(litter_size__icontains=search_int) |
             Q(parent_father__reg_no__icontains=search) |
             Q(parent_father_notes__icontains=search) |
             Q(parent_mother__reg_no__icontains=search) |

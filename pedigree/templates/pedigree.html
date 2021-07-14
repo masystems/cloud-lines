@@ -530,6 +530,10 @@ vertical-align: middle;
                     <li>
                         <div class="bg-light"><i class="fad fa-dna"></i></div> Born As <span class="font-weight-normal">{{ lvl1.born_as|title }}</span></li>
                     {% endif %}
+                    {% if lvl1.litter_size %}
+                    <li>
+                        <div class="bg-light"><i class="fad fa-dna"></i></div> Litter Size <span class="font-weight-normal">{{ lvl1.litter_size }}</span></li>
+                    {% endif %}
                     {% if lvl1.attribute.breed.breed_name %}
                     <li>
                         <div class="bg-light-warning"><i class="fad fa-dna"></i></div> Breed <span class="font-weight-normal">{{ lvl1.attribute.breed.breed_name }}</span></li>

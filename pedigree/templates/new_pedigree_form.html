@@ -130,6 +130,14 @@
                                     <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }}</label>
                                 {% endfor %}
                             </div>
+                        {% elif field.label == 'Litter size' %}
+                            <div>
+                                <select id="litter_size" name='{{ field.name }}' class="form-control">
+                                    {% for option in field %}
+                                        <option value="{{ option.choice_label }}" {% if 1 == option.choice_label %}selected{% endif %}>{{ option.choice_label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         {% elif field.label == 'Breed' %}
                             {% if add_breed %}
                                 <div id="breeds">
