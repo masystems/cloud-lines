@@ -54,7 +54,7 @@ def census(request, type):
         date_format.num_format_str = 'dd/mm/yyyy'
 
         # column header names, you can use your own headers here
-        columns = ['Sex', 'Reg No', 'Date Of Birth', 'Name', 'Tag No', 'Born', 'Litter Size', 'Sire', 'Sire Name', 'Dam', 'Dam Name', 'DOR']
+        columns = ['Sex', 'Reg No', 'Date Of Birth', 'Name', 'Tag No', 'Litter Size', 'Sire', 'Sire Name', 'Dam', 'Dam Name', 'DOR']
 
         # write column headers in sheet
         for col_num in range(len(columns)):
@@ -95,13 +95,12 @@ def census(request, type):
                 worksheet.write(row_num, 2, pedigree.dob, font_style)
                 worksheet.write(row_num, 3, pedigree.name, font_style)
                 worksheet.write(row_num, 4, pedigree.tag_no, font_style)
-                worksheet.write(row_num, 5, pedigree.born_as, font_style)
-                worksheet.write(row_num, 6, pedigree.litter_size, font_style)
-                worksheet.write(row_num, 7, father, font_style)
-                worksheet.write(row_num, 8, father_name, font_style)
-                worksheet.write(row_num, 9, mother, font_style)
-                worksheet.write(row_num, 10, mother_name, font_style)
-                worksheet.write(row_num, 11, pedigree.date_of_registration, date_format)
+                worksheet.write(row_num, 5, pedigree.litter_size, font_style)
+                worksheet.write(row_num, 6, father, font_style)
+                worksheet.write(row_num, 7, father_name, font_style)
+                worksheet.write(row_num, 8, mother, font_style)
+                worksheet.write(row_num, 9, mother_name, font_style)
+                worksheet.write(row_num, 10, pedigree.date_of_registration, date_format)
         workbook.save(response)
     elif type == 'pdf':
         context = {}
@@ -170,7 +169,6 @@ def all(request, type):
                    'Date Of Registration',
                    'Date Of Birth',
                    'Sex',
-                   'Born',
                    'Litter Size',
                    attached_service.father_title,
                    f'{attached_service.father_title} Notes',
@@ -214,15 +212,14 @@ def all(request, type):
             worksheet.write(row_num, 6, pedigree.date_of_registration, date_format)
             worksheet.write(row_num, 7, pedigree.dob, date_format)
             worksheet.write(row_num, 8, pedigree.sex, font_style)
-            worksheet.write(row_num, 9, pedigree.born_as, font_style)
-            worksheet.write(row_num, 10, pedigree.litter_size, font_style)
-            worksheet.write(row_num, 11, father, font_style)
-            worksheet.write(row_num, 12, pedigree.parent_father_notes, font_style)
-            worksheet.write(row_num, 13, mother, font_style)
-            worksheet.write(row_num, 14, pedigree.parent_mother_notes, font_style)
-            worksheet.write(row_num, 15, pedigree.breed.breed_name, font_style)
-            worksheet.write(row_num, 16, pedigree.coi, font_style)
-            worksheet.write(row_num, 17, pedigree.mean_kinship, font_style)
+            worksheet.write(row_num, 9, pedigree.litter_size, font_style)
+            worksheet.write(row_num, 10, father, font_style)
+            worksheet.write(row_num, 11, pedigree.parent_father_notes, font_style)
+            worksheet.write(row_num, 12, mother, font_style)
+            worksheet.write(row_num, 13, pedigree.parent_mother_notes, font_style)
+            worksheet.write(row_num, 14, pedigree.breed.breed_name, font_style)
+            worksheet.write(row_num, 15, pedigree.coi, font_style)
+            worksheet.write(row_num, 16, pedigree.mean_kinship, font_style)
         workbook.save(response)
     date = datetime.now()
     response['Content-Disposition'] = f'attachment; filename="{attached_service.animal_type}-Living_Animal_Export-{date.strftime("%Y-%m-%d")}.{type}"'
