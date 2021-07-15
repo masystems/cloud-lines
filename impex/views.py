@@ -1,3 +1,4 @@
+from account.models import AttachedService
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
@@ -411,7 +412,7 @@ def import_pedigree_data(request):
                                     'col': 'Breeder',
                                     'row': row_number,
                                     'name': ped_name,
-                                    'reason': 'the input for breeding prefix is already being used in another account - please specify a different one'
+                                    'reason': 'the input for breeder is already being used in another account - please specify a different one'
                                 })
                                 database_upload.errors = dumps(errors)
                                 database_upload.save()
@@ -1298,11 +1299,25 @@ def import_breeder_data(request):
                 has_error = True
             # get create a breeder
             # can't do __iexact for get_or_create breeder, so will have to do a filter then a create if nothing is in the filter
-            breeder = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeding_prefix].rstrip())
+            breeder = Breeder.objects.filter(breeding_prefix__iexact=row[breeding_prefix].rstrip())
             if breeder.count() == 0:
                 breeder = Breeder(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             else:
                 breeder = breeder.first()
+                # check the breeder doesn't already exist for another account
+                if breeder.account != attached_service:
+                    # error if breeder is for a different account
+                    errors = loads(database_upload.errors)
+                    errors['invalid'].append({
+                        'col': 'Breeding Prefix',
+                        'row': row_number,
+                        'name': name,
+                        'reason': 'the input for breeding prefix is already being used in another account - please specify a different one'
+                    })
+                    database_upload.errors = dumps(errors)
+                    database_upload.save()
+                    # set has_error
+                    has_error = True
             
             ################### contact name
             try:
