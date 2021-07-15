@@ -436,7 +436,7 @@ def import_pedigree_data(request):
                 # get current owner - error if missing from row ###################
                 try:
                     if row[current_owner] not in ('', None):
-                        current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[current_owner].rstrip())
+                        current_owner_obj = Breeder.objects.filter(breeding_prefix__iexact=row[current_owner].rstrip())
                         # make a new one if current owner doesn't exist
                         if not current_owner_obj.exists():
                             # check this breeder wasn't made already for breeder
@@ -447,6 +447,20 @@ def import_pedigree_data(request):
                                 current_owner_obj = Breeder(account=attached_service, breeding_prefix=row[current_owner].rstrip())
                         else:
                             current_owner_obj = current_owner_obj.first()
+                            # check current owner is for this account
+                            if current_owner_obj.account != attached_service:
+                                # error if current owner is for a different account
+                                errors = loads(database_upload.errors)
+                                errors['invalid'].append({
+                                    'col': 'Current Owner',
+                                    'row': row_number,
+                                    'name': ped_name,
+                                    'reason': 'the input for current owner is already being used in another account - please specify a different one'
+                                })
+                                database_upload.errors = dumps(errors)
+                                database_upload.save()
+                                # set has_error
+                                has_error = True
                     else:
                         current_owner_obj = None
                         # error if missing
