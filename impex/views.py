@@ -396,13 +396,27 @@ def import_pedigree_data(request):
                 # get breeder. error if breeder missing from the row ###################
                 try:
                     if row[breeder] not in ('', None):
-                        breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeder].rstrip())
+                        breeder_obj = Breeder.objects.filter(breeding_prefix__iexact=row[breeder].rstrip())
                         # make a new one if breeder doesn't exist
                         if not breeder_obj.exists():
                             breeder_obj = Breeder(account=attached_service, breeding_prefix=row[breeder].rstrip())
                         # get the breeder if does exist
                         else:
                             breeder_obj = breeder_obj.first()
+                            # check breeder is for this account
+                            if breeder_obj.account != attached_service:
+                                # error if breeder is for a different account
+                                errors = loads(database_upload.errors)
+                                errors['invalid'].append({
+                                    'col': 'Breeder',
+                                    'row': row_number,
+                                    'name': ped_name,
+                                    'reason': 'the input for breeding prefix is already being used in another account - please specify a different one'
+                                })
+                                database_upload.errors = dumps(errors)
+                                database_upload.save()
+                                # set has_error
+                                has_error = True
                     else:
                         breeder_obj = None
                         # error if missing
