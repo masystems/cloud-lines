@@ -451,7 +451,23 @@ def import_pedigree_data(request):
 
                 # get or create pedigrees ###################
                 def get_or_create_pedigree(pedigree, is_parent):
+                    global has_error
                     if pedigree not in ('', None):
+                        # check parent is not pedigree
+                        if pedigree == row[reg_no].rstrip() and is_parent:
+                            # error if pedigree same as parent
+                            errors = loads(database_upload.errors)
+                            errors['invalid'].append({
+                                'col': f'Registration Number/{is_parent}',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': f'the reg number given for the pedigree for this row is the same as the reg number given for {is_parent}'
+                            })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
+                            # set has_error
+                            has_error = True
+                            return None
                         if Pedigree.objects.filter(reg_no__iexact=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
                             # if parent, specify the sex appropriately
@@ -468,6 +484,38 @@ def import_pedigree_data(request):
                             ped = Pedigree.objects.get(reg_no__iexact=pedigree)
                             # check that the pedigree is for this account
                             if ped.account == attached_service:
+                                # validate parent
+                                if is_parent:
+                                    # check father sex
+                                    if (is_parent == 'father' and ped.sex not in ('male', 'Male')):
+                                        # error if father sex wrong
+                                        errors = loads(database_upload.errors)
+                                        errors['invalid'].append({
+                                            'col': 'Father',
+                                            'row': row_number,
+                                            'name': ped_name,
+                                            'reason': 'the reg number given for father corresponds with an existing pedigree that is not male'
+                                        })
+                                        database_upload.errors = dumps(errors)
+                                        database_upload.save()
+                                        # set has_error
+                                        has_error = True
+                                        return None
+                                    # check mother sex
+                                    if (is_parent == 'mother' and ped.sex not in ('female', 'Female')):
+                                        # error if mother sex wrong
+                                        errors = loads(database_upload.errors)
+                                        errors['invalid'].append({
+                                            'col': 'Mother',
+                                            'row': row_number,
+                                            'name': ped_name,
+                                            'reason': 'the reg number given for mother corresponds with an existing pedigree that is not female'
+                                        })
+                                        database_upload.errors = dumps(errors)
+                                        database_upload.save()
+                                        # set has_error
+                                        has_error = True
+                                        return None
                                 return ped
                             # if not for account, create error, as the reg number is taken
                             else:
