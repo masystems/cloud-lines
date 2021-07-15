@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from breeder.models import Breeder
 from breed.models import Breed
 from account.models import AttachedService
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Pedigree(models.Model):
@@ -54,6 +55,8 @@ class Pedigree(models.Model):
 
     born_as = models.CharField(max_length=10, choices=BORNAS, null=True, default='single',
                            help_text="Accepted formats: single, twin, triplet, quad", verbose_name="Born As")
+    litter_size = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(50)], default=1,
+                            help_text="Accepted range: 1-50", verbose_name="Litter Size")
 
     parent_father = models.ForeignKey('self', related_name='father', on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Father', help_text="This should be the parents registration number.")
     parent_father_notes = models.CharField(max_length=500, blank=True, null=True, verbose_name='Father Notes', help_text="Max 500 characters")

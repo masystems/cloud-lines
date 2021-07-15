@@ -47,6 +47,8 @@ class PedigreeForm(forms.Form):
         ('quad', 'Quad')
     )
     born_as = forms.ChoiceField(choices=BORNAS, widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='single', required=True)
+    LITTERSIZE = [tuple([x, x]) for x in range(1, 51)]
+    litter_size = forms.IntegerField(widget=forms.Select(choices=LITTERSIZE), required=True)
 
     father = forms.CharField(required=False)
     father_notes = forms.CharField(required=False)
