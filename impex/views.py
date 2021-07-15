@@ -1253,6 +1253,8 @@ def import_breeder_data(request):
             else:
                 name = ''
 
+            has_error = False
+
             ################### breeding prefix
             # check it is not empty
             if row[breeding_prefix] == '':
@@ -1264,11 +1266,13 @@ def import_breeder_data(request):
                 })
                 database_upload.errors = dumps(errors)
                 database_upload.save()
+                # set has_error
+                has_error = True
             # get create a breeder
             # can't do __iexact for get_or_create breeder, so will have to do a filter then a create if nothing is in the filter
             breeder = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeding_prefix].rstrip())
             if breeder.count() == 0:
-                breeder = Breeder.objects.create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+                breeder = Breeder(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             else:
                 breeder = breeder.first()
             
@@ -1318,9 +1322,8 @@ def import_breeder_data(request):
                         })
                         database_upload.errors = dumps(errors)
                         database_upload.save()
-                        # delete breeder if one was created
-                        if breeder.id:
-                            breeder.delete()
+                        # set has_error
+                        has_error = True
             except IndexError:
                 pass
             except UnboundLocalError:
@@ -1342,9 +1345,8 @@ def import_breeder_data(request):
                     })
                     database_upload.errors = dumps(errors)
                     database_upload.save()
-                    # delete breeder if one was created
-                    if breeder.id:
-                        breeder.delete()
+                    # set has_error
+                    has_error = True
             except ValidationError:
                 pass
             except IndexError:
@@ -1352,11 +1354,12 @@ def import_breeder_data(request):
             except UnboundLocalError:
                 pass
             ###################
-            # save the breeder
-            try:
-                breeder.save()
-            except NameError:
-                pass
+            # save the breeder if no error
+            if not has_error:
+                try:
+                    breeder.save()
+                except NameError:
+                    pass
         
         # set the file just processed to used
         file_slice.used = True
