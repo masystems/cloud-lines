@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.db import IntegrityError
 from pedigree.models import Pedigree, PedigreeImage
 from pedigree.functions import get_pedigree_column_headings
 from breeder.models import Breeder
@@ -388,13 +389,11 @@ def import_pedigree_data(request):
                 # get breeder. error if breeder missing from the row ###################
                 try:
                     if row[breeder] not in ('', None):
-                        breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeder].rstrip())
-                        # make a new one if breeder doesn't exist
-                        if not breeder_obj.exists():
-                            breeder_obj = Breeder.objects.create(account=attached_service, breeding_prefix=row[breeder].rstrip())
-                        # get the breeder if does exist
-                        else:
-                            breeder_obj = breeder_obj.first()
+                        try:
+                            breeder_obj, created = Breeder.objects.get_or_create(account=attached_service, breeding_prefix__iexact=row[breeder].rstrip())
+                        except IntegrityError:
+                            # Need to catch this and add an error to the list
+                            pass
                     else:
                         breeder_obj = None
                         # error if missing
