@@ -37,8 +37,9 @@ class PedigreeForm(forms.Form):
         ('male', 'Male'),
         ('female', 'Female'),
         ('castrated', 'Castrated'),
+        ('unknown', 'Unknown')
     ]
-    sex = forms.ChoiceField(choices=GENDERS, widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='female', required=True)
+    sex = forms.ChoiceField(choices=GENDERS, widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='unknown', required=True)
 
     LITTERSIZE = [tuple([x, x]) for x in range(1, 51)]
     litter_size = forms.IntegerField(widget=forms.Select(choices=LITTERSIZE), required=True)
