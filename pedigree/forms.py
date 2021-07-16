@@ -40,13 +40,6 @@ class PedigreeForm(forms.Form):
     ]
     sex = forms.ChoiceField(choices=GENDERS, widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='female', required=True)
 
-    BORNAS = (
-        ('single', 'Single'),
-        ('twin', 'Twin'),
-        ('triplet', 'Triplet'),
-        ('quad', 'Quad')
-    )
-    born_as = forms.ChoiceField(choices=BORNAS, widget=forms.RadioSelect(attrs={'class': 'radio radio-info'}), initial='single', required=True)
     LITTERSIZE = [tuple([x, x]) for x in range(1, 51)]
     litter_size = forms.IntegerField(widget=forms.Select(choices=LITTERSIZE), required=True)
 

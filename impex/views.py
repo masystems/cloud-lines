@@ -1,4 +1,3 @@
-from account.models import AttachedService
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
@@ -292,7 +291,6 @@ def import_pedigree_data(request):
             dob = post_data['dob'] or ''
             dod = post_data['dod'] or ''
             sex = post_data['sex'] or ''
-            born_as = post_data['born_as'] or ''
             litter_size = post_data['litter_size'] or ''
             status = post_data['status'] or ''
             father = post_data['parent_father'] or ''
@@ -348,10 +346,6 @@ def import_pedigree_data(request):
                 sex = loads(database_upload.header)['header'].index(sex)
             else:
                 sex = thousand
-            if born_as:
-                born_as = loads(database_upload.header)['header'].index(born_as)
-            else:
-                born_as = thousand
             if litter_size:
                 litter_size = loads(database_upload.header)['header'].index(litter_size)
             else:
@@ -397,27 +391,13 @@ def import_pedigree_data(request):
                 # get breeder. error if breeder missing from the row ###################
                 try:
                     if row[breeder] not in ('', None):
-                        breeder_obj = Breeder.objects.filter(breeding_prefix__iexact=row[breeder].rstrip())
+                        breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeder].rstrip())
                         # make a new one if breeder doesn't exist
                         if not breeder_obj.exists():
                             breeder_obj = Breeder(account=attached_service, breeding_prefix=row[breeder].rstrip())
                         # get the breeder if does exist
                         else:
                             breeder_obj = breeder_obj.first()
-                            # check breeder is for this account
-                            if breeder_obj.account != attached_service:
-                                # error if breeder is for a different account
-                                errors = loads(database_upload.errors)
-                                errors['invalid'].append({
-                                    'col': 'Breeder',
-                                    'row': row_number,
-                                    'name': ped_name,
-                                    'reason': 'the input for breeder is already being used in another account - please specify a different one'
-                                })
-                                database_upload.errors = dumps(errors)
-                                database_upload.save()
-                                # set has_error
-                                has_error = True
                     else:
                         breeder_obj = None
                         # error if missing
@@ -437,7 +417,7 @@ def import_pedigree_data(request):
                 # get current owner - error if missing from row ###################
                 try:
                     if row[current_owner] not in ('', None):
-                        current_owner_obj = Breeder.objects.filter(breeding_prefix__iexact=row[current_owner].rstrip())
+                        current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[current_owner].rstrip())
                         # make a new one if current owner doesn't exist
                         if not current_owner_obj.exists():
                             # check this breeder wasn't made already for breeder
@@ -448,20 +428,6 @@ def import_pedigree_data(request):
                                 current_owner_obj = Breeder(account=attached_service, breeding_prefix=row[current_owner].rstrip())
                         else:
                             current_owner_obj = current_owner_obj.first()
-                            # check current owner is for this account
-                            if current_owner_obj.account != attached_service:
-                                # error if current owner is for a different account
-                                errors = loads(database_upload.errors)
-                                errors['invalid'].append({
-                                    'col': 'Current Owner',
-                                    'row': row_number,
-                                    'name': ped_name,
-                                    'reason': 'the input for current owner is already being used in another account - please specify a different one'
-                                })
-                                database_upload.errors = dumps(errors)
-                                database_upload.save()
-                                # set has_error
-                                has_error = True
                     else:
                         current_owner_obj = None
                         # error if missing
@@ -1299,25 +1265,11 @@ def import_breeder_data(request):
                 has_error = True
             # get create a breeder
             # can't do __iexact for get_or_create breeder, so will have to do a filter then a create if nothing is in the filter
-            breeder = Breeder.objects.filter(breeding_prefix__iexact=row[breeding_prefix].rstrip())
+            breeder = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeding_prefix].rstrip())
             if breeder.count() == 0:
                 breeder = Breeder(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             else:
                 breeder = breeder.first()
-                # check the breeder doesn't already exist for another account
-                if breeder.account != attached_service:
-                    # error if breeder is for a different account
-                    errors = loads(database_upload.errors)
-                    errors['invalid'].append({
-                        'col': 'Breeding Prefix',
-                        'row': row_number,
-                        'name': name,
-                        'reason': 'the input for breeding prefix is already being used in another account - please specify a different one'
-                    })
-                    database_upload.errors = dumps(errors)
-                    database_upload.save()
-                    # set has_error
-                    has_error = True
             
             ################### contact name
             try:

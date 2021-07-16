@@ -237,13 +237,6 @@
                                                         <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }} </label>
                                                 {% endfor %}
                                         </div>
-                                        {% elif field.label == 'Born as' %}
-                                            <div class="radio radio-info pt-2">
-                                                {% for option in field %}
-                                                    <input type="radio" name="born_as" id="{{ option.id_for_label }}" value="{{ option.choice_label|lower }}" {% if pedigree.born_as == option.choice_label|lower %}checked{% endif %}>
-                                                        <label for="{{ option.id_for_label }}" class="pr-2"> {{ option.choice_label }} </label>
-                                                {% endfor %}
-                                            </div>
                                         {% elif field.label == 'Litter size' %}
                                             <div>
                                                 <select id="litter_size" name='{{ field.name }}' class="form-control">
