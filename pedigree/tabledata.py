@@ -54,7 +54,6 @@ def get_pedigrees(request):
             Q(dod__icontains=search) |
             Q(status__icontains=search) |
             Q(sex__icontains=search) |
-            Q(born_as__icontains=search) |
             Q(litter_size__icontains=search_int) |
             Q(parent_father__reg_no__icontains=search) |
             Q(parent_father_notes__icontains=search) |
@@ -78,7 +77,6 @@ def get_pedigrees(request):
             Q(dod__icontains=search) |
             Q(status__icontains=search) |
             Q(sex__icontains=search) |
-            Q(born_as__icontains=search) |
             Q(litter_size__icontains=search_int) |
             Q(parent_father__reg_no__icontains=search) |
             Q(parent_father_notes__icontains=search) |

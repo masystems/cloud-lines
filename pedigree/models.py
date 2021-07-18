@@ -41,20 +41,12 @@ class Pedigree(models.Model):
         ('male', 'Male'),
         ('female', 'Female'),
         ('castrated', 'Castrated'),
+        ('unknown', 'Unknown')
     )
 
-    sex = models.CharField(max_length=10, choices=GENDERS, null=True, default='female', 
-                            help_text="Accepted formats: male, female, castrated", verbose_name="Sex")
+    sex = models.CharField(max_length=10, choices=GENDERS, null=True, default='unknown', 
+                            help_text="Accepted formats: male, female, castrated, unknown", verbose_name="Sex")
 
-    BORNAS = (
-        ('single', 'Single'),
-        ('twin', 'Twin'),
-        ('triplet', 'Triplet'),
-        ('quad', 'Quad')
-    )
-
-    born_as = models.CharField(max_length=10, choices=BORNAS, null=True, default='single',
-                           help_text="Accepted formats: single, twin, triplet, quad", verbose_name="Born As")
     litter_size = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(50)], default=1,
                             help_text="Accepted range: 1-50", verbose_name="Litter Size")
 

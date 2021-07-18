@@ -360,7 +360,6 @@ def new_pedigree_form(request):
                 pass
             new_pedigree.status = pedigree_form['status'].value()
             new_pedigree.sex = pedigree_form['sex'].value()
-            new_pedigree.born_as = pedigree_form['born_as'].value()
             new_pedigree.litter_size = pedigree_form['litter_size'].value()
             try:
                 new_pedigree.dod = pedigree_form['date_of_death'].value() or None
@@ -578,7 +577,6 @@ def edit_pedigree_form(request, id):
                 pass
             pedigree.status = pedigree_form['status'].value()
             pedigree.sex = pedigree_form['sex'].value()
-            pedigree.born_as = pedigree_form['born_as'].value()
             pedigree.litter_size = pedigree_form['litter_size'].value()
 
             try:

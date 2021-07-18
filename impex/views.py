@@ -291,7 +291,6 @@ def import_pedigree_data(request):
             dob = post_data['dob'] or ''
             dod = post_data['dod'] or ''
             sex = post_data['sex'] or ''
-            born_as = post_data['born_as'] or ''
             litter_size = post_data['litter_size'] or ''
             status = post_data['status'] or ''
             father = post_data['parent_father'] or ''
@@ -347,10 +346,6 @@ def import_pedigree_data(request):
                 sex = loads(database_upload.header)['header'].index(sex)
             else:
                 sex = thousand
-            if born_as:
-                born_as = loads(database_upload.header)['header'].index(born_as)
-            else:
-                born_as = thousand
             if litter_size:
                 litter_size = loads(database_upload.header)['header'].index(litter_size)
             else:
@@ -389,6 +384,9 @@ def import_pedigree_data(request):
                     ped_name = row[name]
                 else:
                     ped_name = ''
+
+                # variable to store whether the pedigree has any errors
+                has_error = False
                 
                 # get breeder. error if breeder missing from the row ###################
                 try:
@@ -396,7 +394,7 @@ def import_pedigree_data(request):
                         breeder_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeder].rstrip())
                         # make a new one if breeder doesn't exist
                         if not breeder_obj.exists():
-                            breeder_obj = Breeder.objects.create(account=attached_service, breeding_prefix=row[breeder].rstrip())
+                            breeder_obj = Breeder(account=attached_service, breeding_prefix=row[breeder].rstrip())
                         # get the breeder if does exist
                         else:
                             breeder_obj = breeder_obj.first()
@@ -411,6 +409,8 @@ def import_pedigree_data(request):
                         })
                         database_upload.errors = dumps(errors)
                         database_upload.save()
+                        # set has_error
+                        has_error = True
                 except IndexError:
                     breeder_obj = None
 
@@ -420,7 +420,12 @@ def import_pedigree_data(request):
                         current_owner_obj = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[current_owner].rstrip())
                         # make a new one if current owner doesn't exist
                         if not current_owner_obj.exists():
-                            current_owner_obj = Breeder.objects.create(account=attached_service, breeding_prefix=row[current_owner].rstrip())
+                            # check this breeder wasn't made already for breeder
+                            if breeder_obj and row[current_owner].rstrip() == row[breeder].rstrip():
+                                # if it's already made, use it, instead of duplicating breeding prefix
+                                current_owner_obj = breeder_obj
+                            else:
+                                current_owner_obj = Breeder(account=attached_service, breeding_prefix=row[current_owner].rstrip())
                         else:
                             current_owner_obj = current_owner_obj.first()
                     else:
@@ -434,21 +439,39 @@ def import_pedigree_data(request):
                         })
                         database_upload.errors = dumps(errors)
                         database_upload.save()
+                        # set has_error
+                        has_error = True
                 except IndexError:
                     current_owner_obj = None
 
                 # get or create pedigrees ###################
                 def get_or_create_pedigree(pedigree, is_parent):
+                    global has_error
                     if pedigree not in ('', None):
+                        # check parent is not pedigree
+                        if pedigree == row[reg_no].rstrip() and is_parent:
+                            # error if pedigree same as parent
+                            errors = loads(database_upload.errors)
+                            errors['invalid'].append({
+                                'col': f'Registration Number/{is_parent}',
+                                'row': row_number,
+                                'name': ped_name,
+                                'reason': f'the reg number given for the pedigree for this row is the same as the reg number given for {is_parent}'
+                            })
+                            database_upload.errors = dumps(errors)
+                            database_upload.save()
+                            # set has_error
+                            has_error = True
+                            return None
                         if Pedigree.objects.filter(reg_no__iexact=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
                             # if parent, specify the sex appropriately
                             if is_parent == 'father':
-                                pedigree_obj, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=pedigree, sex='male')
+                                pedigree_obj = Pedigree(account=attached_service, reg_no=pedigree, sex='male')
                             elif is_parent == 'mother':
-                                pedigree_obj, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=pedigree, sex='female')
+                                pedigree_obj = Pedigree(account=attached_service, reg_no=pedigree, sex='female')
                             else:
-                                pedigree_obj, created = Pedigree.objects.get_or_create(account=attached_service, reg_no=pedigree)
+                                pedigree_obj = Pedigree(account=attached_service, reg_no=pedigree)
                             
                             return pedigree_obj
                         else:
@@ -456,6 +479,38 @@ def import_pedigree_data(request):
                             ped = Pedigree.objects.get(reg_no__iexact=pedigree)
                             # check that the pedigree is for this account
                             if ped.account == attached_service:
+                                # validate parent
+                                if is_parent:
+                                    # check father sex
+                                    if (is_parent == 'father' and ped.sex not in ('male', 'Male')):
+                                        # error if father sex wrong
+                                        errors = loads(database_upload.errors)
+                                        errors['invalid'].append({
+                                            'col': 'Father',
+                                            'row': row_number,
+                                            'name': ped_name,
+                                            'reason': 'the reg number given for father corresponds with an existing pedigree that is not male'
+                                        })
+                                        database_upload.errors = dumps(errors)
+                                        database_upload.save()
+                                        # set has_error
+                                        has_error = True
+                                        return None
+                                    # check mother sex
+                                    if (is_parent == 'mother' and ped.sex not in ('female', 'Female')):
+                                        # error if mother sex wrong
+                                        errors = loads(database_upload.errors)
+                                        errors['invalid'].append({
+                                            'col': 'Mother',
+                                            'row': row_number,
+                                            'name': ped_name,
+                                            'reason': 'the reg number given for mother corresponds with an existing pedigree that is not female'
+                                        })
+                                        database_upload.errors = dumps(errors)
+                                        database_upload.save()
+                                        # set has_error
+                                        has_error = True
+                                        return None
                                 return ped
                             # if not for account, create error, as the reg number is taken
                             else:
@@ -468,19 +523,35 @@ def import_pedigree_data(request):
                                 })
                                 database_upload.errors = dumps(errors)
                                 database_upload.save()
+                                # set has_error
+                                has_error = True
                                 return None
                     else:
                         return None
 
-                try:
-                    father_obj = get_or_create_pedigree(row[father], 'father')
-                except IndexError:
-                    father_obj = None
-
-                try:
-                    mother_obj = get_or_create_pedigree(row[mother], 'mother')
-                except IndexError:
-                    mother_obj = None
+                # parents ##########################
+                # error if mother is the same as father
+                if row[mother].rstrip() == row[father].rstrip() and row[mother].rstrip() != '':
+                    errors = loads(database_upload.errors)
+                    errors['invalid'].append({
+                        'col': 'Mother/Father',
+                        'row': row_number,
+                        'name': ped_name,
+                        'reason': 'the input for mother is the same as the input for father'
+                    })
+                    database_upload.errors = dumps(errors)
+                    database_upload.save()
+                    # set has_error
+                    has_error = True
+                else:
+                    try:
+                        father_obj = get_or_create_pedigree(row[father], 'father')
+                    except IndexError:
+                        father_obj = None
+                    try:
+                        mother_obj = get_or_create_pedigree(row[mother], 'mother')
+                    except IndexError:
+                        mother_obj = None
 
                 # convert dates ###################
                 def convert_date(date):
@@ -547,6 +618,8 @@ def import_pedigree_data(request):
                         })
                         database_upload.errors = dumps(errors)
                         database_upload.save()
+                        # set has_error
+                        has_error = True
                 except IndexError:
                     pass
 
@@ -664,7 +737,7 @@ def import_pedigree_data(request):
                     # if sex given
                     if row[sex] != '':
                         # if it's valid, save it
-                        if row[sex].lower() in ('male', 'female', 'castrated'):
+                        if row[sex].lower() in ('male', 'female', 'castrated', 'unknown'):
                             pedigree.sex = row[sex].lower()
                         # check if sex is one of the other valid options
                         elif row[sex].lower() in ('m', 'f'):
@@ -679,13 +752,12 @@ def import_pedigree_data(request):
                                 'col': 'Sex',
                                 'row': row_number,
                                 'name': ped_name,
-                                'reason': 'the input for sex, if given, must be one of "male", "female", "M", "F", or "castrated"'
+                                'reason': 'the input for sex, if given, must be one of "male", "female", "M", "F", "unknown", or "castrated"'
                             })
                             database_upload.errors = dumps(errors)
                             database_upload.save()
-                            # delete pedigree if one was created
-                            if pedigree.id:
-                                pedigree.delete()
+                            # set has_error
+                            has_error = True
                     # error if missing
                     else:
                         errors = loads(database_upload.errors)
@@ -696,38 +768,8 @@ def import_pedigree_data(request):
                         })
                         database_upload.errors = dumps(errors)
                         database_upload.save()
-                        # delete pedigree if one was created
-                        if pedigree.id:
-                            pedigree.delete()
-                except IndexError:
-                    pass
-                except NameError:
-                    pass
-                except AttributeError:
-                    pass
-                except UnboundLocalError:
-                    pass
-                ############################# born as
-                try:
-                    # if born_as given
-                    if row[born_as] != '':
-                        # if it's valid, save it
-                        if row[born_as].lower() in ('single', 'twin', 'triplet', 'quad'):
-                            pedigree.born_as = row[born_as]
-                        # invalid, so add error
-                        else:
-                            errors = loads(database_upload.errors)
-                            errors['invalid'].append({
-                                'col': 'Born As',
-                                'row': row_number,
-                                'name': ped_name,
-                                'reason': 'the input for born as, if given, must be one of "single", "twin", "triplet", or "quad"'
-                            })
-                            database_upload.errors = dumps(errors)
-                            database_upload.save()
-                            # delete pedigree if one was created
-                            if pedigree.id:
-                                pedigree.delete()
+                        # set has_error
+                        has_error = True
                 except IndexError:
                     pass
                 except NameError:
@@ -755,9 +797,8 @@ def import_pedigree_data(request):
                             })
                             database_upload.errors = dumps(errors)
                             database_upload.save()
-                            # delete pedigree if one was created
-                            if pedigree.id:
-                                pedigree.delete()
+                            # set has_error
+                            has_error = True
                         # an integer was given
                         if litter_size_int:
                             # if it's valid, save it
@@ -774,9 +815,8 @@ def import_pedigree_data(request):
                                 })
                                 database_upload.errors = dumps(errors)
                                 database_upload.save()
-                                # delete pedigree if one was created
-                                if pedigree.id:
-                                    pedigree.delete()
+                                # set has_error
+                                has_error = True
                 except IndexError:
                     pass
                 except NameError:
@@ -803,9 +843,8 @@ def import_pedigree_data(request):
                             })
                             database_upload.errors = dumps(errors)
                             database_upload.save()
-                            # delete pedigree if one was created
-                            if pedigree.id:
-                                pedigree.delete()
+                            # set has_error
+                            has_error = True
                     # error if missing
                     else:
                         errors = loads(database_upload.errors)
@@ -816,9 +855,8 @@ def import_pedigree_data(request):
                         })
                         database_upload.errors = dumps(errors)
                         database_upload.save()
-                        # delete pedigree if one was created
-                        if pedigree.id:
-                            pedigree.delete()
+                        # set has_error
+                        has_error = True
                 except IndexError:
                     pass
                 except NameError:
@@ -902,9 +940,8 @@ def import_pedigree_data(request):
                             })
                             database_upload.errors = dumps(errors)
                             database_upload.save()
-                            # delete pedigree if one was created
-                            if pedigree.id:
-                                pedigree.delete()
+                            # set has_error
+                            has_error = True
                 except IndexError:
                     pass
                 except NameError:
@@ -931,6 +968,8 @@ def import_pedigree_data(request):
                                 })
                                 database_upload.errors = dumps(errors)
                                 database_upload.save()
+                                # set has_error
+                                has_error = True
                         except IndexError:
                             pass
                 # organisation
@@ -939,9 +978,10 @@ def import_pedigree_data(request):
                         # check if breed exists
                         if Breed.objects.filter(account=attached_service, breed_name__iexact=row[breed]).count() > 0:
                             breed_obj = Breed.objects.filter(account=attached_service, breed_name__iexact=row[breed]).first()
-                        # error if breed not been created
+                        # errors
                         else:
                             breed_obj = None
+                            # error if breed given wasn't created
                             if row[breed] != '':
                                 errors = loads(database_upload.errors)
                                 errors['invalid'].append({
@@ -952,6 +992,20 @@ def import_pedigree_data(request):
                                 })
                                 database_upload.errors = dumps(errors)
                                 database_upload.save()
+                                # set has_error
+                                has_error = True
+                            # error if breed missing
+                            else:
+                                errors = loads(database_upload.errors)
+                                errors['missing'].append({
+                                    'col': 'Breed',
+                                    'row': row_number,
+                                    'name': ped_name
+                                })
+                                database_upload.errors = dumps(errors)
+                                database_upload.save()
+                                # set has_error
+                                has_error = True
                     except IndexError:
                         breed_obj = None
                 else:
@@ -978,17 +1032,39 @@ def import_pedigree_data(request):
                                 acc_custom_fields[id]['field_value'] = row[cf_index]
                             except IndexError:
                                 pass
-                
                 try:
                     pedigree.custom_fields = dumps(acc_custom_fields)
-                    
-                    pedigree.save()
                 except NameError:
                     pass
                 except AttributeError:
                     pass
                 except UnboundLocalError:
                     pass
+
+                ############################ save, or don't
+                if not has_error:
+                    try:
+                        if father_obj:
+                            father_obj.save()
+                    except NameError:
+                        pass
+                    try:
+                        if mother_obj:
+                            mother_obj.save()
+                    except NameError:
+                        pass
+                    try:
+                        breeder_obj.save()
+                    except NameError:
+                        pass
+                    try:
+                        current_owner_obj.save()
+                    except NameError:
+                        pass
+                    try:
+                        pedigree.save()
+                    except NameError:
+                        pass
 
             # mark the slice just processed as used
             file_slice.used = True
@@ -1144,6 +1220,8 @@ def import_breeder_data(request):
             else:
                 name = ''
 
+            has_error = False
+
             ################### breeding prefix
             # check it is not empty
             if row[breeding_prefix] == '':
@@ -1155,11 +1233,13 @@ def import_breeder_data(request):
                 })
                 database_upload.errors = dumps(errors)
                 database_upload.save()
+                # set has_error
+                has_error = True
             # get create a breeder
             # can't do __iexact for get_or_create breeder, so will have to do a filter then a create if nothing is in the filter
             breeder = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeding_prefix].rstrip())
             if breeder.count() == 0:
-                breeder = Breeder.objects.create(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
+                breeder = Breeder(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
             else:
                 breeder = breeder.first()
             
@@ -1209,9 +1289,8 @@ def import_breeder_data(request):
                         })
                         database_upload.errors = dumps(errors)
                         database_upload.save()
-                        # delete breeder if one was created
-                        if breeder.id:
-                            breeder.delete()
+                        # set has_error
+                        has_error = True
             except IndexError:
                 pass
             except UnboundLocalError:
@@ -1233,9 +1312,8 @@ def import_breeder_data(request):
                     })
                     database_upload.errors = dumps(errors)
                     database_upload.save()
-                    # delete breeder if one was created
-                    if breeder.id:
-                        breeder.delete()
+                    # set has_error
+                    has_error = True
             except ValidationError:
                 pass
             except IndexError:
@@ -1243,11 +1321,12 @@ def import_breeder_data(request):
             except UnboundLocalError:
                 pass
             ###################
-            # save the breeder
-            try:
-                breeder.save()
-            except NameError:
-                pass
+            # save the breeder if no error
+            if not has_error:
+                try:
+                    breeder.save()
+                except NameError:
+                    pass
         
         # set the file just processed to used
         file_slice.used = True
