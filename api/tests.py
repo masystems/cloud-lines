@@ -13,5 +13,5 @@ print(token_res.json()['token'])
 headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
 
 ## get pedigrees
-post_res = requests.get(url=f'{sys.argv[1]}/api/pedigrees', headers=headers)
+post_res = requests.get(url=f'{sys.argv[1]}/api/pedigrees/?limit=0&offset=0&sale_or_hire=True', headers=headers)
 print(post_res.json())
