@@ -1084,6 +1084,12 @@ def import_pedigree_data(request):
                     except NameError:
                         pass
                     try:
+                        # set foreign keys again so they aren't forgotten when pedigree saved
+                        pedigree.parent_father = pedigree.parent_father
+                        pedigree.parent_mother = pedigree.parent_mother
+                        pedigree.breeder = pedigree.breeder
+                        pedigree.current_owner = pedigree.current_owner
+
                         pedigree.save()
                     except NameError:
                         pass
