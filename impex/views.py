@@ -1021,6 +1021,28 @@ def import_pedigree_data(request):
                     pass
                 except UnboundLocalError:
                     pass
+                try:
+                    if father_obj:
+                        father_obj.breed = breed_obj
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                except UnboundLocalError:
+                    pass
+                try:
+                    if mother_obj:
+                        mother_obj.breed = breed_obj
+                except KeyError:
+                    pass
+                except NameError:
+                    pass
+                except AttributeError:
+                    pass
+                except UnboundLocalError:
+                    pass
 
                 ############################# custom
                 for cf_name, cf_index in custom_fields_in.items():
