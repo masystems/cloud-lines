@@ -531,19 +531,22 @@ def import_pedigree_data(request):
 
                 # parents ##########################
                 # error if mother is the same as father
-                if row[mother].rstrip() == row[father].rstrip() and row[mother].rstrip() != '':
-                    errors = loads(database_upload.errors)
-                    errors['invalid'].append({
-                        'col': 'Mother/Father',
-                        'row': row_number,
-                        'name': ped_name,
-                        'reason': 'the input for mother is the same as the input for father'
-                    })
-                    database_upload.errors = dumps(errors)
-                    database_upload.save()
-                    # set has_error
-                    has_error = True
-                else:
+                parents_different = True
+                if mother != thousand and father != thousand:
+                    if row[mother].rstrip() == row[father].rstrip() and row[mother].rstrip() != '':
+                        errors = loads(database_upload.errors)
+                        errors['invalid'].append({
+                            'col': 'Mother/Father',
+                            'row': row_number,
+                            'name': ped_name,
+                            'reason': 'the input for mother is the same as the input for father'
+                        })
+                        database_upload.errors = dumps(errors)
+                        database_upload.save()
+                        # set has_error
+                        has_error = True
+                        parents_different = False
+                if parents_different:
                     try:
                         father_obj = get_or_create_pedigree(row[father], 'father')
                     except IndexError:
