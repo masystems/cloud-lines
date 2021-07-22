@@ -101,33 +101,52 @@
     </table>
 </div>
 
+    <p style="text-align: center;">ANNEX I<br>
+        Annex I to Implementing Regulation (EU) 2017/717 is replaced by the following:
+    </p>
 
-    <p style="text-align: center; text-decoration: underline;">
+    <p style="text-align: center;">
         <strong>ANNEX I</strong><br>
         MODEL FORMS FOR THE ZOOTECHNICAL CERTIFICATES FOR TRADE IN
 PUREBRED BREEDING ANIMALS AND THEIR GERMINAL PRODUCTS
     </p>
-    <p style="text-align: center">
-        <strong style="text-decoration: underline;">Section A</strong><br>
+
+    <p style="text-align: center;">
+        <strong>Section A</strong><br>
         Zootechnical certificate for trade in purebred breeding animals of the bovine, porcine, ovine
 and caprine species
     </p>
     <table class="responsive" style="width:100%">
         <tbody>
             <tr>
-                <td class="main-td" colspan="2">
-                    <p style="text-align: center; line-height: 8px;"><strong>Zootechnical certificate<br>
-                        for trade in purebred breeding animals<br>
-                        of the bovine species (Bos taurus, Bos indicus and Bubalus bubalis)(1)/ the porcine species (Sus<br>
-                        scrofa)(1)/ the ovine species (Ovis aries)(1)/ the caprine species (Capra hircus)(1)<br>
-                        in accordance with Regulation (EU) 2016/1012</strong>
+                <td class="main-td" rowspan="2">
+                    <p><strong>Zootechnical certificate, in accordance with Regulation (EU) 2016/1012, for trade in purebred breeding animals of the following species:</strong><br>
+                        (a) <strong>bovine species (Bos taurus, Bos indicus, Bubalus bubalis)</strong> <i>(<small>1</small>)</i><br>
+                        (b) <strong>porcine species (Sus scrofa)</strong> <i>(<small>1</small>) (<small>2</small>)</i><br>
+                        (c) <strong>ovine species (Ovis aries)</strong> <i>(<small>1</small>)</i><br>
+                        (d) <strong>caprine species (Capra hircus)</strong> <i>(<small>1</small>)</i><br>
                     </p>
+                    <p>
+                        <i>All EU official languages of the zootechnical certificates, including footnotes and notes, are available in EUR-Lex</i>
+                    </p>
+                </td>
+                <td class="main-td">
+                    {% if attached_service.image %}
+                        <img src="{{ attached_service.image.url }}" class="img">
+                    {% else %}
+                        <p><i>(a logo of the issuing breed society or competent authority may be included)</i></p>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="main-td">
+                    <p><i>Certificate number (<small>3</small>)</i></p>
                 </td>
             </tr>
             <tr>
                 <td class="main-td" colspan="2">
                     <p>
-                        1. Name of issuing breed society <i>(provide contact details and, where available, a reference to the website)</i>
+                        1. Name of issuing breed society/competent authority <i>(provide contact details and, where available, a reference to the website)</i>
                     </p>
                     <p class="ans">{{ attached_service.organisation_or_society_name }}</p>
                 </td>
@@ -141,7 +160,7 @@ and caprine species
                 </td>
                 <td class="main-td">
                     <p>
-                        3. Name of breed of animal
+                        3. Name of breed of purebred breeding animal
                     </p>
                     <p class="ans">{{ lvl1.breed.breed_name }}</p>
                 </td>
@@ -149,7 +168,7 @@ and caprine species
             <tr>
                 <td class="main-td" colspan="2">
                     <p>
-                        4. Class within the main section of the breeding book where animal is entered<small>(2)</small>
+                        4. Class within the main section of the breeding book where animal is entered (<small>3</small>)
                     </p>
                 </td>
             </tr>
@@ -162,7 +181,7 @@ and caprine species
                 </td>
                 <td class="main-td">
                     <p>
-                        6. Breeding-book No. of animal
+                        6. Breeding book number of animal
                     </p>
                     <p class="ans">{{ lvl1.reg_no }}</p>
                 </td>
@@ -170,16 +189,20 @@ and caprine species
             <tr>
                 <td class="main-td">
                     <p>
-                        7. Identification of animal<small>(3)</small><br>
+                        7. Identification of purebred breeding animal (<small>4</small>)<br>
                         7.1. System<br>
-                        Tag Number
+                        <p class="ans">Tag Number</p>
                         7.2. Individual identification number<br>
                         <p class="ans">{{ lvl1.tag_no }}</p>
+                        7.3. Animal health identification number (<small>5</small>)<br>
+                        <br>
+                        7.4. Name (<small>3</small>)
+                        <p class="ans">{{ lvl1.name }}</p>
                     </p>
                 </td>
                 <td class="main-td">
                     <p>
-                        8. Identity verification<small>(2)(4)</small><br>
+                        8. Identity verification(<small>3</small>)(<small>6</small>)(<small>7</small>)<br>
                         8.1. Method<br>
                         8.2. Result<br>
                     </p>
@@ -188,7 +211,7 @@ and caprine species
             <tr>
                 <td class="main-td" colspan="2">
                     <p>
-                        9. Date <small>(use format dd/mm/yyyy)</small> and country of birth of animal
+                        9. Date (use format dd.mm.yyyy or ISO 8601) (<small>8</small>) and country of birth of animal
                         <p class="ans">{{ lvl1.dob }}</p>
                     </p>
                 </td>
@@ -196,7 +219,7 @@ and caprine species
             <tr>
                 <td class="main-td" colspan="2">
                     <p>
-                        <span class="number">10.</span> Name, address and e-mail address<small>(2)</small> of breeder
+                        <span class="number">10.</span> Name, address and e-mail address(<small>3</small>) of breeder
                     </p>
                     <p class="ans">{% if lvl1.breeder.breeding_prefix %}{{ lvl1.breeder.breeding_prefix }}, {% endif %}
                         {% if lvl1.breeder.address %}{{ lvl1.breeder.address }}, {% endif %}
@@ -207,7 +230,7 @@ and caprine species
             <tr>
                 <td class="main-td" colspan="2">
                     <p>
-                        <span class="number">11.</span> Name, address and e-mail address<small>(2)</small> of owner
+                        <span class="number">11.</span> Name, address and e-mail address (<small>3</small>) of owner
                     </p>
                     <p class="ans">{% if lvl1.current_owner.breeding_prefix %}{{ lvl1.current_owner.breeding_prefix }}, {% endif %}
                         {% if lvl1.current_owner.address %}{{ lvl1.current_owner.address }},  {% endif %}
@@ -217,49 +240,68 @@ and caprine species
             <tr>
                 <td class="main-td" colspan="2">
                     <p>
-                        <span class="number">12.</span> The pedigree<small>(5)</small>
+                        <span class="number">12.</span> The pedigree of the purebred breeding animal (<small>7</small>)(<small>9</small>)
                     </p>
                 </td>
             </tr>
             <tr>
                 <td class="main-td" rowspan="2">
                     <p>
-                        Sire<br>
-                        Breeding-book No. and section<br>
-                        {{ lvl2_1.reg_no }}
-                    </p>
-                </td>
-                <td class="main-td">
-                    <p>
-                        Paternal Grandsire<br>
-                        Breeding-book No. and section<br>
-                        {{ lvl3_1.reg_no }}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td">
-                    <p>
-                        Paternal Granddam<br>
-                        Breeding-book No. and section<br>
-                        {{ lvl3_2.reg_no }}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" rowspan="2">
-                    <p>
-                        Dam<br>
-                        Breeding-book No. and section
+                        12.1 Sire<br>
+                        Breeding book number and section Individual identification number (<small>4</small>) (<small>10</small>)
+                        <p class="ans">{{ lvl2_1.reg_no }}</p>
+                        Animal health identification number (<small>5</small>)<br>
                         <br>
-                        {{ lvl2_2.reg_no }}
+                        Name (<small>3</small>)
+                        <p class="ans">{{ lvl2_1.name }}</p>
                     </p>
                 </td>
                 <td class="main-td">
                     <p>
-                        Maternal Grandsire<br>
-                        Breeding-book No. and section<br>
-                        {{ lvl3_3.reg_no }}
+                        12.1.1 Paternal Grandsire<br>
+                        Breeding book number and section Individual identification number (<small>4</small>) (<small>10</small>)
+                        <p class="ans">{{ lvl3_1.reg_no }}</p>
+                        Animal health identification number (<small>5</small>)<br>
+                        <br>
+                        Name (<small>3</small>)
+                        <p class="ans">{{ lvl3_1.name }}</p>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td class="main-td">
+                    <p>
+                        12.1.2 Paternal Granddam<br>
+                        Breeding book number and section Individual identification number (<small>4</small>) (<small>10</small>)
+                        <p class="ans">{{ lvl3_2.reg_no }}</p>
+                        Animal health identification number (<small>5</small>)<br>
+                        <br>
+                        Name (<small>3</small>)
+                        <p class="ans">{{ lvl3_2.name }}</p>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td class="main-td" rowspan="2">
+                    <p>
+                        12.2 Dam<br>
+                        Breeding book number and section Individual identification number (<small>4</small>) (<small>10</small>)
+                        <p class="ans">{{ lvl2_2.reg_no }}</p>
+                        Animal health identification number (<small>5</small>)<br>
+                        <br>
+                        Name (<small>3</small>)
+                        <p class="ans">{{ lvl2_2.name }}</p>
+                    </p>
+                </td>
+                <td class="main-td">
+                    <p>
+                        12.2.1 Maternal Grandsire<br>
+                        Breeding book number and section Individual identification number (<small>4</small>) (<small>10</small>)
+                        <p class="ans">{{ lvl3_3.reg_no }}</p>
+                        Animal health identification number (<small>5</small>)<br>
+                        <br>
+                        Name (<small>3</small>)
+                        <p class="ans">{{ lvl3_3.name }}</p>
                     </p>
                 </td>
             </tr>
@@ -267,207 +309,105 @@ and caprine species
                 <td class="main-td">
                     <p>
                         Maternal Granddam<br>
-                        Breeding-book No. and section<br>
-                        {{ lvl3_4.reg_no }}
+                        Breeding book number and section Individual identification number (<small>4</small>) (<small>10</small>)
+                        <p class="ans">{{ lvl3_4.reg_no }}</p>
+                        Animal health identification number (<small>5</small>)<br>
+                        <br>
+                        Name (<small>3</small>)
+                        <p class="ans">{{ lvl3_4.name }}</p>
                     </p>
                 </td>
             </tr>
             <tr>
                 <td class="main-td" colspan="2">
                     <p>
-                        <span class="number">13.</span> Additional information<small>(2)(5)(6)</small><br>
-                        <span class="number">13.1.</span> Results of performance testing<br>
+                        14. Additional information<small>(3)(7)(11)</small><br>
+                        13.1. Results of performance testing<br>
                     </p>
                     <p>
-                        <span class="number">13.2.</span> Up-to-date results of the genetic evaluation carried out last on <small>(insert date in format dd/mm/yyyy)</small><br>
-                    </p>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <br>
-    <table class="responsive" style="width:100%">
-        <tbody>
-            <tr>
-                <td class="main-td" colspan="6">
-                    <p>
-                        13.3. Genetic defects and genetic peculiarities of donor male in relation to the breeding programme<br>
-                        13.4. Other relevant information
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="6">
-                    <p>
-                        B. <i>Information on semen</i>
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="6">
-                    <p>
-                        14. Identification of semen
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" scope="row"><p>Colour of straws</p></td>
-                <td class="main-td"><p>Alpha-numeric<br>Code on straws</p></td>
-                <td class="main-td"><p>Number of<br>doses/straws</p></td>
-                <td class="main-td"><p>Place of<br>collection</p></td>
-                <td class="main-td"><p>Date of collection<br><i>(dd/mm/yyyy)</i></p></td>
-                <td class="main-td"><p>Others<small>(2)</small></p></td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="1">
-                    <p>&nbsp;</p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="1">
-                    <p>&nbsp;</p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="1">
-                    <p>&nbsp;</p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="1">
-                    <p>&nbsp;</p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-                <td class="main-td" colspan="1">
-                    <p></p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="6">
-                    <p>
-                        15. Semen collection or storage centre of dispatch<br>
-                        15.1. Name
+                        13.2. Up-to-date results of the genetic evaluation carried out last on..........................<i>(insert date in format dd/mm/yyyy</i> or ISO 8601)<br>
                     </p>
                     <p>
-                        15.2. Address
+                        13.3. Genetic defects and genetic peculiarities of the animal in relation to the breeding programme<br>
                     </p>
                     <p>
-                        15.3. Approval number
+                        13.4. Other relevant information on purebred breeding animal<br>
+                    </p>
+                    <p>
+                        13.5. Other relevant information, including results of performance testing or genetic evaluation, on parents and grandparents, if not indicated in point 12<br>
                     </p>
                 </td>
             </tr>
             <tr>
-                <td class="main-td" colspan="6">
+                <td class="main-td" colspan="2">
                     <p>
-                        16. Name and address of consignee
+                        14. Insemination (<small>1</small>)/mating (<small>1</small>)(<small>3</small>)(<small>12</small>)<br>
+                        14.1. Date (<i>insert date in format dd.mm.yyyy or</i> ISO 8601, <i>or indicate in the same date format the mating period from ................ to ...............</i>)<br>
                     </p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="6">
                     <p>
-                        17. Name and address of the breed society<small>(1)</small>, or the third party<small>(1)</small> designated by that breed society,
-                        responsible for carrying out testing<small>(2)(8)</small>
+                        14.2. Identification of the fertilising male(s)<br>
                     </p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="6">
-                    <p><br>
-                        Done at :.............................. on:...............................<br>
-                        <i>(insert place of issue)</i> <i>(insert date of issue)</i>
-                    </p>
-                    <p style="margin-top: 200%">
-                        Name and capacity of the signatory:....................<br>
-                        <i>(insert in capital letters name and capacity of the individual(9) authorised by the issuing breed society to sign that certificate)</i>
-                    </p>
-                    <p style="margin-top: 200%">
-                        Signature:..............................
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td class="main-td" colspan="6">
                     <p>
-                        <small>(1)</small> Delete where not applicable.<br>
-                    <small>(2)</small> Keep empty if not applicable, see also footnote <small>(6)</small>.<br>
-                    <small>(3)</small> For animals of the bovine, ovine, caprine and equine species, individual identification in accordance with<br>
-                    Union animal health legislation on the identification and registration of animals. For animals of the porcine<br>
-                    species, individual identification in accordance with the rules of the breeding programme approved in<br>
-                    accordance with Article 8<small>(3)</small>, and, where applicable, Article 12 of Regulation (EU) 2016/1012.<br>
-                    <small>(4)</small> Required in accordance with Article 22<small>(1)</small> of Regulation (EU) 2016/1012 for purebred breeding animals of<br>
-                    the bovine, ovine, caprine and equine species used for the collection of semen for artificial insemination.<br>
-                    May be required by breed society in accordance with Article 22(2) of Regulation (EU) 2016/1012 for<br>
-                    purebred breeding animals of the porcine species used for the collection of semen for artificial<br>
-                    insemination.<br>
-                    <small>(5)</small> If necessary use additional paper.<br>
-                    <small>(6)</small> In the case of purebred animals of the equine species, indicate the UELN compatible identification<br>
-                    number, where it is available. Add Breeding-book No only where it is different from UELN compatible<br>
-                    identification number.<br>
-                    <small>(7)</small> If that additional genetic information can be accessed on a website, a reference to that website may be<br>
-                    provided instead.<br>
-                    <small>(8)</small> For semen intended for testing of purebred breeding animals of the bovine, porcine, ovine or caprine<br>
-                    species which have not undergone performance testing or genetic evaluation, in accordance with the<br>
+                        14.2.1. Breeding book number(s) and section(s)<br>
+                    </p>
+                    <p>
+                        14.2.2. Individual identification number(s) (<small>4</small>) (<small>10</small>)<br>
+                    </p>
+                    <p>
+                        14.2.3. Animal health identification number(s) (<small>5</small>)<br>
+                    </p>
+                    <p>
+                        14.2.4. Name(s) (<small>3</small>)<br>
+                    </p>
+                    <p>
+                        14.2.5. System(s) of identity verification and result(s) (<small>6</small>)<br>
                     </p>
                 </td>
             </tr>
 
+            <tr>
+                <td class="main-td" colspan="2">
+                    <p>
+                        15. Validation<br>
+                        15.1. Done at: <i>(insert place of issue)</i> ........................... 15.2. on: <i>(insert date of issue)</i> ...........................<br>
+                    </p>
+                    <p>
+                        15.3. Name and capacity of the signatory: ...............................................................................................<br>
+                        <i>(insert in capital letters name and capacity of the individual (<small>13</small>) signing the certificate)</i>
+                    </p>
+                    <p style="padding-top: 50px">
+                        15.4. Signature: .........................................................................................................................................<br>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td class="main-td" colspan="2">
+                    <p>
+                        Footnotes:
+                        (<small>1</small>) Delete where not applicable.
+                        (<small>2</small>) A single zootechnical certificate may be issued for a group of purebred breeding animals of the porcine species provided that those purebred breeding animals have the same age and the same genetic dam and sire and that individual information is provided in points 5, 6, 7.2, 13 and, as appropriate, 14 of this zootechnical certificate.
+                        (<small>3</small>) Keep empty if not applicable.
+                        (<small>4</small>) For animals of the bovine, ovine and caprine species, individual identification in accordance with Union animal health legislation on the identification and registration of animals. For animals of the porcine species, individual identification in accordance with the rules of the breeding programme approved in accordance with Article 8(3), and, where applicable, Article 12 of Regulation (EU) 2016/1012, and identification number in accordance with Union animal health legislation on the identification and registration of animals.
+                        (<small>5</small>) Only required for animals of the porcine species: Identification number in accordance with Union animal health legislation on the identification and registration of animals of the porcine species.
+                        (<small>6</small>) Required in accordance with Article 22(1) of Regulation (EU) 2016/1012 for purebred breeding animals of the bovine, ovine and caprine species used for the collection of semen for artificial insemination. This may be required by breed societies in accordance with Article 22(2) of Regulation (EU) 2016/1012 for purebred breeding animals of the porcine species used for the collection of semen for artificial insemination or for purebred breeding animals of the bovine, ovine, caprine and porcine species used for the collection of oocytes and embryos.
+                        (<small>7</small>) If necessary attach additional sheets of paper.
+                        (<small>8</small>) For animals of the ovine and caprine species kept in extensive farming conditions, instead of the date of birth, the year of birth (yyyy) and date of identification (dd.mm.yyyy or ISO 8601) may be provided.
+                        (<small>9</small>) Insert "main section" or "supplementary section" as appropriate. Information on additional generations may be provided.
+                        (<small>10</small>) Add individual identification number if different from breeding book number.
+                        (<small>11</small>) If the results of performance testing or genetic evaluation can be accessed on a website, a direct reference to that website may be provided instead.
+                        (<small>12</small>) Required in the case of pregnant females. Information may be indicated in a separate document.
+                        (<small>13</small>) That individual shall be a representative of the breed society, or of a competent authority referred to in Article 30(2)(b) of Regulation (EU) 2016/1012, who is authorised to sign the zootechnical certificate.
+                    </p>
+                    <p>Notes:
+                        <ul>
+                            <li>The zootechnical certificate shall be issued in at least one of the official languages of the Member State of dispatch.</li>
+                            <li>The colour of the signature must be different from that of the printing.</li>
+                            <li>The zootechnical certificate may be issued in portrait or landscape orientation.</li>
+                            <li>The footnotes and notes of this zootechnical certificate may not be printed, provided a reference to a directly accessible multilingual source of information is included in the title.</li>
+                        </ul>
+                    </p>
+                </td>
+            </tr>
         </tbody>
     </table>
 

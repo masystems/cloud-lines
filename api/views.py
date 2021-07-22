@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from rest_framework.authentication import BasicAuthentication, TokenAuthentication
+from rest_framework.authentication import BasicAuthentication, TokenAuthentication, SessionAuthentication
+from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import ApiUpdatesSerializer, \
     ApiAttachedServiceSerializer, \
     ApiPedigreeSerializer, \
@@ -58,9 +59,10 @@ class AttachedServiceViews(viewsets.ModelViewSet):
 
 
 class PedigreeViews(viewsets.ModelViewSet):
-    authentication_classes = (TokenAuthentication, BasicAuthentication)
+    authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
     serializer_class = ApiPedigreeSerializer
-    filter_backends = [SearchFilter]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = '__all__'
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
