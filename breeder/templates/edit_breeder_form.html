@@ -58,8 +58,16 @@
                                             {% render_field field class="form-control" value=breeder.breeding_prefix %}
                                         {% elif field.label == 'Contact name' %}
                                             {% render_field field class="form-control" value=breeder.contact_name %}
-                                        {% elif field.label == 'Address' %}
-                                            {% render_field field class="form-control" value=breeder.address %}
+                                        {% elif field.label == 'Address line 1' %}
+                                            {% render_field field class="form-control" value=breeder.address_line_1 %}
+                                        {% elif field.label == 'Address line 2' %}
+                                            {% render_field field class="form-control" value=breeder.address_line_2 %}
+                                        {% elif field.label == 'Town' %}
+                                            {% render_field field class="form-control" value=breeder.town %}
+                                        {% elif field.label == 'Country' %}
+                                            {% render_field field class="form-control" value=breeder.country %}
+                                        {% elif field.label == 'Postcode' %}
+                                            {% render_field field class="form-control" value=breeder.postcode %}
                                         {% elif field.label == 'Phone number1' %}
                                             {% render_field field class="form-control" value=breeder.phone_number1 %}
                                         {% elif field.label == 'Phone number2' %}

@@ -16,7 +16,11 @@ class BreederForm(forms.ModelForm):
         widgets = {
             'breeding_prefix': forms.TextInput(attrs={'required': True, 'class': 'form-control', 'id': 'id_breeding_prefix'}),
             'contact_name': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_contact_name'}),
-            'address': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_address'}),
+            'address_line_1': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_address_line_1'}),
+            'address_line_2': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_address_line_2'}),
+            'town': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_town'}),
+            'country': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_country'}),
+            'postcode': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_postcode'}),
             'phone_number1': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_phone_number1'}),
             'phone_number2': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_phone_number2'}),
             'email': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_email'}),
