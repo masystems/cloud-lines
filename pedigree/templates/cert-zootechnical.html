@@ -213,6 +213,7 @@ and caprine species
                     <p>
                         9. Date (use format dd/mm/yyyy or ISO 8601) (<small>8</small>) and country of birth of animal
                         <p class="ans">{{ lvl1.dob|date:'d/m/Y' }}</p>
+                        <p class="ans">{{ lvl1.breeder.country }}</p>
                     </p>
                 </td>
             </tr>
@@ -221,8 +222,8 @@ and caprine species
                     <p>
                         <span class="number">10.</span> Name, address and e-mail address(<small>3</small>) of breeder
                     </p>
-                    <p class="ans">{% if lvl1.breeder.breeding_prefix %}{{ lvl1.breeder.breeding_prefix }}, {% endif %}
-                        {% if lvl1.breeder.address %}{{ lvl1.breeder.address }}, {% endif %}
+                    <p class="ans">{% if lvl1.breeder.breeding_prefix %}{{ lvl1.breeder.breeding_prefix }},<br> {% endif %}
+                        {{ lvl1.breeder.address_line_1 }}<br>{{ lvl1.breeder.address_line_2 }}<br>{{ lvl1.breeder.town }}<br>{{ lvl1.breeder.country }}<br>{{ lvl1.breeder.postcode }}<br>
                         {{ lvl1.breeder.email }}
                     </p>
                 </td>
@@ -233,7 +234,7 @@ and caprine species
                         <span class="number">11.</span> Name, address and e-mail address (<small>3</small>) of owner
                     </p>
                     <p class="ans">{% if lvl1.current_owner.breeding_prefix %}{{ lvl1.current_owner.breeding_prefix }}, {% endif %}
-                        {% if lvl1.current_owner.address %}{{ lvl1.current_owner.address }},  {% endif %}
+                        {{ lvl1.current_owner.address_line_1 }}<br>{{ lvl1.current_owner.address_line_2 }}<br>{{ lvl1.current_owner.town }}<br>{{ lvl1.current_owner.country }}<br>{{ lvl1.current_owner.postcode }}<br>
                         {{ lvl1.current_owner.email }}</p>
                 </td>
             </tr>
