@@ -54,7 +54,11 @@ def breeder_csv(request):
     writer = csv.writer(response)
     writer.writerow(['breeding_prefix',
                      'contact_name',
-                     'address',
+                     'address_line_1',
+                     'address_line_2',
+                     'town',
+                     'country',
+                     'postcode',
                      'phone_number1',
                      'phone_number2',
                      'email',
@@ -63,7 +67,11 @@ def breeder_csv(request):
     for row in breeder.all():
         writer.writerow([row.breeding_prefix,
                          row.contact_name,
-                         row.address,
+                         row.address_line_1,
+                         row.address_line_2,
+                         row.town,
+                         row.country,
+                         row.postcode,
                          row.phone_number1,
                          row.phone_number2,
                          row.email,
@@ -89,7 +97,11 @@ def new_breeder_form(request):
             new_breeder = Breeder()
             new_breeder.breeding_prefix = breeder_form['breeding_prefix'].value().replace("'", "").replace("/", "")
             new_breeder.contact_name = breeder_form['contact_name'].value()
-            new_breeder.address = breeder_form['address'].value()
+            new_breeder.address_line_1 = breeder_form['address_line_1'].value()
+            new_breeder.address_line_2 = breeder_form['address_line_2'].value()
+            new_breeder.town = breeder_form['town'].value()
+            new_breeder.country = breeder_form['country'].value()
+            new_breeder.postcode = breeder_form['postcode'].value()
             new_breeder.phone_number1 = breeder_form['phone_number1'].value()
             new_breeder.phone_number2 = breeder_form['phone_number2'].value()
             new_breeder.email = breeder_form['email'].value()
