@@ -1200,7 +1200,11 @@ def import_breeder_data(request):
         # get all options ###################
         breeding_prefix = post_data['breeding_prefix'] or ''
         contact_name = post_data['contact_name'] or ''
-        address = post_data['address'] or ''
+        address_line_1 = post_data['address_line_1'] or ''
+        address_line_2 = post_data['address_line_2'] or ''
+        town = post_data['town'] or ''
+        country = post_data['country'] or ''
+        postcode = post_data['postcode'] or ''
         phone_number1 = post_data['phone_number1'] or ''
         phone_number2 = post_data['phone_number2'] or ''
         email = post_data['email'] or ''
@@ -1217,10 +1221,26 @@ def import_breeder_data(request):
             contact_name = loads(database_upload.header)['header'].index(contact_name)
         else:
             contact_name = thousand
-        if address:
-            address = loads(database_upload.header)['header'].index(address)
+        if address_line_1:
+            address_line_1 = loads(database_upload.header)['header'].index(address_line_1)
         else:
-            address = thousand
+            address_line_1 = thousand
+        if address_line_2:
+            address_line_2 = loads(database_upload.header)['header'].index(address_line_2)
+        else:
+            address_line_2 = thousand
+        if town:
+            town = loads(database_upload.header)['header'].index(town)
+        else:
+            town = thousand
+        if country:
+            country = loads(database_upload.header)['country'].index(town)
+        else:
+            country = thousand
+        if postcode:
+            postcode = loads(database_upload.header)['country'].index(town)
+        else:
+            postcode = thousand
         if phone_number1:
             phone_number1 = loads(database_upload.header)['header'].index(phone_number1)
         else:
@@ -1283,7 +1303,31 @@ def import_breeder_data(request):
                 pass
             ################### address
             try:
-                breeder.address = row[address]
+                breeder.address_line_1 = row[address_line_1]
+            except IndexError:
+                pass
+            except UnboundLocalError:
+                pass
+            try:
+                breeder.address_line_2 = row[address_line_2]
+            except IndexError:
+                pass
+            except UnboundLocalError:
+                pass
+            try:
+                breeder.town = row[town]
+            except IndexError:
+                pass
+            except UnboundLocalError:
+                pass
+            try:
+                breeder.country = row[country]
+            except IndexError:
+                pass
+            except UnboundLocalError:
+                pass
+            try:
+                breeder.postcode = row[postcode]
             except IndexError:
                 pass
             except UnboundLocalError:
