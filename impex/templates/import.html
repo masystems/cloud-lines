@@ -195,6 +195,60 @@
 
                 var header = reader.result.split('\n')[0].replaceAll('"', '').split(',')
                 header[header.length - 1] = header[header.length - 1].replace('\r', '')
+
+                // number of columns
+                var colNum = header.length
+
+                // get all fields, excluding the header
+                var allFields = reader.result.replace(reader.result.split('\n')[0], '').replaceAll('"', '').split(',')
+
+                // get all rows,  using all fields
+                var allRows = []
+                while (allFields.length > 1) {
+                    // variable to create new row
+                    var newRow = []
+
+                    // last occurence of new line character in last field of this row (set later)
+                    var lastNewLine = colNum - 1
+                    
+                    // populate new row with fields
+                    allFields.slice(0, colNum).forEach((field, index) => {
+                        // if we are not on the last field of the row
+                        if (index < colNum - 1) {
+                            // add field to row, cleaning it of new line characters
+                            newRow.push(field)
+                        }
+                        // if this is the last field of the row
+                        else {
+                            // get last occurence of new line character
+                            var slashN = field.lastIndexOf('\n')
+                            var slashR = field.lastIndexOf('\r')
+                            // set to index of last \n if that is present and is last
+                            if (slashN != -1 && slashN > slashR) {
+                                lastNewLine = slashN
+                            }
+                            // set to index of last \r if that is present and is last
+                            else if (slashR != -1 && slashR > slashN) {
+                                lastNewLine = slashR
+                            }
+
+                            newRow.push(field.substring(0, lastNewLine))
+                        }
+                    })
+
+                    // remove new line characters from new row
+                    newRow.forEach((field, index) => {
+                        newRow[index] = field.replaceAll('\n', '').replaceAll('\r', '')
+                    })
+                    // add row to allRows
+                    allRows.push(newRow)
+
+                    // remove processed fields from allFields, apart from the last in the row
+                    // for field in newRow, remove from allFields -- if last field, update field in allFields to not include after the new line
+                    allFields.splice(0, colNum - 1)
+                    // update the field in allFields used to populate the last field in this row so it doesn't include the part that corresponded with this row
+                    allFields[0] = allFields[0].substring(lastNewLine, allFields[0].length).replaceAll('\n', '').replaceAll('\r', '')
+                }
                 
                 // post request to process the header of the uploaded file
                 $.ajax({
@@ -212,16 +266,16 @@
                         // result = JSON.parse(result)
                         if (result.result == 'success') {
                             // process file slices
-                            slicesJob()
+                            slicesJob(allRows)
                         }
                     }
                 })
 
-                function slicesJob() {
+                function slicesJob(allRows) {
                     // maximum size of slice
                     var sliceMax = 200
                     // the start of the first slice
-                    var sliceStart = 1
+                    var sliceStart = 0
                     // the line which is the end of the first slice
                     var sliceEnd = sliceMax
                     if (totalLines < sliceMax) {
@@ -234,15 +288,12 @@
                     // go through slices of the file
                     while (sliceEnd <= totalLines) {
                         // get slice of file
-                        fileSliceArray = reader.result.split('\n').slice(sliceStart, sliceEnd)
+                        fileSliceArray = allRows.slice(sliceStart, sliceEnd)
 
-                        // turn each row into the correct format, and add row number column
+                        // add row number column
                         fileSliceArray.forEach(updateSlice)
                         function updateSlice(row, index) {
-                            var row = row.replace('\r', '')
-                            row = row.replaceAll('"', '').split(',').concat([rowCounter])
-
-                            fileSliceArray[index] = row
+                            fileSliceArray[index] = row.concat([rowCounter])
                             rowCounter += 1
                         }
                         
