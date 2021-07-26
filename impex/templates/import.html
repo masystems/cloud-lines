@@ -247,7 +247,9 @@
                     // for field in newRow, remove from allFields -- if last field, update field in allFields to not include after the new line
                     allFields.splice(0, colNum - 1)
                     // update the field in allFields used to populate the last field in this row so it doesn't include the part that corresponded with this row
-                    allFields[0] = allFields[0].substring(lastNewLine, allFields[0].length).replaceAll('\n', '').replaceAll('\r', '')
+                    if (allFields.length > 0) {
+                        allFields[0] = allFields[0].substring(lastNewLine, allFields[0].length).replaceAll('\n', '').replaceAll('\r', '')
+                    }
                 }
                 
                 // post request to process the header of the uploaded file
