@@ -54,7 +54,7 @@ def get_pedigrees(request):
             Q(dod__icontains=search) |
             Q(status__icontains=search) |
             Q(sex__icontains=search) |
-            Q(litter_size__icontains=search_int) |
+            Q(litter_size__iexact=search_int) |
             Q(parent_father__reg_no__icontains=search) |
             Q(parent_father_notes__icontains=search) |
             Q(parent_mother__reg_no__icontains=search) |
@@ -77,7 +77,7 @@ def get_pedigrees(request):
             Q(dod__icontains=search) |
             Q(status__icontains=search) |
             Q(sex__icontains=search) |
-            Q(litter_size__icontains=search_int) |
+            Q(litter_size__iexact=search_int) |
             Q(parent_father__reg_no__icontains=search) |
             Q(parent_father_notes__icontains=search) |
             Q(parent_mother__reg_no__icontains=search) |
