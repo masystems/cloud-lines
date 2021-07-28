@@ -747,7 +747,7 @@ def import_pedigree_data(request):
                             if row[sex].lower() == 'm':
                                 pedigree.sex = 'male'
                             else:
-                                pedigree.sex == 'female'
+                                pedigree.sex = 'female'
                         # invalid, so add error
                         else:
                             errors = loads(database_upload.errors)
