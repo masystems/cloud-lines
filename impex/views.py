@@ -233,6 +233,9 @@ def import_data(request):
     return redirect('dashboard')
 
 
+
+# variable to store whether the pedigree has any errors
+has_error = False
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor)
 def import_pedigree_data(request):
@@ -386,6 +389,7 @@ def import_pedigree_data(request):
                     ped_name = ''
 
                 # variable to store whether the pedigree has any errors
+                global has_error
                 has_error = False
                 
                 # get breeder. error if breeder missing from the row ###################
