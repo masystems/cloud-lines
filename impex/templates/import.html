@@ -141,6 +141,7 @@
 </script>
 
 <!-- save the file when selected -->
+<script src="{% static 'js/jquery.csv.js' %}"></script>
 <script>
     function showFile(input) {
         if ($('#uploadDatabase').val() != '') {
@@ -149,6 +150,9 @@
             let reader = new FileReader()
             reader.readAsText(inputFile)
             reader.onload = function() {
+                // the content of the csv file
+                var csvContent = $.csv.toArrays(reader.result)
+                
                 // variable to store whether there were errors
                 var errors = false
                 
@@ -170,7 +174,7 @@
                 }
 
                 // find number of lines in file and update modal
-                var totalLines = reader.result.match(/\r?\n/g).length
+                var totalLines = csvContent.length - 1
 
                 // validate file size
                 if (totalLines < 1) {
@@ -193,64 +197,13 @@
                     $('#errors').addClass('d-none')
                 }
 
-                var header = reader.result.split('\n')[0].replaceAll('"', '').split(',')
-                header[header.length - 1] = header[header.length - 1].replace('\r', '')
+                var header = csvContent[0]
 
                 // number of columns
                 var colNum = header.length
 
-                // get all fields, excluding the header
-                var allFields = reader.result.replace(reader.result.split('\n')[0], '').replaceAll('"', '').split(',')
-
                 // get all rows,  using all fields
-                var allRows = []
-                while (allFields.length > 1) {
-                    // variable to create new row
-                    var newRow = []
-
-                    // last occurence of new line character in last field of this row (set later)
-                    var lastNewLine = colNum - 1
-                    
-                    // populate new row with fields
-                    allFields.slice(0, colNum).forEach((field, index) => {
-                        // if we are not on the last field of the row
-                        if (index < colNum - 1) {
-                            // add field to row, cleaning it of new line characters
-                            newRow.push(field)
-                        }
-                        // if this is the last field of the row
-                        else {
-                            // get last occurence of new line character
-                            var slashN = field.lastIndexOf('\n')
-                            var slashR = field.lastIndexOf('\r')
-                            // set to index of last \n if that is present and is last
-                            if (slashN != -1 && slashN > slashR) {
-                                lastNewLine = slashN
-                            }
-                            // set to index of last \r if that is present and is last
-                            else if (slashR != -1 && slashR > slashN) {
-                                lastNewLine = slashR
-                            }
-
-                            newRow.push(field.substring(0, lastNewLine))
-                        }
-                    })
-
-                    // remove new line characters from new row
-                    newRow.forEach((field, index) => {
-                        newRow[index] = field.replaceAll('\n', '').replaceAll('\r', '')
-                    })
-                    // add row to allRows
-                    allRows.push(newRow)
-
-                    // remove processed fields from allFields, apart from the last in the row
-                    // for field in newRow, remove from allFields -- if last field, update field in allFields to not include after the new line
-                    allFields.splice(0, colNum - 1)
-                    // update the field in allFields used to populate the last field in this row so it doesn't include the part that corresponded with this row
-                    if (allFields.length > 0) {
-                        allFields[0] = allFields[0].substring(lastNewLine, allFields[0].length).replaceAll('\n', '').replaceAll('\r', '')
-                    }
-                }
+                var allRows = csvContent.slice(1, csvContent.length)
                 
                 // post request to process the header of the uploaded file
                 $.ajax({
