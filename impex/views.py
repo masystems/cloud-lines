@@ -747,7 +747,7 @@ def import_pedigree_data(request):
                             if row[sex].lower() == 'm':
                                 pedigree.sex = 'male'
                             else:
-                                pedigree.sex == 'female'
+                                pedigree.sex = 'female'
                         # invalid, so add error
                         else:
                             errors = loads(database_upload.errors)
@@ -1128,7 +1128,7 @@ def import_pedigree_data(request):
             
             # check whether there are any more file slices left. if there are, tell the browser to go again
             elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
-                completed_lines = FileSlice.objects.filter(database_upload=database_upload, used=True).count() * 200
+                completed_lines = FileSlice.objects.filter(database_upload=database_upload, used=True).count() * 100
                 remaining_lines = database_upload.total_lines - completed_lines
                 return HttpResponse(dumps({'result': 'again',
                                            'completed': completed_lines,
