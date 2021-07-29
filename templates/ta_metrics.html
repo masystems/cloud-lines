@@ -118,7 +118,7 @@
                                 '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + ped.fields.name + '</li>'
                             );
                             // if one exists, append pedigree tag number
-                            if (ped.fields.tag_no != '') {
+                            if (ped.fields.tag_no != '' && ped.fields.tag_no != null) {
                                 info_element.html(info_element.html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + ped.fields.tag_no + '</li>')
                             }
                             info_element.removeClass('d-none');
