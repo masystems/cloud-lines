@@ -154,7 +154,19 @@
                     <h4 class="card-title">Calculations</h4>
                     <p id="coiTimer" class="text-center"></p>
                     {% if not read_only %}
-                        <button id="coiBtn" onclick="runCoi()" type="button" class="btn btn-block btn-success ml-1">Run COI</button>
+                        {% if breeds.all.count == 1 %}
+                            <button id="coiBtn" onclick="runCoi()" type="button" class="btn btn-block btn-success ml-1" value="">Run COI</button>
+                        {% else %}
+                            <button id="coiBtn" type="button" class="btn btn-block btn-success dropdown-toggle ml-1"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Run COI
+                            </button>
+                            <div class="dropdown-menu">
+                                {% for breed in breeds.all %}
+                                    <button onclick="runCoi()" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     {% endif %}
                     <hr>
                     <p id="meanKinshipTimer" class="text-center"></p>
@@ -166,7 +178,6 @@
         </div>
         <script>
             function runCoi() {
-                console.log('hello')
                 $.ajax({
                     url: "{% url 'run_coi' %}",
                     type: 'post',
