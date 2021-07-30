@@ -140,7 +140,7 @@ def run_coi(request):
     obj.last_run = datetime.now()
     obj.save()
 
-    coi(request, request.POST['breed'])
+    coi(request)
 
     obj.last_run = calc_last_run(attached_service, obj)
 
@@ -149,9 +149,9 @@ def run_coi(request):
     return HttpResponse(dumps({'coi_date': coi_date}))
 
 
-def coi(request, breed):
+def coi(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service, breed__id=breed).values('id',
+    pedigrees = Pedigree.objects.filter(account=attached_service, breed__id=request.POST['breed']).values('id',
                                                                          'parent_father__id',
                                                                          'parent_mother__id',
                                                                          'sex',
