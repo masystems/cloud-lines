@@ -154,12 +154,12 @@
                     <h4 class="card-title">Calculations</h4>
                     <p id="coiTimer" class="text-center"></p>
                     {% if not read_only %}
-                        <button id="coiBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>
+                        <button id="coiBtn" type="button" class="btn btn-block btn-success ml-1">Run COI</button>
                     {% endif %}
                     <hr>
                     <p id="meanKinshipTimer" class="text-center"></p>
                     {% if not read_only %}
-                        <button id="meanKinshipBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run Mean Kinship</button>
+                        <button id="meanKinshipBtn" type="button" class="btn btn-block btn-success ml-1">Run Mean Kinship</button>
                     {% endif %}
                 </div>
             </div>
@@ -167,7 +167,7 @@
         <script>
         $('#coiBtn').click( function() {
             $.ajax({
-                url: '{% url 'run_coi' %}',
+                url: "{% url 'run_coi' %}",
                 type: 'post',
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
                 dataType: 'text',
