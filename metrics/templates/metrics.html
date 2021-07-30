@@ -155,7 +155,7 @@
                     <p id="coiTimer" class="text-center"></p>
                     {% if not read_only %}
                         {% if breeds.all.count == 1 %}
-                            <button id="coiBtn" onclick="runCoi()" type="button" class="btn btn-block btn-success ml-1" value="">Run COI</button>
+                            <button id="coiBtn" onclick="runCoi(this)" type="button" class="btn btn-block btn-success ml-1" value="{{ breeds.first.id }}">Run COI</button>
                         {% else %}
                             <button id="coiBtn" type="button" class="btn btn-block btn-success dropdown-toggle ml-1"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -163,7 +163,7 @@
                             </button>
                             <div class="dropdown-menu">
                                 {% for breed in breeds.all %}
-                                    <button onclick="runCoi()" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                    <button onclick="runCoi(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
                                 {% endfor %}
                             </div>
                         {% endif %}
@@ -177,14 +177,14 @@
             </div>
         </div>
         <script>
-            function runCoi() {
+            function runCoi(breed) {
                 $.ajax({
                     url: "{% url 'run_coi' %}",
                     type: 'post',
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
                     dataType: 'text',
                     async: true,
-                    data: [],
+                    data: {'breed': breed.value},
                     beforeSend: function() {
                         $('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
                     },
