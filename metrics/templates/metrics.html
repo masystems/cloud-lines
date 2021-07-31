@@ -154,86 +154,114 @@
                     <h4 class="card-title">Calculations</h4>
                     <p id="coiTimer" class="text-center"></p>
                     {% if not read_only %}
-                        <button id="coiBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run COI</button>
+                        {% if breeds.all.count == 1 %}
+                            <button id="coiBtn" onclick="runCoi(this)" type="button" class="btn btn-block btn-success ml-1" value="{{ breeds.first.id }}">Run COI</button>
+                        {% elif breeds.all.count > 1 %}
+                            <div class="btn-group btn-block">
+                                <button id="coiBtn" type="button" class="btn btn-success dropdown-toggle ml-1"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Run COI
+                                </button>
+                                <div class="dropdown-menu">
+                                    {% for breed in breeds.all %}
+                                        <button onclick="runCoi(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
                     {% endif %}
                     <hr>
                     <p id="meanKinshipTimer" class="text-center"></p>
                     {% if not read_only %}
-                        <button id="meanKinshipBtn" type="button" class="btn btn-block btn-success ml-1" data-toggle="modal" data-target="#add-contact">Run Mean Kinship</button>
+                        {% if breeds.all.count == 1 %}
+                            <button id="meanKinshipBtn" onclick="runMK(this)" type="button" class="btn btn-block btn-success ml-1" value="{{ breeds.first.id }}">Run Mean Kinship</button>
+                        {% elif breeds.all.count > 1 %}
+                            <div class="btn-group btn-block">
+                                <button id="meanKinshipBtn" type="button" class="btn btn-success dropdown-toggle ml-1"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Run Mean Kinship
+                                </button>
+                                <div class="dropdown-menu">
+                                    {% for breed in breeds.all %}
+                                        <button onclick="runMK(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
         </div>
         <script>
-        $('#coiBtn').click( function() {
-            $.ajax({
-                url: '{% url 'run_coi' %}',
-                type: 'post',
-                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                dataType: 'text',
-                async: true,
-                data: [],
-                beforeSend: function() {
-                    $('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
-                },
-                success: function(data) {
-                    try {
-                            var result = JSON.parse(data);
-                            var coi_countDownDate = new Date(result.coi_date).getTime();
-                            var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
-                            infoMsg('COI now running, allow time for values to be updated')
-                        }
-                    catch(err) {
-                              // not returned anything
-                              var result = '';
+            function runCoi(breed) {
+                $.ajax({
+                    url: "{% url 'run_coi' %}",
+                    type: 'post',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    dataType: 'text',
+                    async: true,
+                    data: {'breed': breed.value},
+                    beforeSend: function() {
+                        $('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                    },
+                    success: function(data) {
+                        try {
+                                var result = JSON.parse(data);
+                                var coi_countDownDate = new Date(result.coi_date).getTime();
+                                var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
+                                infoMsg('COI now running, allow time for values to be updated')
                             }
-                 },
-                error: function(jqXHR, textStatus, errorThrown){
+                        catch(err) {
+                                // not returned anything
+                                var result = '';
+                                }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                    }
+                });
+            }
+
+            // Set the date we're counting down to and start loop interval
+            var coi_countDownDate = new Date("{{ coi_date }}").getTime();
+
+            var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
+
+
+            // Update the count down every 1 second
+            function coi_countDown(coi_countDownDate) {
+                // Get today's date and time
+                var coi_now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var coi_distance = coi_countDownDate - coi_now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var coi_days = Math.floor(coi_distance / (1000 * 60 * 60 * 24));
+                var coi_hours = Math.floor((coi_distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var coi_minutes = Math.floor((coi_distance % (1000 * 60 * 60)) / (1000 * 60));
+                var coi_seconds = Math.floor((coi_distance % (1000 * 60)) / 1000);
+
+                // If the count down is over, write some text
+
+                if (coi_distance < 0) {
+                    clearInterval(coi_countDownInterval);
+                    $("#coiTimer").html("COI ready!");
+                    $('#coiBtn').attr("disabled", false);
+                } else {
+                    // Output the result in an element with id="demo"
+                    $("#coiTimer").html('Run COI again in:<br/>' + coi_days + "d " + coi_hours + "h " + coi_minutes + "m " + coi_seconds + "s ");
+                    $('#coiBtn').attr("disabled", true);
                 }
-            });
-        });
-
-        // Set the date we're counting down to and start loop interval
-        var coi_countDownDate = new Date("{{ coi_date }}").getTime();
-
-        var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
-
-
-        // Update the count down every 1 second
-        function coi_countDown(coi_countDownDate) {
-          // Get today's date and time
-          var coi_now = new Date().getTime();
-
-          // Find the distance between now and the count down date
-          var coi_distance = coi_countDownDate - coi_now;
-
-          // Time calculations for days, hours, minutes and seconds
-          var coi_days = Math.floor(coi_distance / (1000 * 60 * 60 * 24));
-          var coi_hours = Math.floor((coi_distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          var coi_minutes = Math.floor((coi_distance % (1000 * 60 * 60)) / (1000 * 60));
-          var coi_seconds = Math.floor((coi_distance % (1000 * 60)) / 1000);
-
-          // If the count down is over, write some text
-
-          if (coi_distance < 0) {
-            clearInterval(coi_countDownInterval);
-            $("#coiTimer").html("COI ready!");
-            $('#coiBtn').attr("disabled", false);
-          } else {
-            // Output the result in an element with id="demo"
-            $("#coiTimer").html('Run COI again in:<br/>' + coi_days + "d " + coi_hours + "h " + coi_minutes + "m " + coi_seconds + "s ");
-            $('#coiBtn').attr("disabled", true);
-          }
-        }
-    </script>
+            }
+        </script>
         <script>
-        $('#meanKinshipBtn').click( function() {
+        function runMK(breed) {
             $.ajax({
-                url: '{% url 'run_mean_kinship' %}',
+                url: "{% url 'run_mean_kinship' %}",
                 type: 'post',
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
                 dataType: 'text',
-                data: [],
+                data: {'breed': breed.value},
                 beforeSend: function() {
                     $('#meanKinshipTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
                 },
@@ -242,7 +270,7 @@
                             var result = JSON.parse(data);
                             var mk_countDownDate = new Date(result.mean_kinship_date).getTime();
                             var mk_countDownInterval = setInterval(function() { mk_countDown(mk_countDownDate); }, 1000);
-                            infoMsg('Mean Kindship now running, allow time for values to be updated')
+                            infoMsg('Mean Kinship now running, allow time for values to be updated')
                         }
                     catch(err) {
                               // not returned anything
@@ -252,7 +280,7 @@
                 error: function(jqXHR, textStatus, errorThrown){
                 }
             });
-        });
+        }
 
         // Set the date we're counting down to and start loop interval
         var mk_countDownDate = new Date("{{ mean_kinship_date }}").getTime();
