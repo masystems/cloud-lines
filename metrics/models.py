@@ -42,6 +42,10 @@ class StudAdvisorQueue(models.Model):
     email_sent = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
+    mk_threshold = models.DecimalField(max_digits=6, decimal_places=4, verbose_name='Mean Kinship threshold',
+                                       help_text="This value is the mean kinship threshold of the breed of the mother "
+                                                 "at the time this stud advice was created.",
+                                       blank=True, null=True, default=0.0000)
 
 
 class DataValidatorQueue(models.Model):

@@ -112,7 +112,11 @@
         $('#mdMeanKinship').hide().html('<i class="ti-angle-right"></i> Mean Kinship: ' + "{{ mother_details.mk }}").fadeIn(fade);
         $('#breedDetails').removeClass('d-none');
         $('#breedName').hide().html('<i class="ti-angle-right"></i> Name: ' + "{{ sa_queue_item.mother.breed }}").fadeIn(fade);
-        $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Threshold: ' + "{{ mother_details.threshold }}").fadeIn(fade);
+        if ({{ mk_threshold }} != null && {{ mk_threshold }} != '') {
+            $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Threshold Used: ' + "{{ mk_threshold }}").fadeIn(fade);
+        } else {
+            $('#breedThreshold').hide().html('<i class="ti-angle-right"></i> Threshold: ' + "{{ mother_details.threshold }}").fadeIn(fade);
+        }
         if ({{ mother_details.breed_mean_coi }} != "0.0000") {
             $('#breedMeanCoi').hide().html('<i class="ti-angle-right"></i> Mean COI: ' + String(parseFloat({{ mother_details.breed_mean_coi }}).toFixed(2))).fadeIn(fade);
         } else {
