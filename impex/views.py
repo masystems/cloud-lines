@@ -513,18 +513,32 @@ def import_pedigree_data(request):
                                 return ped, has_error
                             # if not for account, create error, as the reg number is taken
                             else:
-                                errors = loads(database_upload.errors)
-                                errors['invalid'].append({
-                                    'col': 'Registration Number',
-                                    'row': row_number,
-                                    'name': ped_name,
-                                    'reason': 'this registration number is being used by another account - please specify a different one'
-                                })
-                                database_upload.errors = dumps(errors)
-                                database_upload.save()
-                                # set has_error
-                                has_error = True
-                                return None, has_error
+                                if is_parent:
+                                    errors = loads(database_upload.errors)
+                                    errors['invalid'].append({
+                                        'col': f'{is_parent}',
+                                        'row': row_number,
+                                        'name': ped_name,
+                                        'reason': f'this registration number for {is_parent} is being used by another account - please specify a different one'
+                                    })
+                                    database_upload.errors = dumps(errors)
+                                    database_upload.save()
+                                    # set has_error
+                                    has_error = True
+                                    return None, has_error
+                                else:
+                                    errors = loads(database_upload.errors)
+                                    errors['invalid'].append({
+                                        'col': 'Registration Number',
+                                        'row': row_number,
+                                        'name': ped_name,
+                                        'reason': 'this registration number is being used by another account - please specify a different one'
+                                    })
+                                    database_upload.errors = dumps(errors)
+                                    database_upload.save()
+                                    # set has_error
+                                    has_error = True
+                                    return None, has_error
                     else:
                         return None, has_error
 
