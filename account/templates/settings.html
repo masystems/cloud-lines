@@ -174,10 +174,11 @@
                                                             <label for="status" class="control-label">Status</label>
                                                             <div class="col-sm-9">
                                                                 <select class="form-control" id="status" name="status" required>
-                                                                <option value="Read Only">Read Only</option>
-                                                                <option value="Contributor">Contributor</option>
-                                                                <option value="Editor">Editor</option>
-                                                            </select>
+                                                                    <option value="Read Only">Read Only</option>
+                                                                    <option value="Contributor">Contributor</option>
+                                                                    <option value="Editor">Editor</option>
+                                                                    <option value="Breed Editor">Breed Editor</option>
+                                                                </select>
                                                             </div>
                                                         </div>
                                                         <input type="hidden" id="formType" name="formType" value="new">
@@ -367,6 +368,11 @@
                                         }
                                     });
                                 });
+
+                                $('#status').change(function() {
+                                    if ($(this).val() == 'Breed Editor') {
+                                    }
+                                })
                             </script>
                         </div>
                     </div>
