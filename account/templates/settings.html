@@ -188,7 +188,7 @@
                                                             <div class="col-sm-9">
                                                                 <div class="checkbox checkbox-success">
                                                                     {% for breed in breeds %}
-                                                                        <input id="{{ breed }}" value="{{ breed }}" type="checkbox">
+                                                                        <input id="{{ breed }}" name="{{ breed }}" type="checkbox">
                                                                         <label for="{{ breed }}" class="mb-0" for="checkbox"> {{ breed|title }} </label>
                                                                     {% endfor %}
                                                                 </div>
