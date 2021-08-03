@@ -198,6 +198,12 @@ def user_edit(request):
             if request.POST.get('status') == 'Editor':
                 main_account.admin_users.add(new_user)
 
+            elif request.POST.get('status') == 'Breed Editor':
+                for breed in Breed.objects.filter(account=main_account):
+                    if request.POST.get(breed.breed_name):
+                        breed.breed_admins.add(new_user)
+                        breed.save()
+
             elif request.POST.get('status') == 'Contributor':
                 main_account.contributors.add(new_user)
 
@@ -243,6 +249,11 @@ def user_edit(request):
             # add user to the request group
             if request.POST.get('status') == 'Editor':
                 main_account.admin_users.add(new_user)
+            elif request.POST.get('status') == 'Breed Editor':
+                for breed in Breed.objects.filter(account=main_account):
+                    if request.POST.get(breed.breed_name):
+                        breed.breed_admins.add(new_user)
+                        breed.save()
             if request.POST.get('status') == 'Contributor':
                 main_account.contributors.add(new_user)
             else:
