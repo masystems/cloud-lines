@@ -181,7 +181,7 @@
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
+                                                        <div class="form-group d-none" id="breeds-checkboxes">
                                                             Please select the breed(s) this user is an editor for
                                                             <div class="col-sm-9">
                                                                 <div class="checkbox checkbox-success">
@@ -381,7 +381,16 @@
                                 });
 
                                 $('#status').change(function() {
+                                    // display breed checkboxes if breed editor is selected
                                     if ($(this).val() == 'Breed Editor') {
+                                        if ($('#breeds-checkboxes').hasClass('d-none')) {
+                                            $('#breeds-checkboxes').removeClass('d-none')
+                                        }
+                                    }
+                                    else {
+                                        if (!$('#breeds-checkboxes').hasClass('d-none')) {
+                                            $('#breeds-checkboxes').addClass('d-none')
+                                        }
                                     }
                                 })
                             </script>
