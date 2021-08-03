@@ -396,7 +396,7 @@ def settings(request):
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
                                              'active_pedigree_columns': active_pedigree_columns,
-                                             'breeds': breeds})
+                                             'breeds': Breed.objects.filter(account=attached_service)})
 
 
 @user_passes_test(is_editor)
