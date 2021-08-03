@@ -378,9 +378,14 @@ def settings(request):
 
     active_pedigree_columns = attached_service.pedigree_columns.split(',')
 
+    breeds = []
+    for breed in Breed.objects.filter(account=attached_service):
+        breeds.append(breed.breed_name)
+
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
-                                             'active_pedigree_columns': active_pedigree_columns})
+                                             'active_pedigree_columns': active_pedigree_columns,
+                                             'breeds': breeds})
 
 
 @user_passes_test(is_editor)

@@ -181,6 +181,17 @@
                                                                 </select>
                                                             </div>
                                                         </div>
+                                                        <div class="form-group">
+                                                            Please select the breed(s) this user is an editor for
+                                                            <div class="col-sm-9">
+                                                                <div class="checkbox checkbox-success">
+                                                                    {% for breed in breeds %}
+                                                                        <input id="{{ breed }}" value="{{ breed }}" type="checkbox">
+                                                                        <label for="{{ breed }}" class="mb-0" for="checkbox"> {{ breed }} </label>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <input type="hidden" id="formType" name="formType" value="new">
                                                     </div>
                                                 </form>
