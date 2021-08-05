@@ -108,17 +108,15 @@
                                         {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
-                                {% for breed in breeds.all %}
-                                    {% for user in breed.breed_admins.all %}
-                                        <tr>
-                                            <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.first_name }}</td>
-                                            <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.last_name }}</td>
-                                            <td>{{ user.username }}</td>
-                                            <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.email }}</td>
-                                            <td><span class="label label-light-info"> Breed Editor</span></td>
-                                            {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
-                                        </tr>
-                                    {% endfor %}
+                                {% for breed_admin in breed_admins %}
+                                    <tr>
+                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.first_name }}</td>
+                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.last_name }}</td>
+                                        <td>{{ breed_admin.username }}</td>
+                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.email }}</td>
+                                        <td><span class="label label-light-info"> Breed Editor</span></td>
+                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
+                                    </tr>
                                 {% endfor %}
                                 {% for user in service.contributors.all %}
                                     <tr>
@@ -199,7 +197,7 @@
                                                             Please select the breed(s) this user is an editor for
                                                             <div class="col-sm-9">
                                                                 <div class="checkbox checkbox-success">
-                                                                    {% for breed in breeds.all %}
+                                                                    {% for breed in breeds %}
                                                                         <input id="{{ breed.breed_name }}" name="{{ breed.breed_name }}" type="checkbox">
                                                                         <label for="{{ breed.breed_name }}" class="mb-0" for="checkbox"> {{ breed.breed_name|title }} </label>
                                                                     {% endfor %}

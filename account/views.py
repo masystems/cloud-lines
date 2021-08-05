@@ -394,10 +394,21 @@ def settings(request):
 
     active_pedigree_columns = attached_service.pedigree_columns.split(',')
 
+    breeds = []
+    breed_admins = []
+    for breed in Breed.objects.filter(account=attached_service):
+        # add each breed to context
+        breeds.append(breed)
+        for breed_admin in breed.breed_admins.all():
+            if breed_admin not in breed_admins:
+                # add each breed admin to context
+                breed_admins.append(breed_admin)
+
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
                                              'active_pedigree_columns': active_pedigree_columns,
-                                             'breeds': Breed.objects.filter(account=attached_service)})
+                                             'breeds': breeds,
+                                             'breed_admins': breed_admins})
 
 
 @user_passes_test(is_editor)
