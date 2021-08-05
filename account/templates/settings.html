@@ -322,6 +322,11 @@
                                         errorMsg('Email not given!')
                                         valid = false
                                     }
+                                    // validate email
+                                    else if (!$("#register-form-email").val().match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g)) {
+                                        errorMsg('Email invalid!')
+                                        valid = false
+                                    }
                                     if ($("#register-form-username").val() == '') {
                                         errorMsg('Username not given!')
                                         valid = false
