@@ -198,7 +198,7 @@
                                                             <div class="col-sm-9">
                                                                 <div class="checkbox checkbox-success">
                                                                     {% for breed in breeds %}
-                                                                        <input id="{{ breed.breed_name }}" name="{{ breed.breed_name }}" type="checkbox">
+                                                                        <input id="{{ breed.breed_name }}" name="{{ breed.breed_name }}" type="checkbox" class="breed-input">
                                                                         <label for="{{ breed.breed_name }}" class="mb-0" for="checkbox"> {{ breed.breed_name|title }} </label>
                                                                     {% endfor %}
                                                                 </div>
@@ -338,6 +338,21 @@
                                     if ($('#firstName').val() == '') {
                                         errorMsg('First Name not given!')
                                         valid = false
+                                    }
+
+                                    // if breed admin status selected, ensure that breed is selected
+                                    if ($('#status').val() == 'Breed Editor') {
+                                        var noneSelected = true
+                                        $('.breed-input').each(function(index, input) {
+                                            if ($(input).is(':checked')) {
+                                                noneSelected = false
+                                                return false
+                                            }
+                                        })
+                                        if (noneSelected) {
+                                            errorMsg('Breed not selected!')
+                                            valid = false
+                                        }
                                     }
 
                                     if (valid) {
