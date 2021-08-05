@@ -187,7 +187,7 @@
                                                                     <option value="Read Only">Read Only</option>
                                                                     <option value="Contributor">Contributor</option>
                                                                     <option value="Editor">Editor</option>
-                                                                    {% if breeds|length > 0 %}
+                                                                    {% if breeds|length > 0 and service.service.multi_breed %}
                                                                         <option value="Breed Editor">Breed Editor</option>
                                                                     {% endif %}
                                                                 </select>
