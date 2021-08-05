@@ -316,26 +316,47 @@
                                 });
 
                                 $("#userFormBtn").click( function(){
-                                    $.ajax({
-                                        url: "{% url 'user_edit' %}",
-                                        type: 'POST',
-                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                                        dataType: 'text',
-                                        data: $('#editor').serialize(),
-                                        success: function(data) {
-                                            console.log(data);
-                                            var result = JSON.parse(data);
-                                            if (result.success){
-                                                $('#verticalcenter').modal('toggle');
-                                                window.location.href = window.location.href.split('#')[0] + "#users";
-                                                location.reload();
-                                            } else {
-                                                $('#verticalcenter').modal('toggle');
-                                                window.location.href = window.location.href.split('#')[0] + "#users";
-                                                location.reload();
+                                    // validate required fields are selected
+                                    var valid = true
+                                    if ($("#register-form-email").val() == '') {
+                                        errorMsg('Email not given!')
+                                        valid = false
+                                    }
+                                    if ($("#register-form-username").val() == '') {
+                                        errorMsg('Username not given!')
+                                        valid = false
+                                    }
+                                    if ($('#lastName').val() == '') {
+                                        errorMsg('Last Name not given!')
+                                        valid = false
+                                    }
+                                    if ($('#firstName').val() == '') {
+                                        errorMsg('First Name not given!')
+                                        valid = false
+                                    }
+
+                                    if (valid) {
+                                        $.ajax({
+                                            url: "{% url 'user_edit' %}",
+                                            type: 'POST',
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            dataType: 'text',
+                                            data: $('#editor').serialize(),
+                                            success: function(data) {
+                                                console.log(data);
+                                                var result = JSON.parse(data);
+                                                if (result.success){
+                                                    $('#verticalcenter').modal('toggle');
+                                                    window.location.href = window.location.href.split('#')[0] + "#users";
+                                                    location.reload();
+                                                } else {
+                                                    $('#verticalcenter').modal('toggle');
+                                                    window.location.href = window.location.href.split('#')[0] + "#users";
+                                                    location.reload();
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                                    }
                                 });
 
 
