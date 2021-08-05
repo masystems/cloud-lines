@@ -151,7 +151,7 @@ def run_coi(request):
 
 def coi(request):
     attached_service = get_main_account(request.user)
-    pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
+    pedigrees = Pedigree.objects.filter(account=attached_service, breed__id=request.POST['breed']).values('id',
                                                                          'parent_father__id',
                                                                          'parent_mother__id',
                                                                          'sex',
@@ -284,42 +284,41 @@ def run_mean_kinship(request):
 
 def mean_kinship(request):
     attached_service = get_main_account(request.user)
-    breeds = Breed.objects.filter(account=attached_service)
-    for breed in breeds.all():
-        pedigrees = Pedigree.objects.filter(account=attached_service, breed=breed, status='alive').values('id',
-                                                                                          'parent_father__id',
-                                                                                          'parent_mother__id',
-                                                                                          'sex',
-                                                                                          'breed__breed_name',
-                                                                                          'status')
-        if len(pedigrees) > 1:
-            # create unique paths
-            if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
-                host = attached_service.domain.partition('://')[2]
-                subdomain = host.partition('.')[0]
-                local_output = f"/tmp/mk_{subdomain}_output.json"
-                remote_output = f"metrics/mk_{subdomain}_output.json"
-                file_name = f"mk_{subdomain}_output.json"
-            else:
-                local_output = f"/tmp/mk_{attached_service.id}_output.json"
-                remote_output = f"metrics/mk_{attached_service.id}_output.json"
-                file_name = f"mk_{attached_service.id}_output.json"
+    
+    pedigrees = Pedigree.objects.filter(account=attached_service, breed=request.POST['breed'], status='alive').values('id',
+                                                                                        'parent_father__id',
+                                                                                        'parent_mother__id',
+                                                                                        'sex',
+                                                                                        'breed__breed_name',
+                                                                                        'status')
+    if len(pedigrees) > 1:
+        # create unique paths
+        if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
+            host = attached_service.domain.partition('://')[2]
+            subdomain = host.partition('.')[0]
+            local_output = f"/tmp/mk_{subdomain}_output.json"
+            remote_output = f"metrics/mk_{subdomain}_output.json"
+            file_name = f"mk_{subdomain}_output.json"
+        else:
+            local_output = f"/tmp/mk_{attached_service.id}_output.json"
+            remote_output = f"metrics/mk_{attached_service.id}_output.json"
+            file_name = f"mk_{attached_service.id}_output.json"
 
-            with open(local_output, 'w') as file:
-                file.write(dumps(list(pedigrees)))
+        with open(local_output, 'w') as file:
+            file.write(dumps(list(pedigrees)))
 
-            multi_part_upload_with_s3(local_output, remote_output)
+        multi_part_upload_with_s3(local_output, remote_output)
 
-            data = {'data_path': remote_output,
-                    'file_name': file_name,
-                    'domain': attached_service.domain}
+        data = {'data_path': remote_output,
+                'file_name': file_name,
+                'domain': attached_service.domain}
 
-            coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
-                                    json=dumps(data, cls=DjangoJSONEncoder), stream=True)
+        coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
+                                json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
-            # coi_dict = loads(coi_raw.json())
-            # for pedigree, value in coi_dict.items():
-            #     Pedigree.objects.filter(account=attached_service, id=pedigree.strip('X')).update(mean_kinship=value['1'])
+        # coi_dict = loads(coi_raw.json())
+        # for pedigree, value in coi_dict.items():
+        #     Pedigree.objects.filter(account=attached_service, id=pedigree.strip('X')).update(mean_kinship=value['1'])
 
 
 def stud_advisor_mother_details(request, mother):
@@ -400,7 +399,7 @@ def stud_advisor(request):
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/stud_advisor/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-    sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name)
+    sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name, mk_threshold=mother.breed.mk_threshold)
     response = {'status': 'message',
                 'msg': "",
                 'item_id': sa.id
@@ -413,7 +412,7 @@ def stud_advisor_results(request, id):
     sa_queue_item = StudAdvisorQueue.objects.get(account=attached_service, id=id)
     mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
     #mother_details = eval(mother_details.content.decode())
-
+    mk_threshold = sa_queue_item.mk_threshold
 
     with urllib.request.urlopen(f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/metrics/results-{sa_queue_item.file}") as results_file:
         results_raw = loads(results_file.read().decode())
@@ -422,7 +421,8 @@ def stud_advisor_results(request, id):
 
     return render(request, 'sa_results.html', {'results_raw': results_raw,
                                                'sa_queue_item': sa_queue_item,
-                                               'mother_details': mother_details})
+                                               'mother_details': mother_details,
+                                               'mk_threshold': mk_threshold})
 
 
 def results_complete(request):

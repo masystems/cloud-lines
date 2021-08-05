@@ -143,7 +143,7 @@
                                 '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</li>'
                             );
                             // if one exists, append mother tag number
-                            if (mother.fields.tag_no != '') {
+                            if (mother.fields.tag_no != '' && mother.fields.tag_no != null) {
                                 $('#mother-info').html($('#mother-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + mother.fields.tag_no + '</li>')
                             }
                             $('#mother-info').removeClass('d-none');
@@ -185,7 +185,7 @@
                                     '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</li>'
                                 );
                                 // if one exists, append mother tag number
-                                if (mother.fields.tag_no != '') {
+                                if (mother.fields.tag_no != '' && mother.fields.tag_no != null) {
                                     $('#mother-info').html($('#mother-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + mother.fields.tag_no + '</li>')
                                 }
                                 $('#mother-info').removeClass('d-none');
@@ -354,7 +354,7 @@
                                 '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + father.fields.name + '</li>'
                             );
                             // if one exists, append father tag number
-                            if (father.fields.tag_no != '') {
+                            if (father.fields.tag_no != '' && father.fields.tag_no != null) {
                                 $('#father-info').html($('#father-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + father.fields.tag_no + '</li>')
                             }
                             $('#father-info').removeClass('d-none');
@@ -396,7 +396,7 @@
                                     '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + father.fields.name + '</li>'
                                 );
                                 // if one exists, append father tag number
-                                if (father.fields.tag_no != '') {
+                                if (father.fields.tag_no != '' && father.fields.tag_no != null) {
                                     $('#father-info').html($('#father-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + father.fields.tag_no + '</li>')
                                 }
                                 $('#father-info').removeClass('d-none');
@@ -491,7 +491,7 @@
                                 '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + offspring.fields.name + '</li>'
                             );
                             // if one exists, append offspring tag number
-                            if (offspring.fields.tag_no != '') {
+                            if (offspring.fields.tag_no != '' && offspring.fields.tag_no != null) {
                                 $('#offspring-info').html($('#offspring-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + offspring.fields.tag_no + '</li>')
                             }
                             $('#offspring-info').removeClass('d-none');

@@ -445,8 +445,7 @@ def import_pedigree_data(request):
                     current_owner_obj = None
 
                 # get or create pedigrees ###################
-                def get_or_create_pedigree(pedigree, is_parent):
-                    global has_error
+                def get_or_create_pedigree(pedigree, is_parent, has_error):
                     if pedigree not in ('', None):
                         # check parent is not pedigree
                         if pedigree == row[reg_no].rstrip() and is_parent:
@@ -462,7 +461,7 @@ def import_pedigree_data(request):
                             database_upload.save()
                             # set has_error
                             has_error = True
-                            return None
+                            return None, has_error
                         if Pedigree.objects.filter(reg_no__iexact=pedigree).count() < 1:
                             # pedigree doesn't exist, so create one
                             # if parent, specify the sex appropriately
@@ -473,7 +472,7 @@ def import_pedigree_data(request):
                             else:
                                 pedigree_obj = Pedigree(account=attached_service, reg_no=pedigree)
                             
-                            return pedigree_obj
+                            return pedigree_obj, has_error
                         else:
                             # get existing pedigree to be updated
                             ped = Pedigree.objects.get(reg_no__iexact=pedigree)
@@ -495,7 +494,7 @@ def import_pedigree_data(request):
                                         database_upload.save()
                                         # set has_error
                                         has_error = True
-                                        return None
+                                        return None, has_error
                                     # check mother sex
                                     if (is_parent == 'mother' and ped.sex not in ('female', 'Female')):
                                         # error if mother sex wrong
@@ -510,24 +509,38 @@ def import_pedigree_data(request):
                                         database_upload.save()
                                         # set has_error
                                         has_error = True
-                                        return None
-                                return ped
+                                        return None, has_error
+                                return ped, has_error
                             # if not for account, create error, as the reg number is taken
                             else:
-                                errors = loads(database_upload.errors)
-                                errors['invalid'].append({
-                                    'col': 'Registration Number',
-                                    'row': row_number,
-                                    'name': ped_name,
-                                    'reason': 'this registration number is being used by another account - please specify a different one'
-                                })
-                                database_upload.errors = dumps(errors)
-                                database_upload.save()
-                                # set has_error
-                                has_error = True
-                                return None
+                                if is_parent:
+                                    errors = loads(database_upload.errors)
+                                    errors['invalid'].append({
+                                        'col': f'{is_parent}',
+                                        'row': row_number,
+                                        'name': ped_name,
+                                        'reason': f'this registration number for {is_parent} is being used by another account - please specify a different one'
+                                    })
+                                    database_upload.errors = dumps(errors)
+                                    database_upload.save()
+                                    # set has_error
+                                    has_error = True
+                                    return None, has_error
+                                else:
+                                    errors = loads(database_upload.errors)
+                                    errors['invalid'].append({
+                                        'col': 'Registration Number',
+                                        'row': row_number,
+                                        'name': ped_name,
+                                        'reason': 'this registration number is being used by another account - please specify a different one'
+                                    })
+                                    database_upload.errors = dumps(errors)
+                                    database_upload.save()
+                                    # set has_error
+                                    has_error = True
+                                    return None, has_error
                     else:
-                        return None
+                        return None, has_error
 
                 # parents ##########################
                 # error if mother is the same as father
@@ -548,11 +561,11 @@ def import_pedigree_data(request):
                         parents_different = False
                 if parents_different:
                     try:
-                        father_obj = get_or_create_pedigree(row[father], 'father')
+                        father_obj, has_error = get_or_create_pedigree(row[father], 'father', has_error)
                     except IndexError:
                         father_obj = None
                     try:
-                        mother_obj = get_or_create_pedigree(row[mother], 'mother')
+                        mother_obj, has_error = get_or_create_pedigree(row[mother], 'mother', has_error)
                     except IndexError:
                         mother_obj = None
 
@@ -629,7 +642,7 @@ def import_pedigree_data(request):
                 # got or create each new pedigree ###################
                 try:
                     # get or create pedigree
-                    pedigree = get_or_create_pedigree(row[reg_no], False)
+                    pedigree, has_error = get_or_create_pedigree(row[reg_no], False, has_error)
                 except IndexError:
                     pass
 

@@ -234,19 +234,20 @@ def user_edit(request):
             User.objects.filter(username=request.POST.get('register-form-username'),
                                 email=request.POST.get('register-form-email')).update(first_name=request.POST.get('firstName'),
                                                                                       last_name=request.POST.get('lastName'))
-            new_user = User.objects.get(username=request.POST.get('register-form-username'),
+            existing_user = User.objects.get(username=request.POST.get('register-form-username'),
                                     email=request.POST.get('register-form-email'))
-            # remove user from admins and read only users
-            main_account.admin_users.remove(new_user)
-            main_account.read_only_users.remove(new_user)
+            # remove user from admins and read only users and contributors
+            main_account.admin_users.remove(existing_user)
+            main_account.read_only_users.remove(existing_user)
+            main_account.contributors.remove(existing_user)
 
             # add user to the request group
             if request.POST.get('status') == 'Editor':
-                main_account.admin_users.add(new_user)
-            if request.POST.get('status') == 'Contributor':
-                main_account.contributors.add(new_user)
+                main_account.admin_users.add(existing_user)
+            elif request.POST.get('status') == 'Contributor':
+                main_account.contributors.add(existing_user)
             else:
-                main_account.read_only_users.add(new_user)
+                main_account.read_only_users.add(existing_user)
 
             return HttpResponse(json.dumps({'success': True}))
 
