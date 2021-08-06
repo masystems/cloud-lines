@@ -52,12 +52,19 @@ def site_mode(request):
                                                            Q(read_only_users=request.user, active=True)|
                                                            Q(user=user_detail, active=True)).distinct()
 
+        breeds = Breed.objects.filter(account=attached_service)
+
         # get user permission level
         editor = False
+        breeds_editable = []
         contributor = False
         read_only = False
         if str(request.user.username) == str(user.user.username):
             editor = True
+        elif breeds.exists():
+            for breed in breeds:
+                if request.user in breed.breed_admins.all():
+                    breeds_editable.append(breed.breed_name)
         elif request.user in attached_service.admin_users.all():
             editor = True
         elif request.user in attached_service.contributors.all():
@@ -111,6 +118,7 @@ def site_mode(request):
                 'users': users,
                 'add_breed': add_breed,
                 'editor': editor,
+                'breeds_editable': breeds_editable,
                 'contributor': contributor,
                 'read_only': read_only,
                 #'gdpr': gdpr,
