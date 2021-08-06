@@ -114,7 +114,7 @@
                                         <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.last_name }}</td>
                                         <td>{{ breed_admin.username }}</td>
                                         <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.email }}</td>
-                                        <td><span class="label label-light-info"> Breed Editor</span></td>
+                                        <td><span class="label label-light-info"> Breed Editor</span><p class="d-none">{% for breed in breeds %}{% if breed_admin in breed.breed_admins.all %}{{ breed.breed_name }},{% endif %}{% endfor %}</p></td>
                                         {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
@@ -249,6 +249,16 @@
                                     $("#register-form-username").prop("readonly", false);
                                     $('#register-form-email').val('');
                                     $("#register-form-email").prop("readonly", false);
+                                    $('#status').val('Read Only')
+                                    // iterate through checkboxes
+                                    $('.breed-input').each(function(index, checkbox) {
+                                        // reset the checkbox
+                                        $(checkbox).prop('checked', false)
+                                    })
+                                    // hide checkboxes (reset)
+                                    if (!$('#breeds-checkboxes').hasClass('d-none')) {
+                                        $('#breeds-checkboxes').addClass('d-none')
+                                    }
 
                                     // edit form type
                                     $('#formType').val('new');
@@ -270,8 +280,35 @@
                                     var breedEditor = status.includes('Breed Editor')
                                     var editor = status.includes('Editor');
                                     var contrib = status.includes('Contributor');
+                                    
+                                    // hide checkboxes (reset)
+                                    if (!$('#breeds-checkboxes').hasClass('d-none')) {
+                                        $('#breeds-checkboxes').addClass('d-none')
+                                    }
+                                    // uncheck the checkboxes
+                                    $('.breed-input').each(function(index, checkbox) {
+                                        $(checkbox).prop('checked', false)
+                                    })
+                                    
                                     if (breedEditor) {
                                         $('#status').val('Breed Editor');
+                                        // set breed checkboxes
+                                        var breeds = currentRow.find("p").text().split(',')
+                                        // iterate through checkboxes
+                                        $('.breed-input').each(function(index, checkbox) {
+                                            // iterate through breeds
+                                            breeds.forEach(breed => {
+                                                if (breed == $(checkbox).attr('id')) {
+                                                    // check the checkbox if we have a match
+                                                    $(checkbox).prop('checked', true)
+                                                    return false
+                                                }
+                                            })
+                                        })
+                                        // display checkboxes
+                                        if ($('#breeds-checkboxes').hasClass('d-none')) {
+                                            $('#breeds-checkboxes').removeClass('d-none')
+                                        }
                                     } else if (editor) {
                                         $('#status').val('Editor');
                                     } else if (contrib) {
