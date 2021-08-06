@@ -226,6 +226,23 @@ def kinship(request):
                     'msg': f"Father ({request.POST['father']}) is not a living male!"
                     }
         return HttpResponse(dumps(response))
+    
+    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("'", '').replace(', ', ',').split(',')
+    # if user is a breed admin
+    if len(breeds_editable) > 0:
+        # check that the breed of the mother is editable
+        if request.user not in mother.breed.breed_admins.all():
+            response = {'status': 'error',
+                        'msg': f"The breed of mother ({request.POST['mother']}) is not a breed you are an editor for!"
+                        }
+            return HttpResponse(dumps(response))
+
+        # check that the breed of the father is editable
+        if request.user not in father.breed.breed_admins.all():
+            response = {'status': 'error',
+                        'msg': f"The breed of father ({request.POST['father']}) is not a breed you are an editor for!"
+                        }
+            return HttpResponse(dumps(response))
 
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
