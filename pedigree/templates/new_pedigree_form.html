@@ -13,7 +13,8 @@
     {% for hidden in pedigree_form.hidden_fields %}
         {{ hidden }}
     {% endfor %}
-
+    <!-- hidden input which tells the backend whether user is a breed admin -->
+    <input type="hidden" name="breeds-editable" value="{{ breeds_editable }}">
     {% for field in pedigree_form.visible_fields %}
         <!-- check whether to show nothing (if the field is breed group and the mode isn't poultry) -->
         {% if field.label == 'Breed group' and service.site_mode != 'poultry' %}

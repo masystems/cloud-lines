@@ -336,6 +336,13 @@ def new_pedigree_form(request):
         if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
             pedigree_form.add_error('breed', 'Selected breed does not exist.')
             pre_checks = False
+        # get breeds editable (length is 0 if they're not a breed admin)
+        breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
+        if '' in breeds_editable:
+            breeds_editable.remove('')
+        if len(breeds_editable) > 0 and pedigree_form['breed'].value() not in breeds_editable:
+            pedigree_form.add_error('breed', 'You are not an editor for the selected breed.')
+            pre_checks = False
         if pedigree_form.is_valid() and pre_checks:
             new_pedigree = Pedigree()
             new_pedigree.creator = request.user
