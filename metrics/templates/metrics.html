@@ -82,6 +82,7 @@
                                 <ul class="list-icons d-none" id="father-info"></ul>
                             </div>
                         </div>
+                        <!-- hidden input which tells the backend whether user is a breed admin -->
                         <input type="hidden" name="breeds-editable" value="{{ breeds_editable }}">
                     </form>
                     <p id="ksMsg" class="mt-2 text-center"></p>
@@ -107,6 +108,8 @@
                                     <ul class="list-icons d-none" id="sa-info"></ul>
                                 </div>
                             </div>
+                            <!-- hidden input which tells the backend whether user is a breed admin -->
+                            <input type="hidden" name="breeds-editable" value="{{ breeds_editable }}">
                         </form>
                         <p id="saMsg" class="mt-2 text-center"></p>
                     </div>
