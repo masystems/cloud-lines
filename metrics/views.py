@@ -228,6 +228,7 @@ def kinship(request):
         return HttpResponse(dumps(response))
     
     breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("'", '').replace(', ', ',').split(',')
+    breeds_editable.remove('')
     # if user is a breed admin
     if len(breeds_editable) > 0:
         # check that the breed of the mother is editable
