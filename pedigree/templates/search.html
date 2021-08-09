@@ -120,6 +120,7 @@
                 url: "{% url 'get_pedigrees' %}",
                 type: "POST",
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                data: {'breeds-editable': '{{ breeds_editable }}'}
             },
             "columns": [
                 { data: "action" },
