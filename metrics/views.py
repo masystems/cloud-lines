@@ -245,6 +245,13 @@ def kinship(request):
                         }
             return HttpResponse(dumps(response))
 
+    # check that the mother and father are of the same breed
+    if mother.breed != father.breed:
+        response = {'status': 'error',
+                        'msg': f"The breed of mother ({request.POST['mother']}) does not match the breed of father ({request.POST['father']})!"
+                    }
+        return HttpResponse(dumps(response))
+
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
         subdomain = host.partition('.')[0]
