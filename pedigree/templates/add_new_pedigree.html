@@ -1,4 +1,4 @@
-{% if editor or contributor %}
+{% if editor or contributor or breeds_editable|length > 0 %}
     <a href="{% url 'new_pedigree_form' %}" class="btn btn-sm btn-outline-success waves-effect waves-light">
         <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</a>
 {% else %}

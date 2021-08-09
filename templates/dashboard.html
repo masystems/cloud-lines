@@ -24,7 +24,7 @@
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-info">
                             {% if add_pedigree %}
-                                {% if editor or contributor %}
+                                {% if editor or contributor or breeds_editable|length > 0 %}
                                     <a href="{% url 'new_pedigree_form' %}">
                                         <div class="box text-center">
                                             <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>

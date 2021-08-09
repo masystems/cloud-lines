@@ -27,7 +27,7 @@
         </div>
     <div class="col-md-6 col-4 align-self-center">
         {% if add_pedigree %}
-            {% if editor or contributor %}
+            {% if editor or contributor or breeds_editable|length > 0 %}
                 <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                 </a>
 
