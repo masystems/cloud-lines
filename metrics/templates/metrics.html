@@ -184,12 +184,14 @@
                         {% elif breeds.all.count > 1 %}
                             <div class="btn-group btn-block">
                                 <button id="meanKinshipBtn" type="button" class="btn btn-success dropdown-toggle ml-1"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {% if breeds_editable|length > 0 %}data-toggle="tooltip" data-placement="top" title="Can only run for your editable breeds"{% endif %}>
                                     Run Mean Kinship
                                 </button>
                                 <div class="dropdown-menu">
                                     {% for breed in breeds.all %}
-                                        <button onclick="runMK(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                        {% if breeds_editable|length == 0 or breed.breed_name in breeds_editable %}
+                                            <button onclick="runMK(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             </div>
