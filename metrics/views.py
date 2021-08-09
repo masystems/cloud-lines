@@ -227,7 +227,7 @@ def kinship(request):
                     }
         return HttpResponse(dumps(response))
     
-    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("'", '').replace(', ', ',').split(',')
+    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
     if '' in breeds_editable:
         breeds_editable.remove('')
     # if user is a breed admin
@@ -389,7 +389,7 @@ def stud_advisor(request):
         }
         return HttpResponse(dumps(response))
 
-    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("'", '').replace(', ', ',').split(',')
+    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
     if '' in breeds_editable:
         breeds_editable.remove('')
     # if user is a breed admin

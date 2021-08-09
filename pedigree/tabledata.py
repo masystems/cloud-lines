@@ -40,7 +40,7 @@ def get_pedigrees(request):
         pass
 
     # get breeds editable (length is 0 if they're not a breed admin)
-    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace(', ', ',').split(',')
+    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
     if '' in breeds_editable:
         breeds_editable.remove('')
 
