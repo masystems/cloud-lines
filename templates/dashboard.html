@@ -238,8 +238,7 @@
                                 </thead>
                                 <tbody>
                                     {% for pedigree in top_pedigrees.all %}
-                                        <tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
-                                            style="cursor: pointer;">
+                                        <tr {% if editor or contributor or breeds_editable|length > 0 and pedigree.breed.breed_name in breeds_editable %}onclick="window.location='{% url 'pedigree' pedigree.id %}';" style="cursor: pointer;"{% endif %}>
                                             <td style="width:50px;"><span class="round">{% if pedigree.images.first %}
                                                                                     <img class="card-img-top"
                                                                                      src="{% for image in pedigree.images.all %}
