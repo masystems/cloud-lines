@@ -466,12 +466,14 @@ vertical-align: middle;
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>
-                                <a href="{% url 'cert' lvl1.id 'cert' %}"><button class="btn float-right hidden-sm-down btn-outline-info">Certificate PDF</button></a>
+                        {% if editor or lvl1.breed.breed_name in breeds_editable %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>
+                                    <a href="{% url 'cert' lvl1.id 'cert' %}"><button class="btn float-right hidden-sm-down btn-outline-info">Certificate PDF</button></a>
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
