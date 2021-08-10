@@ -754,7 +754,8 @@
                                         });
                                     });
                                 </script>
-
+                            {% endif %}
+                            {% if editor or breeds_editable|length > 0 %}
                                 <hr>
                                 <h4>Pedigree Columns</h4>
                                 <p>Select which columns should be shown within the pedigree search page.</p>
@@ -774,7 +775,7 @@
                                         {% endfor %}
                                     </ul>
                                 </form>
-                            <div class="row">
+                                <div class="row">
                                     <div class="col-10">
                                         <div class="alert " id="pedigreeColumnsAlert"> <div id="pedigreeColumnsMessage"></div>
                                         </div>
