@@ -14,7 +14,7 @@
     </thead>
     <tbody>
         {% for pedigree in pedigrees.all %}
-            <tr onclick="window.location='{% url 'pedigree' pedigree.id %}';"
+            <tr {% if editor or contributor or breeds_editable|length > 0 and pedigree.breed__breed_name in breeds_editable %}onclick="window.location='{% url 'pedigree' pedigree.id %}';"{% endif %}
                 style="cursor: pointer;">
                 {% for col in columns %}
                     {% for ped_col, data in column_data.items %}
