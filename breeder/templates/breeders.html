@@ -21,7 +21,7 @@
         </div>
         <div class="col-md-6 col-4 align-self-center">
 
-            {% if editor %}
+            {% if editor or breeds_editable|length > 0 %}
             <a href="{% url 'new_breeder_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add Breeder
             </a>
             {% else %}

@@ -69,7 +69,7 @@
                                 </div>
                             {% endif %}
                             {% if 'setup' not in request.get_full_path %}
-                                {% if editor %}
+                                {% if editor or breeds_editable|length > 0 %}
                                     <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breeder</button>
                                 {% endif %}
                             {% endif %}
