@@ -180,8 +180,11 @@
                                 {% if breed_chart %}
                                     <div id="morris-bar-chart"></div>
                                 {% else %}
-
-                                <p>You still need to <a href="{% url 'new_pedigree_form' %}">add your first Pedigree</a>!</p>
+                                    {% if editor or contributor or breeds_editable|length > 0 %}
+                                        <p>You still need to <a href="{% url 'new_pedigree_form' %}">add your first Pedigree</a>!</p>
+                                    {% else %}
+                                        <p>The first pedigree still needs to be added!</p>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </div>
