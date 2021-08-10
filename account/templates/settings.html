@@ -492,51 +492,52 @@
 <!--                    thrid tab-->
                     <div class="tab-pane" id="customisation" role="tabpanel">
                         <div class="card-body">
-                            <h4>Organisation or Society Name</h4>
-                            <p>This title is used at the top of the page to show you what package you're viewing and used on certificates.</p>
+                            {% if editor %}
+                                <h4>Organisation or Society Name</h4>
+                                <p>This title is used at the top of the page to show you what package you're viewing and used on certificates.</p>
 
-                            <div class="form-group">
-                                <label class="col-md-12">Name</label>
-                                <div class="col-md-12">
-                                    <input type="text" value="{{ service.organisation_or_society_name }}" name="organisation_or_society_name" id="organisation_or_society_name" class="form-control">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-10">
-                                    <div class="alert"> <div id="nameSettingsMessage"></div>
+                                <div class="form-group">
+                                    <label class="col-md-12">Name</label>
+                                    <div class="col-md-12">
+                                        <input type="text" value="{{ service.organisation_or_society_name }}" name="organisation_or_society_name" id="organisation_or_society_name" class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-2">
-                                    <button id="selectNameSettings" class="btn btn-success float-right">Update Name</button>
+                                <div class="row">
+                                    <div class="col-10">
+                                        <div class="alert"> <div id="nameSettingsMessage"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <button id="selectNameSettings" class="btn btn-success float-right">Update Name</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <script>
-                                $('#selectNameSettings').click(function () {
+                                <script>
+                                    $('#selectNameSettings').click(function () {
 
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "{% url 'update_name' %}",
-                                        dataType: "text",
-                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                                        data: {
-                                            "organisation_or_society_name": $('#organisation_or_society_name').val()
-                                        },
-                                        beforeSend: function() {
-                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Updating</h5>').fadeIn(1000);
-                                        },
-                                        success: function (data) {
-                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Name updated!</h5>').fadeIn(1000);
-                                            console.log(data);
-                                        },
-                                        error: function (xhr, textStatus, error) {
-                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Something went wrong, but we are working on it!</h5>').fadeIn(1000);
-                                            console.log(error);
-                                        },
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "{% url 'update_name' %}",
+                                            dataType: "text",
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            data: {
+                                                "organisation_or_society_name": $('#organisation_or_society_name').val()
+                                            },
+                                            beforeSend: function() {
+                                                $('#nameSettingsMessage').hide().html('<h5 class="text-right">Updating</h5>').fadeIn(1000);
+                                            },
+                                            success: function (data) {
+                                                $('#nameSettingsMessage').hide().html('<h5 class="text-right">Name updated!</h5>').fadeIn(1000);
+                                                console.log(data);
+                                            },
+                                            error: function (xhr, textStatus, error) {
+                                                $('#nameSettingsMessage').hide().html('<h5 class="text-right">Something went wrong, but we are working on it!</h5>').fadeIn(1000);
+                                                console.log(error);
+                                            },
+                                        });
                                     });
-                                });
-                            </script>
-
-                            <hr>
+                                </script>
+                                <hr>
+                            {% endif %}
                             <h4>Custom Fields</h4>
                             {% if editor %}<p class="text-left">You can add your own custom fields below!</p>{% endif %}
                             <table id="cfTable" class="table table-bordered table-striped">
