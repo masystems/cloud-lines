@@ -119,5 +119,4 @@ def view_breed(request, breed_id):
         custom_fields = {}
 
     return render(request, 'breed.html', {'breed': breed,
-                                          'editor': is_editor(request.user),
                                           'custom_fields': custom_fields})
