@@ -419,7 +419,7 @@ def settings(request):
                                              'breed_admins': breed_admins})
 
 
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def custom_field_edit(request):
     # this is the additional user customers can add/remove from their service.
@@ -526,7 +526,7 @@ def custom_field_edit(request):
             return HttpResponse(json.dumps({'success': True}))
 
 
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def update_titles(request):
     if request.method == 'POST':
@@ -540,7 +540,7 @@ def update_titles(request):
     return HttpResponse('Fail')
 
 
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def update_name(request):
     if request.method == 'POST':
@@ -553,7 +553,7 @@ def update_name(request):
     return HttpResponse('Fail')
 
 
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def update_pedigree_columns(request):
     if request.method == 'POST':
@@ -566,7 +566,7 @@ def update_pedigree_columns(request):
         return HttpResponse('Done')
     return HttpResponse('Fail')
 
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def metrics_switch(request):
     user_detail = UserDetail.objects.get(user=request.user)
@@ -581,7 +581,7 @@ def metrics_switch(request):
     return HttpResponse('')
 
 
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def welcome(request):
     return render(request, 'welcome.html')

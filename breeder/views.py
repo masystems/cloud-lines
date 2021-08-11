@@ -44,7 +44,7 @@ def breeders(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def breeder_csv(request):
     attached_service = get_main_account(request.user)
     # Create the HttpResponse object with the appropriate CSV header.
@@ -82,7 +82,7 @@ def breeder_csv(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def new_breeder_form(request):
     attached_service = get_main_account(request.user)
     breeder_form = BreederForm(request.POST or None, request.FILES or None)
@@ -132,7 +132,7 @@ def new_breeder_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def edit_breeder_form(request, breeder_id):
     attached_service = get_main_account(request.user)
     breeder = get_object_or_404(Breeder, id=breeder_id, account=attached_service)

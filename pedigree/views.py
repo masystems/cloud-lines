@@ -298,7 +298,7 @@ def search_results(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @never_cache
 def new_pedigree_form(request):
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
@@ -482,7 +482,7 @@ def new_pedigree_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @never_cache
 def edit_pedigree_form(request, id):
     attached_service = get_main_account(request.user)
@@ -787,7 +787,7 @@ def create_approval(request, pedigree, attached_service, state, type):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @never_cache
 def get_pedigree_details(request):
     attached_service = get_main_account(request.user)

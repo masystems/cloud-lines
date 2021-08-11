@@ -15,7 +15,7 @@ import re
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def export(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
@@ -124,7 +124,7 @@ def export(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def importx(request):
     attached_service = get_main_account(request.user)
     if request.user in attached_service.admin_users.all() or request.user == attached_service.user.user:
@@ -179,7 +179,7 @@ def importx(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def import_data(request):
     attached_service = get_main_account(request.user)
     
@@ -234,7 +234,7 @@ def import_data(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def import_pedigree_data(request):
     attached_service = get_main_account(request.user)
     
@@ -1193,7 +1193,7 @@ def import_pedigree_data(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def import_breeder_data(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
@@ -1463,7 +1463,7 @@ def import_breeder_data(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def image_import(request):
     if request.method == 'POST':
         attached_service = get_main_account(request.user)

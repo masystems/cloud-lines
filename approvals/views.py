@@ -13,7 +13,7 @@ from json import loads
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def approvals(request):
     attached_service = get_main_account(request.user)
     approvals = Approval.objects.filter(account=attached_service)
@@ -50,7 +50,7 @@ def approvals(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def approve(request, id):
     approval = Approval.objects.get(id=id)
     for obj in serializers.deserialize("yaml", approval.data):
@@ -86,7 +86,7 @@ def approve(request, id):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def declined(request):
     if request.method == 'POST':
         approval = Approval.objects.get(id=request.POST.get('decline-id'))

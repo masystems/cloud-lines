@@ -18,7 +18,7 @@ def breeds(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def new_breed_form(request):
     breed_form = BreedForm(request.POST or None, request.FILES or None)
     attached_service = get_main_account(request.user)
@@ -65,7 +65,7 @@ def new_breed_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def edit_breed_form(request, breed_id):
     breed = get_object_or_404(Breed, id=breed_id)
     attached_service = get_main_account(request.user)
