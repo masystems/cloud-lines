@@ -143,7 +143,7 @@ def is_editor(user):
             # no admin users!
             contributors = []
 
-        if user in editors or contributors:
+        if user in editors or user in contributors:
             return True
         elif user == main_account.user.user:
             return True
