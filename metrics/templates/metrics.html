@@ -356,7 +356,8 @@
                                         <button class="btn btn-info" {% if not item.complete or not editor and item.mother.breed.breed_name not in breeds_editable and item.father.breed.breed_name not in breeds_editable %}disabled{% endif %}>View</button> 
                                     </a> </td>
                                 {% else %}
-                                    <td class="results"><a href="{% url 'stud_advisor_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                                    <td class="results"><a href="{% url 'stud_advisor_results' item.id %}">
+                                        <button class="btn btn-info" {% if not item.complete or not editor and item.mother.breed.breed_name not in breeds_editable %}disabled{% endif %}>View</button> </a> </td>
                                 {% endif %}
                             </tr>
                         {% endfor %}
