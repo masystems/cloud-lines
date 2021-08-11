@@ -19,6 +19,8 @@ from boto3.s3.transfer import TransferConfig
 from threading import Thread
 from itertools import chain
 
+from account.views import custom_user_passes_test
+
 
 logger = logging.getLogger(__name__)
 
@@ -287,6 +289,7 @@ def kinship(request):
     return HttpResponse(dumps(response))
 
 
+@custom_user_passes_test({'read_only': True, 'contrib': True, 'breed_admin': 'breed', 'admin': True})
 def kinship_results(request, id):
     attached_service = get_main_account(request.user)
     k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)
