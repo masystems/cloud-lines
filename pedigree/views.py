@@ -491,11 +491,14 @@ def new_pedigree_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 @never_cache
 def edit_pedigree_form(request, id):
     attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
+
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        return redirect_2_login(request)
 
     # if state is edited make sure to show edited information
     if pedigree.state == 'edited':
