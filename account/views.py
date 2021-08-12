@@ -32,6 +32,7 @@ from functools import wraps
 from urllib.parse import urlparse
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.shortcuts import resolve_url
+from django.contrib.auth.views import redirect_to_login
 
 
 logger = logging.getLogger(__name__)
@@ -161,53 +162,62 @@ def is_editor(user):
 
 
 def has_permission(request, permissions):
+    has_permission = False
+    
     try:
         account = get_main_account(request.user)
 
         # go through each user type and allow access accoringly
         if request.user == account.user.user:
-            return True
+            has_permission = True
         elif request.user in account.admin_users.all():
-            return permissions['admin']
+            if permissions['admin']:
+                has_permission = True
         elif request.user in account.contributors.all():
-            return permissions['contrib']
+            if permissions['contrib']:
+                has_permission = True
         elif request.user in account.read_only_users.all():
-            return permissions['read_only']
-        else:
-            return False
+            if permissions['read_only']:
+                has_permission = True
 
     except UserDetail.DoesNotExist:
-        return False
+        pass
     except AttachedService.DoesNotExist:
-        return False
+        pass
+
+    return has_permission
 
 
-def custom_user_passes_test(permissions, login_url='/account/login', redirect_field_name=REDIRECT_FIELD_NAME):
-    """
-    Decorator for views that checks that the user passes the given test,
-    redirecting to the log-in page if necessary. The test should be a callable
-    that takes the user object and returns True if the user passes.
-    """
+def redirect_2_login(request):
+    return redirect_to_login(request.build_absolute_uri(), resolve_url('/account/login'), REDIRECT_FIELD_NAME)
 
-    def decorator(view_func):
-        @wraps(view_func)
-        def _wrapped_view(request, *args, **kwargs):
-            if has_permission(request, permissions):
-                return view_func(request, *args, **kwargs)
-            path = request.build_absolute_uri()
-            resolved_login_url = resolve_url(login_url or django_settings.LOGIN_URL)
-            # If the login url is the same scheme and net location then just
-            # use the path as the "next" url.
-            login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
-            current_scheme, current_netloc = urlparse(path)[:2]
-            if ((not login_scheme or login_scheme == current_scheme) and
-                    (not login_netloc or login_netloc == current_netloc)):
-                path = request.get_full_path()
-            from django.contrib.auth.views import redirect_to_login
-            return redirect_to_login(
-                path, resolved_login_url, redirect_field_name)
-        return _wrapped_view
-    return decorator
+
+# def custom_user_passes_test(permissions, login_url='/account/login', redirect_field_name=REDIRECT_FIELD_NAME):
+#     """
+#     Decorator for views that checks that the user passes the given test,
+#     redirecting to the log-in page if necessary. The test should be a callable
+#     that takes the user object and returns True if the user passes.
+#     """
+
+#     def decorator(view_func):
+#         @wraps(view_func)
+#         def _wrapped_view(request, *args, **kwargs):
+#             if check_permission(request, permissions):
+#                 return view_func(request, *args, **kwargs)
+#             path = request.build_absolute_uri()
+#             resolved_login_url = resolve_url(login_url or django_settings.LOGIN_URL)
+#             # If the login url is the same scheme and net location then just
+#             # use the path as the "next" url.
+#             login_scheme, login_netloc = urlparse(resolved_login_url)[:2]
+#             current_scheme, current_netloc = urlparse(path)[:2]
+#             if ((not login_scheme or login_scheme == current_scheme) and
+#                     (not login_netloc or login_netloc == current_netloc)):
+#                 path = request.get_full_path()
+#             from django.contrib.auth.views import redirect_to_login
+#             return redirect_to_login(
+#                 path, resolved_login_url, redirect_field_name)
+#         return _wrapped_view
+#     return decorator
 
 
 def get_main_account(user):

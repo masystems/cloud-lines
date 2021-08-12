@@ -19,7 +19,7 @@ from boto3.s3.transfer import TransferConfig
 from threading import Thread
 from itertools import chain
 
-from account.views import custom_user_passes_test
+from account.views import has_permission, redirect_2_login
 
 
 logger = logging.getLogger(__name__)
@@ -289,12 +289,15 @@ def kinship(request):
     return HttpResponse(dumps(response))
 
 
-@custom_user_passes_test({'read_only': False, 'contrib': True, 'breed_admin': 'breed', 'admin': True})
+#@custom_user_passes_test({'read_only': False, 'contrib': True, 'breed_admin': 'breed', 'admin': True})
 def kinship_results(request, id):
     attached_service = get_main_account(request.user)
     k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)
 
-    return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
+    if has_permission(request, {'read_only': False, 'contrib': True, 'breed_admin': 'breed', 'admin': True}):
+        return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
+    else:
+        return redirect_2_login(request)
 
 
 def run_mean_kinship(request):
