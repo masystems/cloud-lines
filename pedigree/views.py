@@ -21,7 +21,7 @@ from .functions import get_site_pedigree_column_headings
 from django.db.models import Q
 import re
 import json
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from approvals.models import Approval
 import dateutil.parser
 from django.utils.datastructures import MultiValueDictKeyError
@@ -73,10 +73,16 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
 class ShowPedigree(PedigreeBase):
     template_name = 'pedigree.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # check permission
+        if not has_permission(self.request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                    [super().get_context_data(**kwargs)['lvl1']]):
+            return redirect_2_login(self.request)
+        
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        
         
         return context
 
