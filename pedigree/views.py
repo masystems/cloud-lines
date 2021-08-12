@@ -304,9 +304,12 @@ def search_results(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 @never_cache
 def new_pedigree_form(request):
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+        return redirect_2_login(request)
+    
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     pre_checks = True
     attached_service = get_main_account(request.user)
