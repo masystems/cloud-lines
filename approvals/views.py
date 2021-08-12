@@ -55,8 +55,9 @@ def approve(request, id):
     approval = Approval.objects.get(id=id)
     
     # check if user has permission
-    if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
-        return redirect_2_login(request)
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
+            return redirect_2_login(request)
     
     for obj in serializers.deserialize("yaml", approval.data):
         obj.object.state = 'approved'
@@ -91,7 +92,6 @@ def approve(request, id):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def declined(request):
     if request.method == 'POST':
         approval = Approval.objects.get(id=request.POST.get('decline-id'))

@@ -296,11 +296,12 @@ def kinship_results(request, id):
     k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)
 
     # check if user has permission, passing in ids of mother and father from kinship queue item
-    if has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
-                                [k_queue_item.mother ,k_queue_item.father]):
-        return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
-    else:
-        return redirect_2_login(request)
+    if request.method == 'GET':
+        if has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                    [k_queue_item.mother ,k_queue_item.father]):
+            return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
+        else:
+            return redirect_2_login(request)
 
 
 def run_mean_kinship(request):
@@ -461,9 +462,10 @@ def stud_advisor_results(request, id):
     sa_queue_item = StudAdvisorQueue.objects.get(account=attached_service, id=id)
 
     # check permission
-    if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
-                                [sa_queue_item.mother]):
-        return redirect_2_login(request)
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                    [sa_queue_item.mother]):
+            return redirect_2_login(request)
 
     mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
     #mother_details = eval(mother_details.content.decode())

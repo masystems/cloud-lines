@@ -307,8 +307,9 @@ def search_results(request):
 @never_cache
 def new_pedigree_form(request):
     # check if user has permission, passing in ids of mother and father from kinship queue item
-    if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
-        return redirect_2_login(request)
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
     
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     pre_checks = True
@@ -497,8 +498,9 @@ def edit_pedigree_form(request, id):
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
     # check if user has permission
-    if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
-        return redirect_2_login(request)
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            return redirect_2_login(request)
 
     # if state is edited make sure to show edited information
     if pedigree.state == 'edited':
