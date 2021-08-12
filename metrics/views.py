@@ -459,6 +459,12 @@ def stud_advisor(request):
 def stud_advisor_results(request, id):
     attached_service = get_main_account(request.user)
     sa_queue_item = StudAdvisorQueue.objects.get(account=attached_service, id=id)
+
+    # check permission
+    if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                [sa_queue_item.mother]):
+        return redirect_2_login(request)
+
     mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
     #mother_details = eval(mother_details.content.decode())
     mk_threshold = sa_queue_item.mk_threshold
