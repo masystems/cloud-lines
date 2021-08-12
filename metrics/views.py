@@ -289,7 +289,7 @@ def kinship(request):
     return HttpResponse(dumps(response))
 
 
-@custom_user_passes_test({'read_only': True, 'contrib': True, 'breed_admin': 'breed', 'admin': True})
+@custom_user_passes_test({'read_only': False, 'contrib': True, 'breed_admin': 'breed', 'admin': True})
 def kinship_results(request, id):
     attached_service = get_main_account(request.user)
     k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)

@@ -162,11 +162,17 @@ def is_editor(user):
 
 def has_permission(request, permissions):
     try:
-        attached_service = get_main_account(request.user)
+        account = get_main_account(request.user)
 
         # automatically allow access if they're the owner
-        if request.user == attached_service.user.user:
+        if request.user == account.user.user:
             return True
+        elif request.user in account.admin_users.all():
+            return permissions['admin']
+        elif request.user in account.contributors.all():
+            return permissions['contrib']
+        elif request.user in account.read_only_users.all():
+            return permissions['read_only']
         else:
             return False
 
