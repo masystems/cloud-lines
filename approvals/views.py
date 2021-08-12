@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
-from account.views import is_editor, get_main_account, send_mail
+from account.views import is_editor, get_main_account, send_mail, has_permission, redirect_2_login
 from .models import Approval
 from pedigree.models import Pedigree, PedigreeImage
 from breed_group.models import BreedGroup
@@ -53,6 +53,11 @@ def approvals(request):
 @user_passes_test(is_editor, "/account/login")
 def approve(request, id):
     approval = Approval.objects.get(id=id)
+    
+    # check if user has permission
+    if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
+        return redirect_2_login(request)
+    
     for obj in serializers.deserialize("yaml", approval.data):
         obj.object.state = 'approved'
         obj.object.save()
