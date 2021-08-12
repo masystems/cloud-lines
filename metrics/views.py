@@ -20,6 +20,7 @@ from threading import Thread
 from itertools import chain
 
 from account.views import has_permission, redirect_2_login
+from django.contrib.auth.decorators import login_required
 
 
 logger = logging.getLogger(__name__)
@@ -289,12 +290,14 @@ def kinship(request):
     return HttpResponse(dumps(response))
 
 
-#@custom_user_passes_test({'read_only': False, 'contrib': True, 'breed_admin': 'breed', 'admin': True})
+@login_required(login_url="/account/login")
 def kinship_results(request, id):
     attached_service = get_main_account(request.user)
     k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)
 
-    if has_permission(request, {'read_only': False, 'contrib': True, 'breed_admin': 'breed', 'admin': True}):
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                [k_queue_item.mother ,k_queue_item.father]):
         return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
     else:
         return redirect_2_login(request)
