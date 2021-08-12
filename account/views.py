@@ -164,7 +164,7 @@ def has_permission(request, permissions):
     try:
         account = get_main_account(request.user)
 
-        # automatically allow access if they're the owner
+        # go through each user type and allow access accoringly
         if request.user == account.user.user:
             return True
         elif request.user in account.admin_users.all():
