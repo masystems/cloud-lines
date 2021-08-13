@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from django.db.models import Q
 from io import BytesIO
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from breeder.models import Breeder
 from pedigree.models import Pedigree
 from xhtml2pdf import pisa
@@ -12,6 +12,11 @@ import xlwt
 
 @login_required(login_url="/account/login")
 def reports(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    
     return render(request, 'reports.html')
 
 
