@@ -182,6 +182,11 @@ def importx(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor, "/account/login")
 def import_data(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    
     attached_service = get_main_account(request.user)
     
     # get request, so display the page
