@@ -313,6 +313,12 @@ def new_pedigree_form(request):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
             return redirect_2_login(request)
+    elif request.method == 'POST':
+        # particular breed checked below
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+            return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
+    else:
+        return HttpResponse(False)
     
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     pre_checks = True
