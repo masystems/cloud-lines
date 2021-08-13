@@ -189,6 +189,19 @@ def coi(request):
 
 
 def kinship(request):
+    # check permission (this is only used to receive POST requests)
+    # the specific breed is checked later
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+            response = {'status': 'error',
+                        'msg': "You do not have permission!"
+                        }
+            return HttpResponse(dumps(response))
+    else:
+        return HttpResponse(False)
+    
     attached_service = get_main_account(request.user)
     epoch = int(time())
     pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
