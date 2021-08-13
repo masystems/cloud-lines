@@ -75,9 +75,12 @@ class ShowPedigree(PedigreeBase):
 
     def dispatch(self, request, *args, **kwargs):
         # check permission
-        if not has_permission(self.request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
-                                    [super().get_context_data(**kwargs)['lvl1']]):
-            return redirect_2_login(self.request)
+        if self.request.method == 'GET':
+            if not has_permission(self.request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                        [super().get_context_data(**kwargs)['lvl1']]):
+                return redirect_2_login(self.request)
+        else:
+            return HttpResponse(False)
         
         return super().dispatch(request, *args, **kwargs)
 
