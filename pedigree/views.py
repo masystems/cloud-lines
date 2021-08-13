@@ -775,18 +775,26 @@ def add_existing_parent(request, pedigree_id):
     attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
 
-    if request.method == 'POST':
-        parent_reg = request.POST.get('reg_no')
-        parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
-        if parent.sex == 'male':
-            pedigree.parent_father = parent
-        elif parent.sex == 'female':
-            pedigree.parent_mother = parent
+    # check if user has permission (should just be post)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            return HttpResponse(False)
+    else:
+        return HttpResponse(False)
 
-        if request.user in attached_service.contributors.all():
-            create_approval(request, pedigree, attached_service, state='edited', type='edit')
-        else:
-            pedigree.save()
+    parent_reg = request.POST.get('reg_no')
+    parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
+    if parent.sex == 'male':
+        pedigree.parent_father = parent
+    elif parent.sex == 'female':
+        pedigree.parent_mother = parent
+
+    if request.user in attached_service.contributors.all():
+        create_approval(request, pedigree, attached_service, state='edited', type='edit')
+    else:
+        pedigree.save()
 
     return redirect('pedigree', pedigree_id)
 
