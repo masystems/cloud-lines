@@ -1,3 +1,4 @@
+from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
@@ -54,10 +55,12 @@ def approvals(request):
 def approve(request, id):
     approval = Approval.objects.get(id=id)
     
-    # check if user has permission
+    # check if user has permission (should just be a GET)
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
             return redirect_2_login(request)
+    else:
+        return HttpResponse(False)
     
     for obj in serializers.deserialize("yaml", approval.data):
         obj.object.state = 'approved'
