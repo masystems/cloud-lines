@@ -125,56 +125,58 @@ def export(request):
 
 @login_required(login_url="/account/login")
 def importx(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    
     attached_service = get_main_account(request.user)
-    if request.user in attached_service.admin_users.all() or request.user == attached_service.user.user:
-        allowed_file_types = ('.csv')
-        if request.method == 'POST':
-            # get header
-            if request.POST.get('job'):
-                # if we need to save the header
-                if request.POST['job'] == 'header':
-                    # flush the database upload down the digital toilet
-                    DatabaseUpload.objects.filter(account=attached_service, user=request.user).delete()
+    allowed_file_types = ('.csv')
+    if request.method == 'POST':
+        # get header
+        if request.POST.get('job'):
+            # if we need to save the header
+            if request.POST['job'] == 'header':
+                # flush the database upload down the digital toilet
+                DatabaseUpload.objects.filter(account=attached_service, user=request.user).delete()
 
-                    # convert header to JSON
-                    header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
+                # convert header to JSON
+                header = dumps({"header": request.POST.getlist('uploadDatabase[]')})
 
-                    # errors is a dictionary to keep track of missing and invalid fields
-                    errors = {}
-                    # only mandatory fields are added to 
-                    errors['missing'] = []
-                    # only fields that need to be in a certain format are added to invalid fields
-                    errors['invalid'] = []
-                    
-                    # create database upload object
-                    database_upload = DatabaseUpload.objects.create(account=attached_service,
-                                                                    header=header, user=request.user,
-                                                                    errors=dumps(errors),
-                                                                    total_lines=request.POST['totalLines'])
-                    database_upload.save()
-                    
-                    return HttpResponse(dumps({'result': 'success'}))
+                # errors is a dictionary to keep track of missing and invalid fields
+                errors = {}
+                # only mandatory fields are added to 
+                errors['missing'] = []
+                # only fields that need to be in a certain format are added to invalid fields
+                errors['invalid'] = []
                 
-                # if we need to save the body
-                elif request.POST['job'] == 'slices':
+                # create database upload object
+                database_upload = DatabaseUpload.objects.create(account=attached_service,
+                                                                header=header, user=request.user,
+                                                                errors=dumps(errors),
+                                                                total_lines=request.POST['totalLines'])
+                database_upload.save()
+                
+                return HttpResponse(dumps({'result': 'success'}))
+            
+            # if we need to save the body
+            elif request.POST['job'] == 'slices':
+                
+                # create the file slice
+                file_slice = []
+                for key in request.POST:
+                    if 'uploadDatabase' in key:
+                        file_slice.append(request.POST.getlist(key))
+                
+                # save file slice
+                try:
+                    file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id'), file_slice=dumps({'file_slice': file_slice}))
+                except Exception:
+                    pass
+                
+                return HttpResponse(dumps({'result': 'success'}))
                     
-                    # create the file slice
-                    file_slice = []
-                    for key in request.POST:
-                        if 'uploadDatabase' in key:
-                            file_slice.append(request.POST.getlist(key))
-                    
-                    # save file slice
-                    try:
-                        file_slice = FileSlice.objects.create(database_upload=DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id'), file_slice=dumps({'file_slice': file_slice}))
-                    except Exception:
-                        pass
-                    
-                    return HttpResponse(dumps({'result': 'success'}))
-                    
-        return render(request, 'import.html')
-    else:
-        return redirect('dashboard')
+    return render(request, 'import.html')
 
 
 @login_required(login_url="/account/login")
