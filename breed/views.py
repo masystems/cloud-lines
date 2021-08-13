@@ -18,7 +18,6 @@ def breeds(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def new_breed_form(request):
     # check if user has permission
     if request.method == 'GET':
@@ -70,8 +69,12 @@ def new_breed_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def edit_breed_form(request, breed_id):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    
     breed = get_object_or_404(Breed, id=breed_id)
     attached_service = get_main_account(request.user)
     breed_form = BreedForm(request.POST or None, request.FILES or None, instance=breed)
