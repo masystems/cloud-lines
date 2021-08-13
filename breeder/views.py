@@ -143,6 +143,11 @@ def new_breeder_form(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor, "/account/login")
 def edit_breeder_form(request, breeder_id):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    
     attached_service = get_main_account(request.user)
     breeder = get_object_or_404(Breeder, id=breeder_id, account=attached_service)
     breeder_form = BreederForm(request.POST or None, request.FILES or None, instance=breeder)
