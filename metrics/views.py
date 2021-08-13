@@ -138,6 +138,18 @@ def data_validation(request):
 
 
 def run_coi(request):
+    # check permission (this is only used to receive POST requests)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        pedigree = Pedigree.objects.filter(breed__id=request.POST.get('breed')).first()
+        if not pedigree:
+            return HttpResponse(False)
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            return HttpResponse(False)
+    else:
+        return HttpResponse(False)
+
     attached_service = get_main_account(request.user)
     obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
     obj.last_run = datetime.now()
