@@ -87,8 +87,12 @@ def breeder_csv(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def new_breeder_form(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    
     attached_service = get_main_account(request.user)
     breeder_form = BreederForm(request.POST or None, request.FILES or None)
 
