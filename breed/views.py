@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.datastructures import MultiValueDictKeyError
 from .models import Breed
 from .forms import BreedForm
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 import json
 
 
@@ -20,6 +20,11 @@ def breeds(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor, "/account/login")
 def new_breed_form(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    
     breed_form = BreedForm(request.POST or None, request.FILES or None)
     attached_service = get_main_account(request.user)
 
