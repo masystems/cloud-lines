@@ -4,7 +4,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from .models import Service, Page, Gallery, Faq, Testimonial, LargeTierQueue, Blog
 from .forms import ContactForm, BlogForm
 from account.models import UserDetail, AttachedService
-from account.views import get_main_account, send_mail
+from account.views import get_main_account, send_mail, has_permission, redirect_2_login
 from django.conf import settings
 import json
 import stripe
@@ -226,6 +226,11 @@ def gdpr(request):
 
 @login_required(login_url="/account/login")
 def order(request, service=None):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    
     context = {}
     # import stripe key
     if request.user.is_superuser:
