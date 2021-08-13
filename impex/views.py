@@ -17,6 +17,11 @@ import re
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor, "/account/login")
 def export(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
         #fields = request.POST.getlist('fields')
