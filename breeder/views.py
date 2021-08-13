@@ -5,7 +5,7 @@ from .models import Breeder
 from pedigree.models import Pedigree
 from pedigree.functions import get_site_pedigree_column_headings
 from breed_group.models import BreedGroup
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from .forms import BreederForm
 import csv
 import json
@@ -13,6 +13,11 @@ import json
 
 @login_required(login_url="/account/login")
 def breeder(request, breeder_id):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+
     attached_service = get_main_account(request.user)
     breeder = Breeder.objects.get(account=attached_service, id=breeder_id)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
