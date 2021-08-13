@@ -96,8 +96,19 @@ def approve(request, id):
 
 @login_required(login_url="/account/login")
 def declined(request):
-    if request.method == 'POST':
+    approval = ''
+    # check if user has permission
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
         approval = Approval.objects.get(id=request.POST.get('decline-id'))
+        # particular breed checked below
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
+            return HttpResponse(False)
+    else:
+        return HttpResponse(False)
+
+    if request.method == 'POST':
         if approval.pedigree:
             message_approval_id = approval.pedigree.reg_no
             if approval.type == 'new':
