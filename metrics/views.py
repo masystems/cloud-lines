@@ -496,6 +496,8 @@ def stud_advisor_results(request, id):
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
                                     [sa_queue_item.mother]):
             return redirect_2_login(request)
+    else:
+        return HttpResponse(False)
 
     mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
     #mother_details = eval(mother_details.content.decode())
