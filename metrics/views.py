@@ -391,6 +391,20 @@ def stud_advisor_mother_details(request, mother):
 
 
 def stud_advisor(request):
+    # check permission (this is only used to receive POST requests)
+    # the specific breed is checked later
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            response = {'status': 'fail',
+                        'msg': "You do not have permission!",
+                        'item_id': ''
+                        }
+            return HttpResponse(dumps(response))
+    else:
+        return HttpResponse(False)
+    
     attached_service = get_main_account(request.user)
     epoch = int(time())
 
