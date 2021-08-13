@@ -5,7 +5,7 @@ from pedigree.models import Pedigree, PedigreeImage
 from pedigree.functions import get_pedigree_column_headings
 from breeder.models import Breeder
 from breed.models import Breed
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from .models import DatabaseUpload, FileSlice
 from datetime import datetime
 from os.path import splitext
@@ -124,7 +124,6 @@ def export(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def importx(request):
     attached_service = get_main_account(request.user)
     if request.user in attached_service.admin_users.all() or request.user == attached_service.user.user:
