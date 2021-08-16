@@ -612,7 +612,6 @@ def update_titles(request):
     return HttpResponse('Fail')
 
 
-@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def update_name(request):
     if request.method == 'GET':
