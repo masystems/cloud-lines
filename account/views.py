@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib import auth
@@ -28,8 +29,6 @@ import json
 import requests
 import logging
 
-from functools import wraps
-from urllib.parse import urlparse
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.shortcuts import resolve_url
 from django.contrib.auth.views import redirect_to_login
@@ -364,7 +363,7 @@ def update_user(request):
 
         return HttpResponse(True)
 
-    return HttpResponse(False)
+    raise PermissionDenied()
 
 
 def site_login(request):

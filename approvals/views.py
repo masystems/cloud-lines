@@ -2,7 +2,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from account.views import is_editor, get_main_account, send_mail, has_permission, redirect_2_login
 from .models import Approval
 from pedigree.models import Pedigree, PedigreeImage
@@ -60,7 +60,7 @@ def approve(request, id):
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
             return redirect_2_login(request)
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
     
     for obj in serializers.deserialize("yaml", approval.data):
         obj.object.state = 'approved'
@@ -104,9 +104,9 @@ def declined(request):
         approval = Approval.objects.get(id=request.POST.get('decline-id'))
         # particular breed checked below
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
-            return HttpResponse(False)
+            raise PermissionDenied()
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
 
     if request.method == 'POST':
         if approval.pedigree:

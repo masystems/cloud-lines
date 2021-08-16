@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.conf import settings
 from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
@@ -144,11 +144,11 @@ def run_coi(request):
     elif request.method == 'POST':
         pedigree = Pedigree.objects.filter(breed__id=request.POST.get('breed')).first()
         if not pedigree:
-            return HttpResponse(False)
+            raise PermissionDenied()
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
-            return HttpResponse(False)
+            raise PermissionDenied()
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
 
     attached_service = get_main_account(request.user)
     obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
@@ -212,7 +212,7 @@ def kinship(request):
                         }
             return HttpResponse(dumps(response))
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
     
     attached_service = get_main_account(request.user)
     epoch = int(time())
@@ -327,7 +327,7 @@ def kinship_results(request, id):
                                     [k_queue_item.mother ,k_queue_item.father]):
             return redirect_2_login(request)
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
 
     return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
 
@@ -339,11 +339,11 @@ def run_mean_kinship(request):
     elif request.method == 'POST':
         pedigree = Pedigree.objects.filter(breed__id=request.POST.get('breed')).first()
         if not pedigree:
-            return HttpResponse(False)
+            raise PermissionDenied()
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
-            return HttpResponse(False)
+            raise PermissionDenied()
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
     
     attached_service = get_main_account(request.user)
     obj, created = MeanKinshipLastRun.objects.get_or_create(account=attached_service)
@@ -427,7 +427,7 @@ def stud_advisor(request):
                         }
             return HttpResponse(dumps(response))
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
     
     attached_service = get_main_account(request.user)
     epoch = int(time())
@@ -521,7 +521,7 @@ def stud_advisor_results(request, id):
                                     [sa_queue_item.mother]):
             return redirect_2_login(request)
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
 
     mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
     #mother_details = eval(mother_details.content.decode())

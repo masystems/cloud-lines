@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
@@ -80,7 +80,7 @@ class ShowPedigree(PedigreeBase):
                                         [super().get_context_data(**kwargs)['lvl1']]):
                 return redirect_2_login(self.request)
         else:
-            return HttpResponse(False)
+            raise PermissionDenied()
         
         return super().dispatch(request, *args, **kwargs)
 
@@ -318,7 +318,7 @@ def new_pedigree_form(request):
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
             return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
     
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     pre_checks = True
@@ -515,7 +515,7 @@ def edit_pedigree_form(request, id):
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
             return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
 
     # if state is edited make sure to show edited information
     if pedigree.state == 'edited':
@@ -780,9 +780,9 @@ def add_existing_parent(request, pedigree_id):
         return redirect_2_login(request)
     elif request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
-            return HttpResponse(False)
+            raise PermissionDenied()
     else:
-        return HttpResponse(False)
+        raise PermissionDenied()
 
     parent_reg = request.POST.get('reg_no')
     parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
