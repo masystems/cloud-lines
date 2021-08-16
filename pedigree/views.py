@@ -101,6 +101,17 @@ def render_to_pdf(template_src, context_dict):
 
 
 class GeneratePDF(View):
+    def dispatch(self, request, *args, **kwargs):
+        # check permission
+        if self.request.method == 'GET':
+            if not has_permission(self.request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'},
+                                        [Pedigree.objects.get(id=self.kwargs['pedigree_id'])]):
+                return redirect_2_login(self.request)
+        else:
+            raise PermissionDenied()
+        
+        return super().dispatch(request, *args, **kwargs)
+    
     # certificate
     def get(self, request, *args, **kwargs):
         context = {}
