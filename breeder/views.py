@@ -155,6 +155,11 @@ def edit_breeder_form(request, breeder_id):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
             return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
     
     attached_service = get_main_account(request.user)
     breeder = get_object_or_404(Breeder, id=breeder_id, account=attached_service)
