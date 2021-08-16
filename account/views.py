@@ -486,108 +486,116 @@ def settings(request):
 @user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def custom_field_edit(request):
+    # permission check (only post allowed)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return HttpResponse(json.dumps({'fail': True}))
+    else:
+        return HttpResponse(json.dumps({'fail': True}))
+
     # this is the additional user customers can add/remove from their service.
-    if request.method == 'POST':
-        user_detail = UserDetail.objects.get(user=request.user)
-        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-        if user_detail.current_service.custom_fields:
-            custom_fields = json.loads(user_detail.current_service.custom_fields)
-        else:
-            custom_fields = {}
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    if user_detail.current_service.custom_fields:
+        custom_fields = json.loads(user_detail.current_service.custom_fields)
+    else:
+        custom_fields = {}
 
-        if request.POST.get('formType') == 'new':
-            # create unique key
-            for suffix in range(0, len(custom_fields)+2):
-                if 'cf_{}'.format(suffix) not in custom_fields:
-                    field_key = 'cf_{}'.format(suffix)
-                    break
+    if request.POST.get('formType') == 'new':
+        # create unique key
+        for suffix in range(0, len(custom_fields)+2):
+            if 'cf_{}'.format(suffix) not in custom_fields:
+                field_key = 'cf_{}'.format(suffix)
+                break
 
-            custom_fields[field_key] = {'id': field_key,
-                                        'location': request.POST.get('location'),
-                                        'fieldName': request.POST.get('fieldName'),
-                                        'fieldType': request.POST.get('fieldType')}
-            attached_service.custom_fields = json.dumps(custom_fields)
-            attached_service.save()
+        custom_fields[field_key] = {'id': field_key,
+                                    'location': request.POST.get('location'),
+                                    'fieldName': request.POST.get('fieldName'),
+                                    'fieldType': request.POST.get('fieldType')}
+        attached_service.custom_fields = json.dumps(custom_fields)
+        attached_service.save()
 
-            # update the model
-            if request.POST.get('location') == 'pedigree':
-                objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-            elif request.POST.get('location') == 'breeder':
-                objects = Breeder.objects.filter(account=attached_service)
-            elif request.POST.get('location') == 'breed':
-                objects = Breed.objects.filter(account=attached_service)
+        # update the model
+        if request.POST.get('location') == 'pedigree':
+            objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
+        elif request.POST.get('location') == 'breeder':
+            objects = Breeder.objects.filter(account=attached_service)
+        elif request.POST.get('location') == 'breed':
+            objects = Breed.objects.filter(account=attached_service)
 
-            for object in objects.all():
-                try:
-                    object_custom_fields = json.loads(object.custom_fields)
-                except json.decoder.JSONDecodeError:
-                    object_custom_fields = {}
+        for object in objects.all():
+            try:
+                object_custom_fields = json.loads(object.custom_fields)
+            except json.decoder.JSONDecodeError:
+                object_custom_fields = {}
 
-                object_custom_fields[field_key] = {'id': field_key,
-                                                   'location': request.POST.get('location'),
-                                                   'fieldName': request.POST.get('fieldName'),
-                                                   'fieldType': request.POST.get('fieldType')}
+            object_custom_fields[field_key] = {'id': field_key,
+                                                'location': request.POST.get('location'),
+                                                'fieldName': request.POST.get('fieldName'),
+                                                'fieldType': request.POST.get('fieldType')}
 
-                object.custom_fields = json.dumps(object_custom_fields)
-                object.save()
-            return HttpResponse(json.dumps({'success': True}))
+            object.custom_fields = json.dumps(object_custom_fields)
+            object.save()
+        return HttpResponse(json.dumps({'success': True}))
 
-        elif request.POST.get('formType') == 'edit':
+    elif request.POST.get('formType') == 'edit':
+        custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
+                                                    'location': request.POST.get('location'),
+                                                    'fieldName': request.POST.get('fieldName'),
+                                                    'fieldType': request.POST.get('fieldType')}
+        attached_service.custom_fields = json.dumps(custom_fields)
+        attached_service.save()
+
+        # update the model
+        if request.POST.get('location') == 'pedigree':
+            objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
+        elif request.POST.get('location') == 'breeder':
+            objects = Breeder.objects.filter(account=attached_service)
+        elif request.POST.get('location') == 'breed':
+            objects = Breed.objects.filter(account=attached_service)
+
+        for object in objects.all():
+            try:
+                custom_fields = json.loads(object.custom_fields)
+            except json.decoder.JSONDecodeError:
+                custom_fields = {}
+
             custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
-                                                     'location': request.POST.get('location'),
-                                                     'fieldName': request.POST.get('fieldName'),
-                                                     'fieldType': request.POST.get('fieldType')}
-            attached_service.custom_fields = json.dumps(custom_fields)
-            attached_service.save()
+                                                        'location': request.POST.get('location'),
+                                                        'fieldName': request.POST.get('fieldName'),
+                                                        'fieldType': request.POST.get('fieldType')}
 
-            # update the model
-            if request.POST.get('location') == 'pedigree':
-                objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-            elif request.POST.get('location') == 'breeder':
-                objects = Breeder.objects.filter(account=attached_service)
-            elif request.POST.get('location') == 'breed':
-                objects = Breed.objects.filter(account=attached_service)
+            object.custom_fields = json.dumps(custom_fields)
+            object.save()
+        return HttpResponse(json.dumps({'success': True}))
 
-            for object in objects.all():
-                try:
-                    custom_fields = json.loads(object.custom_fields)
-                except json.decoder.JSONDecodeError:
-                    custom_fields = {}
+    elif request.POST.get('formType') == 'delete':
+        custom_fields.pop(request.POST.get('id'), None)
+        attached_service.custom_fields = json.dumps(custom_fields)
+        attached_service.save()
 
-                custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
-                                                         'location': request.POST.get('location'),
-                                                         'fieldName': request.POST.get('fieldName'),
-                                                         'fieldType': request.POST.get('fieldType')}
+        # update model
+        # update the model
+        if request.POST.get('location') == 'pedigree':
+            objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
+        elif request.POST.get('location') == 'breeder':
+            objects = Breeder.objects.filter(account=attached_service)
+        elif request.POST.get('location') == 'breed':
+            objects = Breed.objects.filter(account=attached_service)
 
-                object.custom_fields = json.dumps(custom_fields)
-                object.save()
-            return HttpResponse(json.dumps({'success': True}))
+        for object in objects.all():
+            custom_fields_updated = {}
+            if object.custom_fields:
+                for key, val in json.loads(object.custom_fields).items():
+                    if key in custom_fields:
+                        custom_fields_updated[key] = val
 
-        elif request.POST.get('formType') == 'delete':
-            custom_fields.pop(request.POST.get('id'), None)
-            attached_service.custom_fields = json.dumps(custom_fields)
-            attached_service.save()
+            object.custom_fields = json.dumps(custom_fields_updated)
+            object.save()
 
-            # update model
-            # update the model
-            if request.POST.get('location') == 'pedigree':
-                objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-            elif request.POST.get('location') == 'breeder':
-                objects = Breeder.objects.filter(account=attached_service)
-            elif request.POST.get('location') == 'breed':
-                objects = Breed.objects.filter(account=attached_service)
-
-            for object in objects.all():
-                custom_fields_updated = {}
-                if object.custom_fields:
-                    for key, val in json.loads(object.custom_fields).items():
-                        if key in custom_fields:
-                            custom_fields_updated[key] = val
-
-                object.custom_fields = json.dumps(custom_fields_updated)
-                object.save()
-
-            return HttpResponse(json.dumps({'success': True}))
+        return HttpResponse(json.dumps({'success': True}))
 
 
 @user_passes_test(is_editor, "/account/login")
