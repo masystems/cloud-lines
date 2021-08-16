@@ -16,12 +16,21 @@ def reports(request):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
             return redirect_2_login(request)
+    else:
+        raise PermissionError()
     
     return render(request, 'reports.html')
 
 
 @login_required(login_url="/account/login")
 def census(request, type):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionError()
+    
     attached_service = get_main_account(request.user)
     date = datetime.now()
 
