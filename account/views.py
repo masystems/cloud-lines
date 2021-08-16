@@ -493,7 +493,7 @@ def custom_field_edit(request):
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
             return HttpResponse(json.dumps({'fail': True}))
     else:
-        return HttpResponse(json.dumps({'fail': True}))
+        raise PermissionDenied()
 
     # this is the additional user customers can add/remove from their service.
     user_detail = UserDetail.objects.get(user=request.user)
@@ -625,18 +625,25 @@ def update_name(request):
     return HttpResponse('Fail')
 
 
-@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def update_pedigree_columns(request):
-    if request.method == 'POST':
-        user_detail = UserDetail.objects.get(user=request.user)
-        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-        columns = request.POST['columns']
-        attached_service.pedigree_columns = str(columns)
-        attached_service.save()
+    # check if user has permission
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
 
-        return HttpResponse('Done')
-    return HttpResponse('Fail')
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    columns = request.POST['columns']
+    attached_service.pedigree_columns = str(columns)
+    attached_service.save()
+
+    return HttpResponse('Done')
+
 
 @user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
