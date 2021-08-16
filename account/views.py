@@ -598,18 +598,23 @@ def custom_field_edit(request):
         return HttpResponse(json.dumps({'success': True}))
 
 
-@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def update_titles(request):
-    if request.method == 'POST':
-        user_detail = UserDetail.objects.get(user=request.user)
-        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-        attached_service.mother_title = request.POST.get('mother')
-        attached_service.father_title = request.POST.get('father')
-        attached_service.save()
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    attached_service.mother_title = request.POST.get('mother')
+    attached_service.father_title = request.POST.get('father')
+    attached_service.save()
 
-        return HttpResponse('Done')
-    return HttpResponse('Fail')
+    return HttpResponse('Done')
 
 
 @login_required(login_url="/account/login")
@@ -617,7 +622,7 @@ def update_name(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
