@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 from io import BytesIO
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from breeder.models import Breeder
@@ -17,7 +18,7 @@ def reports(request):
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
             return redirect_2_login(request)
     else:
-        raise PermissionError()
+        raise PermissionDenied()
     
     return render(request, 'reports.html')
 
@@ -30,9 +31,9 @@ def census(request, type):
             return redirect_2_login(request)
     elif request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
-            raise PermissionError()
+            raise PermissionDenied()
     else:
-        raise PermissionError()
+        raise PermissionDenied()
     
     attached_service = get_main_account(request.user)
     date = datetime.now()
