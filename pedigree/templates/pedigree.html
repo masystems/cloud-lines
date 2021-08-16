@@ -223,8 +223,7 @@ vertical-align: middle;
                                 </div>
                             </div>
                         </div>
-
-                        {% if editor or contributor %}
+                        {% if editor or contributor or lvl1.breed.breed_name in breeds_editable %}
                             {% include 'add_new_pedigree.html' %}
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
                         {% else %}
