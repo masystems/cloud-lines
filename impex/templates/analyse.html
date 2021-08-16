@@ -384,6 +384,10 @@
                 console.log(textStatus);
                 console.log('errorThrown:');
                 console.log(errorThrown);
+
+                if (jqXHR.status == 403) {
+                    location.reload()
+                }
             }
         });
     }

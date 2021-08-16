@@ -1215,271 +1215,277 @@ def import_pedigree_data(request):
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor, "/account/login")
 def import_breeder_data(request):
-    if request.method == 'POST':
-        attached_service = get_main_account(request.user)
+    # check if user has permission
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+
+    attached_service = get_main_account(request.user)
+    
+    database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
+    file_slice = FileSlice.objects.filter(database_upload=database_upload, used=False).earliest('id')
+
+    post_data = {}
+
+    # remove blank ('---') entries ###################
+    for key, val in request.POST.items():
+        if val == '---':
+            post_data[key] = ''
+        else:
+            post_data[key] = val
+
+    # get all options ###################
+    breeding_prefix = post_data['breeding_prefix'] or ''
+    contact_name = post_data['contact_name'] or ''
+    address_line_1 = post_data['address_line_1'] or ''
+    address_line_2 = post_data['address_line_2'] or ''
+    town = post_data['town'] or ''
+    country = post_data['country'] or ''
+    postcode = post_data['postcode'] or ''
+    phone_number1 = post_data['phone_number1'] or ''
+    phone_number2 = post_data['phone_number2'] or ''
+    email = post_data['email'] or ''
+    active = post_data['active'] or ''
+
+    # get index of each heading
+    thousand = 1000
+    if breeding_prefix:
+        breeding_prefix = loads(database_upload.header)['header'].index(breeding_prefix)
+    # if heading not given, make the index out of range (who's importing a thousand columns!?)
+    else:
+        breeding_prefix = thousand
+    if contact_name:
+        contact_name = loads(database_upload.header)['header'].index(contact_name)
+    else:
+        contact_name = thousand
+    if address_line_1:
+        address_line_1 = loads(database_upload.header)['header'].index(address_line_1)
+    else:
+        address_line_1 = thousand
+    if address_line_2:
+        address_line_2 = loads(database_upload.header)['header'].index(address_line_2)
+    else:
+        address_line_2 = thousand
+    if town:
+        town = loads(database_upload.header)['header'].index(town)
+    else:
+        town = thousand
+    if country:
+        country = loads(database_upload.header)['country'].index(town)
+    else:
+        country = thousand
+    if postcode:
+        postcode = loads(database_upload.header)['country'].index(town)
+    else:
+        postcode = thousand
+    if phone_number1:
+        phone_number1 = loads(database_upload.header)['header'].index(phone_number1)
+    else:
+        phone_number1 = thousand
+    if phone_number2:
+        phone_number2 = loads(database_upload.header)['header'].index(phone_number2)
+    else:
+        phone_number2 = thousand
+    if email:
+        email = loads(database_upload.header)['header'].index(email)
+    else:
+        email = thousand
+    if active:
+        active = loads(database_upload.header)['header'].index(active)
+    else:
+        active = thousand
+
+    # regex pattern used to validate email
+    email_pattern = re.compile('^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+
+    # get or create each new pedigree ###################
+    for row in loads(file_slice.file_slice)['file_slice']:
+        row_number = row[-1]
         
-        database_upload = DatabaseUpload.objects.filter(account=attached_service, user=request.user).latest('id')
-        file_slice = FileSlice.objects.filter(database_upload=database_upload, used=False).earliest('id')
+        # set name for error messages
+        if contact_name != thousand:
+            name = row[contact_name]
+        else:
+            name = ''
 
-        post_data = {}
+        has_error = False
 
-        # remove blank ('---') entries ###################
-        for key, val in request.POST.items():
-            if val == '---':
-                post_data[key] = ''
-            else:
-                post_data[key] = val
-
-        # get all options ###################
-        breeding_prefix = post_data['breeding_prefix'] or ''
-        contact_name = post_data['contact_name'] or ''
-        address_line_1 = post_data['address_line_1'] or ''
-        address_line_2 = post_data['address_line_2'] or ''
-        town = post_data['town'] or ''
-        country = post_data['country'] or ''
-        postcode = post_data['postcode'] or ''
-        phone_number1 = post_data['phone_number1'] or ''
-        phone_number2 = post_data['phone_number2'] or ''
-        email = post_data['email'] or ''
-        active = post_data['active'] or ''
-
-        # get index of each heading
-        thousand = 1000
-        if breeding_prefix:
-            breeding_prefix = loads(database_upload.header)['header'].index(breeding_prefix)
-        # if heading not given, make the index out of range (who's importing a thousand columns!?)
+        ################### breeding prefix
+        # check it is not empty
+        if row[breeding_prefix] == '':
+            errors = loads(database_upload.errors)
+            errors['missing'].append({
+                'col': 'Breeding Prefix',
+                'row': row_number,
+                'name': name
+            })
+            database_upload.errors = dumps(errors)
+            database_upload.save()
+            # set has_error
+            has_error = True
+        # get create a breeder
+        # can't do __iexact for get_or_create breeder, so will have to do a filter then a create if nothing is in the filter
+        breeder = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeding_prefix].rstrip())
+        if breeder.count() == 0:
+            breeder = Breeder(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
         else:
-            breeding_prefix = thousand
-        if contact_name:
-            contact_name = loads(database_upload.header)['header'].index(contact_name)
-        else:
-            contact_name = thousand
-        if address_line_1:
-            address_line_1 = loads(database_upload.header)['header'].index(address_line_1)
-        else:
-            address_line_1 = thousand
-        if address_line_2:
-            address_line_2 = loads(database_upload.header)['header'].index(address_line_2)
-        else:
-            address_line_2 = thousand
-        if town:
-            town = loads(database_upload.header)['header'].index(town)
-        else:
-            town = thousand
-        if country:
-            country = loads(database_upload.header)['country'].index(town)
-        else:
-            country = thousand
-        if postcode:
-            postcode = loads(database_upload.header)['country'].index(town)
-        else:
-            postcode = thousand
-        if phone_number1:
-            phone_number1 = loads(database_upload.header)['header'].index(phone_number1)
-        else:
-            phone_number1 = thousand
-        if phone_number2:
-            phone_number2 = loads(database_upload.header)['header'].index(phone_number2)
-        else:
-            phone_number2 = thousand
-        if email:
-            email = loads(database_upload.header)['header'].index(email)
-        else:
-            email = thousand
-        if active:
-            active = loads(database_upload.header)['header'].index(active)
-        else:
-            active = thousand
-
-        # regex pattern used to validate email
-        email_pattern = re.compile('^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-
-        # get or create each new pedigree ###################
-        for row in loads(file_slice.file_slice)['file_slice']:
-            row_number = row[-1]
-            
-            # set name for error messages
-            if contact_name != thousand:
-                name = row[contact_name]
-            else:
-                name = ''
-
-            has_error = False
-
-            ################### breeding prefix
-            # check it is not empty
-            if row[breeding_prefix] == '':
-                errors = loads(database_upload.errors)
-                errors['missing'].append({
-                    'col': 'Breeding Prefix',
-                    'row': row_number,
-                    'name': name
-                })
-                database_upload.errors = dumps(errors)
-                database_upload.save()
-                # set has_error
-                has_error = True
-            # get create a breeder
-            # can't do __iexact for get_or_create breeder, so will have to do a filter then a create if nothing is in the filter
-            breeder = Breeder.objects.filter(account=attached_service, breeding_prefix__iexact=row[breeding_prefix].rstrip())
-            if breeder.count() == 0:
-                breeder = Breeder(account=attached_service, breeding_prefix=row[breeding_prefix].rstrip())
-            else:
-                breeder = breeder.first()
-            
-            ################### contact name
-            try:
-                breeder.contact_name = row[contact_name]
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            ################### address
-            try:
-                breeder.address_line_1 = row[address_line_1]
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            try:
-                breeder.address_line_2 = row[address_line_2]
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            try:
-                breeder.town = row[town]
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            try:
-                breeder.country = row[country]
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            try:
-                breeder.postcode = row[postcode]
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            ################### phone_number1
-            try:
-                breeder.phone_number1 = row[phone_number1]
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            ################### phone_number2
-            try:
-                breeder.phone_number2 = row[phone_number2]
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            ################### email
-            try:
-                # if email given
-                if row[email] != '':
-                    # validate email
-                    if email_pattern.match(row[email]):
-                        breeder.email = row[email]
-                    # add to errors invalid
-                    else:
-                        errors = loads(database_upload.errors)
-                        errors['invalid'].append({
-                            'col': 'Email',
-                            'row': row_number,
-                            'name': name,
-                            'reason': 'the email given is invalid'
-                        })
-                        database_upload.errors = dumps(errors)
-                        database_upload.save()
-                        # set has_error
-                        has_error = True
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            ################### active
-            try:
-                if row[active].title() == 'Active':
-                    breeder.active = True
-                elif row[active].title() == 'Inactive':
-                    breeder.active = False
-                # add to invalid if content was invalid
-                elif row[active] != '':
+            breeder = breeder.first()
+        
+        ################### contact name
+        try:
+            breeder.contact_name = row[contact_name]
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        ################### address
+        try:
+            breeder.address_line_1 = row[address_line_1]
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        try:
+            breeder.address_line_2 = row[address_line_2]
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        try:
+            breeder.town = row[town]
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        try:
+            breeder.country = row[country]
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        try:
+            breeder.postcode = row[postcode]
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        ################### phone_number1
+        try:
+            breeder.phone_number1 = row[phone_number1]
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        ################### phone_number2
+        try:
+            breeder.phone_number2 = row[phone_number2]
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        ################### email
+        try:
+            # if email given
+            if row[email] != '':
+                # validate email
+                if email_pattern.match(row[email]):
+                    breeder.email = row[email]
+                # add to errors invalid
+                else:
                     errors = loads(database_upload.errors)
                     errors['invalid'].append({
-                        'col': 'Status',
+                        'col': 'Email',
                         'row': row_number,
                         'name': name,
-                        'reason': 'status must be "Active" or "Inactive" - if left blank, it defaults to "Inactive"'
+                        'reason': 'the email given is invalid'
                     })
                     database_upload.errors = dumps(errors)
                     database_upload.save()
                     # set has_error
                     has_error = True
-            except ValidationError:
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        ################### active
+        try:
+            if row[active].title() == 'Active':
+                breeder.active = True
+            elif row[active].title() == 'Inactive':
+                breeder.active = False
+            # add to invalid if content was invalid
+            elif row[active] != '':
+                errors = loads(database_upload.errors)
+                errors['invalid'].append({
+                    'col': 'Status',
+                    'row': row_number,
+                    'name': name,
+                    'reason': 'status must be "Active" or "Inactive" - if left blank, it defaults to "Inactive"'
+                })
+                database_upload.errors = dumps(errors)
+                database_upload.save()
+                # set has_error
+                has_error = True
+        except ValidationError:
+            pass
+        except IndexError:
+            pass
+        except UnboundLocalError:
+            pass
+        ###################
+        # save the breeder if no error
+        if not has_error:
+            try:
+                breeder.save()
+            except NameError:
                 pass
-            except IndexError:
-                pass
-            except UnboundLocalError:
-                pass
-            ###################
-            # save the breeder if no error
-            if not has_error:
-                try:
-                    breeder.save()
-                except NameError:
-                    pass
+    
+    # set the file just processed to used
+    file_slice.used = True
+    file_slice.save()
+    
+    # if the max number of errors was exceded, stop the import and redirect back to analyse page
+    if len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 50:
+
+        # it's over so delete DatabaseUpload
+        database_upload.delete()
+
+        # make sure we don't send so many errors that a 500 error is caused
+        errors = loads(database_upload.errors)
+        errors['invalid'] = errors['invalid'][:50]
+        errors['missing'] = errors['missing'][:50]
+
+        return HttpResponse(dumps({'result': 'incomplete', 'errors': errors}))
+    
+    # check whether there are any more left. if there are, tell the browser to go again
+    elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
+        completed_lines = FileSlice.objects.filter(database_upload=database_upload, used=True).count() * 200
+        remaining_lines = database_upload.total_lines - completed_lines
+        return HttpResponse(dumps({'result': 'again',
+                                    'completed': completed_lines,
+                                    'remaining': remaining_lines}))
+    
+    # if there were errors, redirect back to analyse page
+    elif len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 0:
+
+        # it's over so delete DatabaseUpload
+        database_upload.delete()
+
+        # make sure we don't send so many errors that a 500 error is caused
+        errors = loads(database_upload.errors)
+        errors['invalid'] = errors['invalid'][:50]
+        errors['missing'] = errors['missing'][:50]
+
+        return HttpResponse(dumps({'result': 'complete', 'errors': errors}))
+    else:
+        # it's over so delete DatabaseUpload
+        database_upload.delete()
         
-        # set the file just processed to used
-        file_slice.used = True
-        file_slice.save()
-        
-        # if the max number of errors was exceded, stop the import and redirect back to analyse page
-        if len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 50:
-
-            # it's over so delete DatabaseUpload
-            database_upload.delete()
-
-            # make sure we don't send so many errors that a 500 error is caused
-            errors = loads(database_upload.errors)
-            errors['invalid'] = errors['invalid'][:50]
-            errors['missing'] = errors['missing'][:50]
-
-            return HttpResponse(dumps({'result': 'incomplete', 'errors': errors}))
-        
-        # check whether there are any more left. if there are, tell the browser to go again
-        elif FileSlice.objects.filter(database_upload=database_upload, used=False).exists():
-            completed_lines = FileSlice.objects.filter(database_upload=database_upload, used=True).count() * 200
-            remaining_lines = database_upload.total_lines - completed_lines
-            return HttpResponse(dumps({'result': 'again',
-                                        'completed': completed_lines,
-                                        'remaining': remaining_lines}))
-        
-        # if there were errors, redirect back to analyse page
-        elif len(loads(database_upload.errors)['missing']) + len(loads(database_upload.errors)['invalid']) > 0:
-
-            # it's over so delete DatabaseUpload
-            database_upload.delete()
-
-            # make sure we don't send so many errors that a 500 error is caused
-            errors = loads(database_upload.errors)
-            errors['invalid'] = errors['invalid'][:50]
-            errors['missing'] = errors['missing'][:50]
-
-            return HttpResponse(dumps({'result': 'complete', 'errors': errors}))
-        else:
-            # it's over so delete DatabaseUpload
-            database_upload.delete()
-            
-            return HttpResponse(dumps({'result': 'success'}))
-
-    return redirect('breeders')
+        return HttpResponse(dumps({'result': 'success'}))
 
 
 @login_required(login_url="/account/login")
