@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -17,6 +18,8 @@ def breeder(request, breeder_id):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
             return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
 
     attached_service = get_main_account(request.user)
     breeder = Breeder.objects.get(account=attached_service, id=breeder_id)
