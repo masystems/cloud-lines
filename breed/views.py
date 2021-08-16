@@ -24,7 +24,7 @@ def new_breed_form(request):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
             return redirect_2_login(request)
-    if request.method == 'POST':
+    elif request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
             raise PermissionDenied()
     else:
@@ -80,6 +80,11 @@ def edit_breed_form(request, breed_id):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
             return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
     
     breed = get_object_or_404(Breed, id=breed_id)
     attached_service = get_main_account(request.user)
