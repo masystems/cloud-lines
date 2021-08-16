@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied, ValidationError, ObjectDoesNotExist
 from pedigree.models import Pedigree, PedigreeImage
 from pedigree.functions import get_pedigree_column_headings
 from breeder.models import Breeder
@@ -134,6 +134,11 @@ def importx(request):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
             return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
     
     attached_service = get_main_account(request.user)
     allowed_file_types = ('.csv')
