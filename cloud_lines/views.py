@@ -271,7 +271,7 @@ def order(request, service=None):
 @login_required(login_url="/account/login")
 def order_service(request):
     if request.method == 'GET':
-        return redirect_2_login()
+        return redirect_2_login(request)
     elif request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
             raise PermissionDenied()
@@ -323,7 +323,7 @@ def order_service(request):
 def order_billing(request):
     # permission check
     if request.method == 'GET':
-        return redirect_2_login()
+        return redirect_2_login(request)
     elif request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
             raise PermissionDenied()
@@ -370,7 +370,7 @@ def order_billing(request):
 def order_subscribe(request):
     # permission check
     if request.method == 'GET':
-        return redirect_2_login()
+        return redirect_2_login(request)
     elif request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
             raise PermissionDenied()
