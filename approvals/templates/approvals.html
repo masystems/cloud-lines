@@ -93,7 +93,7 @@
                                 <td><strong class="text-info">Pending</strong></td>
 
                                 <td>
-                                    {% if editor %}
+                                    {% if editor or approval.pedigree.breed.breed_name in breeds_editable or approval.breed_group.breed.breed_name in breeds_editable %}
                                         <a href="{% url 'approve' approval.id %}"><button class="btn btn-sm btn-success mr-1">Approve</button></a>
                                         {% if approval.pedigree %}
                                             <a href="{% url 'edit_pedigree_form' approval.pedigree.id %}"><button class="btn btn-sm btn-outline-info mr-1">Edit</button></a>

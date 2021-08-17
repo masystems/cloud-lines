@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
@@ -21,7 +21,7 @@ from .functions import get_site_pedigree_column_headings
 from django.db.models import Q
 import re
 import json
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from approvals.models import Approval
 import dateutil.parser
 from django.utils.datastructures import MultiValueDictKeyError
@@ -73,10 +73,19 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
 class ShowPedigree(PedigreeBase):
     template_name = 'pedigree.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # check permission
+        if self.request.method == 'GET':
+            if not has_permission(self.request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                        [super().get_context_data(**kwargs)['lvl1']]):
+                return redirect_2_login(self.request)
+        else:
+            raise PermissionDenied()
+        
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        
         
         return context
 
@@ -92,6 +101,17 @@ def render_to_pdf(template_src, context_dict):
 
 
 class GeneratePDF(View):
+    def dispatch(self, request, *args, **kwargs):
+        # check permission
+        if self.request.method == 'GET':
+            if not has_permission(self.request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'},
+                                        [Pedigree.objects.get(id=self.kwargs['pedigree_id'])]):
+                return redirect_2_login(self.request)
+        else:
+            raise PermissionDenied()
+        
+        return super().dispatch(request, *args, **kwargs)
+    
     # certificate
     def get(self, request, *args, **kwargs):
         context = {}
@@ -298,9 +318,19 @@ def search_results(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
 @never_cache
 def new_pedigree_form(request):
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        # particular breed checked below
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+            return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
+    else:
+        raise PermissionDenied()
+    
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     pre_checks = True
     attached_service = get_main_account(request.user)
@@ -335,6 +365,13 @@ def new_pedigree_form(request):
             pre_checks = False
         if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
             pedigree_form.add_error('breed', 'Selected breed does not exist.')
+            pre_checks = False
+        # get breeds editable (length is 0 if they're not a breed admin)
+        breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
+        if '' in breeds_editable:
+            breeds_editable.remove('')
+        if len(breeds_editable) > 0 and pedigree_form['breed'].value() not in breeds_editable:
+            pedigree_form.add_error('breed', 'You are not an editor for the selected breed.')
             pre_checks = False
         if pedigree_form.is_valid() and pre_checks:
             new_pedigree = Pedigree()
@@ -475,11 +512,21 @@ def new_pedigree_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
 @never_cache
 def edit_pedigree_form(request, id):
     attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
+
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        # particular breed checked below
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
+    else:
+        raise PermissionDenied()
 
     # if state is edited make sure to show edited information
     if pedigree.state == 'edited':
@@ -719,18 +766,26 @@ def add_existing(request, pedigree_id):
     attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
 
-    if request.method == 'POST':
-        child_reg = request.POST.get('reg_no')
-        child = Pedigree.objects.get(account=attached_service, reg_no=child_reg)
-        if pedigree.sex == 'male':
-            child.parent_father = pedigree
-        elif pedigree.sex == 'female':
-            child.parent_mother = pedigree
+    # check if user has permission (should just be post)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
 
-        if request.user in attached_service.contributors.all():
-            create_approval(request, child, attached_service, state='edited', type='edit')
-        else:
-            child.save()
+    child_reg = request.POST.get('reg_no')
+    child = Pedigree.objects.get(account=attached_service, reg_no=child_reg)
+    if pedigree.sex == 'male':
+        child.parent_father = pedigree
+    elif pedigree.sex == 'female':
+        child.parent_mother = pedigree
+
+    if request.user in attached_service.contributors.all():
+        create_approval(request, child, attached_service, state='edited', type='edit')
+    else:
+        child.save()
 
     return redirect('pedigree', pedigree_id)
 
@@ -739,18 +794,26 @@ def add_existing_parent(request, pedigree_id):
     attached_service = get_main_account(request.user)
     pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
 
-    if request.method == 'POST':
-        parent_reg = request.POST.get('reg_no')
-        parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
-        if parent.sex == 'male':
-            pedigree.parent_father = parent
-        elif parent.sex == 'female':
-            pedigree.parent_mother = parent
+    # check if user has permission (should just be post)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
 
-        if request.user in attached_service.contributors.all():
-            create_approval(request, pedigree, attached_service, state='edited', type='edit')
-        else:
-            pedigree.save()
+    parent_reg = request.POST.get('reg_no')
+    parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
+    if parent.sex == 'male':
+        pedigree.parent_father = parent
+    elif parent.sex == 'female':
+        pedigree.parent_mother = parent
+
+    if request.user in attached_service.contributors.all():
+        create_approval(request, pedigree, attached_service, state='edited', type='edit')
+    else:
+        pedigree.save()
 
     return redirect('pedigree', pedigree_id)
 
@@ -780,7 +843,7 @@ def create_approval(request, pedigree, attached_service, state, type):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @never_cache
 def get_pedigree_details(request):
     attached_service = get_main_account(request.user)

@@ -13,7 +13,8 @@
     {% for hidden in pedigree_form.hidden_fields %}
         {{ hidden }}
     {% endfor %}
-
+    <!-- hidden input which tells the backend whether user is a breed admin -->
+    <input type="hidden" name="breeds-editable" value="{{ breeds_editable }}">
     {% for field in pedigree_form.visible_fields %}
         <!-- check whether to show nothing (if the field is breed group and the mode isn't poultry) -->
         {% if field.label == 'Breed group' and service.site_mode != 'poultry' %}
@@ -68,7 +69,7 @@
                                 </div>
                             {% endif %}
                             {% if 'setup' not in request.get_full_path %}
-                                {% if editor %}
+                                {% if editor or breeds_editable|length > 0 %}
                                     <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breeder</button>
                                 {% endif %}
                             {% endif %}
@@ -140,7 +141,7 @@
                                     <input id="hid_breed" class="typeahead form-control" name='{{ field.name }}' type="hidden" value="{{ breeds.all.first }}">
                                     <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
                             {% endif %}
-                            {% if 'setup' not in request.get_full_path %}
+                            {% if 'setup' not in request.get_full_path and editor %}
                                 <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="{% if add_breed %}#newBreedModal{% else %}#upgrade{% endif %}" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breed</button>
                             {% endif %}
                         {% elif field.label == 'Sale or hire' %}

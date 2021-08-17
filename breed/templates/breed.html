@@ -28,8 +28,10 @@
             {% else %}
                 {% include 'upgrade_modal.html' with type='breeds' %}
                 <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Create</button>
-                <a href="{% url 'edit_breed_form' breed.id %}" class="btn btn-outline-info float-right mr-2"><i class="fad fa-pencil-alt"></i> Edit
+                {% if editor %}
+                    <a href="{% url 'edit_breed_form' breed.id %}" class="btn btn-outline-info float-right mr-2"><i class="fad fa-pencil-alt"></i> Edit
                     </a>
+                {% endif %}
             {% endif %}
         </div>
     </div>

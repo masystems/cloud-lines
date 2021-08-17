@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 from io import BytesIO
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from breeder.models import Breeder
 from pedigree.models import Pedigree
 from xhtml2pdf import pisa
@@ -12,11 +13,28 @@ import xlwt
 
 @login_required(login_url="/account/login")
 def reports(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
     return render(request, 'reports.html')
 
 
 @login_required(login_url="/account/login")
 def census(request, type):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     attached_service = get_main_account(request.user)
     date = datetime.now()
 
@@ -132,6 +150,13 @@ def render_to_pdf(template_src, context_dict):
 
 @login_required(login_url="/account/login")
 def all(request, type):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
     attached_service = get_main_account(request.user)
 
     if type == 'form':

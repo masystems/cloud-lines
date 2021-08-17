@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -5,7 +6,7 @@ from .models import Breeder
 from pedigree.models import Pedigree
 from pedigree.functions import get_site_pedigree_column_headings
 from breed_group.models import BreedGroup
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from .forms import BreederForm
 import csv
 import json
@@ -13,6 +14,13 @@ import json
 
 @login_required(login_url="/account/login")
 def breeder(request, breeder_id):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+
     attached_service = get_main_account(request.user)
     breeder = Breeder.objects.get(account=attached_service, id=breeder_id)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
@@ -44,7 +52,7 @@ def breeders(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def breeder_csv(request):
     attached_service = get_main_account(request.user)
     # Create the HttpResponse object with the appropriate CSV header.
@@ -82,8 +90,17 @@ def breeder_csv(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
 def new_breeder_form(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     attached_service = get_main_account(request.user)
     breeder_form = BreederForm(request.POST or None, request.FILES or None)
 
@@ -132,8 +149,18 @@ def new_breeder_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def edit_breeder_form(request, breeder_id):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     attached_service = get_main_account(request.user)
     breeder = get_object_or_404(Breeder, id=breeder_id, account=attached_service)
     breeder_form = BreederForm(request.POST or None, request.FILES or None, instance=breeder)
