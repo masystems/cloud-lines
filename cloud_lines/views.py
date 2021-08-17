@@ -270,44 +270,51 @@ def order(request, service=None):
 
 @login_required(login_url="/account/login")
 def order_service(request):
-    if request.POST:
-        # import stripe key
-        if request.user.is_superuser:
-            stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-        else:
-            stripe.api_key = settings.STRIPE_SECRET_KEY
+    if request.method == 'GET':
+        return redirect_2_login()
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
 
-        user_detail = UserDetail.objects.get(user=request.user)
-        service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
+    # import stripe key
+    if request.user.is_superuser:
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+    else:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
 
-        if request.POST.get('checkout-form-sub-domain'):
-            domain = 'https://{}.cloud-lines.com'.format(request.POST.get('checkout-form-sub-domain'))
-        else:
-            domain = ''
+    user_detail = UserDetail.objects.get(user=request.user)
+    service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
 
-        # if upgade
-        if request.POST.get('checkout-form-upgrade'):
-            try:
-                attached_service = AttachedService.objects.filter(user=user_detail,
-                                                                  id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                                                                                       site_mode=request.POST.get('checkout-form-site-mode'),
-                                                                                                                       domain=domain,
-                                                                                                                       install_available=False,
-                                                                                                                       service=service,
-                                                                                                                       increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                                                                                       active=False)
-            except AttachedService.DoesNotExist:
-                pass
-        else:
-            # create new attached service details object
-            attached_service = AttachedService.objects.create(user=user_detail,
-                                                              animal_type=request.POST.get('checkout-form-animal-type'),
-                                                              site_mode=request.POST.get('checkout-form-site-mode'),
-                                                              domain=domain,
-                                                              install_available=False,
-                                                              service=service,
-                                                              increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                              active=False)
+    if request.POST.get('checkout-form-sub-domain'):
+        domain = 'https://{}.cloud-lines.com'.format(request.POST.get('checkout-form-sub-domain'))
+    else:
+        domain = ''
+
+    # if upgade
+    if request.POST.get('checkout-form-upgrade'):
+        try:
+            attached_service = AttachedService.objects.filter(user=user_detail,
+                                                                id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
+                                                                                                                    site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                                                                    domain=domain,
+                                                                                                                    install_available=False,
+                                                                                                                    service=service,
+                                                                                                                    increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                                                                                    active=False)
+        except AttachedService.DoesNotExist:
+            pass
+    else:
+        # create new attached service details object
+        attached_service = AttachedService.objects.create(user=user_detail,
+                                                            animal_type=request.POST.get('checkout-form-animal-type'),
+                                                            site_mode=request.POST.get('checkout-form-site-mode'),
+                                                            domain=domain,
+                                                            install_available=False,
+                                                            service=service,
+                                                            increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                            active=False)
 
     return HttpResponse(json.dumps(attached_service.id))
 

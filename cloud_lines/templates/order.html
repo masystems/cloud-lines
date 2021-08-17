@@ -355,6 +355,9 @@
 											$('#selectServiceButton').click();
 										},
 										error: function(jqXHR, textStatus, errorThrown){
+											if (jqXHR.status == 403) {
+												location.reload()
+											}
 											$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Change your options and try submitting again.</div>');
 											console.log('jqXHR:');
 											console.log(jqXHR.responseText);
