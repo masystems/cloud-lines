@@ -775,6 +775,15 @@ def subdomain_check(request):
 @login_required(login_url="/account/login")
 @csrf_exempt
 def update_card(request):
+    # permission check
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     user_detail = UserDetail.objects.get(user=request.user)
 
     # add payment token to user
@@ -852,6 +861,13 @@ def send_payment_error(e):
 @login_required(login_url="/account/login")
 @csrf_exempt
 def cancel_sub(request):
+    # permission check
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
     from django.conf import settings
     stripe.api_key = settings.STRIPE_SECRET_KEY
     attached_service = get_main_account(request.user)
