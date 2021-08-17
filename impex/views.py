@@ -21,6 +21,11 @@ def export(request):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
             return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
     
     if request.method == 'POST':
         attached_service = get_main_account(request.user)
