@@ -882,6 +882,9 @@
 										}
 									 },
 									error: function(jqXHR, textStatus, errorThrown){
+										if (jqXHR.status == 403) {
+											location.reload()
+										}
 										console.log('jqXHR:');
 										console.log(jqXHR);
 										console.log('textStatus:');

@@ -321,6 +321,7 @@ def order_service(request):
 
 @login_required(login_url="/account/login")
 def order_billing(request):
+    # permission check
     if request.method == 'GET':
         return redirect_2_login()
     elif request.method == 'POST':
@@ -367,6 +368,15 @@ def order_billing(request):
 
 @login_required(login_url="/account/login")
 def order_subscribe(request):
+    # permission check
+    if request.method == 'GET':
+        return redirect_2_login()
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     user_detail = UserDetail.objects.get(user=request.user)
     attached_service = AttachedService.objects.get(id=request.POST.get('attached_service_id'), user=user_detail, active=False)
     large_tier = ['Small Society', 'Large Society', 'Organisation']
