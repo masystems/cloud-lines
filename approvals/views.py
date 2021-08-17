@@ -1,8 +1,9 @@
+from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
-from django.core.exceptions import ObjectDoesNotExist
-from account.views import is_editor, get_main_account, send_mail
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from account.views import is_editor, get_main_account, send_mail, has_permission, redirect_2_login
 from .models import Approval
 from pedigree.models import Pedigree, PedigreeImage
 from breed_group.models import BreedGroup
@@ -13,7 +14,7 @@ from json import loads
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def approvals(request):
     attached_service = get_main_account(request.user)
     approvals = Approval.objects.filter(account=attached_service)
@@ -50,9 +51,17 @@ def approvals(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 def approve(request, id):
     approval = Approval.objects.get(id=id)
+    
+    # check if user has permission (should just be a GET)
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
     for obj in serializers.deserialize("yaml", approval.data):
         obj.object.state = 'approved'
         obj.object.save()
@@ -86,10 +95,20 @@ def approve(request, id):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
 def declined(request):
-    if request.method == 'POST':
+    approval = ''
+    # check if user has permission
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
         approval = Approval.objects.get(id=request.POST.get('decline-id'))
+        # particular breed checked below
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+
+    if request.method == 'POST':
         if approval.pedigree:
             message_approval_id = approval.pedigree.reg_no
             if approval.type == 'new':

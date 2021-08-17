@@ -132,7 +132,9 @@
                                         </div>
                                     </li>
                                     <li>
-                                    <a class="nav-link text-center" href="{% url 'order' %}"> <strong>Get more services?</strong> <i class="fad fa-angle-right"></i> </a>
+                                    {% if request.user == service.user.user %}
+                                        <a class="nav-link text-center" href="{% url 'order' %}"> <strong>Get more services?</strong> <i class="fad fa-angle-right"></i> </a>
+                                    {% endif %}
                                 </li>
                                 </ul>
                             </div>

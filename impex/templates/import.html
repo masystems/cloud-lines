@@ -223,6 +223,11 @@
                             // process file slices
                             slicesJob(allRows)
                         }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        if (jqXHR.status == 403) {
+                            location.reload()
+                        }
                     }
                 })
 

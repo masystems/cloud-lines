@@ -82,6 +82,8 @@
                                 <ul class="list-icons d-none" id="father-info"></ul>
                             </div>
                         </div>
+                        <!-- hidden input which tells the backend whether user is a breed admin -->
+                        <input type="hidden" name="breeds-editable" value="{{ breeds_editable }}">
                     </form>
                     <p id="ksMsg" class="mt-2 text-center"></p>
                     <hr>
@@ -106,6 +108,8 @@
                                     <ul class="list-icons d-none" id="sa-info"></ul>
                                 </div>
                             </div>
+                            <!-- hidden input which tells the backend whether user is a breed admin -->
+                            <input type="hidden" name="breeds-editable" value="{{ breeds_editable }}">
                         </form>
                         <p id="saMsg" class="mt-2 text-center"></p>
                     </div>
@@ -159,12 +163,14 @@
                         {% elif breeds.all.count > 1 %}
                             <div class="btn-group btn-block">
                                 <button id="coiBtn" type="button" class="btn btn-success dropdown-toggle ml-1"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {% if breeds_editable|length > 0 %}data-toggle="tooltip" data-placement="top" title="Can only run for your editable breeds"{% endif %}>
                                     Run COI
                                 </button>
                                 <div class="dropdown-menu">
                                     {% for breed in breeds.all %}
-                                        <button onclick="runCoi(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                        {% if breeds_editable|length == 0 or breed.breed_name in breeds_editable %}
+                                            <button onclick="runCoi(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -178,12 +184,14 @@
                         {% elif breeds.all.count > 1 %}
                             <div class="btn-group btn-block">
                                 <button id="meanKinshipBtn" type="button" class="btn btn-success dropdown-toggle ml-1"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {% if breeds_editable|length > 0 %}data-toggle="tooltip" data-placement="top" title="Can only run for your editable breeds"{% endif %}>
                                     Run Mean Kinship
                                 </button>
                                 <div class="dropdown-menu">
                                     {% for breed in breeds.all %}
-                                        <button onclick="runMK(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                        {% if breeds_editable|length == 0 or breed.breed_name in breeds_editable %}
+                                            <button onclick="runMK(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -344,9 +352,12 @@
                                 <td>{{ item.created }}</td>
                                 <td class="complete">{% if item.complete %}<i class="fad fa-check text-success"></i>{% else %}<i class="fas fa-cog fa-spin text-info"></i>{% endif %}</td>
                                 {% if item.father %}
-                                    <td class="results"><a href="{% url 'kinship_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                                    <td class="results"><a href="{% url 'kinship_results' item.id %}">
+                                        <button class="btn btn-info" {% if not item.complete or not editor and item.mother.breed.breed_name not in breeds_editable and item.father.breed.breed_name not in breeds_editable %}disabled{% endif %}>View</button> 
+                                    </a> </td>
                                 {% else %}
-                                    <td class="results"><a href="{% url 'stud_advisor_results' item.id %}"><button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                                    <td class="results"><a href="{% url 'stud_advisor_results' item.id %}">
+                                        <button class="btn btn-info" {% if not item.complete or not editor and item.mother.breed.breed_name not in breeds_editable %}disabled{% endif %}>View</button> </a> </td>
                                 {% endif %}
                             </tr>
                         {% endfor %}

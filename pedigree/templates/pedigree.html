@@ -29,8 +29,8 @@ vertical-align: middle;
             </ol>
         </div>
         <div class="col-md-6 col-4 align-self-center">
-            {% if editor or contributor %}
-                {% if lvl1.state == 'approved' or editor %}
+            {% if editor or contributor or breeds_editable|length > 0 %}
+                {% if lvl1.state == 'approved' and contributor or editor or lvl1.breed.breed_name in breeds_editable %}
                     <a href="{% url 'edit_pedigree_form' lvl1.id %}" id="editPedigree" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
                 {% endif %}
@@ -223,8 +223,7 @@ vertical-align: middle;
                                 </div>
                             </div>
                         </div>
-
-                        {% if editor or contributor %}
+                        {% if editor or contributor or lvl1.breed.breed_name in breeds_editable %}
                             {% include 'add_new_pedigree.html' %}
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
                         {% else %}
@@ -466,12 +465,14 @@ vertical-align: middle;
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>
-                                <a href="{% url 'cert' lvl1.id 'cert' %}"><button class="btn float-right hidden-sm-down btn-outline-info">Certificate PDF</button></a>
+                        {% if editor or lvl1.breed.breed_name in breeds_editable %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>
+                                    <a href="{% url 'cert' lvl1.id 'cert' %}"><button class="btn float-right hidden-sm-down btn-outline-info">Certificate PDF</button></a>
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

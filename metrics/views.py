@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.conf import settings
 from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
@@ -18,6 +18,9 @@ from time import time
 from boto3.s3.transfer import TransferConfig
 from threading import Thread
 from itertools import chain
+
+from account.views import has_permission, redirect_2_login
+from django.contrib.auth.decorators import login_required
 
 
 logger = logging.getLogger(__name__)
@@ -135,6 +138,18 @@ def data_validation(request):
 
 
 def run_coi(request):
+    # check permission (this is only used to receive POST requests)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        pedigree = Pedigree.objects.filter(breed__id=request.POST.get('breed')).first()
+        if not pedigree:
+            raise PermissionDenied()
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+
     attached_service = get_main_account(request.user)
     obj, created = CoiLastRun.objects.get_or_create(account=attached_service)
     obj.last_run = datetime.now()
@@ -186,6 +201,19 @@ def coi(request):
 
 
 def kinship(request):
+    # check permission (this is only used to receive POST requests)
+    # the specific breed is checked later
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+            response = {'status': 'error',
+                        'msg': "You do not have permission!"
+                        }
+            return HttpResponse(dumps(response))
+    else:
+        raise PermissionDenied()
+    
     attached_service = get_main_account(request.user)
     epoch = int(time())
     pedigrees = Pedigree.objects.filter(account=attached_service).values('id',
@@ -226,6 +254,32 @@ def kinship(request):
                     'msg': f"Father ({request.POST['father']}) is not a living male!"
                     }
         return HttpResponse(dumps(response))
+    
+    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
+    if '' in breeds_editable:
+        breeds_editable.remove('')
+    # if user is a breed admin
+    if len(breeds_editable) > 0:
+        # check that the breed of the mother is editable
+        if request.user not in mother.breed.breed_admins.all():
+            response = {'status': 'error',
+                        'msg': f"The breed of mother ({request.POST['mother']}) is not a breed you are an editor for!"
+                        }
+            return HttpResponse(dumps(response))
+
+        # check that the breed of the father is editable
+        if request.user not in father.breed.breed_admins.all():
+            response = {'status': 'error',
+                        'msg': f"The breed of father ({request.POST['father']}) is not a breed you are an editor for!"
+                        }
+            return HttpResponse(dumps(response))
+
+    # check that the mother and father are of the same breed
+    if mother.breed != father.breed:
+        response = {'status': 'error',
+                        'msg': f"The breed of mother ({request.POST['mother']}) does not match the breed of father ({request.POST['father']})!"
+                    }
+        return HttpResponse(dumps(response))
 
     if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
         host = attached_service.domain.partition('://')[2]
@@ -261,14 +315,36 @@ def kinship(request):
     return HttpResponse(dumps(response))
 
 
+@login_required(login_url="/account/login")
 def kinship_results(request, id):
     attached_service = get_main_account(request.user)
     k_queue_item = KinshipQueue.objects.get(account=attached_service, id=id)
+
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    # this is only used for GET requests
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                    [k_queue_item.mother ,k_queue_item.father]):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
 
     return render(request, 'k_results.html', {'k_queue_item': k_queue_item})
 
 
 def run_mean_kinship(request):
+    # check permission (this is only used to receive POST requests)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        pedigree = Pedigree.objects.filter(breed__id=request.POST.get('breed')).first()
+        if not pedigree:
+            raise PermissionDenied()
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     attached_service = get_main_account(request.user)
     obj, created = MeanKinshipLastRun.objects.get_or_create(account=attached_service)
 
@@ -339,6 +415,20 @@ def stud_advisor_mother_details(request, mother):
 
 
 def stud_advisor(request):
+    # check permission (this is only used to receive POST requests)
+    # the specific breed is checked later
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            response = {'status': 'fail',
+                        'msg': "You do not have permission!",
+                        'item_id': ''
+                        }
+            return HttpResponse(dumps(response))
+    else:
+        raise PermissionDenied()
+    
     attached_service = get_main_account(request.user)
     epoch = int(time())
 
@@ -362,6 +452,20 @@ def stud_advisor(request):
             'item_id': ''
         }
         return HttpResponse(dumps(response))
+
+    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
+    if '' in breeds_editable:
+        breeds_editable.remove('')
+    # if user is a breed admin
+    if len(breeds_editable) > 0:
+        # check that the breed of the mother is editable
+        if request.user not in mother.breed.breed_admins.all():
+            response = {
+                'status': 'fail',
+                'msg': f"The breed of mother ({request.POST['mother']}) is not a breed you are an editor for!",
+                'item_id': ''
+            }
+            return HttpResponse(dumps(response))
 
     pedigrees = Pedigree.objects.filter(account=attached_service,
                                         breed=mother.breed).values('id',
@@ -410,6 +514,15 @@ def stud_advisor(request):
 def stud_advisor_results(request, id):
     attached_service = get_main_account(request.user)
     sa_queue_item = StudAdvisorQueue.objects.get(account=attached_service, id=id)
+
+    # check permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                    [sa_queue_item.mother]):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+
     mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
     #mother_details = eval(mother_details.content.decode())
     mk_threshold = sa_queue_item.mk_threshold
