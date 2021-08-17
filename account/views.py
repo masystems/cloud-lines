@@ -403,6 +403,8 @@ def profile(request):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
             return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
     
     from django.conf import settings
     stripe_pk = settings.STRIPE_PUBLIC_KEY
@@ -454,6 +456,8 @@ def settings(request):
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
             return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
     
     user_detail = UserDetail.objects.get(user=request.user)
     attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
