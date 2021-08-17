@@ -321,39 +321,46 @@ def order_service(request):
 
 @login_required(login_url="/account/login")
 def order_billing(request):
-    if request.POST:
+    if request.method == 'GET':
+        return redirect_2_login()
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
+    if request.user.is_superuser:
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+    else:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    user_detail = UserDetail.objects.get(user=request.user)
+
+    if not user_detail.stripe_id:
+        # create stripe user
         if request.user.is_superuser:
             stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
         else:
             stripe.api_key = settings.STRIPE_SECRET_KEY
+        customer = stripe.Customer.create(
+            name=request.POST.get('checkout-form-billing-name'),
+            email=request.POST.get('checkout-form-billing-email'),
 
-        user_detail = UserDetail.objects.get(user=request.user)
+            phone=request.POST.get('checkout-form-billing-phone'),
+            address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
+        )
+        customer_id = customer['id']
+        # update user datail
+        UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
+    else:
+        stripe.Customer.modify(
+            user_detail.stripe_id,
+            name=request.POST.get('checkout-form-billing-name'),
+            email=request.POST.get('checkout-form-billing-email'),
 
-        if not user_detail.stripe_id:
-            # create stripe user
-            if request.user.is_superuser:
-                stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-            else:
-                stripe.api_key = settings.STRIPE_SECRET_KEY
-            customer = stripe.Customer.create(
-                name=request.POST.get('checkout-form-billing-name'),
-                email=request.POST.get('checkout-form-billing-email'),
-
-                phone=request.POST.get('checkout-form-billing-phone'),
-                address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
-            )
-            customer_id = customer['id']
-            # update user datail
-            UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
-        else:
-            stripe.Customer.modify(
-                user_detail.stripe_id,
-                name=request.POST.get('checkout-form-billing-name'),
-                email=request.POST.get('checkout-form-billing-email'),
-
-                phone=request.POST.get('checkout-form-billing-phone'),
-                address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
-            )
+            phone=request.POST.get('checkout-form-billing-phone'),
+            address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
+        )
 
     return HttpResponse('done')
 
