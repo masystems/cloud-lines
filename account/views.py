@@ -346,6 +346,11 @@ def user_edit(request):
         else:
             main_account.read_only_users.add(existing_user)
 
+        # set breeder
+        if request.POST.get('breeding_prefix') != '':
+            breeder.user = existing_user
+            breeder.save()
+
         return HttpResponse(json.dumps({'success': True}))
 
     elif request.POST.get('formType') == 'delete':
