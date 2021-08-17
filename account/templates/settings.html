@@ -204,6 +204,12 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        <div class="form-group">
+                                                            <label for="breeding_prefix" class="control-label">Breeding Prefix (optional)</label>
+                                                            <div id="breeders" class="col-sm-9">
+                                                                <input type="text" class="typeahead form-control" id="breeding_prefix" name="breeding_prefix" placeholder="Breeding Prefix">
+                                                            </div>
+                                                        </div>
                                                         <input type="hidden" id="formType" name="formType" value="new">
                                                     </div>
                                                 </form>
@@ -406,6 +412,8 @@
                                                     $('#verticalcenter').modal('toggle');
                                                     window.location.href = window.location.href.split('#')[0] + "#users";
                                                     location.reload();
+                                                } else if (result.fail) {
+                                                    errorMsg(result.msg)
                                                 } else {
                                                     $('#verticalcenter').modal('toggle');
                                                     window.location.href = window.location.href.split('#')[0] + "#users";

@@ -243,6 +243,15 @@ def user_edit(request):
     # this is the additional user customers can add/remove from their service.
     main_account = get_main_account(request.user)
     user_detail = UserDetail.objects.get(user=request.user)
+    
+    # validate breeder
+    if request.POST.get('breeding_prefix') != '':
+        breeder = Breeder.objects.filter(account=main_account, breeding_prefix=request.POST.get('breeding_prefix'))
+        if breeder.exists():
+            breeder = breeder.first()
+        else:
+            return HttpResponse(json.dumps({'fail': True, 'msg': 'Breeding Prefix does not match an existing Breeder!'}))
+    
     if request.POST.get('formType') == 'new':
         # generate password
         password = ''.join(
@@ -279,8 +288,12 @@ def user_edit(request):
         else:
             main_account.read_only_users.add(new_user)
 
-        # send email to new user
+        # set breeder
+        if request.POST.get('breeding_prefix') != '':
+            breeder.user = new_user
+            breeder.save()
 
+        # send email to new user
         if main_account.domain:
             domain = main_account.domain
         else:
