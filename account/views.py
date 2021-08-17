@@ -232,110 +232,115 @@ def get_main_account(user):
 
 @login_required(login_url="/account/login")
 def user_edit(request):
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return HttpResponse(json.dumps({'success': False}))
+    else:
+        raise PermissionDenied()
+    
     # this is the additional user customers can add/remove from their service.
-    if request.method == 'POST':
-        main_account = get_main_account(request.user)
-        user_detail = UserDetail.objects.get(user=request.user)
-        if request.POST.get('formType') == 'new':
-            # generate password
-            password = ''.join(
-                [random.choice(string.ascii_letters + string.digits + string.punctuation) for n in range(int(10))])
+    main_account = get_main_account(request.user)
+    user_detail = UserDetail.objects.get(user=request.user)
+    if request.POST.get('formType') == 'new':
+        # generate password
+        password = ''.join(
+            [random.choice(string.ascii_letters + string.digits + string.punctuation) for n in range(int(10))])
 
-            # create new user
-            new_user = User.objects.create_user(username=request.POST.get('register-form-username').lower(),
-                                                email=request.POST.get('register-form-email'),
-                                                password=password,
-                                                first_name=request.POST.get('firstName'),
-                                                last_name=request.POST.get('lastName'))
+        # create new user
+        new_user = User.objects.create_user(username=request.POST.get('register-form-username').lower(),
+                                            email=request.POST.get('register-form-email'),
+                                            password=password,
+                                            first_name=request.POST.get('firstName'),
+                                            last_name=request.POST.get('lastName'))
 
-            # update user details
-            new_user_detail = UserDetail.objects.create(user=new_user,
-                                                        phone='',
-                                                        )
-            attached_service = AttachedService.objects.filter(user=new_user_detail).update(animal_type='Pedigrees',
-                                                                                           install_available=False,
-                                                                                           active=True)
-            new_user_detail.current_service_id = user_detail.current_service_id
-            new_user_detail.save()
-            if request.POST.get('status') == 'Editor':
-                main_account.admin_users.add(new_user)
+        # update user details
+        new_user_detail = UserDetail.objects.create(user=new_user,
+                                                    phone='',
+                                                    )
+        attached_service = AttachedService.objects.filter(user=new_user_detail).update(animal_type='Pedigrees',
+                                                                                        install_available=False,
+                                                                                        active=True)
+        new_user_detail.current_service_id = user_detail.current_service_id
+        new_user_detail.save()
+        if request.POST.get('status') == 'Editor':
+            main_account.admin_users.add(new_user)
 
-            elif request.POST.get('status') == 'Breed Editor':
-                for breed in Breed.objects.filter(account=main_account):
-                    if request.POST.get(breed.breed_name):
-                        breed.breed_admins.add(new_user)
-                        breed.save()
-
-            elif request.POST.get('status') == 'Contributor':
-                main_account.contributors.add(new_user)
-
-            else:
-                main_account.read_only_users.add(new_user)
-
-            # send email to new user
-
-            if main_account.domain:
-                domain = main_account.domain
-            else:
-                domain = 'https://cloud-lines.com'
-            email_body = """
-                        <p><strong>You have been registered on Cloud-lines by {}!</strong></p>
-
-                        <p>Now that you have been registered you will need to set your own secure password.</p>
-                        
-                        <p><strong>Username: </strong>{}</p>
-
-                        <p><a href="{}">Click here</a> to reset your password.</p>
-                        
-                        <p><a href="{}">Or Click here</a> to to login.</p>
-
-                        <p>Feel free to contact us about anything and enjoy!</p>""".format(request.user.get_full_name(),
-                                                                                           new_user.username,
-                                                                                           urljoin(domain, 'accounts/password_reset/'),
-                                                                                           domain)
-            if not django_settings.DEBUG:
-                send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
-            return HttpResponse(json.dumps({'success': True}))
-
-        elif request.POST.get('formType') == 'edit':
-            # find user and update name fields
-            User.objects.filter(username=request.POST.get('register-form-username'),
-                                email=request.POST.get('register-form-email')).update(first_name=request.POST.get('firstName'),
-                                                                                      last_name=request.POST.get('lastName'))
-            existing_user = User.objects.get(username=request.POST.get('register-form-username'),
-                                    email=request.POST.get('register-form-email'))
-            # remove user from admins and read only users and contributors
-            main_account.admin_users.remove(existing_user)
-            main_account.read_only_users.remove(existing_user)
-            main_account.contributors.remove(existing_user)
+        elif request.POST.get('status') == 'Breed Editor':
             for breed in Breed.objects.filter(account=main_account):
-                if not request.POST.get(breed.breed_name):
-                    breed.breed_admins.remove(existing_user)
+                if request.POST.get(breed.breed_name):
+                    breed.breed_admins.add(new_user)
                     breed.save()
 
-            # add user to the request group
-            if request.POST.get('status') == 'Editor':
-                main_account.admin_users.add(existing_user)
-            elif request.POST.get('status') == 'Breed Editor':
-                for breed in Breed.objects.filter(account=main_account):
-                    if request.POST.get(breed.breed_name):
-                        breed.breed_admins.add(existing_user)
-                        breed.save()
-            elif request.POST.get('status') == 'Contributor':
-                main_account.contributors.add(existing_user)
-            else:
-                main_account.read_only_users.add(existing_user)
+        elif request.POST.get('status') == 'Contributor':
+            main_account.contributors.add(new_user)
 
-            return HttpResponse(json.dumps({'success': True}))
+        else:
+            main_account.read_only_users.add(new_user)
 
-        elif request.POST.get('formType') == 'delete':
+        # send email to new user
 
-            User.objects.get(username=request.POST.get('register-form-username'),
-                             email=request.POST.get('register-form-email')).delete()
+        if main_account.domain:
+            domain = main_account.domain
+        else:
+            domain = 'https://cloud-lines.com'
+        email_body = """
+                    <p><strong>You have been registered on Cloud-lines by {}!</strong></p>
 
-            return HttpResponse(json.dumps({'success': True}))
+                    <p>Now that you have been registered you will need to set your own secure password.</p>
+                    
+                    <p><strong>Username: </strong>{}</p>
 
-    return HttpResponse(json.dumps({'success': False}))
+                    <p><a href="{}">Click here</a> to reset your password.</p>
+                    
+                    <p><a href="{}">Or Click here</a> to to login.</p>
+
+                    <p>Feel free to contact us about anything and enjoy!</p>""".format(request.user.get_full_name(),
+                                                                                        new_user.username,
+                                                                                        urljoin(domain, 'accounts/password_reset/'),
+                                                                                        domain)
+        if not django_settings.DEBUG:
+            send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
+        return HttpResponse(json.dumps({'success': True}))
+
+    elif request.POST.get('formType') == 'edit':
+        # find user and update name fields
+        User.objects.filter(username=request.POST.get('register-form-username'),
+                            email=request.POST.get('register-form-email')).update(first_name=request.POST.get('firstName'),
+                                                                                    last_name=request.POST.get('lastName'))
+        existing_user = User.objects.get(username=request.POST.get('register-form-username'),
+                                email=request.POST.get('register-form-email'))
+        # remove user from admins and read only users and contributors
+        main_account.admin_users.remove(existing_user)
+        main_account.read_only_users.remove(existing_user)
+        main_account.contributors.remove(existing_user)
+        for breed in Breed.objects.filter(account=main_account):
+            if not request.POST.get(breed.breed_name):
+                breed.breed_admins.remove(existing_user)
+                breed.save()
+
+        # add user to the request group
+        if request.POST.get('status') == 'Editor':
+            main_account.admin_users.add(existing_user)
+        elif request.POST.get('status') == 'Breed Editor':
+            for breed in Breed.objects.filter(account=main_account):
+                if request.POST.get(breed.breed_name):
+                    breed.breed_admins.add(existing_user)
+                    breed.save()
+        elif request.POST.get('status') == 'Contributor':
+            main_account.contributors.add(existing_user)
+        else:
+            main_account.read_only_users.add(existing_user)
+
+        return HttpResponse(json.dumps({'success': True}))
+
+    elif request.POST.get('formType') == 'delete':
+
+        User.objects.get(username=request.POST.get('register-form-username'),
+                            email=request.POST.get('register-form-email')).delete()
+
+        return HttpResponse(json.dumps({'success': True}))
 
 
 @login_required(login_url="/account/login")
