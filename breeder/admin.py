@@ -15,7 +15,7 @@ class BreederAdmin(admin.ModelAdmin):
             'fields': ('account',)
         }),
         ('Breeder details', {
-            'fields': ('breeding_prefix', 'active')
+            'fields': ('breeding_prefix', 'active', 'user')
         }),
         ('Contact options', {
             'fields': ('contact_name', 'address_line_1', 'phone_number1', 'phone_number2', 'email', 'custom_fields'),
