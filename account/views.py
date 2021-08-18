@@ -244,7 +244,8 @@ def user_edit(request):
     main_account = get_main_account(request.user)
     user_detail = UserDetail.objects.get(user=request.user)
     
-    # validate breeder
+    # validate breeder, if given
+    breeder = None
     if request.POST.get('breeding_prefix') != '':
         breeder = Breeder.objects.filter(account=main_account, breeding_prefix=request.POST.get('breeding_prefix'))
         if breeder.exists():
@@ -347,7 +348,15 @@ def user_edit(request):
             main_account.read_only_users.add(existing_user)
 
         # set breeder
-        if request.POST.get('breeding_prefix') != '':
+        # get old breeder and prefix if exists
+        old_breeder = existing_user.breeder.all()
+        if old_breeder.exists():
+            # unset old breeder
+            old_breeder = old_breeder.first()
+            old_breeder.user = None
+            old_breeder.save()
+        # set new breeder, if given
+        if breeder:
             breeder.user = existing_user
             breeder.save()
 

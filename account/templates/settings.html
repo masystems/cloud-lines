@@ -117,7 +117,7 @@
                                         <td>{{ breed_admin.username }}</td>
                                         <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.email }}</td>
                                         <td><span class="label label-light-info"> Breed Editor</span><p class="d-none">{% for breed in breeds %}{% if breed_admin in breed.breed_admins.all %}{{ breed.breed_name }},{% endif %}{% endfor %}</p></td>
-                                        <td>{{ user.breeder.first.breeding_prefix }}</td>
+                                        <td>{{ breed_admin.breeder.first.breeding_prefix }}</td>
                                         {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
@@ -286,7 +286,7 @@
                                     $("#register-form-username").prop("readonly", true);
                                     $('#register-form-email').val(currentRow.find("td:eq(3)").text());
                                     $("#register-form-email").prop("readonly", true);
-                                    console.log(currentRow.find("p").text())
+                                    $('#breeding_prefix').val(currentRow.find("td:eq(5)").text())
                                     // check if editor
                                     var status = currentRow.find("td:eq(4)").text();
                                     var breedEditor = status.includes('Breed Editor')
