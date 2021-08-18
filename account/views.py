@@ -250,7 +250,11 @@ def user_edit(request):
         breeder = Breeder.objects.filter(account=main_account, breeding_prefix=request.POST.get('breeding_prefix'))
         if breeder.exists():
             breeder = breeder.first()
+            if breeder.user:
+                # error because breeder already has a user
+                return HttpResponse(json.dumps({'fail': True, 'msg': 'A User is already assigned to this Breeder!'}))
         else:
+            # error because breeder doesn't exist
             return HttpResponse(json.dumps({'fail': True, 'msg': 'Breeding Prefix does not match an existing Breeder!'}))
     
     if request.POST.get('formType') == 'new':
