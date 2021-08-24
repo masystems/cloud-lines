@@ -561,11 +561,11 @@ def import_pedigree_data(request):
                         parents_different = False
                 if parents_different:
                     try:
-                        father_obj, has_error = get_or_create_pedigree(row[father], 'father', has_error)
+                        father_obj, has_error = get_or_create_pedigree(row[father].rstrip(), 'father', has_error)
                     except IndexError:
                         father_obj = None
                     try:
-                        mother_obj, has_error = get_or_create_pedigree(row[mother], 'mother', has_error)
+                        mother_obj, has_error = get_or_create_pedigree(row[mother].rstrip(), 'mother', has_error)
                     except IndexError:
                         mother_obj = None
 
@@ -625,7 +625,7 @@ def import_pedigree_data(request):
                     dod_converted = None
                 ############################# reg_no
                 try:
-                    if row[reg_no] == '':
+                    if row[reg_no].rstrip() == '':
                         errors = loads(database_upload.errors)
                         errors['missing'].append({
                             'col': 'Registration Number',
@@ -642,7 +642,7 @@ def import_pedigree_data(request):
                 # got or create each new pedigree ###################
                 try:
                     # get or create pedigree
-                    pedigree, has_error = get_or_create_pedigree(row[reg_no], False, has_error)
+                    pedigree, has_error = get_or_create_pedigree(row[reg_no].rstrip(), False, has_error)
                 except IndexError:
                     pass
 
