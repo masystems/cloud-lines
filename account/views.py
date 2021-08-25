@@ -66,11 +66,11 @@ def site_mode(request):
         read_only = False
         if str(request.user.username) == str(user.user.username):
             editor = True
+        elif request.user in attached_service.admin_users.all():
+            editor = True
         elif breeds.exists():
             for breed in breeds:
                 breeds_editable.append(breed.breed_name)
-        elif request.user in attached_service.admin_users.all():
-            editor = True
         elif request.user in attached_service.contributors.all():
             contributor = True
         elif request.user in attached_service.read_only_users.all():
