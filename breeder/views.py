@@ -149,7 +149,6 @@ def new_breeder_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def edit_breeder_form(request, breeder_id):
     # check if user has permission
     if request.method == 'GET':
