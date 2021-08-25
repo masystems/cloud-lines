@@ -306,7 +306,12 @@ vertical-align: middle;
                                         dataType: 'text',
                                         data: $('#addFatherForm').serialize(),
                                         success: function(result) {
-                                            location.reload()
+                                            result = JSON.parse(result)
+                                            if (result.success) {
+                                                location.reload()
+                                            } else {
+                                                console.log('FAIL')
+                                            }
                                         },
                                         error: function(jqXHR, textStatus, errorThrown){
                                             console.log('jqXHR:');

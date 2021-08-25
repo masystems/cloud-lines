@@ -804,7 +804,14 @@ def add_existing_parent(request, pedigree_id):
         raise PermissionDenied()
 
     parent_reg = request.POST.get('reg_no')
-    parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
+    parent = Pedigree.objects.filter(account=attached_service, reg_no=parent_reg)
+
+    # check parent exists
+    if parent.exists():
+        parent = parent.first()
+    else:
+        return HttpResponse(json.dumps({'fail': True}))
+
     if parent.sex == 'male':
         pedigree.parent_father = parent
     elif parent.sex == 'female':
@@ -815,7 +822,7 @@ def add_existing_parent(request, pedigree_id):
     else:
         pedigree.save()
 
-    return HttpResponse(json.dumps({}))
+    return HttpResponse(json.dumps({'success': True}))
 
 
 def create_approval(request, pedigree, attached_service, state, type):
