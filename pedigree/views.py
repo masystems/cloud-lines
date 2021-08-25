@@ -815,7 +815,7 @@ def add_existing_parent(request, pedigree_id):
     else:
         pedigree.save()
 
-    return redirect('pedigree', pedigree_id)
+    return HttpResponse(json.dumps({}))
 
 
 def create_approval(request, pedigree, attached_service, state, type):

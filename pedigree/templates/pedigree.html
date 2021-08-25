@@ -275,7 +275,7 @@ vertical-align: middle;
                                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                         </div>
                                         <div class="modal-body">
-                                            <form action="{% url 'add_existing_parent' lvl1.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                                            <form id="addFatherForm" class="form-horizontal" enctype="multipart/form-data">
                                                 {% csrf_token %}
                                                 <div class="form-body">
                                                     <div class="form-group row">
@@ -287,7 +287,7 @@ vertical-align: middle;
                                                             <ul class="list-icons d-none" id="father-info"></ul>
                                                         </div>
                                                         <div class="col-4">
-                                                            <button type="submit" class="btn btn-success">Submit</button>
+                                                            <button id="addFatherSubmit" class="btn btn-success">Submit</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -296,6 +296,29 @@ vertical-align: middle;
                                     </div>
                                 </div>
                             </div>
+                            <!-- ajax call to add existing father -->
+                            <script>
+                                $('#addFatherSubmit').click( function(e) {
+                                    e.preventDefault()
+                                    $.ajax({
+                                        url: "{% url 'add_existing_parent' lvl1.id %}",
+                                        type: 'post',
+                                        dataType: 'text',
+                                        data: $('#addFatherForm').serialize(),
+                                        success: function(result) {
+                                            location.reload()
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown){
+                                            console.log('jqXHR:');
+                                            console.log(jqXHR);
+                                            console.log('textStatus:');
+                                            console.log(textStatus);
+                                            console.log('errorThrown:');
+                                            console.log(errorThrown);
+                                        }
+                                    });
+                                });
+                            </script>
                         {% endif %}
                         <div id="certificate">
                             <table class="table responsive">
