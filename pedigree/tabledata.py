@@ -102,10 +102,17 @@ def get_pedigrees(request):
             # allow access to pedigree view page, or don't (include disabled if not)
             href = ''
             disabled = ''
-            if len(breeds_editable) == 0 or pedigree.breed.breed_name in breeds_editable:
-                href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+
+            if pedigree.breed:
+                if len(breeds_editable) == 0 or pedigree.breed.breed_name in breeds_editable:
+                    href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+                else:
+                    disabled = 'disabled'
             else:
-                disabled = 'disabled'
+                if len(breeds_editable) == 0:
+                    href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+                else:
+                    disabled = 'disabled'
 
             row = {}
             row['action'] = f"""<a {href}><button class='btn btn-info' {disabled}>View</button></a>"""
