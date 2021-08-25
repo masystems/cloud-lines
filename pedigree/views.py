@@ -776,7 +776,14 @@ def add_existing(request, pedigree_id):
         raise PermissionDenied()
 
     child_reg = request.POST.get('reg_no')
-    child = Pedigree.objects.get(account=attached_service, reg_no=child_reg)
+    child = Pedigree.objects.filter(account=attached_service, reg_no=child_reg)
+
+    # check parent exists
+    if child.exists():
+        child = child.first()
+    else:
+        return HttpResponse(json.dumps({'fail': True, 'msg': 'Input child does not exist!'}))
+
     if pedigree.sex == 'male':
         child.parent_father = pedigree
     elif pedigree.sex == 'female':
@@ -787,7 +794,7 @@ def add_existing(request, pedigree_id):
     else:
         child.save()
 
-    return redirect('pedigree', pedigree_id)
+    return HttpResponse(json.dumps({'success': True}))
 
 
 def add_existing_parent(request, pedigree_id):
