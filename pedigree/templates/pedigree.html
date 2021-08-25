@@ -310,7 +310,7 @@ vertical-align: middle;
                                             if (result.success) {
                                                 location.reload()
                                             } else {
-                                                console.log('FAIL')
+                                                errorMsg('Input father does not exist')
                                             }
                                         },
                                         error: function(jqXHR, textStatus, errorThrown){
