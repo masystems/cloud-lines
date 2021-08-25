@@ -14,8 +14,14 @@ from json import loads
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def approvals(request):
+    # check if user has permission (breeds admins allowed to page, but blocked from doing things with approvals they're not admin for)
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
     attached_service = get_main_account(request.user)
     approvals = Approval.objects.filter(account=attached_service)
     data = []
@@ -51,7 +57,6 @@ def approvals(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def approve(request, id):
     approval = Approval.objects.get(id=id)
     

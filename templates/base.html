@@ -97,7 +97,7 @@
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
 <!--                        alert for editors -->
-                        {% if editor %}
+                        {% if editor or breeds_editable|length > 0 %}
                             <a class="nav-link dropdown-toggle text-muted text-muted waves-effect waves-dark" href="{% url 'approvals' %}"> <i class="fad fa-bell"></i>
                                 {% if pending_approvals %}
                                     <div class="notify"> <span class="heartbit"></span> <span class="point"></span> </div>
