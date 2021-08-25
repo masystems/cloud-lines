@@ -810,7 +810,7 @@ def add_existing_parent(request, pedigree_id):
     if parent.exists():
         parent = parent.first()
     else:
-        return HttpResponse(json.dumps({'fail': True}))
+        return HttpResponse(json.dumps({'fail': True, 'msg': 'Input parent does not exist!'}))
 
     if parent.sex == 'male':
         pedigree.parent_father = parent

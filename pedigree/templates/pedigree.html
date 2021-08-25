@@ -278,7 +278,7 @@ vertical-align: middle;
                                             if (result.success) {
                                                 location.reload()
                                             } else {
-                                                errorMsg('Input mother does not exist')
+                                                errorMsg(result.msg)
                                             }
                                         },
                                         error: function(jqXHR, textStatus, errorThrown){
@@ -338,7 +338,7 @@ vertical-align: middle;
                                             if (result.success) {
                                                 location.reload()
                                             } else {
-                                                errorMsg('Input father does not exist')
+                                                errorMsg(result.msg)
                                             }
                                         },
                                         error: function(jqXHR, textStatus, errorThrown){
