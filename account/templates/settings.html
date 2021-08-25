@@ -703,7 +703,7 @@
                                     });
                                 </script>
                             </div>
-                            {% if editor %}
+                            {% if request.user == service.user.user %}
                                 <!-- End Popup Model -->
                                 <hr>
                                 <h4>Parent Titles</h4>
