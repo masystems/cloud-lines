@@ -823,6 +823,10 @@ def add_existing_parent(request, pedigree_id):
     else:
         return HttpResponse(json.dumps({'fail': True, 'msg': 'Input parent does not exist!'}))
 
+    # check breed is correct
+    if parent.breed.id != int(request.POST.get('breed')):
+        return HttpResponse(json.dumps({'fail': True, 'msg': f'Input parent is not a {pedigree.breed.breed_name}!'}))
+
     if parent.sex == 'male':
         pedigree.parent_father = parent
     elif parent.sex == 'female':
