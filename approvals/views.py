@@ -17,7 +17,7 @@ from json import loads
 def approvals(request):
     # check if user has permission (breeds admins allowed to page, but blocked from doing things with approvals they're not admin for)
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
