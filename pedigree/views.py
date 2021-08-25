@@ -776,7 +776,18 @@ def add_existing(request, pedigree_id):
         raise PermissionDenied()
 
     child_reg = request.POST.get('reg_no')
-    child = Pedigree.objects.get(account=attached_service, reg_no=child_reg)
+    child = Pedigree.objects.filter(account=attached_service, reg_no=child_reg)
+
+    # check parent exists
+    if child.exists():
+        child = child.first()
+    else:
+        return HttpResponse(json.dumps({'fail': True, 'msg': 'Input child does not exist!'}))
+
+    # check breed is correct
+    if child.breed.id != int(request.POST.get('breed')):
+        return HttpResponse(json.dumps({'fail': True, 'msg': f'Input child is not a {pedigree.breed.breed_name}!'}))
+
     if pedigree.sex == 'male':
         child.parent_father = pedigree
     elif pedigree.sex == 'female':
@@ -787,7 +798,7 @@ def add_existing(request, pedigree_id):
     else:
         child.save()
 
-    return redirect('pedigree', pedigree_id)
+    return HttpResponse(json.dumps({'success': True}))
 
 
 def add_existing_parent(request, pedigree_id):
@@ -804,7 +815,18 @@ def add_existing_parent(request, pedigree_id):
         raise PermissionDenied()
 
     parent_reg = request.POST.get('reg_no')
-    parent = Pedigree.objects.get(account=attached_service, reg_no=parent_reg)
+    parent = Pedigree.objects.filter(account=attached_service, reg_no=parent_reg)
+
+    # check parent exists
+    if parent.exists():
+        parent = parent.first()
+    else:
+        return HttpResponse(json.dumps({'fail': True, 'msg': 'Input parent does not exist!'}))
+
+    # check breed is correct
+    if parent.breed.id != int(request.POST.get('breed')):
+        return HttpResponse(json.dumps({'fail': True, 'msg': f'Input parent is not a {pedigree.breed.breed_name}!'}))
+
     if parent.sex == 'male':
         pedigree.parent_father = parent
     elif parent.sex == 'female':
@@ -815,7 +837,7 @@ def add_existing_parent(request, pedigree_id):
     else:
         pedigree.save()
 
-    return redirect('pedigree', pedigree_id)
+    return HttpResponse(json.dumps({'success': True}))
 
 
 def create_approval(request, pedigree, attached_service, state, type):
