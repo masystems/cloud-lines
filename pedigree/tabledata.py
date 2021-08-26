@@ -99,16 +99,23 @@ def get_pedigrees(request):
             # update pedigree custom fields if they need updating
             update_pedigree_cf(attached_service, pedigree)
 
-            # allow access to pedigree view page, or don't (include tooltip if not)
+            # allow access to pedigree view page, or don't (include disabled if not)
             href = ''
-            tooltip = ''
-            if len(breeds_editable) == 0 or pedigree.breed.breed_name in breeds_editable:
-                href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+            disabled = ''
+
+            if pedigree.breed:
+                if len(breeds_editable) == 0 or pedigree.breed.breed_name in breeds_editable:
+                    href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+                else:
+                    disabled = 'disabled'
             else:
-                tooltip = 'data-toggle="tooltip" data-placement="top" title="You do not have permission to view this pedigree"'
+                if len(breeds_editable) == 0:
+                    href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+                else:
+                    disabled = 'disabled'
 
             row = {}
-            row['action'] = f"""<a {href}><button class='btn btn-info' {tooltip}>View</button></a>"""
+            row['action'] = f"""<a {href}><button class='btn btn-info' {disabled}>View</button></a>"""
             for col in columns:
                 for data in column_data:
                     if col == column_data[data]['db_id']:

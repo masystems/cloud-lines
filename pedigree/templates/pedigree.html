@@ -202,7 +202,7 @@ vertical-align: middle;
                                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="{% url 'add_existing' lvl1.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                                        <form id="addChildForm" class="form-horizontal" enctype="multipart/form-data">
                                             {% csrf_token %}
                                             <div class="form-body">
                                                 <div class="form-group row">
@@ -214,15 +214,44 @@ vertical-align: middle;
                                                         <ul class="list-icons d-none" id="offspring-info"></ul>
                                                     </div>
                                                     <div class="col-4">
-                                                        <button type="submit" class="btn btn-success">Submit</button>
+                                                        <button id="addChildSubmit" class="btn btn-success">Submit</button>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <input type="hidden" name="breed" value="{{ lvl1.breed.id }}">
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <!-- ajax call to add existing child -->
+                        <script>
+                            $('#addChildSubmit').click( function(e) {
+                                e.preventDefault()
+                                $.ajax({
+                                    url: "{% url 'add_existing' lvl1.id %}",
+                                    type: 'post',
+                                    dataType: 'text',
+                                    data: $('#addChildForm').serialize(),
+                                    success: function(result) {
+                                        result = JSON.parse(result)
+                                        if (result.success) {
+                                            location.reload()
+                                        } else {
+                                            errorMsg(result.msg)
+                                        }
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown){
+                                        console.log('jqXHR:');
+                                        console.log(jqXHR);
+                                        console.log('textStatus:');
+                                        console.log(textStatus);
+                                        console.log('errorThrown:');
+                                        console.log(errorThrown);
+                                    }
+                                });
+                            });
+                        </script>
                         {% if editor or contributor or lvl1.breed.breed_name in breeds_editable %}
                             {% include 'add_new_pedigree.html' %}
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
@@ -243,7 +272,7 @@ vertical-align: middle;
                                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                         </div>
                                         <div class="modal-body">
-                                            <form action="{% url 'add_existing_parent' lvl1.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                                            <form id="addMotherForm" class="form-horizontal" enctype="multipart/form-data">
                                                 {% csrf_token %}
                                                 <div class="form-body">
                                                     <div class="form-group row">
@@ -255,15 +284,44 @@ vertical-align: middle;
                                                             <ul class="list-icons d-none" id="mother-info"></ul>
                                                         </div>
                                                         <div class="col-4">
-                                                            <button type="submit" class="btn btn-success">Submit</button>
+                                                            <button id="addMotherSubmit" class="btn btn-success">Submit</button>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <input type="hidden" name="breed" value="{{ lvl1.breed.id }}">
                                             </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <!-- ajax call to add existing mother -->
+                            <script>
+                                $('#addMotherSubmit').click( function(e) {
+                                    e.preventDefault()
+                                    $.ajax({
+                                        url: "{% url 'add_existing_parent' lvl1.id %}",
+                                        type: 'post',
+                                        dataType: 'text',
+                                        data: $('#addMotherForm').serialize(),
+                                        success: function(result) {
+                                            result = JSON.parse(result)
+                                            if (result.success) {
+                                                location.reload()
+                                            } else {
+                                                errorMsg(result.msg)
+                                            }
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown){
+                                            console.log('jqXHR:');
+                                            console.log(jqXHR);
+                                            console.log('textStatus:');
+                                            console.log(textStatus);
+                                            console.log('errorThrown:');
+                                            console.log(errorThrown);
+                                        }
+                                    });
+                                });
+                            </script>
                         {% endif %}
                         {% if not lvl2_1 %}
                             <!--Add existing Parent Father-->
@@ -275,7 +333,7 @@ vertical-align: middle;
                                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                         </div>
                                         <div class="modal-body">
-                                            <form action="{% url 'add_existing_parent' lvl1.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                                            <form id="addFatherForm" class="form-horizontal" enctype="multipart/form-data">
                                                 {% csrf_token %}
                                                 <div class="form-body">
                                                     <div class="form-group row">
@@ -287,15 +345,44 @@ vertical-align: middle;
                                                             <ul class="list-icons d-none" id="father-info"></ul>
                                                         </div>
                                                         <div class="col-4">
-                                                            <button type="submit" class="btn btn-success">Submit</button>
+                                                            <button id="addFatherSubmit" class="btn btn-success">Submit</button>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <input type="hidden" name="breed" value="{{ lvl1.breed.id }}">
                                             </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <!-- ajax call to add existing father -->
+                            <script>
+                                $('#addFatherSubmit').click( function(e) {
+                                    e.preventDefault()
+                                    $.ajax({
+                                        url: "{% url 'add_existing_parent' lvl1.id %}",
+                                        type: 'post',
+                                        dataType: 'text',
+                                        data: $('#addFatherForm').serialize(),
+                                        success: function(result) {
+                                            result = JSON.parse(result)
+                                            if (result.success) {
+                                                location.reload()
+                                            } else {
+                                                errorMsg(result.msg)
+                                            }
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown){
+                                            console.log('jqXHR:');
+                                            console.log(jqXHR);
+                                            console.log('textStatus:');
+                                            console.log(textStatus);
+                                            console.log('errorThrown:');
+                                            console.log(errorThrown);
+                                        }
+                                    });
+                                });
+                            </script>
                         {% endif %}
                         <div id="certificate">
                             <table class="table responsive">

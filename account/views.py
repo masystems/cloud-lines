@@ -57,7 +57,7 @@ def site_mode(request):
                                                            Q(read_only_users=request.user, active=True)|
                                                            Q(user=user_detail, active=True)).distinct()
 
-        breeds = Breed.objects.filter(account=attached_service)
+        breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
 
         # get user permission level
         editor = False
@@ -66,12 +66,11 @@ def site_mode(request):
         read_only = False
         if str(request.user.username) == str(user.user.username):
             editor = True
-        elif breeds.exists():
-            for breed in breeds:
-                if request.user in breed.breed_admins.all():
-                    breeds_editable.append(breed.breed_name)
         elif request.user in attached_service.admin_users.all():
             editor = True
+        elif breeds.exists():
+            for breed in breeds:
+                breeds_editable.append(breed.breed_name)
         elif request.user in attached_service.contributors.all():
             contributor = True
         elif request.user in attached_service.read_only_users.all():
@@ -399,13 +398,6 @@ def logout(request):
 
 @login_required(login_url="/account/login")
 def profile(request):
-    # check if user has permission
-    if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
-            return redirect_2_login(request)
-    else:
-        raise PermissionDenied()
-    
     from django.conf import settings
     stripe_pk = settings.STRIPE_PUBLIC_KEY
     stripe.api_key = settings.STRIPE_SECRET_KEY
