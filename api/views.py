@@ -62,7 +62,7 @@ class PedigreeViews(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
     serializer_class = ApiPedigreeSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = '__all__'
+    filter_fields = '__all__'
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
