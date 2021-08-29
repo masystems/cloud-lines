@@ -44,7 +44,7 @@ def export(request):
             domain = attached_service.domain
         else:
             domain = "https://cloud-lines.com"
-        data = '{"domain": "%s", "account": %f, "file_name": "%s"}' % (domain, attached_service.id, file_name)
+        data = '{"domain": "%s", "account": %d, "file_name": "%s"}' % (domain, attached_service.id, file_name)
         post_res = requests.post(url=urllib.parse.urljoin(settings.ORCH_URL, '/api/tasks/export_all/'), headers=headers, data=data)
 
         if post_res.status_code == 200:
