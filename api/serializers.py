@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from cloud_lines.models import Update
+from cloud_lines.models import LargeTierQueue
 from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
@@ -10,10 +10,23 @@ from metrics.models import KinshipQueue, DataValidatorQueue
 from django.contrib.auth.models import User
 
 
-class ApiUpdatesSerializer(serializers.HyperlinkedModelSerializer):
+class ApiLargeTierQueueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Update
-        fields = '__all__'
+        model = LargeTierQueue
+        #fields = '__all__'
+        fields = ('id',
+                  'subdomain',
+                  'user',
+                  'user_detail',
+                  'attached_service',
+                  'build_state',
+                  'build_status',
+                  'percentage_complete',
+                  'username',
+                  'service_id',
+                  'stripe_id',
+                  'site_mode',
+                  'animal_type')
 
 
 class ApiAttachedServiceSerializer(serializers.ModelSerializer):

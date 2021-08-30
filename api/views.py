@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication, SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
-from .serializers import ApiUpdatesSerializer, \
+from .serializers import ApiLargeTierQueueSerializer, \
     ApiAttachedServiceSerializer, \
     ApiPedigreeSerializer, \
     ApiPedigreeImageSerializer,\
@@ -14,7 +14,7 @@ from .serializers import ApiUpdatesSerializer, \
     ApiDataValidationSerializer, \
     ApiServiceSerializer, \
     ApiAuthentication
-from cloud_lines.models import Update
+from cloud_lines.models import LargeTierQueue
 from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
@@ -30,11 +30,12 @@ from django.db.models import Q
 
 
 @permission_classes((AllowAny, ))
-class UpdateViews(viewsets.ModelViewSet):
-    queryset = Update.objects.all()
-    serializer_class = ApiUpdatesSerializer
+class LargeTierQueueViews(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
+    queryset = LargeTierQueue.objects.all()
+    serializer_class = ApiLargeTierQueueSerializer
     filter_backends = [SearchFilter]
-    search_fields = ['date', 'body']
+    search_fields = '__all__'
 
 
 @permission_classes((AllowAny, ))
@@ -122,9 +123,9 @@ class FaqViews(viewsets.ModelViewSet):
     filter_backends = [SearchFilter]
 
 
-class Authenticate(viewsets.ModelViewSet):
-    queryset = Update.objects.all()
-    serializer_class = ApiAuthentication
+# class Authenticate(viewsets.ModelViewSet):
+#     queryset = Update.objects.all()
+#     serializer_class = ApiAuthentication
 
 
 class KinshipViews(viewsets.ModelViewSet):
