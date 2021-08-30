@@ -65,11 +65,11 @@ def export_results_complete(request):
         item = stud_item[0]
         # check if item is complete
         tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
-        export_file = requests.get(urllib.parse.urljoin(tld, f"exports/{item.file_name}.csv"))
+        export_file = requests.get(urllib.parse.urljoin(tld, f"exports/{item.file_name}-acc-{item.account.id}.csv"))
         # set item to complete if it's true
         if export_file.status_code == 200:
             item.complete = True
-            item.download_url = urllib.parse.urljoin(tld, f"exports/{item.file_name}.csv")
+            item.download_url = urllib.parse.urljoin(tld, f"exports/{item.file_name}-acc-{item.account.id}.csv")
             item.save()
 
         return HttpResponse(dumps({'result': 'success',
