@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from json import loads
 
 
 class Service(models.Model):
@@ -121,6 +122,10 @@ class LargeTierQueue(models.Model):
 
     def animal_type(self):
         return self.attached_service.animal_type
+
+    def user_data(self):
+        from django.core import serializers
+        return loads(serializers.serialize("json", [self.user]))
 
     def __str__(self):
         return str(self.subdomain)
