@@ -484,6 +484,7 @@ def import_pedigree_data(request):
                                     # set has_error
                                     has_error = True
                                     return None, has_error
+
                             return ped, has_error
                         # if not for account, create error, as the reg number is taken
                         else:
