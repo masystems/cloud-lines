@@ -1,9 +1,10 @@
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.datastructures import MultiValueDictKeyError
 from .models import Breed
 from .forms import BreedForm
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 import json
 
 
@@ -18,8 +19,17 @@ def breeds(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
 def new_breed_form(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     breed_form = BreedForm(request.POST or None, request.FILES or None)
     attached_service = get_main_account(request.user)
 
@@ -65,8 +75,17 @@ def new_breed_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor)
 def edit_breed_form(request, breed_id):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     breed = get_object_or_404(Breed, id=breed_id)
     attached_service = get_main_account(request.user)
     breed_form = BreedForm(request.POST or None, request.FILES or None, instance=breed)
@@ -119,5 +138,4 @@ def view_breed(request, breed_id):
         custom_fields = {}
 
     return render(request, 'breed.html', {'breed': breed,
-                                          'editor': is_editor(request.user),
                                           'custom_fields': custom_fields})

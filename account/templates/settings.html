@@ -108,6 +108,16 @@
                                         {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
+                                {% for breed_admin in breed_admins %}
+                                    <tr>
+                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.first_name }}</td>
+                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.last_name }}</td>
+                                        <td>{{ breed_admin.username }}</td>
+                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.email }}</td>
+                                        <td><span class="label label-light-info"> Breed Editor</span><p class="d-none">{% for breed in breeds %}{% if breed_admin in breed.breed_admins.all %}{{ breed.breed_name }},{% endif %}{% endfor %}</p></td>
+                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
+                                    </tr>
+                                {% endfor %}
                                 {% for user in service.contributors.all %}
                                     <tr>
                                         <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.first_name }}</td>
@@ -174,10 +184,24 @@
                                                             <label for="status" class="control-label">Status</label>
                                                             <div class="col-sm-9">
                                                                 <select class="form-control" id="status" name="status" required>
-                                                                <option value="Read Only">Read Only</option>
-                                                                <option value="Contributor">Contributor</option>
-                                                                <option value="Editor">Editor</option>
-                                                            </select>
+                                                                    <option value="Read Only">Read Only</option>
+                                                                    <option value="Contributor">Contributor</option>
+                                                                    <option value="Editor">Editor</option>
+                                                                    {% if breeds|length > 0 and service.service.multi_breed %}
+                                                                        <option value="Breed Editor">Breed Editor</option>
+                                                                    {% endif %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group d-none" id="breeds-checkboxes">
+                                                            Please select the breed(s) this user is an editor for
+                                                            <div class="col-sm-9">
+                                                                <div class="checkbox checkbox-success">
+                                                                    {% for breed in breeds %}
+                                                                        <input id="{{ breed.breed_name }}" name="{{ breed.breed_name }}" type="checkbox" class="breed-input">
+                                                                        <label for="{{ breed.breed_name }}" class="mb-0" for="checkbox"> {{ breed.breed_name|title }} </label>
+                                                                    {% endfor %}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <input type="hidden" id="formType" name="formType" value="new">
@@ -225,6 +249,16 @@
                                     $("#register-form-username").prop("readonly", false);
                                     $('#register-form-email').val('');
                                     $("#register-form-email").prop("readonly", false);
+                                    $('#status').val('Read Only')
+                                    // iterate through checkboxes
+                                    $('.breed-input').each(function(index, checkbox) {
+                                        // reset the checkbox
+                                        $(checkbox).prop('checked', false)
+                                    })
+                                    // hide checkboxes (reset)
+                                    if (!$('#breeds-checkboxes').hasClass('d-none')) {
+                                        $('#breeds-checkboxes').addClass('d-none')
+                                    }
 
                                     // edit form type
                                     $('#formType').val('new');
@@ -243,9 +277,39 @@
                                     $("#register-form-email").prop("readonly", true);
                                     // check if editor
                                     var status = currentRow.find("td:eq(4)").text();
+                                    var breedEditor = status.includes('Breed Editor')
                                     var editor = status.includes('Editor');
                                     var contrib = status.includes('Contributor');
-                                    if (editor) {
+                                    
+                                    // hide checkboxes (reset)
+                                    if (!$('#breeds-checkboxes').hasClass('d-none')) {
+                                        $('#breeds-checkboxes').addClass('d-none')
+                                    }
+                                    // uncheck the checkboxes
+                                    $('.breed-input').each(function(index, checkbox) {
+                                        $(checkbox).prop('checked', false)
+                                    })
+                                    
+                                    if (breedEditor) {
+                                        $('#status').val('Breed Editor');
+                                        // set breed checkboxes
+                                        var breeds = currentRow.find("p").text().split(',')
+                                        // iterate through checkboxes
+                                        $('.breed-input').each(function(index, checkbox) {
+                                            // iterate through breeds
+                                            breeds.forEach(breed => {
+                                                if (breed == $(checkbox).attr('id')) {
+                                                    // check the checkbox if we have a match
+                                                    $(checkbox).prop('checked', true)
+                                                    return false
+                                                }
+                                            })
+                                        })
+                                        // display checkboxes
+                                        if ($('#breeds-checkboxes').hasClass('d-none')) {
+                                            $('#breeds-checkboxes').removeClass('d-none')
+                                        }
+                                    } else if (editor) {
                                         $('#status').val('Editor');
                                     } else if (contrib) {
                                         $('#status').val('Contributor');
@@ -289,26 +353,67 @@
                                 });
 
                                 $("#userFormBtn").click( function(){
-                                    $.ajax({
-                                        url: "{% url 'user_edit' %}",
-                                        type: 'POST',
-                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                                        dataType: 'text',
-                                        data: $('#editor').serialize(),
-                                        success: function(data) {
-                                            console.log(data);
-                                            var result = JSON.parse(data);
-                                            if (result.success){
-                                                $('#verticalcenter').modal('toggle');
-                                                window.location.href = window.location.href.split('#')[0] + "#users";
-                                                location.reload();
-                                            } else {
-                                                $('#verticalcenter').modal('toggle');
-                                                window.location.href = window.location.href.split('#')[0] + "#users";
-                                                location.reload();
+                                    // validate required fields are selected
+                                    var valid = true
+                                    if ($("#register-form-email").val() == '') {
+                                        errorMsg('Email not given!')
+                                        valid = false
+                                    }
+                                    // validate email
+                                    else if (!$("#register-form-email").val().match(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/g)) {
+                                        errorMsg('Email invalid!')
+                                        valid = false
+                                    }
+                                    if ($("#register-form-username").val() == '') {
+                                        errorMsg('Username not given!')
+                                        valid = false
+                                    }
+                                    if ($('#lastName').val() == '') {
+                                        errorMsg('Last Name not given!')
+                                        valid = false
+                                    }
+                                    if ($('#firstName').val() == '') {
+                                        errorMsg('First Name not given!')
+                                        valid = false
+                                    }
+
+                                    // if breed admin status selected, ensure that breed is selected
+                                    if ($('#status').val() == 'Breed Editor') {
+                                        var noneSelected = true
+                                        $('.breed-input').each(function(index, input) {
+                                            if ($(input).is(':checked')) {
+                                                noneSelected = false
+                                                return false
                                             }
+                                        })
+                                        if (noneSelected) {
+                                            errorMsg('Breed not selected!')
+                                            valid = false
                                         }
-                                    });
+                                    }
+
+                                    if (valid) {
+                                        $.ajax({
+                                            url: "{% url 'user_edit' %}",
+                                            type: 'POST',
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            dataType: 'text',
+                                            data: $('#editor').serialize(),
+                                            success: function(data) {
+                                                console.log(data);
+                                                var result = JSON.parse(data);
+                                                if (result.success){
+                                                    $('#verticalcenter').modal('toggle');
+                                                    window.location.href = window.location.href.split('#')[0] + "#users";
+                                                    location.reload();
+                                                } else {
+                                                    $('#verticalcenter').modal('toggle');
+                                                    window.location.href = window.location.href.split('#')[0] + "#users";
+                                                    location.reload();
+                                                }
+                                            }
+                                        });
+                                    }
                                 });
 
 
@@ -367,58 +472,74 @@
                                         }
                                     });
                                 });
+
+                                $('#status').change(function() {
+                                    // display breed checkboxes if breed editor is selected
+                                    if ($(this).val() == 'Breed Editor') {
+                                        if ($('#breeds-checkboxes').hasClass('d-none')) {
+                                            $('#breeds-checkboxes').removeClass('d-none')
+                                        }
+                                    }
+                                    else {
+                                        if (!$('#breeds-checkboxes').hasClass('d-none')) {
+                                            $('#breeds-checkboxes').addClass('d-none')
+                                        }
+                                    }
+                                })
                             </script>
                         </div>
                     </div>
 <!--                    thrid tab-->
                     <div class="tab-pane" id="customisation" role="tabpanel">
                         <div class="card-body">
-                            <h4>Organisation or Society Name</h4>
-                            <p>This title is used at the top of the page to show you what package you're viewing and used on certificates.</p>
+                            {% if request.user == service.user.user %}
+                                <h4>Organisation or Society Name</h4>
+                                <p>This title is used at the top of the page to show you what package you're viewing and used on certificates.</p>
 
-                            <div class="form-group">
-                                <label class="col-md-12">Name</label>
-                                <div class="col-md-12">
-                                    <input type="text" value="{{ service.organisation_or_society_name }}" name="organisation_or_society_name" id="organisation_or_society_name" class="form-control">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-10">
-                                    <div class="alert"> <div id="nameSettingsMessage"></div>
+                                <div class="form-group">
+                                    <label class="col-md-12">Name</label>
+                                    <div class="col-md-12">
+                                        <input type="text" value="{{ service.organisation_or_society_name }}" name="organisation_or_society_name" id="organisation_or_society_name" class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-2">
-                                    <button id="selectNameSettings" class="btn btn-success float-right">Update Name</button>
+                                <div class="row">
+                                    <div class="col-10">
+                                        <div class="alert"> <div id="nameSettingsMessage"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <button id="selectNameSettings" class="btn btn-success float-right">Update Name</button>
+                                    </div>
                                 </div>
-                            </div>
-                            <script>
-                                $('#selectNameSettings').click(function () {
+                                <script>
+                                    $('#selectNameSettings').click(function () {
 
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "{% url 'update_name' %}",
-                                        dataType: "text",
-                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                                        data: {
-                                            "organisation_or_society_name": $('#organisation_or_society_name').val()
-                                        },
-                                        beforeSend: function() {
-                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Updating</h5>').fadeIn(1000);
-                                        },
-                                        success: function (data) {
-                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Name updated!</h5>').fadeIn(1000);
-                                            console.log(data);
-                                        },
-                                        error: function (xhr, textStatus, error) {
-                                            $('#nameSettingsMessage').hide().html('<h5 class="text-right">Something went wrong, but we are working on it!</h5>').fadeIn(1000);
-                                            console.log(error);
-                                        },
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "{% url 'update_name' %}",
+                                            dataType: "text",
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            data: {
+                                                "organisation_or_society_name": $('#organisation_or_society_name').val()
+                                            },
+                                            beforeSend: function() {
+                                                $('#nameSettingsMessage').hide().html('<h5 class="text-right">Updating</h5>').fadeIn(1000);
+                                            },
+                                            success: function (data) {
+                                                $('#nameSettingsMessage').hide().html('<h5 class="text-right">Name updated!</h5>').fadeIn(1000);
+                                                console.log(data);
+                                            },
+                                            error: function (xhr, textStatus, error) {
+                                                $('#nameSettingsMessage').hide().html('<h5 class="text-right">Something went wrong, but we are working on it!</h5>').fadeIn(1000);
+                                                console.log(error);
+                                            },
+                                        });
                                     });
-                                });
-                            </script>
-
-                            <hr>
-                            <p class="text-left">You can add your own custom fields below! Start by clicking Edit rows, then click add new.</p>
+                                </script>
+                                <hr>
+                            {% endif %}
+                            <h4>Custom Fields</h4>
+                            {% if editor %}<p class="text-left">You can add your own custom fields below!</p>{% endif %}
                             <table id="cfTable" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
@@ -575,13 +696,14 @@
                                                     location.reload();
                                                 } else {
                                                     console.log('something went wrong!');
+                                                    location.reload()
                                                 }
                                             }
                                         });
                                     });
                                 </script>
                             </div>
-                            {% if editor %}
+                            {% if request.user == service.user.user %}
                                 <!-- End Popup Model -->
                                 <hr>
                                 <h4>Parent Titles</h4>
@@ -634,7 +756,8 @@
                                         });
                                     });
                                 </script>
-
+                            {% endif %}
+                            {% if editor or breeds_editable|length > 0 %}
                                 <hr>
                                 <h4>Pedigree Columns</h4>
                                 <p>Select which columns should be shown within the pedigree search page.</p>
@@ -654,7 +777,7 @@
                                         {% endfor %}
                                     </ul>
                                 </form>
-                            <div class="row">
+                                <div class="row">
                                     <div class="col-10">
                                         <div class="alert " id="pedigreeColumnsAlert"> <div id="pedigreeColumnsMessage"></div>
                                         </div>

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import PermissionDenied
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib import auth
@@ -27,6 +28,10 @@ import time
 import json
 import requests
 import logging
+
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.shortcuts import resolve_url
+from django.contrib.auth.views import redirect_to_login
 
 
 logger = logging.getLogger(__name__)
@@ -52,14 +57,20 @@ def site_mode(request):
                                                            Q(read_only_users=request.user, active=True)|
                                                            Q(user=user_detail, active=True)).distinct()
 
+        breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+
         # get user permission level
         editor = False
+        breeds_editable = []
         contributor = False
         read_only = False
         if str(request.user.username) == str(user.user.username):
             editor = True
         elif request.user in attached_service.admin_users.all():
             editor = True
+        elif breeds.exists():
+            for breed in breeds:
+                breeds_editable.append(breed.breed_name)
         elif request.user in attached_service.contributors.all():
             contributor = True
         elif request.user in attached_service.read_only_users.all():
@@ -111,6 +122,7 @@ def site_mode(request):
                 'users': users,
                 'add_breed': add_breed,
                 'editor': editor,
+                'breeds_editable': breeds_editable,
                 'contributor': contributor,
                 'read_only': read_only,
                 #'gdpr': gdpr,
@@ -135,7 +147,7 @@ def is_editor(user):
             # no admin users!
             contributors = []
 
-        if user in editors or contributors:
+        if user in editors or user in contributors:
             return True
         elif user == main_account.user.user:
             return True
@@ -145,6 +157,55 @@ def is_editor(user):
         return False
     except AttachedService.DoesNotExist:
         return False
+
+
+def has_permission(request, permissions, pedigrees):
+    has_permission = False
+    
+    try:
+        account = get_main_account(request.user)
+
+        # go through each user type and allow access accoringly
+        if request.user == account.user.user:
+            has_permission = True
+        elif request.user in account.admin_users.all():
+            if permissions['admin']:
+                has_permission = True
+        # if user is a breed admin
+        elif Breed.objects.filter(account=account, breed_admins__in=[request.user]).exists():
+            # if its a straight yes or no
+            if permissions['breed_admin'] in (True, False):
+                if permissions['breed_admin']:
+                    # if breed admins are always allowed, grant permission
+                    has_permission = True
+            # if particular breed required
+            else:
+                breed_permission = True
+                for pedigree in pedigrees:
+                    if request.user not in pedigree.breed.breed_admins.all():
+                        # if breed admin is not an admin of the correct breed, deny permission
+                        breed_permission = False
+                        break
+                if breed_permission:
+                    # if user is breed admin of all required breeds, grant permission
+                    has_permission = True
+        elif request.user in account.contributors.all():
+            if permissions['contrib']:
+                has_permission = True
+        elif request.user in account.read_only_users.all():
+            if permissions['read_only']:
+                has_permission = True
+
+    except UserDetail.DoesNotExist:
+        pass
+    except AttachedService.DoesNotExist:
+        pass
+
+    return has_permission
+
+
+def redirect_2_login(request):
+    return redirect_to_login(request.build_absolute_uri(), resolve_url('/account/login'), REDIRECT_FIELD_NAME)
 
 
 def get_main_account(user):
@@ -198,6 +259,12 @@ def user_edit(request):
             if request.POST.get('status') == 'Editor':
                 main_account.admin_users.add(new_user)
 
+            elif request.POST.get('status') == 'Breed Editor':
+                for breed in Breed.objects.filter(account=main_account):
+                    if request.POST.get(breed.breed_name):
+                        breed.breed_admins.add(new_user)
+                        breed.save()
+
             elif request.POST.get('status') == 'Contributor':
                 main_account.contributors.add(new_user)
 
@@ -240,10 +307,19 @@ def user_edit(request):
             main_account.admin_users.remove(existing_user)
             main_account.read_only_users.remove(existing_user)
             main_account.contributors.remove(existing_user)
+            for breed in Breed.objects.filter(account=main_account):
+                if not request.POST.get(breed.breed_name):
+                    breed.breed_admins.remove(existing_user)
+                    breed.save()
 
             # add user to the request group
             if request.POST.get('status') == 'Editor':
                 main_account.admin_users.add(existing_user)
+            elif request.POST.get('status') == 'Breed Editor':
+                for breed in Breed.objects.filter(account=main_account):
+                    if request.POST.get(breed.breed_name):
+                        breed.breed_admins.add(existing_user)
+                        breed.save()
             elif request.POST.get('status') == 'Contributor':
                 main_account.contributors.add(existing_user)
             else:
@@ -286,7 +362,7 @@ def update_user(request):
 
         return HttpResponse(True)
 
-    return HttpResponse(False)
+    raise PermissionDenied()
 
 
 def site_login(request):
@@ -368,6 +444,13 @@ def profile(request):
 
 @login_required(login_url="/account/login")
 def settings(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
     user_detail = UserDetail.objects.get(user=request.user)
     attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
 
@@ -379,161 +462,206 @@ def settings(request):
 
     active_pedigree_columns = attached_service.pedigree_columns.split(',')
 
+    breeds = []
+    breed_admins = []
+    for breed in Breed.objects.filter(account=attached_service):
+        # add each breed to context
+        breeds.append(breed)
+        for breed_admin in breed.breed_admins.all():
+            if breed_admin not in breed_admins:
+                # add each breed admin to context
+                breed_admins.append(breed_admin)
+
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
-                                             'active_pedigree_columns': active_pedigree_columns})
+                                             'active_pedigree_columns': active_pedigree_columns,
+                                             'breeds': breeds,
+                                             'breed_admins': breed_admins})
 
 
-@user_passes_test(is_editor)
+@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def custom_field_edit(request):
+    # permission check (only post allowed)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            return HttpResponse(json.dumps({'fail': True}))
+    else:
+        raise PermissionDenied()
+
     # this is the additional user customers can add/remove from their service.
-    if request.method == 'POST':
-        user_detail = UserDetail.objects.get(user=request.user)
-        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-        if user_detail.current_service.custom_fields:
-            custom_fields = json.loads(user_detail.current_service.custom_fields)
-        else:
-            custom_fields = {}
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    if user_detail.current_service.custom_fields:
+        custom_fields = json.loads(user_detail.current_service.custom_fields)
+    else:
+        custom_fields = {}
 
-        if request.POST.get('formType') == 'new':
-            # create unique key
-            for suffix in range(0, len(custom_fields)+2):
-                if 'cf_{}'.format(suffix) not in custom_fields:
-                    field_key = 'cf_{}'.format(suffix)
-                    break
+    if request.POST.get('formType') == 'new':
+        # create unique key
+        for suffix in range(0, len(custom_fields)+2):
+            if 'cf_{}'.format(suffix) not in custom_fields:
+                field_key = 'cf_{}'.format(suffix)
+                break
 
-            custom_fields[field_key] = {'id': field_key,
-                                        'location': request.POST.get('location'),
-                                        'fieldName': request.POST.get('fieldName'),
-                                        'fieldType': request.POST.get('fieldType')}
-            attached_service.custom_fields = json.dumps(custom_fields)
-            attached_service.save()
+        custom_fields[field_key] = {'id': field_key,
+                                    'location': request.POST.get('location'),
+                                    'fieldName': request.POST.get('fieldName'),
+                                    'fieldType': request.POST.get('fieldType')}
+        attached_service.custom_fields = json.dumps(custom_fields)
+        attached_service.save()
 
-            # update the model
-            if request.POST.get('location') == 'pedigree':
-                objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-            elif request.POST.get('location') == 'breeder':
-                objects = Breeder.objects.filter(account=attached_service)
-            elif request.POST.get('location') == 'breed':
-                objects = Breed.objects.filter(account=attached_service)
+        # update the model
+        if request.POST.get('location') == 'pedigree':
+            objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
+        elif request.POST.get('location') == 'breeder':
+            objects = Breeder.objects.filter(account=attached_service)
+        elif request.POST.get('location') == 'breed':
+            objects = Breed.objects.filter(account=attached_service)
 
-            for object in objects.all():
-                try:
-                    object_custom_fields = json.loads(object.custom_fields)
-                except json.decoder.JSONDecodeError:
-                    object_custom_fields = {}
+        for object in objects.all():
+            try:
+                object_custom_fields = json.loads(object.custom_fields)
+            except json.decoder.JSONDecodeError:
+                object_custom_fields = {}
 
-                object_custom_fields[field_key] = {'id': field_key,
-                                                   'location': request.POST.get('location'),
-                                                   'fieldName': request.POST.get('fieldName'),
-                                                   'fieldType': request.POST.get('fieldType')}
+            object_custom_fields[field_key] = {'id': field_key,
+                                                'location': request.POST.get('location'),
+                                                'fieldName': request.POST.get('fieldName'),
+                                                'fieldType': request.POST.get('fieldType')}
 
-                object.custom_fields = json.dumps(object_custom_fields)
-                object.save()
-            return HttpResponse(json.dumps({'success': True}))
+            object.custom_fields = json.dumps(object_custom_fields)
+            object.save()
+        return HttpResponse(json.dumps({'success': True}))
 
-        elif request.POST.get('formType') == 'edit':
+    elif request.POST.get('formType') == 'edit':
+        custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
+                                                    'location': request.POST.get('location'),
+                                                    'fieldName': request.POST.get('fieldName'),
+                                                    'fieldType': request.POST.get('fieldType')}
+        attached_service.custom_fields = json.dumps(custom_fields)
+        attached_service.save()
+
+        # update the model
+        if request.POST.get('location') == 'pedigree':
+            objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
+        elif request.POST.get('location') == 'breeder':
+            objects = Breeder.objects.filter(account=attached_service)
+        elif request.POST.get('location') == 'breed':
+            objects = Breed.objects.filter(account=attached_service)
+
+        for object in objects.all():
+            try:
+                custom_fields = json.loads(object.custom_fields)
+            except json.decoder.JSONDecodeError:
+                custom_fields = {}
+
             custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
-                                                     'location': request.POST.get('location'),
-                                                     'fieldName': request.POST.get('fieldName'),
-                                                     'fieldType': request.POST.get('fieldType')}
-            attached_service.custom_fields = json.dumps(custom_fields)
-            attached_service.save()
+                                                        'location': request.POST.get('location'),
+                                                        'fieldName': request.POST.get('fieldName'),
+                                                        'fieldType': request.POST.get('fieldType')}
 
-            # update the model
-            if request.POST.get('location') == 'pedigree':
-                objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-            elif request.POST.get('location') == 'breeder':
-                objects = Breeder.objects.filter(account=attached_service)
-            elif request.POST.get('location') == 'breed':
-                objects = Breed.objects.filter(account=attached_service)
+            object.custom_fields = json.dumps(custom_fields)
+            object.save()
+        return HttpResponse(json.dumps({'success': True}))
 
-            for object in objects.all():
-                try:
-                    custom_fields = json.loads(object.custom_fields)
-                except json.decoder.JSONDecodeError:
-                    custom_fields = {}
+    elif request.POST.get('formType') == 'delete':
+        custom_fields.pop(request.POST.get('id'), None)
+        attached_service.custom_fields = json.dumps(custom_fields)
+        attached_service.save()
 
-                custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
-                                                         'location': request.POST.get('location'),
-                                                         'fieldName': request.POST.get('fieldName'),
-                                                         'fieldType': request.POST.get('fieldType')}
+        # update model
+        # update the model
+        if request.POST.get('location') == 'pedigree':
+            objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
+        elif request.POST.get('location') == 'breeder':
+            objects = Breeder.objects.filter(account=attached_service)
+        elif request.POST.get('location') == 'breed':
+            objects = Breed.objects.filter(account=attached_service)
 
-                object.custom_fields = json.dumps(custom_fields)
-                object.save()
-            return HttpResponse(json.dumps({'success': True}))
+        for object in objects.all():
+            custom_fields_updated = {}
+            if object.custom_fields:
+                for key, val in json.loads(object.custom_fields).items():
+                    if key in custom_fields:
+                        custom_fields_updated[key] = val
 
-        elif request.POST.get('formType') == 'delete':
-            custom_fields.pop(request.POST.get('id'), None)
-            attached_service.custom_fields = json.dumps(custom_fields)
-            attached_service.save()
+            object.custom_fields = json.dumps(custom_fields_updated)
+            object.save()
 
-            # update model
-            # update the model
-            if request.POST.get('location') == 'pedigree':
-                objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-            elif request.POST.get('location') == 'breeder':
-                objects = Breeder.objects.filter(account=attached_service)
-            elif request.POST.get('location') == 'breed':
-                objects = Breed.objects.filter(account=attached_service)
-
-            for object in objects.all():
-                custom_fields_updated = {}
-                if object.custom_fields:
-                    for key, val in json.loads(object.custom_fields).items():
-                        if key in custom_fields:
-                            custom_fields_updated[key] = val
-
-                object.custom_fields = json.dumps(custom_fields_updated)
-                object.save()
-
-            return HttpResponse(json.dumps({'success': True}))
+        return HttpResponse(json.dumps({'success': True}))
 
 
-@user_passes_test(is_editor)
 @login_required(login_url="/account/login")
 def update_titles(request):
-    if request.method == 'POST':
-        user_detail = UserDetail.objects.get(user=request.user)
-        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-        attached_service.mother_title = request.POST.get('mother')
-        attached_service.father_title = request.POST.get('father')
-        attached_service.save()
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    attached_service.mother_title = request.POST.get('mother')
+    attached_service.father_title = request.POST.get('father')
+    attached_service.save()
 
-        return HttpResponse('Done')
-    return HttpResponse('Fail')
+    return HttpResponse('Done')
 
 
-@user_passes_test(is_editor)
 @login_required(login_url="/account/login")
 def update_name(request):
-    if request.method == 'POST':
-        user_detail = UserDetail.objects.get(user=request.user)
-        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-        attached_service.organisation_or_society_name = request.POST.get('organisation_or_society_name')
-        attached_service.save()
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
 
-        return HttpResponse('Done')
-    return HttpResponse('Fail')
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    attached_service.organisation_or_society_name = request.POST.get('organisation_or_society_name')
+    attached_service.save()
+
+    return HttpResponse('Done')
 
 
-@user_passes_test(is_editor)
 @login_required(login_url="/account/login")
 def update_pedigree_columns(request):
-    if request.method == 'POST':
-        user_detail = UserDetail.objects.get(user=request.user)
-        attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-        columns = request.POST['columns']
-        attached_service.pedigree_columns = str(columns)
-        attached_service.save()
+    # check if user has permission
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
 
-        return HttpResponse('Done')
-    return HttpResponse('Fail')
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    columns = request.POST['columns']
+    attached_service.pedigree_columns = str(columns)
+    attached_service.save()
 
-@user_passes_test(is_editor)
+    return HttpResponse('Done')
+
+
 @login_required(login_url="/account/login")
 def metrics_switch(request):
+    # permission check
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     user_detail = UserDetail.objects.get(user=request.user)
     attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
     if attached_service.metrics:
@@ -546,7 +674,6 @@ def metrics_switch(request):
     return HttpResponse('')
 
 
-@user_passes_test(is_editor)
 @login_required(login_url="/account/login")
 def welcome(request):
     return render(request, 'welcome.html')
@@ -639,6 +766,15 @@ def subdomain_check(request):
 @login_required(login_url="/account/login")
 @csrf_exempt
 def update_card(request):
+    # permission check
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     user_detail = UserDetail.objects.get(user=request.user)
 
     # add payment token to user
@@ -716,6 +852,13 @@ def send_payment_error(e):
 @login_required(login_url="/account/login")
 @csrf_exempt
 def cancel_sub(request):
+    # permission check
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
     from django.conf import settings
     stripe.api_key = settings.STRIPE_SECRET_KEY
     attached_service = get_main_account(request.user)

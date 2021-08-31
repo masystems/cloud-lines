@@ -8,5 +8,6 @@ urlpatterns = [
     path('import_pedigree_data', views.import_pedigree_data, name='import_pedigree_data'),
     path('import_breeder_data', views.import_breeder_data, name='import_breeder_data'),
     path('import_data', views.import_data, name='import_data'),
-    path('image_import', views.image_import, name='image_import')
+    path('image_import', views.image_import, name='image_import'),
+    path('export_results_complete', views.export_results_complete, name='export_results_complete'),
 ]

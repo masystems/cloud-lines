@@ -1,10 +1,11 @@
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.datastructures import MultiValueDictKeyError
 from .models import Service, Page, Gallery, Faq, Testimonial, LargeTierQueue, Blog
 from .forms import ContactForm, BlogForm
 from account.models import UserDetail, AttachedService
-from account.views import get_main_account, send_mail
+from account.views import get_main_account, send_mail, has_permission, redirect_2_login
 from django.conf import settings
 import json
 import stripe
@@ -226,6 +227,13 @@ def gdpr(request):
 
 @login_required(login_url="/account/login")
 def order(request, service=None):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
     context = {}
     # import stripe key
     if request.user.is_superuser:
@@ -262,89 +270,113 @@ def order(request, service=None):
 
 @login_required(login_url="/account/login")
 def order_service(request):
-    if request.POST:
-        # import stripe key
-        if request.user.is_superuser:
-            stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-        else:
-            stripe.api_key = settings.STRIPE_SECRET_KEY
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
 
-        user_detail = UserDetail.objects.get(user=request.user)
-        service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
+    # import stripe key
+    if request.user.is_superuser:
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+    else:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
 
-        if request.POST.get('checkout-form-sub-domain'):
-            domain = 'https://{}.cloud-lines.com'.format(request.POST.get('checkout-form-sub-domain'))
-        else:
-            domain = ''
+    user_detail = UserDetail.objects.get(user=request.user)
+    service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
 
-        # if upgade
-        if request.POST.get('checkout-form-upgrade'):
-            try:
-                attached_service = AttachedService.objects.filter(user=user_detail,
-                                                                  id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                                                                                       site_mode=request.POST.get('checkout-form-site-mode'),
-                                                                                                                       domain=domain,
-                                                                                                                       install_available=False,
-                                                                                                                       service=service,
-                                                                                                                       increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                                                                                       active=False)
-            except AttachedService.DoesNotExist:
-                pass
-        else:
-            # create new attached service details object
-            attached_service = AttachedService.objects.create(user=user_detail,
-                                                              animal_type=request.POST.get('checkout-form-animal-type'),
-                                                              site_mode=request.POST.get('checkout-form-site-mode'),
-                                                              domain=domain,
-                                                              install_available=False,
-                                                              service=service,
-                                                              increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                              active=False)
+    if request.POST.get('checkout-form-sub-domain'):
+        domain = 'https://{}.cloud-lines.com'.format(request.POST.get('checkout-form-sub-domain'))
+    else:
+        domain = ''
+
+    # if upgade
+    if request.POST.get('checkout-form-upgrade'):
+        try:
+            attached_service = AttachedService.objects.filter(user=user_detail,
+                                                                id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
+                                                                                                                    site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                                                                    domain=domain,
+                                                                                                                    install_available=False,
+                                                                                                                    service=service,
+                                                                                                                    increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                                                                                    active=False)
+        except AttachedService.DoesNotExist:
+            pass
+    else:
+        # create new attached service details object
+        attached_service = AttachedService.objects.create(user=user_detail,
+                                                            animal_type=request.POST.get('checkout-form-animal-type'),
+                                                            site_mode=request.POST.get('checkout-form-site-mode'),
+                                                            domain=domain,
+                                                            install_available=False,
+                                                            service=service,
+                                                            increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                            active=False)
 
     return HttpResponse(json.dumps(attached_service.id))
 
 
 @login_required(login_url="/account/login")
 def order_billing(request):
-    if request.POST:
+    # permission check
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
+    if request.user.is_superuser:
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+    else:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    user_detail = UserDetail.objects.get(user=request.user)
+
+    if not user_detail.stripe_id:
+        # create stripe user
         if request.user.is_superuser:
             stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
         else:
             stripe.api_key = settings.STRIPE_SECRET_KEY
+        customer = stripe.Customer.create(
+            name=request.POST.get('checkout-form-billing-name'),
+            email=request.POST.get('checkout-form-billing-email'),
 
-        user_detail = UserDetail.objects.get(user=request.user)
+            phone=request.POST.get('checkout-form-billing-phone'),
+            address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
+        )
+        customer_id = customer['id']
+        # update user datail
+        UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
+    else:
+        stripe.Customer.modify(
+            user_detail.stripe_id,
+            name=request.POST.get('checkout-form-billing-name'),
+            email=request.POST.get('checkout-form-billing-email'),
 
-        if not user_detail.stripe_id:
-            # create stripe user
-            if request.user.is_superuser:
-                stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-            else:
-                stripe.api_key = settings.STRIPE_SECRET_KEY
-            customer = stripe.Customer.create(
-                name=request.POST.get('checkout-form-billing-name'),
-                email=request.POST.get('checkout-form-billing-email'),
-
-                phone=request.POST.get('checkout-form-billing-phone'),
-                address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
-            )
-            customer_id = customer['id']
-            # update user datail
-            UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
-        else:
-            stripe.Customer.modify(
-                user_detail.stripe_id,
-                name=request.POST.get('checkout-form-billing-name'),
-                email=request.POST.get('checkout-form-billing-email'),
-
-                phone=request.POST.get('checkout-form-billing-phone'),
-                address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
-            )
+            phone=request.POST.get('checkout-form-billing-phone'),
+            address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
+        )
 
     return HttpResponse('done')
 
 
 @login_required(login_url="/account/login")
 def order_subscribe(request):
+    # permission check
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
     user_detail = UserDetail.objects.get(user=request.user)
     attached_service = AttachedService.objects.get(id=request.POST.get('attached_service_id'), user=user_detail, active=False)
     large_tier = ['Small Society', 'Large Society', 'Organisation']

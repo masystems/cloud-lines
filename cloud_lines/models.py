@@ -107,6 +107,21 @@ class LargeTierQueue(models.Model):
     build_status = models.CharField(max_length=255, blank=True)
     percentage_complete = models.IntegerField(default=0, null=True)
 
+    def username(self):
+        return self.user.username
+
+    def service_id(self):
+        return self.attached_service.service.pk
+
+    def stripe_id(self):
+        return self.user_detail.stripe_id
+
+    def site_mode(self):
+        return self.attached_service.site_mode
+
+    def animal_type(self):
+        return self.attached_service.animal_type
+
     def __str__(self):
         return str(self.subdomain)
 

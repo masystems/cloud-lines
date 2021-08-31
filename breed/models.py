@@ -1,5 +1,6 @@
 from django.db import models
 from account.models import AttachedService
+from django.contrib.auth.models import User
 
 
 def user_directory_path(instance, filename):
@@ -20,6 +21,8 @@ class Breed(models.Model):
                                                  " this figure, determines the acceptable range of MK values in the "
                                                  "male population, for a breeding match.",
                                        blank=True, null=True, default=0.0000)
+
+    breed_admins = models.ManyToManyField(User, related_name='breed_admins', blank=True)
 
     def __str__(self):
         return self.breed_name

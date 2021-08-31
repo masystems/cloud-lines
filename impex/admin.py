@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DatabaseUpload, FileSlice
+from .models import DatabaseUpload, FileSlice, ExportQueue
 
 
 class DatabaseUploadAdmin(admin.ModelAdmin):
@@ -28,3 +28,17 @@ class FileSliceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(FileSlice, FileSliceAdmin)
+
+
+class ExportAdmin(admin.ModelAdmin):
+    list_display = ('account', 'user', 'file_name', 'complete', 'download_url', 'created')
+    list_display_links = ['account', 'user', 'file_name', 'complete', 'download_url', 'created']
+    search_fields = ('account', 'user', 'file_name', 'complete', 'download_url', 'created')
+    list_filter = ('account', 'user', 'file_name', 'complete', 'download_url', 'created')
+    ordering = ['account', 'user', 'file_name', 'complete', 'download_url', 'created']
+    empty_value_display = '-empty-'
+
+    save_on_top = True
+
+
+admin.site.register(ExportQueue, ExportAdmin)

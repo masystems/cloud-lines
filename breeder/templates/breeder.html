@@ -29,7 +29,7 @@
         </div>
         <div class="col-md-6 col-4 align-self-center">
 
-            {% if editor %}
+            {% if editor or breeds_editable|length > 0 %}
                 <a href="{% url 'edit_breeder_form' breeder.id %}" id="editBreeder" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fad fa-pencil-alt"></i> Edit
                 </a>
                 <a href="{% url 'new_breeder_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add Breeder

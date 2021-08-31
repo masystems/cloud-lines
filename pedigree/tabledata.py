@@ -39,6 +39,11 @@ def get_pedigrees(request):
     except ValueError:
         pass
 
+    # get breeds editable (length is 0 if they're not a breed admin)
+    breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
+    if '' in breeds_editable:
+        breeds_editable.remove('')
+
     pedigrees = []
     if search == "":
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
@@ -93,9 +98,24 @@ def get_pedigrees(request):
         for pedigree in all_pedigrees.all():
             # update pedigree custom fields if they need updating
             update_pedigree_cf(attached_service, pedigree)
-            
+
+            # allow access to pedigree view page, or don't (include disabled if not)
+            href = ''
+            disabled = ''
+
+            if pedigree.breed:
+                if len(breeds_editable) == 0 or pedigree.breed.breed_name in breeds_editable:
+                    href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+                else:
+                    disabled = 'disabled'
+            else:
+                if len(breeds_editable) == 0:
+                    href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+                else:
+                    disabled = 'disabled'
+
             row = {}
-            row['action'] = f"""<a href='{reverse("pedigree", args=[pedigree.id])}'><button class='btn btn-info'>View</button></a>"""
+            row['action'] = f"""<a {href}><button class='btn btn-info' {disabled}>View</button></a>"""
             for col in columns:
                 for data in column_data:
                     if col == column_data[data]['db_id']:
