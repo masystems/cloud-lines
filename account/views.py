@@ -674,7 +674,6 @@ def metrics_switch(request):
     return HttpResponse('')
 
 
-@user_passes_test(is_editor, "/account/login")
 @login_required(login_url="/account/login")
 def welcome(request):
     return render(request, 'welcome.html')
