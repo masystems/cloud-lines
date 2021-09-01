@@ -26,7 +26,8 @@ class ApiLargeTierQueueSerializer(serializers.ModelSerializer):
                   'service_id',
                   'stripe_id',
                   'site_mode',
-                  'animal_type')
+                  'animal_type',
+                  'user_data')
 
 
 class ApiAttachedServiceSerializer(serializers.ModelSerializer):
