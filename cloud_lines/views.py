@@ -518,6 +518,15 @@ def order_subscribe(request):
         result['tier'] = 'large'
         result['build_id'] = queue_item.id
 
+        token_res = requests.post(url=f'{settings.ORCH_URL}/api-token-auth/',
+                                  data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
+        ## create header
+        headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
+        ## get pedigrees
+        data = '{"queue_id": %d}' % queue_item.id
+
+        post_res = requests.post(url=f'{settings.ORCH_URL}/api/tasks/new_large_tier/', headers=headers, data=data)
+
     return HttpResponse(json.dumps(result))
 
 
