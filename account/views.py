@@ -159,7 +159,7 @@ def is_editor(user):
         return False
 
 
-def has_permission(request, permissions, pedigrees):
+def has_permission(request, permissions, pedigrees, breeder_users):
     has_permission = False
     
     try:
@@ -193,7 +193,10 @@ def has_permission(request, permissions, pedigrees):
             if permissions['contrib']:
                 has_permission = True
         elif request.user in account.read_only_users.all():
-            if permissions['read_only']:
+            if permissions['read_only'] in (True, False):
+                if permissions['read_only']:
+                    has_permission = True
+            elif request.user in breeder_users:
                 has_permission = True
 
     except UserDetail.DoesNotExist:
