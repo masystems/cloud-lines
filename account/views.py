@@ -249,7 +249,7 @@ def user_edit(request):
         breeder = Breeder.objects.filter(account=main_account, breeding_prefix=request.POST.get('breeding_prefix'))
         if breeder.exists():
             breeder = breeder.first()
-            if breeder.user:
+            if breeder.user and request.POST.get('formType') == 'new':
                 # error because breeder already has a user
                 return HttpResponse(json.dumps({'fail': True, 'msg': 'A User is already assigned to this Breeder!'}))
         else:
@@ -328,6 +328,13 @@ def user_edit(request):
                                                                                     last_name=request.POST.get('lastName'))
         existing_user = User.objects.get(username=request.POST.get('register-form-username'),
                                 email=request.POST.get('register-form-email'))
+
+        # check breeder doesn't already have a user other than the edited user
+        if breeder:
+            if breeder.user and breeder.user != existing_user:
+                # error because breeder already has a user
+                return HttpResponse(json.dumps({'fail': True, 'msg': 'A User is already assigned to this Breeder!'}))
+
         # remove user from admins and read only users and contributors
         main_account.admin_users.remove(existing_user)
         main_account.read_only_users.remove(existing_user)
