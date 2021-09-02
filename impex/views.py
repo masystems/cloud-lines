@@ -1,17 +1,20 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied, ValidationError, ObjectDoesNotExist
+from django.conf import settings
 from pedigree.models import Pedigree, PedigreeImage
 from pedigree.functions import get_pedigree_column_headings
 from breeder.models import Breeder
 from breed.models import Breed
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
-from .models import DatabaseUpload, FileSlice
+from .models import DatabaseUpload, FileSlice, ExportQueue
 from datetime import datetime
 from os.path import splitext
-import csv
 from json import loads, dumps, JSONDecodeError
+from time import time
+import urllib.parse
 import re
+import requests
 
 
 @login_required(login_url="/account/login")
@@ -26,111 +29,55 @@ def export(request):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
-    
+
+    attached_service = get_main_account(request.user)
     if request.method == 'POST':
-        attached_service = get_main_account(request.user)
-        #fields = request.POST.getlist('fields')
-        #print(fields)
-        date = datetime.now()
-        if request.POST['submit'] == 'xlsx':
+        token_res = requests.post(url=urllib.parse.urljoin(settings.ORCH_URL, '/api-token-auth/'),
+                                  data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
+
+        ## create header
+        headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
+
+        ## get pedigrees
+        file_name = f"export-{attached_service.animal_type}-{time()}-acc-{attached_service.id}"
+        if attached_service.service.service_name in ('Small Society', 'Large Society', 'Organisation'):
+            domain = attached_service.domain
+        else:
+            domain = "https://cloud-lines.com"
+        data = '{"domain": "%s", "account": %d, "file_name": "%s"}' % (domain, attached_service.id, file_name)
+        post_res = requests.post(url=urllib.parse.urljoin(settings.ORCH_URL, '/api/tasks/export_all/'), headers=headers, data=data)
+
+        if post_res.status_code == 200:
+            ExportQueue(account=attached_service, file_name=file_name, user=request.user).save()
+        else:
+            # for error handling
             pass
-        elif request.POST['submit'] == 'csv':
-            # Create the HttpResponse object with the appropriate CSV header.
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = 'attachment; filename="cloud-lines-pedigrees-{}.csv"'.format(date.strftime("%Y-%m-%d"))
+    return render(request, 'export.html', {'queue_items': ExportQueue.objects.filter(account=attached_service)})
 
-            writer = csv.writer(response)
-            header = False
 
-            for pedigree in Pedigree.objects.filter(account=attached_service):
-                head = []
-                row = []
-                for key, val in pedigree.__dict__.items():
-                    if key not in ('_state', 'state', 'id', 'creator_id', 'account_id', 'breed_group', 'date_added'):
-                        # load custom fields
-                        if key == 'custom_fields':
-                            try:
-                                custom_fields = dict(loads(pedigree.custom_fields)).values()
-                            except JSONDecodeError:
-                                custom_fields = {}
-                        
-                        if not header:
-                            if key == 'custom_fields':
-                                # add a columns for each custom field
-                                for field in custom_fields:
-                                    head.append(field['fieldName'])
-                            else:
-                                # use verbose names of the pedigree fields as field names
-                                head.append(Pedigree._meta.get_field(key).verbose_name)
-                        
-                        if key == 'parent_mother_id' or key == 'parent_father_id':
-                            try:
-                                parent = Pedigree.objects.get(id=val)
-                                reg_no = parent.reg_no.strip()
-                            except ObjectDoesNotExist:
-                                reg_no = ""
-                            row.append('{}'.format(reg_no))
-                        elif key == 'breeder_id':
-                            try:
-                                breeder = Breeder.objects.get(id=val)
-                                breed_prefix = breeder.breeding_prefix
-                            except ObjectDoesNotExist:
-                                breed_prefix = ""
-                            row.append('{}'.format(breed_prefix))
-                        elif key == 'current_owner_id':
-                            try:
-                                current_owner = Breeder.objects.get(id=val)
-                                current_owner_prefix = current_owner.breeding_prefix
-                            except ObjectDoesNotExist:
-                                current_owner_prefix = ""
-                            row.append('{}'.format(current_owner_prefix))
-                        elif key == 'breed_id':
-                            try:
-                                breed = Breed.objects.get(id=val)
-                                breed_name = breed.breed_name
-                            except ObjectDoesNotExist:
-                                breed_name = ""
-                            row.append('{}'.format(breed_name))
-                        elif key == 'custom_fields':
-                            # populate each custom field column with the value
-                            for field in custom_fields:
-                                if 'field_value' in field:
-                                    row.append(field['field_value'])
-                                else:
-                                    row.append('')
-                        elif key == 'sale_or_hire':
-                            if pedigree.sale_or_hire:
-                                row.append('yes')
-                            else:
-                                row.append('no')
-                        # make sure 'None' isn't given for dates, and that they're formatted well
-                        elif key == 'date_of_registration':
-                            if pedigree.date_of_registration:
-                                row.append(pedigree.date_of_registration.strftime('%d/%m/%Y'))
-                            else:
-                                row.append('')
-                        elif key == 'dob':
-                            if pedigree.dob:
-                                row.append(pedigree.dob.strftime('%d/%m/%Y'))
-                            else:
-                                row.append('')
-                        elif key == 'dod':
-                            if pedigree.dod:
-                                row.append(pedigree.dod.strftime('%d/%m/%Y'))
-                            else:
-                                row.append('')
-                        else:
-                            row.append('{}'.format(val))
-                if not header:
-                    writer.writerow(head)
-                    header = True
-                writer.writerow(row)
+@login_required(login_url="/account/login")
+def export_results_complete(request):
+    # get queue item
+    stud_item = ExportQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
 
-            return response
-        elif request.POST['submit'] == 'pdf':
-            pass
+    if len(stud_item) > 0:
+        # process only the first item in the queue list
+        item = stud_item[0]
+        # check if item is complete
+        tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
+        export_file = requests.get(urllib.parse.urljoin(tld, f"exports/{item.file_name}.csv"))
+        # set item to complete if it's true
+        if export_file.status_code == 200:
+            item.complete = True
+            item.download_url = urllib.parse.urljoin(tld, f"exports/{item.file_name}.csv")
+            item.save()
 
-    return render(request, 'export.html', {'fields': Pedigree._meta.get_fields(include_parents=False, include_hidden=False)})
+        return HttpResponse(dumps({'result': 'success',
+                                   'complete': item.complete,
+                                   'download_url': item.download_url}))
+    # queue item not found
+    else:
+        return HttpResponse(dumps({'result': 'fail'}))
 
 
 @login_required(login_url="/account/login")
@@ -537,6 +484,7 @@ def import_pedigree_data(request):
                                     # set has_error
                                     has_error = True
                                     return None, has_error
+
                             return ped, has_error
                         # if not for account, create error, as the reg number is taken
                         else:

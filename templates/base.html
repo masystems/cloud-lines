@@ -97,7 +97,7 @@
                     <!-- ============================================================== -->
                     <li class="nav-item dropdown">
 <!--                        alert for editors -->
-                        {% if editor %}
+                        {% if editor or breeds_editable|length > 0 %}
                             <a class="nav-link dropdown-toggle text-muted text-muted waves-effect waves-dark" href="{% url 'approvals' %}"> <i class="fad fa-bell"></i>
                                 {% if pending_approvals %}
                                     <div class="notify"> <span class="heartbit"></span> <span class="point"></span> </div>
@@ -173,7 +173,7 @@
                                             <h4>{{ request.user.get_full_name }} {{ request.user.last }}</h4>
                                             <p class="text-muted">{{ request.user.email }}</p>
                                             <p><strong>{{ service.service.service_name }}</strong></p>
-                                            <p class="text-muted">{% if editor %}Editor{% elif contributor %}Contributor{% else %}Read Only{% endif %}</p>
+                                            <p class="text-muted">{% if editor %}Editor{% elif breeds_editable|length > 0 %}Breed Editor{% elif contributor %}Contributor{% else %}Read Only{% endif %}</p>
                                         </div>
                                     </div>
                                 </li>

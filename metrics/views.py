@@ -569,41 +569,6 @@ def results_complete(request):
         return HttpResponse(dumps({'result': 'fail'}))
 
 
-# def calculate_sa_thresholds(studs_raw, attached_service, mother, mother_details):
-#     studs_data = {}
-#     for stud, kinship in studs_raw[str(mother.id)][0].items():
-#         try:
-#             male = Pedigree.objects.get(account=attached_service, id=stud, sex='male', status='alive')
-#             mk_minus_mk_thresh = mother.mean_kinship - mother.breed.mk_threshold
-#             mk_plus_mk_thresh = mother.mean_kinship + mother.breed.mk_threshold
-#             mk_minus_mk_thresh_2 = mother.mean_kinship - (mother.breed.mk_threshold*2)
-#             mk_plus_mk_thresh_2 = mother.mean_kinship + (mother.breed.mk_threshold*2)
-#
-#             if mk_minus_mk_thresh <= male.mean_kinship <= mk_plus_mk_thresh\
-#                     and kinship <= float(mother_details['breed_mean_coi']):
-#                 color = 'green'
-#             elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
-#                     and kinship <= float(mother_details['breed_mean_coi']):
-#                 color = 'orange'
-#             elif mk_minus_mk_thresh_2 <= male.mean_kinship <= mk_plus_mk_thresh_2\
-#                     and kinship > float(mother_details['breed_mean_coi']):
-#                 color = 'red'
-#             else:
-#                 color = None
-#
-#             if color:
-#                 studs_data[stud] = {'id': male.id,
-#                                     'reg_no': male.reg_no,
-#                                     'name': male.name,
-#                                     'mean_kinship': str(male.mean_kinship),
-#                                     'kinship': kinship,
-#                                     'color': color}
-#         except ObjectDoesNotExist:
-#             continue
-#
-#     return studs_data
-
-
 def poprep_export(request):
     from datetime import datetime
     import csv

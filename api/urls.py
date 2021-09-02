@@ -3,7 +3,7 @@ from . import views
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register('updates', views.UpdateViews)
+router.register('large-tier-queue', views.LargeTierQueueViews)
 router.register('pedigrees', views.PedigreeViews, basename='Pedigree')
 router.register('pedigree-images', views.PedigreeImageViews, basename='PedigreeImage')
 router.register('breeders', views.BreederViews, basename='Breeder')
@@ -14,7 +14,7 @@ router.register('faq', views.FaqViews, basename='faq')
 router.register('kinship', views.KinshipViews, basename='kinship')
 router.register('data_validation', views.DataValidatorViews, basename='data_validation')
 router.register('attached-service', views.AttachedServiceViews, basename='AttachedService')
-router.register('authenticate', views.Authenticate)
+#router.register('authenticate', views.Authenticate)
 
 urlpatterns = [
     path('', include(router.urls)),

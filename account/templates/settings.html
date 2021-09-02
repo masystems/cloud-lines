@@ -506,7 +506,7 @@
 <!--                    thrid tab-->
                     <div class="tab-pane" id="customisation" role="tabpanel">
                         <div class="card-body">
-                            {% if editor %}
+                            {% if request.user == service.user.user %}
                                 <h4>Organisation or Society Name</h4>
                                 <p>This title is used at the top of the page to show you what package you're viewing and used on certificates.</p>
 
@@ -717,7 +717,7 @@
                                     });
                                 </script>
                             </div>
-                            {% if editor %}
+                            {% if request.user == service.user.user %}
                                 <!-- End Popup Model -->
                                 <hr>
                                 <h4>Parent Titles</h4>

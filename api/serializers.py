@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from cloud_lines.models import Update
+from cloud_lines.models import LargeTierQueue
 from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
@@ -10,10 +10,24 @@ from metrics.models import KinshipQueue, DataValidatorQueue
 from django.contrib.auth.models import User
 
 
-class ApiUpdatesSerializer(serializers.HyperlinkedModelSerializer):
+class ApiLargeTierQueueSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Update
-        fields = '__all__'
+        model = LargeTierQueue
+        #fields = '__all__'
+        fields = ('id',
+                  'subdomain',
+                  'user',
+                  'user_detail',
+                  'attached_service',
+                  'build_state',
+                  'build_status',
+                  'percentage_complete',
+                  'username',
+                  'service_id',
+                  'stripe_id',
+                  'site_mode',
+                  'animal_type',
+                  'user_data')
 
 
 class ApiAttachedServiceSerializer(serializers.ModelSerializer):
@@ -25,7 +39,54 @@ class ApiAttachedServiceSerializer(serializers.ModelSerializer):
 class ApiPedigreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pedigree
-        fields = '__all__'
+        #fields = '__all__'
+        fields = ("id",
+                  "state",
+                  "reg_no",
+                  "tag_no",
+                  "name",
+                  "description",
+                  "date_of_registration",
+                  "dob",
+                  "dod",
+                  "status",
+                  "sex",
+                  "litter_size",
+                  "parent_father_notes",
+                  "parent_mother_notes",
+                  "breed_group",
+                  "coi",
+                  "mean_kinship",
+                  "date_added",
+                  "custom_fields",
+                  "sale_or_hire",
+                  "creator",
+                  "account",
+                  "breeder",
+                  "current_owner",
+                  "parent_father",
+                  "parent_mother",
+                  "breed",
+                  "parent_father_reg_no",
+                  "parent_mother_reg_no",
+                  "breeder_breeding_prefix",
+                  "current_owner_breeding_prefix",
+                  "breed_breed_name")
+
+        def to_representation(self, instance):
+            ret = super(ApiPedigreeSerializer, self).to_representation(instance)
+            # check the request is list view or detail view
+            is_list_view = isinstance(self.instance, list)
+            if is_list_view:
+                parent_father_id = ret.pop('parent_father', None)
+                print(parent_father_id)
+                parent_father = Pedigree.objects.filter(id=parent_father_id).first()
+                user_name = parent_father.reg_no if parent_father else ""
+                extra_ret = {
+                    "parent_father": user_name
+                }
+                ret.update(extra_ret)
+            return ret
 
 
 class ApiPedigreeImageSerializer(serializers.ModelSerializer):

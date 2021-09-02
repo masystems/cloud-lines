@@ -62,7 +62,27 @@ class Pedigree(models.Model):
     date_added = models.DateTimeField(auto_now_add=True, verbose_name="Date Added")
     custom_fields = models.TextField(blank=True, verbose_name="Custom Fields")
     sale_or_hire = models.BooleanField(default=False, help_text="Is the pedigree for sale/hire, or not?", verbose_name="For Sale/Hire")
-    
+
+    def parent_father_reg_no(self):
+        if self.parent_father:
+            return self.parent_father.reg_no
+
+    def parent_mother_reg_no(self):
+        if self.parent_mother:
+            return self.parent_mother.reg_no
+
+    def breeder_breeding_prefix(self):
+        if self.breeder:
+            return self.breeder.breeding_prefix
+
+    def current_owner_breeding_prefix(self):
+        if self.current_owner:
+            return self.current_owner.breeding_prefix
+
+    def breed_breed_name(self):
+        if self.breed:
+            return self.breed.breed_name
+
     def __str__(self):
         return self.reg_no
 
