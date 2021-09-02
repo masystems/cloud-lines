@@ -89,58 +89,58 @@
                             <table id="userTable" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th class="d-none d-lg-table-cell d-xl-table-cell">First Name</th>
-                                        <th class="d-none d-lg-table-cell d-xl-table-cell">Last Name</th>
+                                        <th class="d-none d-xl-table-cell">First Name</th>
+                                        <th class="d-none d-xl-table-cell">Last Name</th>
                                         <th>Username</th>
-                                        <th class="d-none d-lg-table-cell d-xl-table-cell">Email</th>
+                                        <th class="d-none d-md-table-cell">Email</th>
                                         <th>Status</th>
-                                        <th>Breeding Prefix</th>
+                                        <th class="d-none d-lg-table-cell">Breeding Prefix</th>
                                         {% if editor %}<th scope="col" class="d-none d-sm-table-cell">Edit</th>{% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
                                 {% for user in service.admin_users.all %}
                                     <tr>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.first_name }}</td>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.last_name }}</td>
+                                        <td class="d-none d-xl-table-cell">{{ user.first_name }}</td>
+                                        <td class="d-none d-xl-table-cell">{{ user.last_name }}</td>
                                         <td>{{ user.username }}</td>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.email }}</td>
+                                        <td class="d-none d-md-table-cell">{{ user.email }}</td>
                                         <td><span class="label label-light-info"> Editor</span></td>
-                                        <td>{{ user.breeder.first.breeding_prefix }}</td>
-                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
+                                        <td class="d-none d-lg-table-cell">{{ user.breeder.first.breeding_prefix }}</td>
+                                        {% if editor %}<td class="d-none d-sm-table-cell"><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
                                 {% for breed_admin in breed_admins %}
                                     <tr>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.first_name }}</td>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.last_name }}</td>
+                                        <td class="d-none d-xl-table-cell">{{ breed_admin.first_name }}</td>
+                                        <td class="d-none d-xl-table-cell">{{ breed_admin.last_name }}</td>
                                         <td>{{ breed_admin.username }}</td>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ breed_admin.email }}</td>
+                                        <td class="d-none d-md-table-cell">{{ breed_admin.email }}</td>
                                         <td><span class="label label-light-info"> Breed Editor</span><p class="d-none">{% for breed in breeds %}{% if breed_admin in breed.breed_admins.all %}{{ breed.breed_name }},{% endif %}{% endfor %}</p></td>
-                                        <td>{{ breed_admin.breeder.first.breeding_prefix }}</td>
-                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
+                                        <td class="d-none d-lg-table-cell">{{ breed_admin.breeder.first.breeding_prefix }}</td>
+                                        {% if editor %}<td class="d-none d-sm-table-cell"><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
                                 {% for user in service.contributors.all %}
                                     <tr>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.first_name }}</td>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.last_name }}</td>
+                                        <td class="d-none d-xl-table-cell">{{ user.first_name }}</td>
+                                        <td class="d-none d-xl-table-cell">{{ user.last_name }}</td>
                                         <td>{{ user.username }}</td>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.email }}</td>
+                                        <td class="d-none d-md-table-cell">{{ user.email }}</td>
                                         <td><span class="label label-light-success"> Contributor</span></td>
-                                        <td>{{ user.breeder.first.breeding_prefix }}</td>
-                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
+                                        <td class="d-none d-lg-table-cell">{{ user.breeder.first.breeding_prefix }}</td>
+                                        {% if editor %}<td class="d-none d-sm-table-cell"><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
                                 {% for user in service.read_only_users.all %}
                                     <tr>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.first_name }}</td>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.last_name }}</td>
+                                        <td class="d-none d-xl-table-cell">{{ user.first_name }}</td>
+                                        <td class="d-none d-xl-table-cell">{{ user.last_name }}</td>
                                         <td>{{ user.username }}</td>
-                                        <td class="d-none d-lg-table-cell d-xl-table-cell">{{ user.email }}</td>
+                                        <td class="d-none d-md-table-cell">{{ user.email }}</td>
                                         <td><span class="label label-light-warning"> Read Only</span></td>
-                                        <td>{{ user.breeder.first.breeding_prefix }}</td>
-                                        {% if editor %}<td><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
+                                        <td class="d-none d-lg-table-cell">{{ user.breeder.first.breeding_prefix }}</td>
+                                        {% if editor %}<td class="d-none d-sm-table-cell"><button class="btn btn-sm btn-outline-info" id="userEdit">Edit</button> <button class="btn btn-sm btn-danger" id="userDeleteBtn">Delete</button></td>{% endif %}
                                     </tr>
                                 {% endfor %}
                                 </tbody>
