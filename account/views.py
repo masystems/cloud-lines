@@ -159,7 +159,7 @@ def is_editor(user):
         return False
 
 
-def has_permission(request, permissions, pedigrees, breeder_users):
+def has_permission(request, permissions, pedigrees=[], breeder_users=[]):
     has_permission = False
     
     try:
@@ -190,7 +190,10 @@ def has_permission(request, permissions, pedigrees, breeder_users):
                     # if user is breed admin of all required breeds, grant permission
                     has_permission = True
         elif request.user in account.contributors.all():
-            if permissions['contrib']:
+            if permissions['contrib'] in (True, False):
+                if permissions['contrib']:
+                    has_permission = True
+            elif request.user in breeder_users:
                 has_permission = True
         elif request.user in account.read_only_users.all():
             if permissions['read_only'] in (True, False):
