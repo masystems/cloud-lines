@@ -240,7 +240,7 @@ def user_edit(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             return HttpResponse(json.dumps({'success': False}))
     else:
         raise PermissionDenied()
@@ -495,7 +495,7 @@ def profile(request):
 def settings(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
@@ -535,7 +535,7 @@ def custom_field_edit(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             return HttpResponse(json.dumps({'fail': True}))
     else:
         raise PermissionDenied()
@@ -648,7 +648,7 @@ def update_titles(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -667,7 +667,7 @@ def update_name(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -686,7 +686,7 @@ def update_pedigree_columns(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -706,7 +706,7 @@ def metrics_switch(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -819,7 +819,7 @@ def update_card(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -903,7 +903,7 @@ def send_payment_error(e):
 def cancel_sub(request):
     # permission check
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()

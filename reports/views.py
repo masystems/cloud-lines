@@ -15,7 +15,7 @@ import xlwt
 def reports(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
@@ -27,10 +27,10 @@ def reports(request):
 def census(request, type):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -152,7 +152,7 @@ def render_to_pdf(template_src, context_dict):
 def all(request, type):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()

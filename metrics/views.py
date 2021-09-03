@@ -145,7 +145,7 @@ def run_coi(request):
         pedigree = Pedigree.objects.filter(breed__id=request.POST.get('breed')).first()
         if not pedigree:
             raise PermissionDenied()
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree]):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -206,7 +206,7 @@ def kinship(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
             response = {'status': 'error',
                         'msg': "You do not have permission!"
                         }
@@ -324,7 +324,7 @@ def kinship_results(request, id):
     # this is only used for GET requests
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
-                                    [k_queue_item.mother ,k_queue_item.father]):
+                                    pedigrees=[k_queue_item.mother ,k_queue_item.father]):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
@@ -340,7 +340,7 @@ def run_mean_kinship(request):
         pedigree = Pedigree.objects.filter(breed__id=request.POST.get('breed')).first()
         if not pedigree:
             raise PermissionDenied()
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree]):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -420,7 +420,7 @@ def stud_advisor(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             response = {'status': 'fail',
                         'msg': "You do not have permission!",
                         'item_id': ''
@@ -518,7 +518,7 @@ def stud_advisor_results(request, id):
     # check permission
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
-                                    [sa_queue_item.mother]):
+                                    pedigrees=[sa_queue_item.mother]):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()

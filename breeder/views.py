@@ -94,10 +94,10 @@ def breeder_csv(request):
 def new_breeder_form(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -153,10 +153,10 @@ def new_breeder_form(request):
 def edit_breeder_form(request, breeder_id):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()

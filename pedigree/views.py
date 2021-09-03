@@ -324,11 +324,11 @@ def search_results(request):
 def new_pedigree_form(request):
     # check if user has permission, passing in ids of mother and father from kinship queue item
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     elif request.method == 'POST':
         # particular breed checked below
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
             return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
     else:
         raise PermissionDenied()
@@ -521,11 +521,11 @@ def edit_pedigree_form(request, id):
 
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree]):
             return redirect_2_login(request)
     elif request.method == 'POST':
         # particular breed checked below
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree]):
             return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
     else:
         raise PermissionDenied()
@@ -772,7 +772,7 @@ def add_existing(request, pedigree_id):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree]):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -811,7 +811,7 @@ def add_existing_parent(request, pedigree_id):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree]):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
