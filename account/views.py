@@ -74,7 +74,7 @@ def site_mode(request):
         elif request.user in attached_service.contributors.all():
             contributor = True
         elif request.user in attached_service.read_only_users.all():
-            read_only = False
+            read_only = True
         else:
             editor = False
             contributor = False
