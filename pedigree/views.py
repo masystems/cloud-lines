@@ -322,20 +322,28 @@ def search_results(request):
 @login_required(login_url="/account/login")
 @never_cache
 def new_pedigree_form(request):
+    pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
+    pre_checks = True
+    attached_service = get_main_account(request.user)
+    
     # check if user has permission, passing in ids of mother and father from kinship queue item
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        # particular breed checked below
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
-            return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
+        # (particular breed checked below)
+        # specify breeder to validate user is breeder
+        if Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists():
+            if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
+                                            breeder_users=[Breeder.objects.get(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).user]):
+                return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
+        # if breeder doesn't exist, allow contribs on through as that error will be handled later
+        else:
+            if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+                return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
     else:
         raise PermissionDenied()
     
-    pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
-    pre_checks = True
-    attached_service = get_main_account(request.user)
     try:
         custom_fields = json.loads(attached_service.custom_fields)
     except json.decoder.JSONDecodeError:
