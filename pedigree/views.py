@@ -106,8 +106,10 @@ class GeneratePDF(View):
     def dispatch(self, request, *args, **kwargs):
         # check permission
         if self.request.method == 'GET':
-            if not has_permission(self.request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'},
-                                        [Pedigree.objects.get(id=self.kwargs['pedigree_id'])]):
+            pedigree = Pedigree.objects.get(id=self.kwargs['pedigree_id'])
+            if not has_permission(self.request, {'read_only': 'breeder', 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'},
+                                        pedigrees=[pedigree],
+                                        breeder_users=[pedigree.breeder.user, pedigree.current_owner.user]):
                 return redirect_2_login(self.request)
         else:
             raise PermissionDenied()
