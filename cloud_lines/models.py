@@ -127,6 +127,10 @@ class LargeTierQueue(models.Model):
         from django.core import serializers
         return loads(serializers.serialize("json", [self.user]))
 
+    def services_data(self):
+        from django.core import serializers
+        return loads(serializers.serialize("json", Service.objects.all()))
+
     def __str__(self):
         return str(self.subdomain)
 
