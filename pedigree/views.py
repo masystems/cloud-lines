@@ -85,8 +85,8 @@ class ShowPedigree(PedigreeBase):
                 breeder_users.append(super().get_context_data(**kwargs)['lvl1'].current_owner.user)
         if self.request.method == 'GET':
             if not has_permission(self.request, {'read_only': 'breeder', 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
-                                        [super().get_context_data(**kwargs)['lvl1']],
-                                        breeder_users):
+                                        pedigrees=[super().get_context_data(**kwargs)['lvl1']],
+                                        breeder_users=breeder_users):
                 return redirect_2_login(self.request)
         else:
             raise PermissionDenied()
