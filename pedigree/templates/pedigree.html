@@ -634,7 +634,7 @@ vertical-align: middle;
                                 </tbody>
                             </table>
                         </div>
-                        {% if editor or lvl1.breed.breed_name in breeds_editable %}
+                        {% if editor or lvl1.breed.breed_name in breeds_editable or lvl1.current_owner.user == request.user or lvl1.breeder.user == request.user %}
                             <div class="row">
                                 <div class="col-12">
                                     <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>
