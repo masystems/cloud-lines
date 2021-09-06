@@ -65,6 +65,10 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             context['custom_fields'] = {}
 
+        context['breeder'] = False
+        if Breeder.objects.filter(account=context['attached_service'], user=self.request.user).exists():
+            context['breeder'] = True
+
         context = generate_hirearchy(context)
 
         return context
