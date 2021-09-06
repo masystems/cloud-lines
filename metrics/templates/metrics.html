@@ -157,7 +157,7 @@
 
                     <h4 class="card-title">Calculations</h4>
                     <p id="coiTimer" class="text-center"></p>
-                    {% if not read_only %}
+                    {% if not read_only and not contributor %}
                         {% if breeds.all.count == 1 %}
                             <button id="coiBtn" onclick="runCoi(this)" type="button" class="btn btn-block btn-success ml-1" value="{{ breeds.first.id }}">Run COI</button>
                         {% elif breeds.all.count > 1 %}
@@ -178,7 +178,7 @@
                     {% endif %}
                     <hr>
                     <p id="meanKinshipTimer" class="text-center"></p>
-                    {% if not read_only %}
+                    {% if not read_only and not contributor %}
                         {% if breeds.all.count == 1 %}
                             <button id="meanKinshipBtn" onclick="runMK(this)" type="button" class="btn btn-block btn-success ml-1" value="{{ breeds.first.id }}">Run Mean Kinship</button>
                         {% elif breeds.all.count > 1 %}
