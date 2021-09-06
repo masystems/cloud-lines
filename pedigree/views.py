@@ -850,11 +850,17 @@ def add_existing_parent(request, pedigree_id):
     pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
 
     # check if user has permission (should just be post)
+    breeder_users = []
+    if pedigree.breeder:
+        if pedigree.breeder.user:
+            breeder_users.append(pedigree.breeder.user)
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree]):
-            raise PermissionDenied()
+        if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'}, 
+                                        pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
+            return HttpResponse(json.dumps({'fail': True, 'msg': 'You do not have permission!'}))
     else:
         raise PermissionDenied()
 
