@@ -435,8 +435,13 @@ def stud_advisor(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
+        # get breeder users
+        breeder_users = []
+        if mother.current_owner:
+            if mother.current_owner.user:
+                breeder_users.append(mother.current_owner.user)
         if not has_permission(request, {'read_only': 'breeder', 'contrib': 'breeder', 'admin': True, 'breed_admin': True}, 
-                                        breeder_users=[mother.current_owner.user]):
+                                        breeder_users=breeder_users):
             response = {'status': 'fail',
                         'msg': "You do not have permission!",
                         'item_id': ''
