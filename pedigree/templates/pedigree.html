@@ -252,7 +252,7 @@ vertical-align: middle;
                                 });
                             });
                         </script>
-                        {% if editor or contributor and breeder or lvl1.breed.breed_name in breeds_editable %}
+                        {% if editor or contributor and lvl1.current_owner.user == request.user or lvl1.breed.breed_name in breeds_editable %}
                             {% include 'add_new_pedigree.html' %}
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
                         {% else %}
