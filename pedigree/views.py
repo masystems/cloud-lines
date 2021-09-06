@@ -75,11 +75,18 @@ class ShowPedigree(PedigreeBase):
 
     def dispatch(self, request, *args, **kwargs):
         # check permission
+        # get breeder_users of pedigree
+        breeder_users = []
+        if super().get_context_data(**kwargs)['lvl1'].breeder:
+            if super().get_context_data(**kwargs)['lvl1'].breeder.user:
+                breeder_users.append(super().get_context_data(**kwargs)['lvl1'].breeder.user)
+        if super().get_context_data(**kwargs)['lvl1'].current_owner:
+            if super().get_context_data(**kwargs)['lvl1'].current_owner.user:
+                breeder_users.append(super().get_context_data(**kwargs)['lvl1'].current_owner.user)
         if self.request.method == 'GET':
             if not has_permission(self.request, {'read_only': 'breeder', 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
                                         [super().get_context_data(**kwargs)['lvl1']],
-                                        [super().get_context_data(**kwargs)['lvl1'].breeder.user, 
-                                        super().get_context_data(**kwargs)['lvl1'].current_owner.user]):
+                                        breeder_users):
                 return redirect_2_login(self.request)
         else:
             raise PermissionDenied()
