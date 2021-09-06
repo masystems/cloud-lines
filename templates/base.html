@@ -182,7 +182,7 @@
                                     <li><a href="/admin"><i class="fad fa-cogs"></i></i> Backend Admin</a></li>
                                 {% endif %}
                                 <li role="separator" class="divider"></li>
-                                <li><a href="{% url 'settings' %}"><i class="fad fa-cogs"></i> Site Settings</a></li>
+                                <li><a {% if editor or breeds_editable|length > 0 %}href="{% url 'settings' %}"{% endif %}><i class="fad fa-cogs"></i> Site Settings</a></li>
                                 <li><a href="{% url 'profile' %}"><i class="fad fa-user-cog"></i> Account Settings</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{% url 'cl_logout' %}"><i class="fad fa-power-off"></i> Logout</a></li>
