@@ -236,8 +236,10 @@
                     {% endif %}
 
 
-                    <li><a href="{% url 'reports' %}"><i class="fad fa-file-chart-line"></i><span
-                            class="hide-menu"> Reports</span></a></li>
+                    {% if editor or breeds_editable|length > 0 %}
+                        <li><a href="{% url 'reports' %}"><i class="fad fa-file-chart-line"></i><span
+                                class="hide-menu"> Reports</span></a></li>
+                    {% endif %}
 
 
                     {% if editor %}
