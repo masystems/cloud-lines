@@ -523,9 +523,14 @@ def stud_advisor_results(request, id):
 
     # check permission
     if request.method == 'GET':
+        # get breeder users
+        breeder_users = []
+        if sa_queue_item.mother.current_owner:
+            if sa_queue_item.mother.current_owner.user:
+                breeder_users.append(sa_queue_item.mother.current_owner.user)
         if not has_permission(request, {'read_only': 'breeder', 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'},
                                     pedigrees=[sa_queue_item.mother],
-                                    breeder_users=[sa_queue_item.mother.current_owner.user]):
+                                    breeder_users=breeder_users):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
