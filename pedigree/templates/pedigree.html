@@ -256,7 +256,9 @@ vertical-align: middle;
                             {% include 'add_new_pedigree.html' %}
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
                         {% else %}
-                            {% include 'add_new_pedigree.html' %}
+                            <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                            </button>
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#login">Add existing</button>
                         {% endif %}
                     </div>
