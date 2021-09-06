@@ -401,8 +401,12 @@ vertical-align: middle;
                                             {% if lvl2_1 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl2_1 %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
-                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentFather">Add existing</button>
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentFather">Add existing</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#login">Add existing</button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         <!--## col2 ##-->
@@ -480,8 +484,12 @@ vertical-align: middle;
                                                 Group
                                                 {% include 'relative-breed_group.html' with breed_group=lvl2_2_grp %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl2_2 %}
-                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentMother">Add existing</button>
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl2_2 %}
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentMother">Add existing</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#login">Add existing</button>
+                                                {% endif %}
                                             {% endif %}
 
                                         </td>
