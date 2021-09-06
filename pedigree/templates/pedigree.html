@@ -30,7 +30,7 @@ vertical-align: middle;
         </div>
         <div class="col-md-6 col-4 align-self-center">
             {% if editor or contributor and breeder or breeds_editable|length > 0 %}
-                {% if lvl1.state == 'approved' and contributor or editor or lvl1.breed.breed_name in breeds_editable %}
+                {% if lvl1.state == 'approved' and contributor and lvl1.current_owner.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
                     <a href="{% url 'edit_pedigree_form' lvl1.id %}" id="editPedigree" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
                 {% endif %}
