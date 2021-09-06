@@ -545,14 +545,19 @@ def edit_pedigree_form(request, id):
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
     # check if user has permission
+    # get breeder users
+    breeder_users = []
+    if pedigree.current_owner:
+        if pedigree.current_owner.user:
+            breeder_users.append(pedigree.current_owner.user)
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree],
-                                        breeder_users=[pedigree.current_owner.user]):
+                                        breeder_users=breeder_users):
             return redirect_2_login(request)
     elif request.method == 'POST':
         # particular breed checked below
         if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree],
-                                        breeder_users=[pedigree.current_owner.user]):
+                                        breeder_users=breeder_users):
             return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
     else:
         raise PermissionDenied()
