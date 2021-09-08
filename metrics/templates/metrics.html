@@ -357,7 +357,7 @@
                                     </a> </td>
                                 {% else %}
                                     <td class="results"><a href="{% url 'stud_advisor_results' item.id %}">
-                                        <button class="btn btn-info" {% if not item.complete or not editor and item.mother.breed.breed_name not in breeds_editable and item.mother.current_owner.user != request.user %}disabled{% endif %}>View</button> </a> </td>
+                                        <button class="btn btn-info" {% if item.complete and editor or item.complete and item.mother.breed.breed_name in breeds_editable or item.complete and item.mother.current_owner.user == request.user and contributor or item.complete and item.mother.current_owner.user == request.user and read_only_user %}{% else %}disabled{% endif %}>View</button> </a> </td>
                                 {% endif %}
                             </tr>
                         {% endfor %}
