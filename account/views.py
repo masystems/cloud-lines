@@ -182,8 +182,13 @@ def has_permission(request, permissions, pedigrees=[], breeder_users=[]):
             else:
                 breed_permission = True
                 for pedigree in pedigrees:
-                    if request.user not in pedigree.breed.breed_admins.all():
-                        # if breed admin is not an admin of the correct breed, deny permission
+                    if pedigree.breed:
+                        if request.user not in pedigree.breed.breed_admins.all():
+                            # if breed admin is not an admin of the correct breed, deny permission
+                            breed_permission = False
+                            break
+                    else:
+                        # breed of pedigree not set
                         breed_permission = False
                         break
                 if breed_permission:
