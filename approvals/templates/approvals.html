@@ -19,7 +19,7 @@
     <!-- End Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
 
-    {% if editor %}
+    {% if editor or breeds_editable|length > 0 %}
         <div id="decline-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="decline-modal" aria-hidden="true" style="display: none;">
             <div class="modal-dialog">
                 <div class="modal-content">

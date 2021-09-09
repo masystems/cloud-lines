@@ -17,7 +17,7 @@ from json import loads
 def approvals(request):
     # check if user has permission (breeds admins allowed to page, but blocked from doing things with approvals they're not admin for)
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
@@ -62,7 +62,7 @@ def approve(request, id):
     
     # check if user has permission (should just be a GET)
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[approval.pedigree]):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
@@ -108,7 +108,7 @@ def declined(request):
     elif request.method == 'POST':
         approval = Approval.objects.get(id=request.POST.get('decline-id'))
         # particular breed checked below
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [approval.pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, pedigrees=[approval.pedigree]):
             raise PermissionDenied()
     else:
         raise PermissionDenied()

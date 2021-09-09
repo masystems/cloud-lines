@@ -74,7 +74,7 @@ def site_mode(request):
         elif request.user in attached_service.contributors.all():
             contributor = True
         elif request.user in attached_service.read_only_users.all():
-            read_only = False
+            read_only = True
         else:
             editor = False
             contributor = False
@@ -159,7 +159,7 @@ def is_editor(user):
         return False
 
 
-def has_permission(request, permissions, pedigrees):
+def has_permission(request, permissions, pedigrees=[], breeder_users=[]):
     has_permission = False
     
     try:
@@ -182,18 +182,29 @@ def has_permission(request, permissions, pedigrees):
             else:
                 breed_permission = True
                 for pedigree in pedigrees:
-                    if request.user not in pedigree.breed.breed_admins.all():
-                        # if breed admin is not an admin of the correct breed, deny permission
+                    if pedigree.breed:
+                        if request.user not in pedigree.breed.breed_admins.all():
+                            # if breed admin is not an admin of the correct breed, deny permission
+                            breed_permission = False
+                            break
+                    else:
+                        # breed of pedigree not set
                         breed_permission = False
                         break
                 if breed_permission:
                     # if user is breed admin of all required breeds, grant permission
                     has_permission = True
         elif request.user in account.contributors.all():
-            if permissions['contrib']:
+            if permissions['contrib'] in (True, False):
+                if permissions['contrib']:
+                    has_permission = True
+            elif request.user in breeder_users:
                 has_permission = True
         elif request.user in account.read_only_users.all():
-            if permissions['read_only']:
+            if permissions['read_only'] in (True, False):
+                if permissions['read_only']:
+                    has_permission = True
+            elif request.user in breeder_users:
                 has_permission = True
 
     except UserDetail.DoesNotExist:
@@ -231,110 +242,153 @@ def get_main_account(user):
 
 @login_required(login_url="/account/login")
 def user_edit(request):
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
+            return HttpResponse(json.dumps({'success': False}))
+    else:
+        raise PermissionDenied()
+    
     # this is the additional user customers can add/remove from their service.
-    if request.method == 'POST':
-        main_account = get_main_account(request.user)
-        user_detail = UserDetail.objects.get(user=request.user)
-        if request.POST.get('formType') == 'new':
-            # generate password
-            password = ''.join(
-                [random.choice(string.ascii_letters + string.digits + string.punctuation) for n in range(int(10))])
+    main_account = get_main_account(request.user)
+    user_detail = UserDetail.objects.get(user=request.user)
+    
+    # validate breeder, if given
+    breeder = None
+    if request.POST.get('breeding_prefix') != '':
+        breeder = Breeder.objects.filter(account=main_account, breeding_prefix=request.POST.get('breeding_prefix'))
+        if breeder.exists():
+            breeder = breeder.first()
+            if breeder.user and request.POST.get('formType') == 'new':
+                # error because breeder already has a user
+                return HttpResponse(json.dumps({'fail': True, 'msg': 'A User is already assigned to this Breeder!'}))
+        else:
+            # error because breeder doesn't exist
+            return HttpResponse(json.dumps({'fail': True, 'msg': 'Breeding Prefix does not match an existing Breeder!'}))
+    
+    if request.POST.get('formType') == 'new':
+        # generate password
+        password = ''.join(
+            [random.choice(string.ascii_letters + string.digits + string.punctuation) for n in range(int(10))])
 
-            # create new user
-            new_user = User.objects.create_user(username=request.POST.get('register-form-username').lower(),
-                                                email=request.POST.get('register-form-email'),
-                                                password=password,
-                                                first_name=request.POST.get('firstName'),
-                                                last_name=request.POST.get('lastName'))
+        # create new user
+        new_user = User.objects.create_user(username=request.POST.get('register-form-username').lower(),
+                                            email=request.POST.get('register-form-email'),
+                                            password=password,
+                                            first_name=request.POST.get('firstName'),
+                                            last_name=request.POST.get('lastName'))
 
-            # update user details
-            new_user_detail = UserDetail.objects.create(user=new_user,
-                                                        phone='',
-                                                        )
-            attached_service = AttachedService.objects.filter(user=new_user_detail).update(animal_type='Pedigrees',
-                                                                                           install_available=False,
-                                                                                           active=True)
-            new_user_detail.current_service_id = user_detail.current_service_id
-            new_user_detail.save()
-            if request.POST.get('status') == 'Editor':
-                main_account.admin_users.add(new_user)
+        # update user details
+        new_user_detail = UserDetail.objects.create(user=new_user,
+                                                    phone='',
+                                                    )
+        attached_service = AttachedService.objects.filter(user=new_user_detail).update(animal_type='Pedigrees',
+                                                                                        install_available=False,
+                                                                                        active=True)
+        new_user_detail.current_service_id = user_detail.current_service_id
+        new_user_detail.save()
+        if request.POST.get('status') == 'Editor':
+            main_account.admin_users.add(new_user)
 
-            elif request.POST.get('status') == 'Breed Editor':
-                for breed in Breed.objects.filter(account=main_account):
-                    if request.POST.get(breed.breed_name):
-                        breed.breed_admins.add(new_user)
-                        breed.save()
-
-            elif request.POST.get('status') == 'Contributor':
-                main_account.contributors.add(new_user)
-
-            else:
-                main_account.read_only_users.add(new_user)
-
-            # send email to new user
-
-            if main_account.domain:
-                domain = main_account.domain
-            else:
-                domain = 'https://cloud-lines.com'
-            email_body = """
-                        <p><strong>You have been registered on Cloud-lines by {}!</strong></p>
-
-                        <p>Now that you have been registered you will need to set your own secure password.</p>
-                        
-                        <p><strong>Username: </strong>{}</p>
-
-                        <p><a href="{}">Click here</a> to reset your password.</p>
-                        
-                        <p><a href="{}">Or Click here</a> to to login.</p>
-
-                        <p>Feel free to contact us about anything and enjoy!</p>""".format(request.user.get_full_name(),
-                                                                                           new_user.username,
-                                                                                           urljoin(domain, 'accounts/password_reset/'),
-                                                                                           domain)
-            if not django_settings.DEBUG:
-                send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
-            return HttpResponse(json.dumps({'success': True}))
-
-        elif request.POST.get('formType') == 'edit':
-            # find user and update name fields
-            User.objects.filter(username=request.POST.get('register-form-username'),
-                                email=request.POST.get('register-form-email')).update(first_name=request.POST.get('firstName'),
-                                                                                      last_name=request.POST.get('lastName'))
-            existing_user = User.objects.get(username=request.POST.get('register-form-username'),
-                                    email=request.POST.get('register-form-email'))
-            # remove user from admins and read only users and contributors
-            main_account.admin_users.remove(existing_user)
-            main_account.read_only_users.remove(existing_user)
-            main_account.contributors.remove(existing_user)
+        elif request.POST.get('status') == 'Breed Editor':
             for breed in Breed.objects.filter(account=main_account):
-                if not request.POST.get(breed.breed_name):
-                    breed.breed_admins.remove(existing_user)
+                if request.POST.get(breed.breed_name):
+                    breed.breed_admins.add(new_user)
                     breed.save()
 
-            # add user to the request group
-            if request.POST.get('status') == 'Editor':
-                main_account.admin_users.add(existing_user)
-            elif request.POST.get('status') == 'Breed Editor':
-                for breed in Breed.objects.filter(account=main_account):
-                    if request.POST.get(breed.breed_name):
-                        breed.breed_admins.add(existing_user)
-                        breed.save()
-            elif request.POST.get('status') == 'Contributor':
-                main_account.contributors.add(existing_user)
-            else:
-                main_account.read_only_users.add(existing_user)
+        elif request.POST.get('status') == 'Contributor':
+            main_account.contributors.add(new_user)
 
-            return HttpResponse(json.dumps({'success': True}))
+        else:
+            main_account.read_only_users.add(new_user)
 
-        elif request.POST.get('formType') == 'delete':
+        # set breeder
+        if request.POST.get('breeding_prefix') != '':
+            breeder.user = new_user
+            breeder.save()
 
-            User.objects.get(username=request.POST.get('register-form-username'),
-                             email=request.POST.get('register-form-email')).delete()
+        # send email to new user
+        if main_account.domain:
+            domain = main_account.domain
+        else:
+            domain = 'https://cloud-lines.com'
+        email_body = """
+                    <p><strong>You have been registered on Cloud-lines by {}!</strong></p>
 
-            return HttpResponse(json.dumps({'success': True}))
+                    <p>Now that you have been registered you will need to set your own secure password.</p>
+                    
+                    <p><strong>Username: </strong>{}</p>
 
-    return HttpResponse(json.dumps({'success': False}))
+                    <p><a href="{}">Click here</a> to reset your password.</p>
+                    
+                    <p><a href="{}">Or Click here</a> to to login.</p>
+
+                    <p>Feel free to contact us about anything and enjoy!</p>""".format(request.user.get_full_name(),
+                                                                                        new_user.username,
+                                                                                        urljoin(domain, 'accounts/password_reset/'),
+                                                                                        domain)
+        if not django_settings.DEBUG:
+            send_mail('Welcome to Cloud-lines!', new_user.get_full_name(), email_body, send_to=new_user.email)
+        return HttpResponse(json.dumps({'success': True}))
+
+    elif request.POST.get('formType') == 'edit':
+        # find user and update name fields
+        User.objects.filter(username=request.POST.get('register-form-username'),
+                            email=request.POST.get('register-form-email')).update(first_name=request.POST.get('firstName'),
+                                                                                    last_name=request.POST.get('lastName'))
+        existing_user = User.objects.get(username=request.POST.get('register-form-username'),
+                                email=request.POST.get('register-form-email'))
+
+        # check breeder doesn't already have a user other than the edited user
+        if breeder:
+            if breeder.user and breeder.user != existing_user:
+                # error because breeder already has a user
+                return HttpResponse(json.dumps({'fail': True, 'msg': 'A User is already assigned to this Breeder!'}))
+
+        # remove user from admins and read only users and contributors
+        main_account.admin_users.remove(existing_user)
+        main_account.read_only_users.remove(existing_user)
+        main_account.contributors.remove(existing_user)
+        for breed in Breed.objects.filter(account=main_account):
+            if not request.POST.get(breed.breed_name):
+                breed.breed_admins.remove(existing_user)
+                breed.save()
+
+        # add user to the request group
+        if request.POST.get('status') == 'Editor':
+            main_account.admin_users.add(existing_user)
+        elif request.POST.get('status') == 'Breed Editor':
+            for breed in Breed.objects.filter(account=main_account):
+                if request.POST.get(breed.breed_name):
+                    breed.breed_admins.add(existing_user)
+                    breed.save()
+        elif request.POST.get('status') == 'Contributor':
+            main_account.contributors.add(existing_user)
+        else:
+            main_account.read_only_users.add(existing_user)
+
+        # set breeder
+        # get old breeder and prefix if exists
+        old_breeder = existing_user.breeder.all()
+        if old_breeder.exists():
+            # unset old breeder
+            old_breeder = old_breeder.first()
+            old_breeder.user = None
+            old_breeder.save()
+        # set new breeder, if given
+        if breeder:
+            breeder.user = existing_user
+            breeder.save()
+
+        return HttpResponse(json.dumps({'success': True}))
+
+    elif request.POST.get('formType') == 'delete':
+
+        User.objects.get(username=request.POST.get('register-form-username'),
+                            email=request.POST.get('register-form-email')).delete()
+
+        return HttpResponse(json.dumps({'success': True}))
 
 
 @login_required(login_url="/account/login")
@@ -446,7 +500,7 @@ def profile(request):
 def settings(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
@@ -486,7 +540,7 @@ def custom_field_edit(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             return HttpResponse(json.dumps({'fail': True}))
     else:
         raise PermissionDenied()
@@ -599,7 +653,7 @@ def update_titles(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -618,7 +672,7 @@ def update_name(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -637,7 +691,7 @@ def update_pedigree_columns(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -657,7 +711,7 @@ def metrics_switch(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -770,7 +824,7 @@ def update_card(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -854,7 +908,7 @@ def send_payment_error(e):
 def cancel_sub(request):
     # permission check
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()

@@ -29,8 +29,8 @@ vertical-align: middle;
             </ol>
         </div>
         <div class="col-md-6 col-4 align-self-center">
-            {% if editor or contributor or breeds_editable|length > 0 %}
-                {% if lvl1.state == 'approved' and contributor or editor or lvl1.breed.breed_name in breeds_editable %}
+            {% if editor or contributor and breeder or breeds_editable|length > 0 %}
+                {% if lvl1.state == 'approved' and contributor and lvl1.current_owner.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
                     <a href="{% url 'edit_pedigree_form' lvl1.id %}" id="editPedigree" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
                 {% endif %}
@@ -252,11 +252,13 @@ vertical-align: middle;
                                 });
                             });
                         </script>
-                        {% if editor or contributor or lvl1.breed.breed_name in breeds_editable %}
+                        {% if editor or contributor and lvl1.current_owner.user == request.user or lvl1.breed.breed_name in breeds_editable %}
                             {% include 'add_new_pedigree.html' %}
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#existing">Add existing</button>
                         {% else %}
-                            {% include 'add_new_pedigree.html' %}
+                            <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                            </button>
                             <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#login">Add existing</button>
                         {% endif %}
                     </div>
@@ -401,8 +403,12 @@ vertical-align: middle;
                                             {% if lvl2_1 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl2_1 %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
-                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentFather">Add existing</button>
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl2_1 %}
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentFather">Add existing</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#login">Add existing</button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         <!--## col2 ##-->
@@ -410,7 +416,13 @@ vertical-align: middle;
                                             {% if lvl3_1 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_1 %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl3_1 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl3_1 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         <!--## col3 ##-->
@@ -418,7 +430,13 @@ vertical-align: middle;
                                             {% if lvl4_1 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_1 %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl4_1 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl4_1 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -431,7 +449,13 @@ vertical-align: middle;
                                                 Group
                                                 {% include 'relative-breed_group.html' with breed_group=lvl4_2_grp %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl4_2 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl4_2 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -444,7 +468,13 @@ vertical-align: middle;
                                                 Group
                                                 {% include 'relative-breed_group.html' with breed_group=lvl3_2_grp %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl3_2 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl3_2 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
 
                                         </td>
@@ -453,7 +483,13 @@ vertical-align: middle;
                                             {% if lvl4_3 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_3 %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl4_3 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl4_3 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -466,7 +502,13 @@ vertical-align: middle;
                                                 Group
                                                 {% include 'relative-breed_group.html' with breed_group=lvl4_4_grp %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl4_4 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl4_4 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -480,8 +522,12 @@ vertical-align: middle;
                                                 Group
                                                 {% include 'relative-breed_group.html' with breed_group=lvl2_2_grp %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl2_2 %}
-                                                <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentMother">Add existing</button>
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl2_2 %}
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#addExistingParentMother">Add existing</button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#login">Add existing</button>
+                                                {% endif %}
                                             {% endif %}
 
                                         </td>
@@ -490,7 +536,13 @@ vertical-align: middle;
                                             {% if lvl3_3 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl3_3 %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl3_3 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl3_3 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         <!--## col3 ##-->
@@ -498,7 +550,13 @@ vertical-align: middle;
                                             {% if lvl4_5 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_5 %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl4_5 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl4_5 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -511,7 +569,13 @@ vertical-align: middle;
                                                 Group
                                                 {% include 'relative-breed_group.html' with breed_group=lvl4_6_grp %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl4_6 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl4_6 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -524,7 +588,13 @@ vertical-align: middle;
                                                 Group
                                                 {% include 'relative-breed_group.html' with breed_group=lvl3_4_grp %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl3_4 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl3_4 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         <!--## col3 ##-->
@@ -532,7 +602,13 @@ vertical-align: middle;
                                             {% if lvl4_7 %}{{ service.father_title }}
                                                 {% include 'relative.html' with pedigree=lvl4_7 %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl4_7 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl4_7 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -545,14 +621,20 @@ vertical-align: middle;
                                                 Group
                                                 {% include 'relative-breed_group.html' with breed_group=lvl4_8_grp %}
                                             {% else %}
-                                                {% include 'add_new_pedigree.html' with pedigree=lvl4_8 %}
+                                                {% if lvl1.state == 'approved' and contributor and lvl1.breeder.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
+                                                    {% include 'add_new_pedigree.html' with pedigree=lvl4_8 %}
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-success waves-effect waves-light" type="button" data-toggle="modal" data-target="#login">
+                                                        <span class="btn-label"><i class="fad fa-plus-circle"></i></span> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                                                    </button>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        {% if editor or lvl1.breed.breed_name in breeds_editable %}
+                        {% if editor or lvl1.breed.breed_name in breeds_editable or lvl1.current_owner.user == request.user or lvl1.breeder.user == request.user %}
                             <div class="row">
                                 <div class="col-12">
                                     <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>

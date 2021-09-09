@@ -29,15 +29,20 @@
         </div>
         <div class="col-md-6 col-4 align-self-center">
 
-            {% if editor or breeds_editable|length > 0 %}
+            {% if editor or breeds_editable|length > 0 or breeder.user == request.user and contributor %}
                 <a href="{% url 'edit_breeder_form' breeder.id %}" id="editBreeder" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fad fa-pencil-alt"></i> Edit
-                </a>
-                <a href="{% url 'new_breeder_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add Breeder
                 </a>
             {% else %}
                 {% include 'login_modal.html' %}
                 <!-- /.modal -->
                 <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fad fa-pencil-alt"></i> Edit</button>
+            {% endif %}
+            {% if editor or breeds_editable|length > 0 %}
+                <a href="{% url 'new_breeder_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add Breeder
+                </a>
+            {% else %}
+                {% include 'login_modal.html' %}
+                <!-- /.modal -->
                 <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Add Breeder</button>
             {% endif %}
         </div>
