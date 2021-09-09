@@ -404,11 +404,18 @@
                 // am pm
                 var hours = dt.getHours();
                 var ampm = hours >= 12 ? ' p.m.' : ' a.m.';
+                // convert hours to 12 hour time equivalent
+                if (hours == 0) {
+                    hours = 12
+                }
+                else if (hours > 12) {
+                    hours -= 12
+                }
                 // create time string
                 var datetime = dt.getDate() + " "
                 + (month[dt.getMonth()+1])  + " "
                 + dt.getFullYear() + ", "
-                + dt.getHours() + ":"
+                + hours + ":"
                 + dt.getMinutes() + ampm;
 
                 // set time string with seconds
