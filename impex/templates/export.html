@@ -51,8 +51,11 @@
                             <td>{{ item.user.get_full_name }}</td>
                             <td>{{ item.created }}</td>
                             <td class="complete">{% if item.complete %}<i class="fad fa-check text-success"></i>{% else %}<i class="fas fa-cog fa-spin text-info"></i>{% endif %}</td>
-                            <td class="results"><a href="{{ item.download_url }}" target="_blank">
-                            <button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button> </a> </td>
+                            <td class="results">
+                                <a href="{{ item.download_url }}" target="_blank" download="{{ item.file_name }}.csv">
+                                    <button class="btn btn-info" {% if not item.complete %}disabled{% endif %}>View</button>
+                                </a>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -86,7 +89,6 @@
                     data: {'item_id': itemId},
                     success: function(data) {
                         result = JSON.parse(data);
-
                         if (result.result == 'success') {
                             // if item is complete
                             if (result.complete) {
