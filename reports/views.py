@@ -233,7 +233,13 @@ def all(request, type):
         for col_num in range(len(columns)):
             worksheet.write(row_num, col_num, columns[col_num], font_style_header)
 
-        for pedigree in Pedigree.objects.filter(account=attached_service, status__icontains='alive'):
+        # get breeds editable if user is breed admin
+        if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
+            breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+        else:
+            breeds = Breed.objects.filter(account=attached_service)
+
+        for pedigree in Pedigree.objects.filter(account=attached_service, status__icontains='alive', breed__in=breeds):
             # Sheet body, remaining rows
             font_style = xlwt.XFStyle()
 
