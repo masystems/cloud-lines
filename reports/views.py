@@ -88,15 +88,14 @@ def census(request, type):
             # Sheet body, remaining rows
             font_style = xlwt.XFStyle()
 
-            pedigrees = []
             if form:
                 if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
-                    for breed in Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]):
-                        pedigrees = pedigrees + list(Pedigree.objects.filter(account=attached_service,
+                    breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+                    pedigrees = Pedigree.objects.filter(account=attached_service,
                                                         current_owner=breeder,
                                                         date_of_registration__range=[start_date, end_date],
                                                         status='alive',
-                                                        breed=breed))
+                                                        breed__in=breeds)
                 else:
                     pedigrees = Pedigree.objects.filter(account=attached_service,
                                                         current_owner=breeder,
@@ -104,9 +103,9 @@ def census(request, type):
                                                         status='alive')
             else:
                 if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
-                    for breed in Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]):
-                        pedigrees = pedigrees + list(Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive',
-                                                                            breed=breed))
+                    breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+                    pedigrees = Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive',
+                                                                            breed__in=breeds)
                 else:
                     pedigrees = Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive')
             for pedigree in pedigrees:
