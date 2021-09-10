@@ -139,12 +139,24 @@ def census(request, type):
         context = {}
         attached_service = get_main_account(request.user)
         context['breeders'] = Breeder.objects.filter(account=attached_service, active=True)
+        context['pedigrees'] = []
         if form:
-            context['pedigrees'] = Pedigree.objects.filter(account=attached_service,
-                                                           status='alive',
-                                                           date_of_registration__range=[start_date, end_date],)
+            if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
+                breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+                context['pedigrees'] = Pedigree.objects.filter(account=attached_service,
+                                                    status='alive',
+                                                    date_of_registration__range=[start_date, end_date],
+                                                    breed__in=breeds)
+            else:
+                context['pedigrees'] = Pedigree.objects.filter(account=attached_service,
+                                                        status='alive',
+                                                        date_of_registration__range=[start_date, end_date],)
         else:
-            context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive')
+            if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
+                breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+                context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive', breed__in=breeds)
+            else:
+                context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive')
 
         pdf = render_to_pdf('census.html', context)
         response = HttpResponse(pdf, content_type='application/pdf')
