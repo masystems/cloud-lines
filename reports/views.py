@@ -7,6 +7,7 @@ from io import BytesIO
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from breeder.models import Breeder
 from pedigree.models import Pedigree
+from breed.models import Breed
 from xhtml2pdf import pisa
 from datetime import datetime
 import xlwt
@@ -88,12 +89,25 @@ def census(request, type):
             font_style = xlwt.XFStyle()
 
             if form:
-                pedigrees = Pedigree.objects.filter(account=attached_service,
-                                                    current_owner=breeder,
-                                                    date_of_registration__range=[start_date, end_date],
-                                                    status='alive')
+                if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
+                    breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+                    pedigrees = Pedigree.objects.filter(account=attached_service,
+                                                        current_owner=breeder,
+                                                        date_of_registration__range=[start_date, end_date],
+                                                        status='alive',
+                                                        breed__in=breeds)
+                else:
+                    pedigrees = Pedigree.objects.filter(account=attached_service,
+                                                        current_owner=breeder,
+                                                        date_of_registration__range=[start_date, end_date],
+                                                        status='alive')
             else:
-                pedigrees = Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive')
+                if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
+                    breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+                    pedigrees = Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive',
+                                                                            breed__in=breeds)
+                else:
+                    pedigrees = Pedigree.objects.filter(account=attached_service, current_owner=breeder, status='alive')
             for pedigree in pedigrees:
                 row_num = row_num + 1
                 try:
@@ -124,12 +138,24 @@ def census(request, type):
         context = {}
         attached_service = get_main_account(request.user)
         context['breeders'] = Breeder.objects.filter(account=attached_service, active=True)
+        context['pedigrees'] = []
         if form:
-            context['pedigrees'] = Pedigree.objects.filter(account=attached_service,
-                                                           status='alive',
-                                                           date_of_registration__range=[start_date, end_date],)
+            if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
+                breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+                context['pedigrees'] = Pedigree.objects.filter(account=attached_service,
+                                                    status='alive',
+                                                    date_of_registration__range=[start_date, end_date],
+                                                    breed__in=breeds)
+            else:
+                context['pedigrees'] = Pedigree.objects.filter(account=attached_service,
+                                                        status='alive',
+                                                        date_of_registration__range=[start_date, end_date],)
         else:
-            context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive')
+            if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
+                breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+                context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive', breed__in=breeds)
+            else:
+                context['pedigrees'] = Pedigree.objects.filter(account=attached_service, status='alive')
 
         pdf = render_to_pdf('census.html', context)
         response = HttpResponse(pdf, content_type='application/pdf')
@@ -207,7 +233,13 @@ def all(request, type):
         for col_num in range(len(columns)):
             worksheet.write(row_num, col_num, columns[col_num], font_style_header)
 
-        for pedigree in Pedigree.objects.filter(account=attached_service, status__icontains='alive'):
+        # get breeds editable if user is breed admin
+        if Breed.objects.filter(account=attached_service, breed_admins__in=[request.user]).exists():
+            breeds = Breed.objects.filter(account=attached_service, breed_admins__in=[request.user])
+        else:
+            breeds = Breed.objects.filter(account=attached_service)
+
+        for pedigree in Pedigree.objects.filter(account=attached_service, status__icontains='alive', breed__in=breeds):
             # Sheet body, remaining rows
             font_style = xlwt.XFStyle()
 
