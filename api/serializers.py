@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from cloud_lines.models import LargeTierQueue
+from reports.models import ReportQueue
 from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
@@ -29,6 +30,12 @@ class ApiLargeTierQueueSerializer(serializers.ModelSerializer):
                   'animal_type',
                   'user_data',
                   'services_data')
+
+
+class ApiReportQueueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportQueue
+        fields = '__all__'
 
 
 class ApiAttachedServiceSerializer(serializers.ModelSerializer):
@@ -69,7 +76,9 @@ class ApiPedigreeSerializer(serializers.ModelSerializer):
                   "parent_mother",
                   "breed",
                   "parent_father_reg_no",
+                  "parent_father_name",
                   "parent_mother_reg_no",
+                  "parent_mother_name",
                   "breeder_breeding_prefix",
                   "current_owner_breeding_prefix",
                   "breed_breed_name")
