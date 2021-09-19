@@ -22,10 +22,10 @@ import requests
 def export(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -65,11 +65,11 @@ def export_results_complete(request):
         item = stud_item[0]
         # check if item is complete
         tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
-        export_file = requests.get(urllib.parse.urljoin(tld, f"exports/{item.file_name}.zip"))
+        export_file = requests.get(urllib.parse.urljoin(tld, f"exports/{item.file_name}.csv"))
         # set item to complete if it's true
         if export_file.status_code == 200:
             item.complete = True
-            item.download_url = urllib.parse.urljoin(tld, f"exports/{item.file_name}.zip")
+            item.download_url = urllib.parse.urljoin(tld, f"exports/{item.file_name}.csv")
             item.save()
 
         return HttpResponse(dumps({'result': 'success',
@@ -84,10 +84,10 @@ def export_results_complete(request):
 def importx(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -146,7 +146,7 @@ def importx(request):
 def import_data(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
@@ -206,7 +206,7 @@ def import_pedigree_data(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -1172,7 +1172,7 @@ def import_breeder_data(request):
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()

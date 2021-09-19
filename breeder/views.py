@@ -14,15 +14,16 @@ import json
 
 @login_required(login_url="/account/login")
 def breeder(request, breeder_id):
+    attached_service = get_main_account(request.user)
+    breeder = Breeder.objects.get(account=attached_service, id=breeder_id)
+    
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': 'breeder', 'contrib': 'breeder', 'admin': True, 'breed_admin': True}, breeder_users=[breeder.user]):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
-
-    attached_service = get_main_account(request.user)
-    breeder = Breeder.objects.get(account=attached_service, id=breeder_id)
+    
     columns, column_data = get_site_pedigree_column_headings(attached_service)
     breeder_pedigrees = Pedigree.objects.filter(account=attached_service, breeder__breeding_prefix__exact=breeder).exclude(
                 state='unapproved').values('id', *columns)[:500]
@@ -93,10 +94,10 @@ def breeder_csv(request):
 def new_breeder_form(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
@@ -150,18 +151,21 @@ def new_breeder_form(request):
 
 @login_required(login_url="/account/login")
 def edit_breeder_form(request, breeder_id):
+    attached_service = get_main_account(request.user)
+    breeder = get_object_or_404(Breeder, id=breeder_id, account=attached_service)
+    
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
+                                        breeder_users=[breeder.user]):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}, []):
+        if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
+                                        breeder_users=[breeder.user]):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
     
-    attached_service = get_main_account(request.user)
-    breeder = get_object_or_404(Breeder, id=breeder_id, account=attached_service)
     breeder_form = BreederForm(request.POST or None, request.FILES or None, instance=breeder)
 
     try:

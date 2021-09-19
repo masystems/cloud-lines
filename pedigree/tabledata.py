@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.serializers import serialize
 from django.db.models import Q
 from .models import Pedigree
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission
 from .functions import get_site_pedigree_column_headings
 from json import dumps
 from django.urls import reverse
@@ -103,16 +103,21 @@ def get_pedigrees(request):
             href = ''
             disabled = ''
 
-            if pedigree.breed:
-                if len(breeds_editable) == 0 or pedigree.breed.breed_name in breeds_editable:
-                    href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
-                else:
-                    disabled = 'disabled'
+            # check whether they have permission to access pedigree view page
+            breeder_users = []
+            if pedigree.breeder:
+                if pedigree.breeder.user:
+                    breeder_users.append(pedigree.breeder.user)
+            if pedigree.current_owner:
+                if pedigree.current_owner.user:
+                    breeder_users.append(pedigree.current_owner.user)
+
+            if has_permission(request, {'read_only': 'breeder', 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                        pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
+                href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
             else:
-                if len(breeds_editable) == 0:
-                    href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
-                else:
-                    disabled = 'disabled'
+                disabled = 'disabled'
 
             row = {}
             row['action'] = f"""<a {href}><button class='btn btn-info' {disabled}>View</button></a>"""

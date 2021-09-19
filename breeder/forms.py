@@ -7,7 +7,7 @@ class BreederForm(forms.ModelForm):
     class Meta:
         model = Breeder
         fields = '__all__'
-        exclude = ('account',)
+        exclude = ('account', 'user')
         help_texts = {
             'breeding_prefix': _('The name the breeder goes by e.g. Devon Dogs'),
             'contact_name': _('Point of contact for the breeder'),

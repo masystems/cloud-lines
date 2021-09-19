@@ -69,7 +69,7 @@
                                 </div>
                             </div>
                             <div class="col-md-2">
-                                <button id="ksBtn" class="btn btn-info mt-2" name='Submit' type="button" >Calculate Kinship</button>
+                                <button id="ksBtn" class="btn btn-info mt-2" name='Submit' type="button" {% if read_only %}disabled{% endif %}>Calculate Kinship</button>
                             </div>
                         </div>
                         <div class="row">
@@ -157,7 +157,7 @@
 
                     <h4 class="card-title">Calculations</h4>
                     <p id="coiTimer" class="text-center"></p>
-                    {% if not read_only %}
+                    {% if not read_only and not contributor %}
                         {% if breeds.all.count == 1 %}
                             <button id="coiBtn" onclick="runCoi(this)" type="button" class="btn btn-block btn-success ml-1" value="{{ breeds.first.id }}">Run COI</button>
                         {% elif breeds.all.count > 1 %}
@@ -178,7 +178,7 @@
                     {% endif %}
                     <hr>
                     <p id="meanKinshipTimer" class="text-center"></p>
-                    {% if not read_only %}
+                    {% if not read_only and not contributor %}
                         {% if breeds.all.count == 1 %}
                             <button id="meanKinshipBtn" onclick="runMK(this)" type="button" class="btn btn-block btn-success ml-1" value="{{ breeds.first.id }}">Run Mean Kinship</button>
                         {% elif breeds.all.count > 1 %}
@@ -357,7 +357,7 @@
                                     </a> </td>
                                 {% else %}
                                     <td class="results"><a href="{% url 'stud_advisor_results' item.id %}">
-                                        <button class="btn btn-info" {% if not item.complete or not editor and item.mother.breed.breed_name not in breeds_editable and not contributor %}disabled{% endif %}>View</button> </a> </td>
+                                        <button class="btn btn-info" {% if item.complete and editor or item.complete and item.mother.breed.breed_name in breeds_editable or item.complete and item.mother.current_owner.user == request.user and contributor or item.complete and item.mother.current_owner.user == request.user and read_only_user %}{% else %}disabled{% endif %}>View</button> </a> </td>
                                 {% endif %}
                             </tr>
                         {% endfor %}
@@ -404,11 +404,18 @@
                 // am pm
                 var hours = dt.getHours();
                 var ampm = hours >= 12 ? ' p.m.' : ' a.m.';
+                // convert hours to 12 hour time equivalent
+                if (hours == 0) {
+                    hours = 12
+                }
+                else if (hours > 12) {
+                    hours -= 12
+                }
                 // create time string
                 var datetime = dt.getDate() + " "
-                + (month[dt.getMonth()+1])  + " "
+                + (month[dt.getMonth()])  + " "
                 + dt.getFullYear() + ", "
-                + dt.getHours() + ":"
+                + hours + ":"
                 + dt.getMinutes() + ampm;
 
                 // set time string with seconds
@@ -475,11 +482,18 @@
                 // am pm
                 var hours = dt.getHours();
                 var ampm = hours >= 12 ? ' p.m.' : ' a.m.';
+                // convert hours to 12 hour time equivalent
+                if (hours == 0) {
+                    hours = 12
+                }
+                else if (hours > 12) {
+                    hours -= 12
+                }
                 // create time string
                 var datetime = dt.getDate() + " "
-                + (month[dt.getMonth()+1])  + " "
+                + (month[dt.getMonth()])  + " "
                 + dt.getFullYear() + ", "
-                + dt.getHours() + ":"
+                + hours + ":"
                 + dt.getMinutes() + ampm;
 
                 // set time string with seconds

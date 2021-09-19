@@ -65,6 +65,10 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
         except ObjectDoesNotExist:
             context['custom_fields'] = {}
 
+        context['breeder'] = False
+        if Breeder.objects.filter(account=context['attached_service'], user=self.request.user).exists():
+            context['breeder'] = True
+
         context = generate_hirearchy(context)
 
         return context
@@ -75,9 +79,18 @@ class ShowPedigree(PedigreeBase):
 
     def dispatch(self, request, *args, **kwargs):
         # check permission
+        # get breeder_users of pedigree
+        breeder_users = []
+        if super().get_context_data(**kwargs)['lvl1'].breeder:
+            if super().get_context_data(**kwargs)['lvl1'].breeder.user:
+                breeder_users.append(super().get_context_data(**kwargs)['lvl1'].breeder.user)
+        if super().get_context_data(**kwargs)['lvl1'].current_owner:
+            if super().get_context_data(**kwargs)['lvl1'].current_owner.user:
+                breeder_users.append(super().get_context_data(**kwargs)['lvl1'].current_owner.user)
         if self.request.method == 'GET':
-            if not has_permission(self.request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
-                                        [super().get_context_data(**kwargs)['lvl1']]):
+            if not has_permission(self.request, {'read_only': 'breeder', 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                        pedigrees=[super().get_context_data(**kwargs)['lvl1']],
+                                        breeder_users=breeder_users):
                 return redirect_2_login(self.request)
         else:
             raise PermissionDenied()
@@ -104,8 +117,18 @@ class GeneratePDF(View):
     def dispatch(self, request, *args, **kwargs):
         # check permission
         if self.request.method == 'GET':
-            if not has_permission(self.request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'},
-                                        [Pedigree.objects.get(id=self.kwargs['pedigree_id'])]):
+            pedigree = Pedigree.objects.get(id=self.kwargs['pedigree_id'])
+            # get breeder_users of pedigree
+            breeder_users = []
+            if pedigree.breeder:
+                if pedigree.breeder.user:
+                    breeder_users.append(pedigree.breeder.user)
+            if pedigree.current_owner:
+                if pedigree.current_owner.user:
+                    breeder_users.append(pedigree.current_owner.user)
+            if not has_permission(self.request, {'read_only': 'breeder', 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'},
+                                        pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
                 return redirect_2_login(self.request)
         else:
             raise PermissionDenied()
@@ -320,20 +343,28 @@ def search_results(request):
 @login_required(login_url="/account/login")
 @never_cache
 def new_pedigree_form(request):
-    # check if user has permission, passing in ids of mother and father from kinship queue item
-    if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
-            return redirect_2_login(request)
-    elif request.method == 'POST':
-        # particular breed checked below
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}, []):
-            return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
-    else:
-        raise PermissionDenied()
-    
     pedigree_form = PedigreeForm(request.POST or None, request.FILES or None)
     pre_checks = True
     attached_service = get_main_account(request.user)
+    
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        # (particular breed checked below)
+        # specify breeder to validate user is breeder
+        if Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists():
+            if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
+                                            breeder_users=[Breeder.objects.get(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).user]):
+                return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
+        # if breeder doesn't exist, allow contribs on through as that error will be handled later
+        else:
+            if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+                return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
+    else:
+        raise PermissionDenied()
+    
     try:
         custom_fields = json.loads(attached_service.custom_fields)
     except json.decoder.JSONDecodeError:
@@ -518,12 +549,19 @@ def edit_pedigree_form(request, id):
     pedigree = Pedigree.objects.get(account=attached_service, id__exact=int(id))
 
     # check if user has permission
+    # get breeder users
+    breeder_users = []
+    if pedigree.current_owner:
+        if pedigree.current_owner.user:
+            breeder_users.append(pedigree.current_owner.user)
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
             return redirect_2_login(request)
     elif request.method == 'POST':
         # particular breed checked below
-        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
+        if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'}, pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
             return HttpResponse(json.dumps({'result': 'fail', 'errors': {'field_errors': [],'non_field_errors': ['You do not have permission!']}}))
     else:
         raise PermissionDenied()
@@ -767,11 +805,17 @@ def add_existing(request, pedigree_id):
     pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
 
     # check if user has permission (should just be post)
+    breeder_users = []
+    if pedigree.current_owner:
+        if pedigree.current_owner.user:
+            breeder_users.append(pedigree.current_owner.user)
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
-            raise PermissionDenied()
+        if not has_permission(request, {'read_only': False, 'contrib': 'breed', 'admin': True, 'breed_admin': 'breed'}, 
+                                        pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
+            return HttpResponse(json.dumps({'fail': True, 'msg': 'You do not have permission!'}))
     else:
         raise PermissionDenied()
 
@@ -806,11 +850,17 @@ def add_existing_parent(request, pedigree_id):
     pedigree = Pedigree.objects.get(account=attached_service, id=pedigree_id)
 
     # check if user has permission (should just be post)
+    breeder_users = []
+    if pedigree.breeder:
+        if pedigree.breeder.user:
+            breeder_users.append(pedigree.breeder.user)
     if request.method == 'GET':
         return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': 'breed'}, [pedigree]):
-            raise PermissionDenied()
+        if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': 'breed'}, 
+                                        pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
+            return HttpResponse(json.dumps({'fail': True, 'msg': 'You do not have permission!'}))
     else:
         raise PermissionDenied()
 

@@ -101,7 +101,7 @@
                                 <form action="{% url 'import_pedigree_data' %}" method="POST" enctype="multipart/form-data" id="pedigrees-form">
                                     {% csrf_token %}
                                     {% for pedigree_heading in pedigree_headings %}
-                                        {% if pedigree_heading.verbose_name != None %}
+                                        {% if pedigree_heading.verbose_name != None and pedigree_heading.verbose_name != 'COI' and pedigree_heading.verbose_name != 'Mean Kinship' %}
                                             <div class="row mx-lg-n5">
                                                 <div class="col bg-light border">
                                                     <p class="mt-2"><strong>{{ pedigree_heading.verbose_name|title }}</strong></p>

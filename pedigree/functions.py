@@ -3,7 +3,7 @@ from .models import Pedigree
 
 def get_pedigree_column_headings():
     # get pedigree model headings
-    forbidden_pedigree_fields = ['id', 'creator', 'account', 'date_added', 'state', 'breed_group', 'custom_fields', 'mean_kinship', 'coi']
+    forbidden_pedigree_fields = ['id', 'creator', 'account', 'date_added', 'state', 'breed_group', 'custom_fields']
     return [field for field in Pedigree._meta.get_fields(include_parents=False, include_hidden=False) if
                          field.name not in forbidden_pedigree_fields]
 
