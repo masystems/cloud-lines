@@ -65,7 +65,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="pedigree_table" class="table table-striped table-bordered display no-wrap new-text-inputs-searching" style="width:100%">
+                        <table id="pedigree_table" class="table table-striped table-bordered display no-wrap" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>Action</th>
@@ -103,27 +103,23 @@
 
     <!--This page plugins -->
     <script src="{% static 'dist/js/pages/datatable/custom-datatable.js' %}"></script>
-    <script src="{% static 'dist/js/pages/datatable/datatable-api.init.js' %}"></script>
 
     <script src="{% static 'assets/libs/datatables/media/js/jquery.dataTables.min.js' %}"></script>
     
     <script>
         // Setup - add a text input to each footer cell
-        $('.new-text-inputs-searching tfoot th').each(function() {
-            var title = $(this).text();
-            if ($(this).text() != 'Action'){
-                $(this).html('<input type="text" placeholder="Search ' + title + '" />');
-            }
-            else {
-                $(this).html('')
-            }
-        });
-        
+        $('#pedigree_table thead tr')
+            .clone(true)
+            .addClass('filters')
+            .appendTo('#pedigree_table thead');
+
         var pedigree_table = $('#pedigree_table').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "responsive": true,
-            "scrollX": true,
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            scrollX: true,
+            orderCellsTop: true,
+            fixedHeader: true,
             stateSave: true,
             "ajax": {
                 url: "{% url 'get_pedigrees' %}",
@@ -147,17 +143,48 @@
             initComplete: function() {
                 var api = this.api();
 
-                // Apply the search
-                api.columns().every(function() {
-                    var that = this;
+                // For each column
+                api
+                .columns()
+                .eq(0)
+                .each(function (colIdx) {
+                    // Set the header cell to contain the input element
+                    var cell = $('.filters th').eq(
+                        $(api.column(colIdx).header()).index()
+                    );
+                    var title = $(cell).text();
+                    $(cell).html('<input type="text" placeholder="' + title + '" />');
 
-                    $('input', this.footer()).on('keyup change', function() {
-                        if (that.search() !== this.value) {
-                            that
-                            .search(this.value)
-                            .draw();
-                        }
-                    });
+                    // On every keypress in this input
+                    $(
+                        'input',
+                        $('.filters th').eq($(api.column(colIdx).header()).index())
+                    )
+                        .off('keyup change')
+                        .on('keyup change', function (e) {
+                            e.stopPropagation();
+
+                            // Get the search value
+                            $(this).attr('title', $(this).val());
+                            var regexr = '({search})'; //$(this).parents('th').find('select').val();
+
+                            var cursorPosition = this.selectionStart;
+                            // Search the column for that value
+                            api
+                                .column(colIdx)
+                                .search(
+                                    this.value != ''
+                                        ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                        : '',
+                                    this.value != '',
+                                    this.value == ''
+                                )
+                                .draw();
+
+                            $(this)
+                                .focus()[0]
+                                .setSelectionRange(cursorPosition, cursorPosition);
+                        });
                 });
             }
         });
