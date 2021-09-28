@@ -78,18 +78,6 @@
                                     {% endfor %}
                                 </tr>
                             </thead>
-                            <tfoot>
-                                <tr>
-                                    <th>Action</th>
-                                    {% for col in columns %}
-                                        {% for ped_col, data in column_data.items %}
-                                            {% if col == data.db_id %}
-                                                <th>{{ data.name }}</th>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -107,7 +95,7 @@
     <script src="{% static 'assets/libs/datatables/media/js/jquery.dataTables.min.js' %}"></script>
 
     <script>
-        // Setup - add a text input to each footer cell
+        // Setup - add a text input to each header cell
         $('#pedigree_table thead tr')
             .clone(true)
             .addClass('filters')
