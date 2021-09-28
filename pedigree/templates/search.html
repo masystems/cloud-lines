@@ -82,7 +82,7 @@
                                     {% for col in columns %}
                                         {% for ped_col, data in column_data.items %}
                                             {% if col == data.db_id %}
-                                                <th>{{ data.name }}</th>
+                                                <th><input type="text" placeholder="Search {{ data.name }}" /></th>
                                             {% endif %}
                                         {% endfor %}
                                     {% endfor %}
@@ -140,14 +140,14 @@
                 .columns()
                 .eq(0)
                 .each(function (colIdx) {
-                    // Set the header cell to contain the input element
-                    var cell = $('.filters th').eq(
-                        $(api.column(colIdx).header()).index()
-                    );
-                    var title = $(cell).text();
-                    if (title != '') {
-                        $(cell).html('<input type="text" placeholder="Search ' + title + '" />');
-                    }
+                    // // Set the header cell to contain the input element
+                    // var cell = $('.filters th').eq(
+                    //     $(api.column(colIdx).header()).index()
+                    // );
+                    // var title = $(cell).text();
+                    // if (title != '') {
+                    //     $(cell).html('<input type="text" placeholder="Search ' + title + '" />');
+                    // }
 
                     // On every keypress in this input
                     $(
