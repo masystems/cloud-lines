@@ -160,7 +160,7 @@
 
                             // Get the search value
                             $(this).attr('title', $(this).val());
-                            var regexr = '({search})'; //$(this).parents('th').find('select').val();
+                            var regexr = '{search}'; //$(this).parents('th').find('select').val();
 
                             var cursorPosition = this.selectionStart;
                             // Search the column for that value
@@ -168,7 +168,7 @@
                                 .column(colIdx)
                                 .search(
                                     this.value != ''
-                                        ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                        ? regexr.replace('{search}', this.value)
                                         : '',
                                     this.value != '',
                                     this.value == ''
