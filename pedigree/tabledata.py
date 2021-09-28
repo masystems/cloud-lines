@@ -12,6 +12,7 @@ from .views import update_pedigree_cf
 
 @login_required(login_url='/accounts/login/')
 def get_pedigrees(request):
+    print(request.POST)
     attached_service = get_main_account(request.user)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
     start = int(request.POST.get('start', 0))
