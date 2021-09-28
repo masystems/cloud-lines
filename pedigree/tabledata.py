@@ -18,7 +18,7 @@ def get_pedigrees(request):
     end = int(request.POST.get('length', 20))
     search = request.POST.get('search[value]', "")
     sort_by = request.POST.get(f'columns[{request.POST.get("order[0][column]")}][data]')
-
+    print(request.POST)
     # desc or asc
     if request.POST.get('order[0][dir]') == 'asc':
         direction = ""
