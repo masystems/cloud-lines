@@ -77,6 +77,16 @@
                                         {% endfor %}
                                     {% endfor %}
                                 </tr>
+                                <tr class='filters'>
+                                    <th></th>
+                                    {% for col in columns %}
+                                        {% for ped_col, data in column_data.items %}
+                                            {% if col == data.db_id %}
+                                                <th>{{ data.name }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
                             </thead>
                         </table>
                     </div>
@@ -95,12 +105,6 @@
     <script src="{% static 'assets/libs/datatables/media/js/jquery.dataTables.min.js' %}"></script>
 
     <script>
-        // Setup - add a text input to each header cell
-        $('#pedigree_table thead tr')
-            .clone(true)
-            .addClass('filters')
-            .appendTo('#pedigree_table thead');
-
         var pedigree_table = $('#pedigree_table').DataTable({
             processing: true,
             serverSide: true,
@@ -141,7 +145,9 @@
                         $(api.column(colIdx).header()).index()
                     );
                     var title = $(cell).text();
-                    $(cell).html('<input type="text" placeholder="' + title + '" />');
+                    if (title != '') {
+                        $(cell).html('<input type="text" placeholder="Search ' + title + '" />');
+                    }
 
                     // On every keypress in this input
                     $(
