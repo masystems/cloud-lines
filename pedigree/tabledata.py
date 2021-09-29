@@ -75,6 +75,11 @@ def get_pedigrees(request):
     else:
         father_search = ''
     # parent_father_notes_search
+    if 'parent_father_notes' in attached_service.pedigree_columns:
+        father_notes_index = int(attached_service.pedigree_columns.split(',').index('parent_father_notes')) + 1
+        father_notes_search = request.POST.get(f'columns[{father_notes_index}][search][value]')
+    else:
+        father_notes_search = ''
     # parent_mother_search
     if 'parent_mother' in attached_service.pedigree_columns:
         mother_index = int(attached_service.pedigree_columns.split(',').index('parent_mother')) + 1
@@ -82,8 +87,19 @@ def get_pedigrees(request):
     else:
         mother_search = ''
     # parent_mother_notes_search
+    if 'parent_mother_notes' in attached_service.pedigree_columns:
+        mother_notes_index = int(attached_service.pedigree_columns.split(',').index('parent_mother_notes')) + 1
+        mother_notes_search = request.POST.get(f'columns[{mother_notes_index}][search][value]')
+    else:
+        mother_notes_search = ''
     # breed_group_search
     # breed_search
+    print(attached_service.pedigree_columns)
+    if 'breed' in attached_service.pedigree_columns:
+        breed_index = int(attached_service.pedigree_columns.split(',').index('breed')) + 1
+        breed_search = request.POST.get(f'columns[{breed_index}][search][value]')
+    else:
+        breed_search = ''
     # coi_search
     # mean_kinship_search
 
@@ -100,12 +116,12 @@ def get_pedigrees(request):
         else:
             sort_by_col = f"-reg_no"
 
-    # make an int if possible to filter for litter size
-    search_int = ''
-    try:
-        search_int = int(search)
-    except ValueError:
-        pass
+    # # make an int if possible to filter for litter size
+    # search_int = ''
+    # try:
+    #     search_int = int(search)
+    # except ValueError:
+    #     pass
 
     # get breeds editable (length is 0 if they're not a breed admin)
     breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
@@ -113,7 +129,7 @@ def get_pedigrees(request):
         breeds_editable.remove('')
 
     pedigrees = []
-    if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "" and  desc_search == "" and  status_search == "" and  sex_search == "" and  litter_search == "" and father_search == "" and mother_search == "":
+    if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "" and  desc_search == "" and  status_search == "" and  sex_search == "" and  litter_search == "" and father_search == "" and father_notes_search == "" and mother_search == "" and mother_notes_search == "" and breed_search == "":
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
                             start:start + end]
     else:
@@ -145,10 +161,10 @@ def get_pedigrees(request):
                 sex__icontains=sex_search,
                 litter_size__icontains=litter_search,
                 parent_father__reg_no__icontains=father_search,
-                # parent_father_notes__icontains=father_notes_search,
+                parent_father_notes__icontains=father_notes_search,
                 parent_mother__reg_no__icontains=mother_search,
-                # parent_mother_notes__icontains=mother_notes_search,
-                # breed__breed_name__icontains=breed_search,
+                parent_mother_notes__icontains=mother_notes_search,
+                breed__breed_name__icontains=breed_search,
                 account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
         elif father_search:
             all_pedigrees = Pedigree.objects.filter(
@@ -177,9 +193,9 @@ def get_pedigrees(request):
                 sex__icontains=sex_search,
                 litter_size__icontains=litter_search,
                 parent_father__reg_no__icontains=father_search,
-                # parent_father_notes__icontains=father_notes_search,
-                # parent_mother_notes__icontains=mother_notes_search,
-                # breed__breed_name__icontains=breed_search,
+                parent_father_notes__icontains=father_notes_search,
+                parent_mother_notes__icontains=mother_notes_search,
+                breed__breed_name__icontains=breed_search,
                 account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
         elif mother_search:
             all_pedigrees = Pedigree.objects.filter(
@@ -208,10 +224,10 @@ def get_pedigrees(request):
                 status__icontains=status_search,
                 sex__icontains=sex_search,
                 litter_size__icontains=litter_search,
-                # parent_father_notes__icontains=father_notes_search,
+                parent_father_notes__icontains=father_notes_search,
                 parent_mother__reg_no__icontains=mother_search,
-                # parent_mother_notes__icontains=mother_notes_search,
-                # breed__breed_name__icontains=breed_search,
+                parent_mother_notes__icontains=mother_notes_search,
+                breed__breed_name__icontains=breed_search,
                 account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
         else:
             all_pedigrees = Pedigree.objects.filter(
@@ -239,11 +255,11 @@ def get_pedigrees(request):
                 status__icontains=status_search,
                 sex__icontains=sex_search,
                 litter_size__icontains=litter_search,
-                # parent_father_notes__icontains=father_notes_search,
-                # parent_mother_notes__icontains=mother_notes_search,
-                # breed__breed_name__icontains=breed_search,
+                parent_father_notes__icontains=father_notes_search,
+                parent_mother_notes__icontains=mother_notes_search,
+                breed__breed_name__icontains=breed_search,
                 account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
-    if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "" and  desc_search == "" and  status_search == "" and  sex_search == "" and  litter_search == "" and father_search == "" and mother_search == "":
+    if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "" and  desc_search == "" and  status_search == "" and  sex_search == "" and  litter_search == "" and father_search == "" and father_notes_search == "" and mother_search == "" and mother_notes_search == "" and breed_search == "":
         total_pedigrees = Pedigree.objects.filter(account=attached_service).distinct().count()
     else:
         if father_search and mother_search:
@@ -277,10 +293,10 @@ def get_pedigrees(request):
                 sex__icontains=sex_search,
                 litter_size__icontains=litter_search,
                 parent_father__reg_no__icontains=father_search,
-                # parent_father_notes__icontains=father_notes_search,
+                parent_father_notes__icontains=father_notes_search,
                 parent_mother__reg_no__icontains=mother_search,
-                # parent_mother_notes__icontains=mother_notes_search,
-                # breed__breed_name__icontains=breed_search,
+                parent_mother_notes__icontains=mother_notes_search,
+                breed__breed_name__icontains=breed_search,
                 # coi__icontains=coi_search,
                 # mean_kinship__icontains=mk_search,
                 account=attached_service).order_by(
@@ -316,9 +332,9 @@ def get_pedigrees(request):
                 sex__icontains=sex_search,
                 litter_size__icontains=litter_search,
                 parent_father__reg_no__icontains=father_search,
-                # parent_father_notes__icontains=father_notes_search,
-                # parent_mother_notes__icontains=mother_notes_search,
-                # breed__breed_name__icontains=breed_search,
+                parent_father_notes__icontains=father_notes_search,
+                parent_mother_notes__icontains=mother_notes_search,
+                breed__breed_name__icontains=breed_search,
                 # coi__icontains=coi_search,
                 # mean_kinship__icontains=mk_search,
                 account=attached_service).order_by(
@@ -353,10 +369,10 @@ def get_pedigrees(request):
                 status__icontains=status_search,
                 sex__icontains=sex_search,
                 litter_size__icontains=litter_search,
-                # parent_father_notes__icontains=father_notes_search,
+                parent_father_notes__icontains=father_notes_search,
                 parent_mother__reg_no__icontains=mother_search,
-                # parent_mother_notes__icontains=mother_notes_search,
-                # breed__breed_name__icontains=breed_search,
+                parent_mother_notes__icontains=mother_notes_search,
+                breed__breed_name__icontains=breed_search,
                 # coi__icontains=coi_search,
                 # mean_kinship__icontains=mk_search,
                 account=attached_service).order_by(
@@ -390,9 +406,9 @@ def get_pedigrees(request):
                 status__icontains=status_search,
                 sex__icontains=sex_search,
                 litter_size__icontains=litter_search,
-                # parent_father_notes__icontains=father_notes_search,
-                # parent_mother_notes__icontains=mother_notes_search,
-                # breed__breed_name__icontains=breed_search,
+                parent_father_notes__icontains=father_notes_search,
+                parent_mother_notes__icontains=mother_notes_search,
+                breed__breed_name__icontains=breed_search,
                 # coi__icontains=coi_search,
                 # mean_kinship__icontains=mk_search,
                 account=attached_service).order_by(
