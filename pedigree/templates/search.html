@@ -149,6 +149,9 @@
                     //     $(cell).html('<input type="text" placeholder="Search ' + title + '" />');
                     // }
 
+                    // make sure filter inputs haven't forgotten values after refresh
+                    $('input', $('.filters th').eq($(api.column(colIdx).header()).index())).val(api.column(colIdx).search())
+
                     // On every keypress in this input
                     $(
                         'input',

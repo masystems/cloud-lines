@@ -12,25 +12,24 @@ from .views import update_pedigree_cf
 
 @login_required(login_url='/accounts/login/')
 def get_pedigrees(request):
-    print(request.POST)
     attached_service = get_main_account(request.user)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
     start = int(request.POST.get('start', 0))
     end = int(request.POST.get('length', 20))
     search = request.POST.get('search[value]', "")
     sort_by = request.POST.get(f'columns[{request.POST.get("order[0][column]")}][data]')
-    
-    # get each column search input
-    post_keys = list(dict(request.POST).keys())
-    post_values = list(dict(request.POST).values())
 
-    if ['reg_no'] in post_values:
-        reg_no_search = request.POST.get(post_keys[post_values.index(['reg_no'])])# use the index in here to find {x}
-        reg_no_search = request.POST.get(f'columns[{x}][search][value]')
+    # get the values of the column search fields
+    if 'reg_no' in attached_service.pedigree_columns:
+        reg_no_index = int(attached_service.pedigree_columns.split(',').index('reg_no')) + 1
+        reg_no_search = request.POST.get(f'columns[{reg_no_index}][search][value]')
     else:
         reg_no_search = ''
-    print(reg_no_search)
-    # tag_no_search
+    # if 'tag_no' in attached_service.pedigree_columns:
+    #     tag_no_index = int(attached_service.pedigree_columns.split(',').index('tag_no')) + 1
+    #     tag_no_search = request.POST.get(f'columns[{tag_no_index}][search][value]')
+    # else:
+    #     tag_no_search = ''
     # name_search
     # description_search
     # date_of_registration_search
@@ -74,7 +73,7 @@ def get_pedigrees(request):
         breeds_editable.remove('')
 
     pedigrees = []
-    if search == "":
+    if search == "" and reg_no_search == "":
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
                             start:start + end]
     else:
@@ -97,9 +96,9 @@ def get_pedigrees(request):
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
             Q(mean_kinship__icontains=search),
-            #reg_no__icontains=request.POST.get('columns[2][search][value]'),
+            reg_no__icontains=reg_no_search,
             account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
-    if search == "":
+    if search == "" and reg_no_search == "":
         total_pedigrees = Pedigree.objects.filter(account=attached_service).distinct().count()
     else:
         total_pedigrees = Pedigree.objects.filter(
@@ -121,6 +120,7 @@ def get_pedigrees(request):
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
             Q(mean_kinship__icontains=search),
+            reg_no__icontains=reg_no_search,
             account=attached_service).order_by(
             sort_by_col).count()
 
