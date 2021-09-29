@@ -21,25 +21,25 @@ def get_pedigrees(request):
 
     # get the values of the column search fields
     # reg_no search
-    if 'reg_no' in attached_service.pedigree_columns:
+    if 'reg_no' in attached_service.pedigree_columns.split(','):
         reg_no_index = int(attached_service.pedigree_columns.split(',').index('reg_no')) + 1
         reg_no_search = request.POST.get(f'columns[{reg_no_index}][search][value]')
     else:
         reg_no_search = ''
     # tag_no search
-    if 'tag_no' in attached_service.pedigree_columns:
+    if 'tag_no' in attached_service.pedigree_columns.split(','):
         tag_no_index = int(attached_service.pedigree_columns.split(',').index('tag_no')) + 1
         tag_no_search = request.POST.get(f'columns[{tag_no_index}][search][value]')
     else:
         tag_no_search = ''
     # name_search
-    if 'name' in attached_service.pedigree_columns:
+    if 'name' in attached_service.pedigree_columns.split(','):
         name_index = int(attached_service.pedigree_columns.split(',').index('name')) + 1
         name_search = request.POST.get(f'columns[{name_index}][search][value]')
     else:
         name_search = ''
     # description_search
-    if 'description' in attached_service.pedigree_columns:
+    if 'description' in attached_service.pedigree_columns.split(','):
         desc_index = int(attached_service.pedigree_columns.split(',').index('description')) + 1
         desc_search = request.POST.get(f'columns[{desc_index}][search][value]')
     else:
@@ -48,19 +48,19 @@ def get_pedigrees(request):
     # dob_search
     # dod_search
     # status_search
-    if 'status' in attached_service.pedigree_columns:
+    if 'status' in attached_service.pedigree_columns.split(','):
         status_index = int(attached_service.pedigree_columns.split(',').index('status')) + 1
         status_search = request.POST.get(f'columns[{status_index}][search][value]')
     else:
         status_search = ''
     # sex_search
-    if 'sex' in attached_service.pedigree_columns:
+    if 'sex' in attached_service.pedigree_columns.split(','):
         sex_index = int(attached_service.pedigree_columns.split(',').index('sex')) + 1
         sex_search = request.POST.get(f'columns[{sex_index}][search][value]')
     else:
         sex_search = ''
     # litter_search
-    if 'litter_size' in attached_service.pedigree_columns:
+    if 'litter_size' in attached_service.pedigree_columns.split(','):
         litter_index = int(attached_service.pedigree_columns.split(',').index('litter_size')) + 1
         try:
             litter_search = int(request.POST.get(f'columns[{litter_index}][search][value]'))
@@ -69,33 +69,32 @@ def get_pedigrees(request):
     else:
         litter_search = ''
     # parent_father_search
-    if 'parent_father' in attached_service.pedigree_columns:
+    if 'parent_father' in attached_service.pedigree_columns.split(','):
         father_index = int(attached_service.pedigree_columns.split(',').index('parent_father')) + 1
         father_search = request.POST.get(f'columns[{father_index}][search][value]')
     else:
         father_search = ''
     # parent_father_notes_search
-    if 'parent_father_notes' in attached_service.pedigree_columns:
+    if 'parent_father_notes' in attached_service.pedigree_columns.split(','):
         father_notes_index = int(attached_service.pedigree_columns.split(',').index('parent_father_notes')) + 1
         father_notes_search = request.POST.get(f'columns[{father_notes_index}][search][value]')
     else:
         father_notes_search = ''
     # parent_mother_search
-    if 'parent_mother' in attached_service.pedigree_columns:
+    if 'parent_mother' in attached_service.pedigree_columns.split(','):
         mother_index = int(attached_service.pedigree_columns.split(',').index('parent_mother')) + 1
         mother_search = request.POST.get(f'columns[{mother_index}][search][value]')
     else:
         mother_search = ''
     # parent_mother_notes_search
-    if 'parent_mother_notes' in attached_service.pedigree_columns:
+    if 'parent_mother_notes' in attached_service.pedigree_columns.split(','):
         mother_notes_index = int(attached_service.pedigree_columns.split(',').index('parent_mother_notes')) + 1
         mother_notes_search = request.POST.get(f'columns[{mother_notes_index}][search][value]')
     else:
         mother_notes_search = ''
     # breed_group_search
     # breed_search
-    print(attached_service.pedigree_columns)
-    if 'breed' in attached_service.pedigree_columns:
+    if 'breed' in attached_service.pedigree_columns.split(','):
         breed_index = int(attached_service.pedigree_columns.split(',').index('breed')) + 1
         breed_search = request.POST.get(f'columns[{breed_index}][search][value]')
     else:
