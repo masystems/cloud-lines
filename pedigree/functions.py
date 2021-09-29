@@ -36,7 +36,7 @@ def get_site_pedigree_column_headings(atatched_service):
                                  'html': ''},
                         'description': {'db_id': 'description',
                                         'db_id_internal': 'description',
-                                        'name': 'Name',
+                                        'name': 'Description',
                                         'upper': False,
                                         'html': ''},
                         'date_of_registration': {'db_id': 'date_of_registration',
