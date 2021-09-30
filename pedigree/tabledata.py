@@ -139,7 +139,8 @@ def get_pedigrees(request):
     pedigrees = []
     
     # call the function to apply filters and return all pedigrees
-    all_pedigrees = get_all_pedigrees(attached_service, sort_by_col, start, end, reg_no_search=reg_no_search)
+    all_pedigrees = get_all_pedigrees(attached_service, sort_by_col, start, end, 
+                    reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search)
     
     if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "" and  desc_search == "" and  status_search == "" and  sex_search == "" and  litter_search == "" and father_search == "" and father_notes_search == "" and mother_search == "" and mother_notes_search == "" and breed_search == "":
         total_pedigrees = Pedigree.objects.filter(account=attached_service).distinct().count()
@@ -356,15 +357,27 @@ def get_all_pedigrees(attached_service, sort_by_col, start, end,
     
     # reg_no, name, litter_size, sale_or_hire - none of these can be None - the rest of the filterable fields can
 
+    # the following functions return the corresponding condition, or no conidition, depending if there is user input
+
     def reg_no_filter():
         if reg_no_search:
             return Q(reg_no__icontains=reg_no_search)
         else:
             return Q()
 
-    print(reg_no_filter())
+    def tag_no_filter():
+        if tag_no_search:
+            return Q(tag_no__icontains=tag_no_search)
+        else:
+            return Q()
 
-    if search == "" and reg_no_search == "":
+    def name_filter():
+        if name_search:
+            return Q(name__icontains=name_search)
+        else:
+            return Q()
+
+    if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "":
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
                             start:start + end]
     else:
@@ -388,6 +401,8 @@ def get_all_pedigrees(attached_service, sort_by_col, start, end,
             Q(coi__icontains=search) |
             Q(mean_kinship__icontains=search),
             reg_no_filter(),
+            tag_no_filter(),
+            name_filter(),
             account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
     
     return all_pedigrees
