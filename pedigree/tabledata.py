@@ -45,6 +45,15 @@ def get_pedigrees(request):
     else:
         desc_search = ''
     # date_of_registration_search
+    if 'date_of_registration' in attached_service.pedigree_columns.split(','):
+        dor_index = int(attached_service.pedigree_columns.split(',').index('date_of_registration')) + 1
+        dor_search_list = request.POST.get(f'columns[{dor_index}][search][value]').split('-')
+        if len(dor_search_list) == 3:
+            dor_search = f'{dor_search_list[2]}-{dor_search_list[1]}-{dor_search_list[0]}'
+        elif len(dor_search_list) == 2:
+            dor_search = f'{dor_search_list[1]}-{dor_search_list[0]}'
+        else:
+            dor_search = dor_search_list[0]
     # dob_search
     # dod_search
     # status_search
