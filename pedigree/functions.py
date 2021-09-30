@@ -51,7 +51,7 @@ def get_site_pedigree_column_headings(atatched_service):
                                 'html': ''},
                         'dod': {'db_id': 'dod',
                                 'db_id_internal': 'dod.strftime(format="%d-%m-%Y")',
-                                'name': 'Date of Birth',
+                                'name': 'Date of Death',
                                 'upper': False,
                                 'html': ''},
                         'status': {'db_id': 'status',
