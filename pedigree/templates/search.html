@@ -82,7 +82,11 @@
                                     {% for col in columns %}
                                         {% for ped_col, data in column_data.items %}
                                             {% if col == data.db_id %}
-                                                <th><input type="text" placeholder="Search {{ data.name }}" /></th>
+                                                <th>
+                                                    {% if col != 'coi' and col != 'mean_kinship' %}
+                                                        <input type="text" placeholder="Search {{ data.name }}" />
+                                                    {% endif %}
+                                                </th>
                                             {% endif %}
                                         {% endfor %}
                                     {% endfor %}
