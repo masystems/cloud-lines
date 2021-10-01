@@ -160,7 +160,7 @@ def get_pedigrees(request):
     all_pedigrees, total_pedigrees = get_filtered_pedigrees(attached_service, sort_by_col, start, end, 
                     reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search,
                     desc_search=desc_search, dor_search=dor_search, dob_search=dob_search, dod_search=dod_search,
-                    status_search=status_search, sex_search=sex_search,
+                    status_search=status_search, sex_search=sex_search, litter_search=litter_search,
                     father_search=father_search, father_notes_search=father_notes_search, 
                     mother_search=mother_search, mother_notes_search=mother_notes_search)
 
@@ -280,6 +280,12 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
         else:
             return Q()
 
+    def litter_cond():
+        if litter_search:
+            return Q(litter_size__iexact=litter_search)
+        else:
+            return Q()
+
     def father_cond():
         if father_search:
             return Q(parent_father__reg_no__icontains=father_search)
@@ -305,7 +311,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             return Q()
 
     # filter pedigrees
-    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search\
+    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search == litter_search\
                 == father_search == father_notes_search == mother_search == mother_notes_search == dor_search == dob_search\
                 == dod_search:
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
@@ -339,13 +345,16 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             dod_cond(),
             status_cond(),
             sex_cond(),
+            litter_cond(),
             father_cond(),
             father_notes_cond(),
             mother_cond(),
             mother_notes_cond(),
             account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
 
-    if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "":
+    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search == litter_search\
+                == father_search == father_notes_search == mother_search == mother_notes_search == dor_search == dob_search\
+                == dod_search:
         total_pedigrees = Pedigree.objects.filter(account=attached_service).distinct().count()
     else:
         total_pedigrees = Pedigree.objects.filter(
@@ -376,6 +385,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             dod_cond(),
             status_cond(),
             sex_cond(),
+            litter_cond(),
             father_cond(),
             father_notes_cond(),
             mother_cond(),
