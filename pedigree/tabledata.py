@@ -366,17 +366,26 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         return Q()
 
     def breed_cond(type):
-        if breed_search:
+        if type == 'col' and breed_search:
             return Q(breed__breed_name__icontains=breed_search)
-        else:
-            return Q()
+        elif type=='all' and 'breed' in columns:
+            return Q(breed__breed_name__icontains=search)
+        return Q()
 
     def sale_hire_cond(type):
-        if sale_hire_search:
+        if type == 'col' and sale_hire_search:
             try:
                 if sale_hire_search.lower() in 'true':
                     return Q(sale_or_hire=True)
                 elif sale_hire_search.lower() in 'false':
+                    return Q(sale_or_hire=False)
+            except SyntaxError:
+                return Q()
+        elif type=='all' and 'sale_or_hire' in columns:
+            try:
+                if search.lower() in 'true':
+                    return Q(sale_or_hire=True)
+                elif search.lower() in 'false':
                     return Q(sale_or_hire=False)
             except SyntaxError:
                 return Q()
@@ -406,10 +415,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             father_notes_cond('all') |
             mother_cond('all') |
             mother_notes_cond('all') |
-            Q(breed_group__icontains=search) |
-            Q(breed__breed_name__icontains=search) |
-            Q(coi__icontains=search) |
-            Q(mean_kinship__icontains=search)),
+            breed_cond('all') |
+            sale_hire_cond('all')),
             breeder_cond('col'),
             owner_cond('col'),
             reg_no_cond('col'),
@@ -452,10 +459,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             father_notes_cond('all') |
             mother_cond('all') |
             mother_notes_cond('all') |
-            Q(breed_group__icontains=search) |
-            Q(breed__breed_name__icontains=search) |
-            Q(coi__icontains=search) |
-            Q(mean_kinship__icontains=search)),
+            breed_cond('all') |
+            sale_hire_cond('col')),
             breeder_cond('col'),
             owner_cond('col'),
             reg_no_cond('col'),
