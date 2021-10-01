@@ -20,6 +20,18 @@ def get_pedigrees(request):
     sort_by = request.POST.get(f'columns[{request.POST.get("order[0][column]")}][data]')
 
     # get the values of the column search fields
+    # breeder search
+    if 'breeder' in attached_service.pedigree_columns.split(','):
+        breeder_index = int(attached_service.pedigree_columns.split(',').index('breeder')) + 1
+        breeder_search = request.POST.get(f'columns[{breeder_index}][search][value]')
+    else:
+        breeder_search = ''
+    # current owner search
+    if 'current_owner' in attached_service.pedigree_columns.split(','):
+        owner_index = int(attached_service.pedigree_columns.split(',').index('current_owner')) + 1
+        owner_search = request.POST.get(f'columns[{owner_index}][search][value]')
+    else:
+        owner_search = ''
     # reg_no search
     if 'reg_no' in attached_service.pedigree_columns.split(','):
         reg_no_index = int(attached_service.pedigree_columns.split(',').index('reg_no')) + 1
@@ -148,13 +160,6 @@ def get_pedigrees(request):
         else:
             sort_by_col = f"-reg_no"
 
-    # # make an int if possible to filter for litter size
-    # search_int = ''
-    # try:
-    #     search_int = int(search)
-    # except ValueError:
-    #     pass
-
     # get breeds editable (length is 0 if they're not a breed admin)
     breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
     if '' in breeds_editable:
@@ -164,6 +169,7 @@ def get_pedigrees(request):
     
     # call the function to apply filters and return all pedigrees
     all_pedigrees, total_pedigrees = get_filtered_pedigrees(attached_service, sort_by_col, start, end, 
+                    breeder_search=breeder_search, owner_search=owner_search,
                     reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search,
                     desc_search=desc_search, dor_search=dor_search, dob_search=dob_search, dod_search=dod_search,
                     status_search=status_search, sex_search=sex_search, litter_search=litter_search,
@@ -223,14 +229,26 @@ def get_pedigrees(request):
 
 
 def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
-        search="", reg_no_search="", tag_no_search="", name_search="", desc_search="", dor_search="",
-        dob_search="", dod_search="", status_search="", sex_search="", litter_search="",
+        search="", breeder_search="", owner_search="", reg_no_search="", tag_no_search="", name_search="", desc_search="", 
+        dor_search="", dob_search="", dod_search="", status_search="", sex_search="", litter_search="",
         father_search="", father_notes_search="", mother_search="", mother_notes_search="",
         breed_search=""):
     
     # reg_no, name, litter_size, sale_or_hire - none of these can be None - the rest of the filterable fields can
 
     # the following functions return the corresponding condition, or no conidition, depending if there is user input
+
+    def breeder_cond():
+        if breeder_search:
+            return Q(breeder__breeding_prefix__icontains=breeder_search)
+        else:
+            return Q()
+
+    def owner_cond():
+        if owner_search:
+            return Q(current_owner__breeding_prefix__icontains=owner_search)
+        else:
+            return Q()
 
     def reg_no_cond():
         if reg_no_search:
@@ -323,8 +341,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             return Q()
 
     # filter pedigrees
-    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == dor_search == dob_search\
-                == dod_search == status_search == sex_search == litter_search\
+    if "" == search == breeder_search == owner_search == reg_no_search == tag_no_search == name_search == desc_search\
+                == dor_search == dob_search == dod_search == status_search == sex_search == litter_search\
                 == father_search == father_notes_search == mother_search == mother_notes_search == breed_search:
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
                             start:start + end]
@@ -348,6 +366,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
             Q(mean_kinship__icontains=search),
+            breeder_cond(),
+            owner_cond(),
             reg_no_cond(),
             tag_no_cond(),
             name_cond(),
@@ -365,8 +385,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             breed_cond(),
             account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
 
-    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == dor_search == dob_search\
-                == dod_search == status_search == sex_search == litter_search\
+    if "" == search == breeder_search == owner_search == reg_no_search == tag_no_search == name_search == desc_search\
+                == dor_search == dob_search == dod_search == status_search == sex_search == litter_search\
                 == father_search == father_notes_search == mother_search == mother_notes_search == breed_search:
         total_pedigrees = Pedigree.objects.filter(account=attached_service).distinct().count()
     else:
@@ -389,6 +409,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
             Q(mean_kinship__icontains=search),
+            breeder_cond(),
+            owner_cond(),
             reg_no_cond(),
             tag_no_cond(),
             name_cond(),
