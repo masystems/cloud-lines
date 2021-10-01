@@ -275,16 +275,18 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         return Q()
 
     def name_cond(type):
-        if name_search:
+        if type == 'col' and name_search:
             return Q(name__icontains=name_search)
-        else:
-            return Q()
+        elif type=='all' and 'name' in columns:
+            return Q(name__icontains=search)
+        return Q()
 
     def desc_cond(type):
-        if desc_search:
+        if type == 'col' and desc_search:
             return Q(description__icontains=desc_search)
-        else:
-            return Q()
+        elif type=='all' and 'description' in columns:
+            return Q(description__icontains=search)
+        return Q()
 
     def dor_cond(type):
         if dor_search:
@@ -375,8 +377,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             owner_cond('all') |
             reg_no_cond('all') |
             tag_no_cond('all') |
-            Q(name__icontains=search) |
-            Q(description__icontains=search) |
+            name_cond('all') |
+            desc_cond('all') |
             Q(date_of_registration__icontains=search) |
             Q(dob__icontains=search) |
             Q(dod__icontains=search) |
@@ -421,8 +423,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             owner_cond('all') |
             reg_no_cond('all') |
             tag_no_cond('all') |
-            Q(name__icontains=search) |
-            Q(description__icontains=search) |
+            name_cond('all') |
+            desc_cond('all') |
             Q(date_of_registration__icontains=search) |
             Q(dob__icontains=search) |
             Q(dod__icontains=search) |
