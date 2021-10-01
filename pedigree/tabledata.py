@@ -55,7 +55,25 @@ def get_pedigrees(request):
         else:
             dor_search = dor_search_list[0]
     # dob_search
+    if 'dob' in attached_service.pedigree_columns.split(','):
+        dob_index = int(attached_service.pedigree_columns.split(',').index('dob')) + 1
+        dob_search_list = request.POST.get(f'columns[{dob_index}][search][value]').split('-')
+        if len(dob_search_list) == 3:
+            dob_search = f'{dob_search_list[2]}-{dob_search_list[1]}-{dob_search_list[0]}'
+        elif len(dob_search_list) == 2:
+            dob_search = f'{dob_search_list[1]}-{dob_search_list[0]}'
+        else:
+            dob_search = dob_search_list[0]
     # dod_search
+    if 'dod' in attached_service.pedigree_columns.split(','):
+        dod_index = int(attached_service.pedigree_columns.split(',').index('dod')) + 1
+        dod_search_list = request.POST.get(f'columns[{dod_index}][search][value]').split('-')
+        if len(dod_search_list) == 3:
+            dod_search = f'{dod_search_list[2]}-{dod_search_list[1]}-{dod_search_list[0]}'
+        elif len(dod_search_list) == 2:
+            dod_search = f'{dod_search_list[1]}-{dod_search_list[0]}'
+        else:
+            dod_search = dod_search_list[0]
     # status_search
     if 'status' in attached_service.pedigree_columns.split(','):
         status_index = int(attached_service.pedigree_columns.split(',').index('status')) + 1
@@ -141,7 +159,8 @@ def get_pedigrees(request):
     # call the function to apply filters and return all pedigrees
     all_pedigrees, total_pedigrees = get_filtered_pedigrees(attached_service, sort_by_col, start, end, 
                     reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search,
-                    desc_search=desc_search, status_search=status_search, sex_search=sex_search,
+                    desc_search=desc_search, dor_search=dor_search, dob_search=dob_search, dod_search=dod_search,
+                    status_search=status_search, sex_search=sex_search,
                     father_search=father_search, father_notes_search=father_notes_search, 
                     mother_search=mother_search, mother_notes_search=mother_notes_search)
 
@@ -231,6 +250,24 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
         else:
             return Q()
 
+    def dor_cond():
+        if dor_search:
+            return Q(date_of_registration__icontains=dor_search)
+        else:
+            return Q()
+
+    def dob_cond():
+        if dob_search:
+            return Q(dob__icontains=dob_search)
+        else:
+            return Q()
+
+    def dod_cond():
+        if dod_search:
+            return Q(dod__icontains=dod_search)
+        else:
+            return Q()
+
     def status_cond():
         if status_search:
             return Q(status__icontains=status_search)
@@ -269,7 +306,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
 
     # filter pedigrees
     if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search\
-                == father_search == father_notes_search == mother_search == mother_notes_search:
+                == father_search == father_notes_search == mother_search == mother_notes_search == dor_search == dob_search\
+                == dod_search:
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
                             start:start + end]
     else:
@@ -296,6 +334,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             tag_no_cond(),
             name_cond(),
             desc_cond(),
+            dor_cond(),
+            dob_cond(),
+            dod_cond(),
             status_cond(),
             sex_cond(),
             father_cond(),
@@ -330,6 +371,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             tag_no_cond(),
             name_cond(),
             desc_cond(),
+            dor_cond(),
+            dob_cond(),
+            dod_cond(),
             status_cond(),
             sex_cond(),
             father_cond(),
