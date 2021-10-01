@@ -338,28 +338,32 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         return Q()
 
     def father_cond(type):
-        if father_search:
+        if type == 'col' and father_search:
             return Q(parent_father__reg_no__icontains=father_search)
-        else:
-            return Q()
+        elif type=='all' and 'parent_father' in columns:
+            return Q(parent_father__reg_no__icontains=search)
+        return Q()
 
     def father_notes_cond(type):
-        if father_notes_search:
+        if type == 'col' and father_notes_search:
             return Q(parent_father_notes__icontains=father_notes_search)
-        else:
-            return Q()
+        elif type=='all' and 'parent_father_notes' in columns:
+            return Q(parent_father_notes__icontains=search)
+        return Q()
 
     def mother_cond(type):
-        if mother_search:
+        if type == 'col' and mother_search:
             return Q(parent_mother__reg_no__icontains=mother_search)
-        else:
-            return Q()
+        elif type=='all' and 'parent_mother' in columns:
+            return Q(parent_mother__reg_no__icontains=search)
+        return Q()
 
     def mother_notes_cond(type):
-        if mother_notes_search:
+        if type == 'col' and mother_notes_search:
             return Q(parent_mother_notes__icontains=mother_notes_search)
-        else:
-            return Q()
+        elif type=='all' and 'parent_mother_notes' in columns:
+            return Q(parent_mother_notes__icontains=search)
+        return Q()
 
     def breed_cond(type):
         if breed_search:
@@ -398,10 +402,10 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             status_cond('all') |
             sex_cond('all') |
             litter_cond('all') |
-            Q(parent_father__reg_no__icontains=search) |
-            Q(parent_father_notes__icontains=search) |
-            Q(parent_mother__reg_no__icontains=search) |
-            Q(parent_mother_notes__icontains=search) |
+            father_cond('all') |
+            father_notes_cond('all') |
+            mother_cond('all') |
+            mother_notes_cond('all') |
             Q(breed_group__icontains=search) |
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
@@ -444,10 +448,10 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             status_cond('all') |
             sex_cond('all') |
             litter_cond('all') |
-            Q(parent_father__reg_no__icontains=search) |
-            Q(parent_father_notes__icontains=search) |
-            Q(parent_mother__reg_no__icontains=search) |
-            Q(parent_mother_notes__icontains=search) |
+            father_cond('all') |
+            father_notes_cond('all') |
+            mother_cond('all') |
+            mother_notes_cond('all') |
             Q(breed_group__icontains=search) |
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
