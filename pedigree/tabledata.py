@@ -310,22 +310,32 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         return Q()
 
     def status_cond(type):
-        if status_search:
+        if type == 'col' and status_search:
             return Q(status__icontains=status_search)
-        else:
-            return Q()
+        elif type=='all' and 'status' in columns:
+            return Q(status__icontains=search)
+        return Q()
 
     def sex_cond(type):
-        if sex_search:
+        if type == 'col' and sex_search:
             return Q(sex__icontains=sex_search)
-        else:
-            return Q()
+        elif type=='all' and 'sex' in columns:
+            return Q(sex__icontains=search)
+        return Q()
+
+    # make an int, if possible, to be used to include litter size in the search all
+    search_int = ''
+    try:
+        search_int = int(search)
+    except ValueError:
+        pass
 
     def litter_cond(type):
-        if litter_search:
+        if type == 'col' and litter_search:
             return Q(litter_size__iexact=litter_search)
-        else:
-            return Q()
+        elif type=='all' and 'litter_size' in columns:
+            return Q(litter_size__iexact=search_int)
+        return Q()
 
     def father_cond(type):
         if father_search:
@@ -385,9 +395,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             dor_cond('all') |
             dob_cond('all') |
             dod_cond('all') |
-            Q(status__icontains=search) |
-            Q(sex__icontains=search) |
-            Q(litter_size__iexact=litter_search) |
+            status_cond('all') |
+            sex_cond('all') |
+            litter_cond('all') |
             Q(parent_father__reg_no__icontains=search) |
             Q(parent_father_notes__icontains=search) |
             Q(parent_mother__reg_no__icontains=search) |
@@ -431,9 +441,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             dor_cond('all') |
             dob_cond('all') |
             dod_cond('all') |
-            Q(status__icontains=search) |
-            Q(sex__icontains=search) |
-            Q(litter_size__iexact=litter_search) |
+            status_cond('all') |
+            sex_cond('all') |
+            litter_cond('all') |
             Q(parent_father__reg_no__icontains=search) |
             Q(parent_father_notes__icontains=search) |
             Q(parent_mother__reg_no__icontains=search) |
