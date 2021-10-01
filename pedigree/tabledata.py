@@ -141,7 +141,9 @@ def get_pedigrees(request):
     # call the function to apply filters and return all pedigrees
     all_pedigrees, total_pedigrees = get_filtered_pedigrees(attached_service, sort_by_col, start, end, 
                     reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search,
-                    desc_search=desc_search, status_search=status_search, sex_search=sex_search)
+                    desc_search=desc_search, status_search=status_search, sex_search=sex_search,
+                    father_search=father_search, father_notes_search=father_notes_search, 
+                    mother_search=mother_search, mother_notes_search=mother_notes_search)
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
@@ -198,51 +200,76 @@ def get_pedigrees(request):
 def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
         search="", reg_no_search="", tag_no_search="", name_search="", desc_search="", dor_search="",
         dob_search="", dod_search="", status_search="", sex_search="", litter_search="",
-        parent_father_search="", parent_father_notes_search="", parent_mother_search="", parent_mother_notes_search="",
+        father_search="", father_notes_search="", mother_search="", mother_notes_search="",
         breed_search=""):
     
     # reg_no, name, litter_size, sale_or_hire - none of these can be None - the rest of the filterable fields can
 
     # the following functions return the corresponding condition, or no conidition, depending if there is user input
 
-    def reg_no_filter():
+    def reg_no_cond():
         if reg_no_search:
             return Q(reg_no__icontains=reg_no_search)
         else:
             return Q()
 
-    def tag_no_filter():
+    def tag_no_cond():
         if tag_no_search:
             return Q(tag_no__icontains=tag_no_search)
         else:
             return Q()
 
-    def name_filter():
+    def name_cond():
         if name_search:
             return Q(name__icontains=name_search)
         else:
             return Q()
 
-    def desc_filter():
+    def desc_cond():
         if desc_search:
             return Q(description__icontains=desc_search)
         else:
             return Q()
 
-    def status_filter():
+    def status_cond():
         if status_search:
             return Q(status__icontains=status_search)
         else:
             return Q()
 
-    def sex_filter():
+    def sex_cond():
         if sex_search:
             return Q(sex__icontains=sex_search)
         else:
             return Q()
 
+    def father_cond():
+        if father_search:
+            return Q(parent_father__reg_no__icontains=father_search)
+        else:
+            return Q()
+
+    def father_notes_cond():
+        if father_notes_search:
+            return Q(parent_father_notes__icontains=father_notes_search)
+        else:
+            return Q()
+
+    def mother_cond():
+        if mother_search:
+            return Q(parent_mother__reg_no__icontains=mother_search)
+        else:
+            return Q()
+
+    def mother_notes_cond():
+        if mother_notes_search:
+            return Q(parent_mother_notes__icontains=mother_notes_search)
+        else:
+            return Q()
+
     # filter pedigrees
-    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search:
+    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search\
+                == father_search == father_notes_search == mother_search == mother_notes_search:
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
                             start:start + end]
     else:
@@ -265,12 +292,16 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
             Q(mean_kinship__icontains=search),
-            reg_no_filter(),
-            tag_no_filter(),
-            name_filter(),
-            desc_filter(),
-            status_filter(),
-            sex_filter(),
+            reg_no_cond(),
+            tag_no_cond(),
+            name_cond(),
+            desc_cond(),
+            status_cond(),
+            sex_cond(),
+            father_cond(),
+            father_notes_cond(),
+            mother_cond(),
+            mother_notes_cond(),
             account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
 
     if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "":
@@ -295,9 +326,16 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
             Q(mean_kinship__icontains=search),
-            reg_no_filter(),
-            tag_no_filter(),
-            name_filter(),
+            reg_no_cond(),
+            tag_no_cond(),
+            name_cond(),
+            desc_cond(),
+            status_cond(),
+            sex_cond(),
+            father_cond(),
+            father_notes_cond(),
+            mother_cond(),
+            mother_notes_cond(),
             account=attached_service).order_by(
             sort_by_col).count()
     
