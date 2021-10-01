@@ -175,6 +175,7 @@ def get_pedigrees(request):
     
     # call the function to apply filters and return all pedigrees
     all_pedigrees, total_pedigrees = get_filtered_pedigrees(attached_service, sort_by_col, start, end, 
+                    attached_service.pedigree_columns.split(','),
                     search=search, breeder_search=breeder_search, owner_search=owner_search,
                     reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search,
                     desc_search=desc_search, dor_search=dor_search, dob_search=dob_search, dod_search=dod_search,
@@ -234,7 +235,7 @@ def get_pedigrees(request):
     return HttpResponse(dumps(complete_data))
 
 
-def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
+def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         search="", breeder_search="", owner_search="", reg_no_search="", tag_no_search="", name_search="", desc_search="", 
         dor_search="", dob_search="", dod_search="", status_search="", sex_search="", litter_search="",
         father_search="", father_notes_search="", mother_search="", mother_notes_search="",
@@ -243,110 +244,112 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
     # reg_no, name, litter_size, sale_or_hire - none of these can be None - the rest of the filterable fields can
 
     # the following functions return the corresponding condition, or no conidition, depending if there is user input
+    # in each function, the condition is returned if it is a column filter or a search all
 
-    def breeder_cond():
-        if breeder_search:
+    def breeder_cond(type):
+        if type == 'col' and breeder_search:
             return Q(breeder__breeding_prefix__icontains=breeder_search)
-        else:
-            return Q()
+        elif 'breeder' in columns:
+            return Q(breeder__breeding_prefix__icontains=search)
+        return Q()
 
-    def owner_cond():
+    def owner_cond(type):
         if owner_search:
             return Q(current_owner__breeding_prefix__icontains=owner_search)
         else:
             return Q()
 
-    def reg_no_cond():
+    def reg_no_cond(type):
         if reg_no_search:
             return Q(reg_no__icontains=reg_no_search)
         else:
             return Q()
 
-    def tag_no_cond():
+    def tag_no_cond(type):
         if tag_no_search:
             return Q(tag_no__icontains=tag_no_search)
         else:
             return Q()
 
-    def name_cond():
+    def name_cond(type):
         if name_search:
             return Q(name__icontains=name_search)
         else:
             return Q()
 
-    def desc_cond():
+    def desc_cond(type):
         if desc_search:
             return Q(description__icontains=desc_search)
         else:
             return Q()
 
-    def dor_cond():
+    def dor_cond(type):
         if dor_search:
             return Q(date_of_registration__icontains=dor_search)
         else:
             return Q()
 
-    def dob_cond():
+    def dob_cond(type):
         if dob_search:
             return Q(dob__icontains=dob_search)
         else:
             return Q()
 
-    def dod_cond():
+    def dod_cond(type):
         if dod_search:
             return Q(dod__icontains=dod_search)
         else:
             return Q()
 
-    def status_cond():
+    def status_cond(type):
         if status_search:
             return Q(status__icontains=status_search)
         else:
             return Q()
 
-    def sex_cond():
+    def sex_cond(type):
         if sex_search:
             return Q(sex__icontains=sex_search)
         else:
             return Q()
 
-    def litter_cond():
+    def litter_cond(type):
         if litter_search:
             return Q(litter_size__iexact=litter_search)
         else:
             return Q()
 
-    def father_cond():
+    def father_cond(type):
         if father_search:
             return Q(parent_father__reg_no__icontains=father_search)
         else:
             return Q()
 
-    def father_notes_cond():
+    def father_notes_cond(type):
         if father_notes_search:
             return Q(parent_father_notes__icontains=father_notes_search)
         else:
             return Q()
 
-    def mother_cond():
+    def mother_cond(type):
         if mother_search:
             return Q(parent_mother__reg_no__icontains=mother_search)
         else:
             return Q()
 
-    def mother_notes_cond():
+    def mother_notes_cond(type):
         if mother_notes_search:
             return Q(parent_mother_notes__icontains=mother_notes_search)
         else:
             return Q()
 
-    def breed_cond():
+    def breed_cond(type):
         if breed_search:
             return Q(breed__breed_name__icontains=breed_search)
         else:
             return Q()
 
-    def sale_hire_cond():
+    def sale_hire_cond(type):
         if sale_hire_search:
             try:
                 if sale_hire_search.lower() in 'true':
@@ -365,6 +368,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
                             start:start + end]
     else:
         all_pedigrees = Pedigree.objects.filter(
+            (breeder_cond('all') |
             Q(reg_no__icontains=search) |
             Q(tag_no__icontains=search) |
             Q(name__icontains=search) |
@@ -382,25 +386,25 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             Q(breed_group__icontains=search) |
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
-            Q(mean_kinship__icontains=search),
-            breeder_cond(),
-            owner_cond(),
-            reg_no_cond(),
-            tag_no_cond(),
-            name_cond(),
-            desc_cond(),
-            dor_cond(),
-            dob_cond(),
-            dod_cond(),
-            status_cond(),
-            sex_cond(),
-            litter_cond(),
-            father_cond(),
-            father_notes_cond(),
-            mother_cond(),
-            mother_notes_cond(),
-            breed_cond(),
-            sale_hire_cond(),
+            Q(mean_kinship__icontains=search)),
+            breeder_cond('col'),
+            owner_cond('col'),
+            reg_no_cond('col'),
+            tag_no_cond('col'),
+            name_cond('col'),
+            desc_cond('col'),
+            dor_cond('col'),
+            dob_cond('col'),
+            dod_cond('col'),
+            status_cond('col'),
+            sex_cond('col'),
+            litter_cond('col'),
+            father_cond('col'),
+            father_notes_cond('col'),
+            mother_cond('col'),
+            mother_notes_cond('col'),
+            breed_cond('col'),
+            sale_hire_cond('col'),
             account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
 
     if "" == search == breeder_search == owner_search == reg_no_search == tag_no_search == name_search == desc_search\
@@ -409,6 +413,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
         total_pedigrees = Pedigree.objects.filter(account=attached_service).distinct().count()
     else:
         total_pedigrees = Pedigree.objects.filter(
+            (breeder_cond('all') |
             Q(reg_no__icontains=search) |
             Q(tag_no__icontains=search) |
             Q(name__icontains=search) |
@@ -426,25 +431,25 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             Q(breed_group__icontains=search) |
             Q(breed__breed_name__icontains=search) |
             Q(coi__icontains=search) |
-            Q(mean_kinship__icontains=search),
-            breeder_cond(),
-            owner_cond(),
-            reg_no_cond(),
-            tag_no_cond(),
-            name_cond(),
-            desc_cond(),
-            dor_cond(),
-            dob_cond(),
-            dod_cond(),
-            status_cond(),
-            sex_cond(),
-            litter_cond(),
-            father_cond(),
-            father_notes_cond(),
-            mother_cond(),
-            mother_notes_cond(),
-            breed_cond(),
-            sale_hire_cond(),
+            Q(mean_kinship__icontains=search)),
+            breeder_cond('col'),
+            owner_cond('col'),
+            reg_no_cond('col'),
+            tag_no_cond('col'),
+            name_cond('col'),
+            desc_cond('col'),
+            dor_cond('col'),
+            dob_cond('col'),
+            dod_cond('col'),
+            status_cond('col'),
+            sex_cond('col'),
+            litter_cond('col'),
+            father_cond('col'),
+            father_notes_cond('col'),
+            mother_cond('col'),
+            mother_notes_cond('col'),
+            breed_cond('col'),
+            sale_hire_cond('col'),
             account=attached_service).order_by(
             sort_by_col).count()
     
