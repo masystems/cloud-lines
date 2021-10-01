@@ -249,27 +249,30 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
     def breeder_cond(type):
         if type == 'col' and breeder_search:
             return Q(breeder__breeding_prefix__icontains=breeder_search)
-        elif 'breeder' in columns:
+        elif type=='all' and 'breeder' in columns:
             return Q(breeder__breeding_prefix__icontains=search)
         return Q()
 
     def owner_cond(type):
-        if owner_search:
+        if type == 'col' and owner_search:
             return Q(current_owner__breeding_prefix__icontains=owner_search)
-        else:
-            return Q()
+        elif type=='all' and 'current_owner' in columns:
+            return Q(current_owner__breeding_prefix__icontains=search)
+        return Q()
 
     def reg_no_cond(type):
-        if reg_no_search:
+        if type == 'col' and reg_no_search:
             return Q(reg_no__icontains=reg_no_search)
-        else:
-            return Q()
+        elif type=='all' and 'reg_no' in columns:
+            return Q(reg_no__icontains=search)
+        return Q()
 
     def tag_no_cond(type):
-        if tag_no_search:
+        if type == 'col' and tag_no_search:
             return Q(tag_no__icontains=tag_no_search)
-        else:
-            return Q()
+        elif type=='all' and 'tag_no' in columns:
+            return Q(tag_no__icontains=search)
+        return Q()
 
     def name_cond(type):
         if name_search:
@@ -369,8 +372,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
     else:
         all_pedigrees = Pedigree.objects.filter(
             (breeder_cond('all') |
-            Q(reg_no__icontains=search) |
-            Q(tag_no__icontains=search) |
+            owner_cond('all') |
+            reg_no_cond('all') |
+            tag_no_cond('all') |
             Q(name__icontains=search) |
             Q(description__icontains=search) |
             Q(date_of_registration__icontains=search) |
@@ -414,8 +418,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
     else:
         total_pedigrees = Pedigree.objects.filter(
             (breeder_cond('all') |
-            Q(reg_no__icontains=search) |
-            Q(tag_no__icontains=search) |
+            owner_cond('all') |
+            reg_no_cond('all') |
+            tag_no_cond('all') |
             Q(name__icontains=search) |
             Q(description__icontains=search) |
             Q(date_of_registration__icontains=search) |
