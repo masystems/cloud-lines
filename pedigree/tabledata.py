@@ -140,7 +140,8 @@ def get_pedigrees(request):
     
     # call the function to apply filters and return all pedigrees
     all_pedigrees, total_pedigrees = get_filtered_pedigrees(attached_service, sort_by_col, start, end, 
-                    reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search)
+                    reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search,
+                    desc_search=desc_search, status_search=status_search, sex_search=sex_search)
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
@@ -222,8 +223,26 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
         else:
             return Q()
 
+    def desc_filter():
+        if desc_search:
+            return Q(description__icontains=desc_search)
+        else:
+            return Q()
+
+    def status_filter():
+        if status_search:
+            return Q(status__icontains=status_search)
+        else:
+            return Q()
+
+    def sex_filter():
+        if sex_search:
+            return Q(sex__icontains=sex_search)
+        else:
+            return Q()
+
     # filter pedigrees
-    if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "":
+    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search:
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
                             start:start + end]
     else:
@@ -249,6 +268,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             reg_no_filter(),
             tag_no_filter(),
             name_filter(),
+            desc_filter(),
+            status_filter(),
+            sex_filter(),
             account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
 
     if search == "" and reg_no_search == "" and tag_no_search == "" and name_search == "":
