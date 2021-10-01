@@ -54,6 +54,8 @@ def get_pedigrees(request):
             dor_search = f'{dor_search_list[1]}-{dor_search_list[0]}'
         else:
             dor_search = dor_search_list[0]
+    else:
+        dor_search = ''
     # dob_search
     if 'dob' in attached_service.pedigree_columns.split(','):
         dob_index = int(attached_service.pedigree_columns.split(',').index('dob')) + 1
@@ -64,6 +66,8 @@ def get_pedigrees(request):
             dob_search = f'{dob_search_list[1]}-{dob_search_list[0]}'
         else:
             dob_search = dob_search_list[0]
+    else:
+        dob_search = ''
     # dod_search
     if 'dod' in attached_service.pedigree_columns.split(','):
         dod_index = int(attached_service.pedigree_columns.split(',').index('dod')) + 1
@@ -74,6 +78,8 @@ def get_pedigrees(request):
             dod_search = f'{dod_search_list[1]}-{dod_search_list[0]}'
         else:
             dod_search = dod_search_list[0]
+    else:
+        dod_search = ''
     # status_search
     if 'status' in attached_service.pedigree_columns.split(','):
         status_index = int(attached_service.pedigree_columns.split(',').index('status')) + 1
@@ -162,7 +168,7 @@ def get_pedigrees(request):
                     desc_search=desc_search, dor_search=dor_search, dob_search=dob_search, dod_search=dod_search,
                     status_search=status_search, sex_search=sex_search, litter_search=litter_search,
                     father_search=father_search, father_notes_search=father_notes_search, 
-                    mother_search=mother_search, mother_notes_search=mother_notes_search)
+                    mother_search=mother_search, mother_notes_search=mother_notes_search, breed_search=breed_search)
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
@@ -310,10 +316,16 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
         else:
             return Q()
 
+    def breed_cond():
+        if breed_search:
+            return Q(breed__breed_name__icontains=breed_search)
+        else:
+            return Q()
+
     # filter pedigrees
-    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search == litter_search\
-                == father_search == father_notes_search == mother_search == mother_notes_search == dor_search == dob_search\
-                == dod_search:
+    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == dor_search == dob_search\
+                == dod_search == status_search == sex_search == litter_search\
+                == father_search == father_notes_search == mother_search == mother_notes_search == breed_search:
         all_pedigrees = Pedigree.objects.filter(account=attached_service).order_by(sort_by_col).distinct()[
                             start:start + end]
     else:
@@ -350,11 +362,12 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             father_notes_cond(),
             mother_cond(),
             mother_notes_cond(),
+            breed_cond(),
             account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
 
-    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == status_search == sex_search == litter_search\
-                == father_search == father_notes_search == mother_search == mother_notes_search == dor_search == dob_search\
-                == dod_search:
+    if "" == search == reg_no_search == tag_no_search == name_search == desc_search == dor_search == dob_search\
+                == dod_search == status_search == sex_search == litter_search\
+                == father_search == father_notes_search == mother_search == mother_notes_search == breed_search:
         total_pedigrees = Pedigree.objects.filter(account=attached_service).distinct().count()
     else:
         total_pedigrees = Pedigree.objects.filter(
@@ -390,6 +403,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end,
             father_notes_cond(),
             mother_cond(),
             mother_notes_cond(),
+            breed_cond(),
             account=attached_service).order_by(
             sort_by_col).count()
     
