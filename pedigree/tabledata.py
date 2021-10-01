@@ -175,7 +175,7 @@ def get_pedigrees(request):
     
     # call the function to apply filters and return all pedigrees
     all_pedigrees, total_pedigrees = get_filtered_pedigrees(attached_service, sort_by_col, start, end, 
-                    breeder_search=breeder_search, owner_search=owner_search,
+                    search=search, breeder_search=breeder_search, owner_search=owner_search,
                     reg_no_search=reg_no_search, tag_no_search=tag_no_search, name_search=name_search,
                     desc_search=desc_search, dor_search=dor_search, dob_search=dob_search, dod_search=dod_search,
                     status_search=status_search, sex_search=sex_search, litter_search=litter_search,
