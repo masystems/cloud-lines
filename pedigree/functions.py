@@ -109,6 +109,11 @@ def get_site_pedigree_column_headings(atatched_service):
                                          'name': 'Mean Kinship',
                                          'upper': False,
                                          'html': ''},
+                        'sale_or_hire': {'db_id': 'sale_or_hire',
+                                         'db_id_internal': 'sale_or_hire',
+                                         'name': 'For Sale/Hire',
+                                         'upper': False,
+                                         'html': ''},
                         }
 
     site_columns = atatched_service.pedigree_columns.split(',')
