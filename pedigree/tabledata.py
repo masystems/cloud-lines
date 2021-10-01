@@ -289,22 +289,25 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         return Q()
 
     def dor_cond(type):
-        if dor_search:
+        if type == 'col' and dor_search:
             return Q(date_of_registration__icontains=dor_search)
-        else:
-            return Q()
+        elif type=='all' and 'date_of_registration' in columns:
+            return Q(date_of_registration__icontains=search)
+        return Q()
 
     def dob_cond(type):
-        if dob_search:
+        if type == 'col' and dob_search:
             return Q(dob__icontains=dob_search)
-        else:
-            return Q()
+        elif type=='all' and 'dob' in columns:
+            return Q(dob__icontains=search)
+        return Q()
 
     def dod_cond(type):
-        if dod_search:
+        if type == 'col' and dod_search:
             return Q(dod__icontains=dod_search)
-        else:
-            return Q()
+        elif type=='all' and 'dod' in columns:
+            return Q(dod__icontains=search)
+        return Q()
 
     def status_cond(type):
         if status_search:
@@ -379,9 +382,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             tag_no_cond('all') |
             name_cond('all') |
             desc_cond('all') |
-            Q(date_of_registration__icontains=search) |
-            Q(dob__icontains=search) |
-            Q(dod__icontains=search) |
+            dor_cond('all') |
+            dob_cond('all') |
+            dod_cond('all') |
             Q(status__icontains=search) |
             Q(sex__icontains=search) |
             Q(litter_size__iexact=litter_search) |
@@ -425,9 +428,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             tag_no_cond('all') |
             name_cond('all') |
             desc_cond('all') |
-            Q(date_of_registration__icontains=search) |
-            Q(dob__icontains=search) |
-            Q(dod__icontains=search) |
+            dor_cond('all') |
+            dob_cond('all') |
+            dod_cond('all') |
             Q(status__icontains=search) |
             Q(sex__icontains=search) |
             Q(litter_size__iexact=litter_search) |
