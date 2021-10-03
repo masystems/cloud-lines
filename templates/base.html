@@ -148,18 +148,6 @@
                 <!-- User profile and search -->
                 <!-- ============================================================== -->
                 <ul class="navbar-nav my-lg-0">
-                    <li class="nav-item hidden-sm-down">
-                        {% if user.is_authenticated %}
-
-                        <form class="app-search" method="POST" action="{% url 'results' %}" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <input type="text" name="search" id="search" class="form-control" placeholder="{% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %}search">
-                            <button type="submit" class="srh-btn mr-2" style="border:none">
-                                <i class="ti-search"></i>
-                            </button>
-                        </form>
-                        {% endif %}
-                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href=""
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fad fa-user-circle fa-lg"></i> {{ request.user.get_full_name }}</a>
