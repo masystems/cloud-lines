@@ -153,6 +153,13 @@ def get_pedigrees(request):
     else:
         sale_hire_search = ''
 
+    # search_int (make an int, if possible, to be used to include litter size in the search all)
+    search_int = ''
+    try:
+        search_int = int(search)
+    except ValueError:
+        pass
+
     # desc or asc
     if request.POST.get('order[0][dir]') == 'asc':
         direction = ""
@@ -181,7 +188,8 @@ def get_pedigrees(request):
                     desc_search=desc_search, dor_search=dor_search, dob_search=dob_search, dod_search=dod_search,
                     status_search=status_search, sex_search=sex_search, litter_search=litter_search,
                     father_search=father_search, father_notes_search=father_notes_search, mother_search=mother_search, 
-                    mother_notes_search=mother_notes_search, breed_search=breed_search, sale_hire_search=sale_hire_search)
+                    mother_notes_search=mother_notes_search, breed_search=breed_search, sale_hire_search=sale_hire_search,
+                    search_int=search_int)
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
@@ -239,7 +247,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         search="", breeder_search="", owner_search="", reg_no_search="", tag_no_search="", name_search="", desc_search="", 
         dor_search="", dob_search="", dod_search="", status_search="", sex_search="", litter_search="",
         father_search="", father_notes_search="", mother_search="", mother_notes_search="",
-        breed_search="", sale_hire_search=""):
+        breed_search="", sale_hire_search="", search_int=""):
     
     # reg_no, name, litter_size, sale_or_hire - none of these can be None - the rest of the filterable fields can
 
@@ -322,13 +330,6 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         elif type=='all' and 'sex' in columns:
             return Q(sex__icontains=search)
         return Q()
-
-    # make an int, if possible, to be used to include litter size in the search all
-    search_int = ''
-    try:
-        search_int = int(search)
-    except ValueError:
-        pass
 
     def litter_cond(type):
         if type == 'col' and litter_search:
