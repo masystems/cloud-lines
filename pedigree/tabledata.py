@@ -379,8 +379,10 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
                     return Q(sale_or_hire=True)
                 elif sale_hire_search.lower() in 'false':
                     return Q(sale_or_hire=False)
+                else:
+                    return Q(sale_or_hire=None)
             except SyntaxError:
-                return Q()
+                return Q(sale_or_hire=None)
         elif type=='all' and 'sale_or_hire' in columns:
             try:
                 if search.lower() in 'true':
@@ -388,8 +390,8 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
                 elif search.lower() in 'false':
                     return Q(sale_or_hire=False)
             except SyntaxError:
-                return Q()
-        return Q()
+                return Q(sale_or_hire=None)
+        return Q(sale_or_hire=None)
 
     # filter pedigrees
     if "" == search == breeder_search == owner_search == reg_no_search == tag_no_search == name_search == desc_search\
