@@ -160,6 +160,16 @@ def get_pedigrees(request):
     except ValueError:
         pass
 
+    # search_date (convert into date like we do for the filter date inputs but for the search input)
+    search_date = ''
+    search_list = search.split('-')
+    if len(search_list) == 3:
+        search_date = f'{search_list[2]}-{search_list[1]}-{search_list[0]}'
+    elif len(search_list) == 2:
+        search_date = f'{search_list[1]}-{search_list[0]}'
+    else:
+        search_date = search_list[0]
+
     # desc or asc
     if request.POST.get('order[0][dir]') == 'asc':
         direction = ""
@@ -189,7 +199,7 @@ def get_pedigrees(request):
                     status_search=status_search, sex_search=sex_search, litter_search=litter_search,
                     father_search=father_search, father_notes_search=father_notes_search, mother_search=mother_search, 
                     mother_notes_search=mother_notes_search, breed_search=breed_search, sale_hire_search=sale_hire_search,
-                    search_int=search_int)
+                    search_int=search_int, search_date=search_date)
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
@@ -247,7 +257,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         search="", breeder_search="", owner_search="", reg_no_search="", tag_no_search="", name_search="", desc_search="", 
         dor_search="", dob_search="", dod_search="", status_search="", sex_search="", litter_search="",
         father_search="", father_notes_search="", mother_search="", mother_notes_search="",
-        breed_search="", sale_hire_search="", search_int=""):
+        breed_search="", sale_hire_search="", search_int="", search_date=""):
     
     # reg_no, name, litter_size, sale_or_hire - none of these can be None - the rest of the filterable fields can
 
@@ -300,21 +310,21 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         if type == 'col' and dor_search:
             return Q(date_of_registration__icontains=dor_search)
         elif type=='all' and 'date_of_registration' in columns:
-            return Q(date_of_registration__icontains=search)
+            return Q(date_of_registration__icontains=search_date)
         return Q()
 
     def dob_cond(type):
         if type == 'col' and dob_search:
             return Q(dob__icontains=dob_search)
         elif type=='all' and 'dob' in columns:
-            return Q(dob__icontains=search)
+            return Q(dob__icontains=search_date)
         return Q()
 
     def dod_cond(type):
         if type == 'col' and dod_search:
             return Q(dod__icontains=dod_search)
         elif type=='all' and 'dod' in columns:
-            return Q(dod__icontains=search)
+            return Q(dod__icontains=search_date)
         return Q()
 
     def status_cond(type):
