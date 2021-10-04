@@ -64,40 +64,36 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form class="form-control-line" method="POST" action="{% url 'results' %}"
-                        enctype="multipart/form-data">
-                        {% csrf_token %}
-
-                        <div class="form-group has-success">
-                            <div class="form-group has-success">
-                                <label class="form-control-label" for="search"> Search</label>
-                                <input class="form-control form-control-success" name="search" id="search" required type="text">
-                            </div>
-
-                            {% if error %}
-                            <br>
-                                <div class="alert alert-warning" role="alert">
-                                    {{ error }}<strong>{{ search_string }}</strong>.
-                                </div>
-                            {% endif %}
-                        </div>
-                    </form>
-                    <table id="pedigree_table" class="table table-striped table-bordered display no-wrap"
-                            style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                {% for col in columns %}
-                                    {% for ped_col, data in column_data.items %}
-                                        {% if col == data.db_id %}
-                                            <th>{{ data.name }}</th>
-                                        {% endif %}
+                    <div class="table-responsive">
+                        <table id="pedigree_table" class="table table-striped table-bordered display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    {% for col in columns %}
+                                        {% for ped_col, data in column_data.items %}
+                                            {% if col == data.db_id %}
+                                                <th>{{ data.name }}</th>
+                                            {% endif %}
+                                        {% endfor %}
                                     {% endfor %}
-                                {% endfor %}
-                            </tr>
-                        </thead>
-
-                    </table>
+                                </tr>
+                                <tr class='filters'>
+                                    <th></th>
+                                    {% for col in columns %}
+                                        {% for ped_col, data in column_data.items %}
+                                            {% if col == data.db_id %}
+                                                <th>
+                                                    {% if col != 'coi' and col != 'mean_kinship' %}
+                                                        <input type="text" placeholder="Filter {{ data.name }}" />
+                                                    {% endif %}
+                                                </th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,14 +103,19 @@
 
 {% block footer %}
 
+    <!--This page plugins -->
+    <script src="{% static 'dist/js/pages/datatable/custom-datatable.js' %}"></script>
+
     <script src="{% static 'assets/libs/datatables/media/js/jquery.dataTables.min.js' %}"></script>
+
     <script>
-        var page = 'members-detailed';
-        var members_table = $('#pedigree_table').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "responsive": true,
-            "scrollX": true,
+        var pedigree_table = $('#pedigree_table').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            scrollX: true,
+            orderCellsTop: true,
+            fixedHeader: true,
             stateSave: true,
             "ajax": {
                 url: "{% url 'get_pedigrees' %}",
@@ -133,7 +134,59 @@
                 {% endfor %}
             ],
             "language": {
-                "search": "Filter:"
+                "search": "Search all:"
+            },
+            initComplete: function() {
+                var api = this.api();
+
+                // For each column
+                api
+                .columns()
+                .eq(0)
+                .each(function (colIdx) {
+                    // // Set the header cell to contain the input element
+                    // var cell = $('.filters th').eq(
+                    //     $(api.column(colIdx).header()).index()
+                    // );
+                    // var title = $(cell).text();
+                    // if (title != '') {
+                    //     $(cell).html('<input type="text" placeholder="Search ' + title + '" />');
+                    // }
+
+                    // make sure filter inputs haven't forgotten values after refresh
+                    $('input', $('.filters th').eq($(api.column(colIdx).header()).index())).val(api.column(colIdx).search())
+
+                    // On every keypress in this input
+                    $(
+                        'input',
+                        $('.filters th').eq($(api.column(colIdx).header()).index())
+                    )
+                        .off('keyup change')
+                        .on('keyup change', function (e) {
+                            e.stopPropagation();
+
+                            // Get the search value
+                            $(this).attr('title', $(this).val());
+                            var regexr = '{search}'; //$(this).parents('th').find('select').val();
+
+                            var cursorPosition = this.selectionStart;
+                            // Search the column for that value
+                            api
+                                .column(colIdx)
+                                .search(
+                                    this.value != ''
+                                        ? regexr.replace('{search}', this.value)
+                                        : '',
+                                    this.value != '',
+                                    this.value == ''
+                                )
+                                .draw();
+
+                            $(this)
+                                .focus()[0]
+                                .setSelectionRange(cursorPosition, cursorPosition);
+                        });
+                });
             }
         });
     </script>

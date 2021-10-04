@@ -67,9 +67,17 @@ class Pedigree(models.Model):
         if self.parent_father:
             return self.parent_father.reg_no
 
+    def parent_father_name(self):
+        if self.parent_father:
+            return self.parent_father.name
+
     def parent_mother_reg_no(self):
         if self.parent_mother:
             return self.parent_mother.reg_no
+
+    def parent_mother_name(self):
+        if self.parent_mother:
+            return self.parent_mother.name
 
     def breeder_breeding_prefix(self):
         if self.breeder:

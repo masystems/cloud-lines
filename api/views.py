@@ -1,8 +1,8 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication, SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import ApiLargeTierQueueSerializer, \
+    ApiReportQueueSerializer, \
     ApiAttachedServiceSerializer, \
     ApiPedigreeSerializer, \
     ApiPedigreeImageSerializer,\
@@ -15,6 +15,7 @@ from .serializers import ApiLargeTierQueueSerializer, \
     ApiServiceSerializer, \
     ApiAuthentication
 from cloud_lines.models import LargeTierQueue
+from reports.models import ReportQueue
 from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
@@ -22,9 +23,9 @@ from breed_group.models import BreedGroup
 from cloud_lines.models import Service, Faq
 from account.models import UserDetail, AttachedService
 from metrics.models import KinshipQueue, DataValidatorQueue
-from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.decorators import permission_classes
 from account.views import get_main_account
 from django.db.models import Q
 
@@ -34,6 +35,15 @@ class LargeTierQueueViews(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
     queryset = LargeTierQueue.objects.all()
     serializer_class = ApiLargeTierQueueSerializer
+    filter_backends = [SearchFilter]
+    search_fields = '__all__'
+
+
+@permission_classes((AllowAny, ))
+class ReportQueueViews(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
+    queryset = ReportQueue.objects.all()
+    serializer_class = ApiReportQueueSerializer
     filter_backends = [SearchFilter]
     search_fields = '__all__'
 
