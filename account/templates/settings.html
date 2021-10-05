@@ -834,8 +834,46 @@
                                     });
                                 </script>
                             {% endif %}
+                            {% if editor or breeds_editable|length > 0 %}
+                                <hr>
+                                <h4>Logo</h4>
+                                {% if service.image %}
+                                    <div class="card-columns el-element-overlay">
+                                        <div class="card">
+                                            <div class="el-card-item">
+                                                <div class="el-card-avatar el-overlay-1">
+                                                    <a class="image-popup-vertical-fit" href="{{ service.image.url }}"> <img class="img" src="{{ service.image.url }}" alt="{{ service.image }}" /> </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <p>Upload a logo to be displayed in the pedigree certificates and the census.</p>
+                                <form action="{% url 'logo_upload' %}" class="dropzone" id="imageUploads"></form>
+                                <script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
+                                <script>
+                                    Dropzone.options.imageUploads= {
+                                    url: "{% url 'logo_upload' %}",
+                                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                    method: "POST",
+                                    autoProcessQueue: true,
+                                    uploadMultiple: true,
+                                    parallelUploads: 5,
+                                    maxFiles: 10,
+                                    acceptedFiles: 'image/*',
+                                    addRemoveLinks: true,
+                                    ignoreHiddenFiles: true,
+                                    dictDefaultMessage: "Click or drop files here to upload",
+                                    resizeWidth: 1000,
+                                    resizeHeight: 1000,
+                                    resizeMethod: 'contain',
+                                    resizeQuality: 1.0,
+                                    }
+                                </script>
+                            {% endif %}
                         </div>
                     </div>
+                    <!-- metrics tab -->
                     <div class="tab-pane" id="metrics" role="tabpanel">
                         <div class="card-body">
 
