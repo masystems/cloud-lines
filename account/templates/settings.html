@@ -837,12 +837,12 @@
                             {% if editor or breeds_editable|length > 0 %}
                                 <hr>
                                 <h4>Logo</h4>
-                                {% if attached_service.image %}
+                                {% if service.image %}
                                     <div class="card-columns el-element-overlay">
                                         <div class="card">
                                             <div class="el-card-item">
                                                 <div class="el-card-avatar el-overlay-1">
-                                                    <img src="{{ attached_service.image.url }}" alt="{{ attached_service.image }}" />
+                                                    <a class="image-popup-vertical-fit" href="{{ service.image.url }}"> <img class="img" src="{{ service.image.url }}" alt="{{ service.image }}" /> </a>
                                                 </div>
                                             </div>
                                         </div>
