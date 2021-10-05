@@ -778,6 +778,7 @@ def image_upload(request, id):
 
     image = request.FILES['file[0]']
     from PIL import Image
+    #from PIL.Image import core as _imaging
     from django.core.files.base import ContentFile
     import pyheif
     from io import BytesIO
