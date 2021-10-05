@@ -56,6 +56,7 @@
                                 <p>Please upload one .CSV file at a time, with each value separated by a comma.</p>
                                 <p>Breeders/owners should be imported first, as pedigrees cannot reference any breeders/owners that do not already exist in the database.</p>
                                 <p>If you are importing breeders/pedigrees which are already in the database, the existing entries will be overwritten with your new entries.</p>
+                                <p>You can download an example .CSV import file by clicking <a href="https://s3.eu-west-1.amazonaws.com/media.cloud-lines.com/pedigree_import_file_example_v1.0.csv"><strong><u>here</u></strong></a>.</p>
                                 {% if error %}
                                     <div class="alert alert-danger">{{ error }} </div>
                                 {% endif %}

@@ -107,9 +107,13 @@ def get_pedigrees(request):
     # litter_search
     if 'litter_size' in attached_service.pedigree_columns.split(','):
         litter_index = int(attached_service.pedigree_columns.split(',').index('litter_size')) + 1
-        try:
-            litter_search = int(request.POST.get(f'columns[{litter_index}][search][value]'))
-        except ValueError:
+        if request.POST.get(f'columns[{litter_index}][search][value]'):
+            try:
+                litter_search = int(request.POST.get(f'columns[{litter_index}][search][value]'))
+            except ValueError:
+                # invalid input
+                litter_search = -1
+        else:
             litter_search = ''
     else:
         litter_search = ''
@@ -153,6 +157,23 @@ def get_pedigrees(request):
     else:
         sale_hire_search = ''
 
+    # search_int (make an int, if possible, to be used to include litter size in the search all)
+    search_int = ''
+    try:
+        search_int = int(search)
+    except ValueError:
+        pass
+
+    # search_date (convert into date like we do for the filter date inputs but for the search input)
+    search_date = ''
+    search_list = search.split('-')
+    if len(search_list) == 3:
+        search_date = f'{search_list[2]}-{search_list[1]}-{search_list[0]}'
+    elif len(search_list) == 2:
+        search_date = f'{search_list[1]}-{search_list[0]}'
+    else:
+        search_date = search_list[0]
+
     # desc or asc
     if request.POST.get('order[0][dir]') == 'asc':
         direction = ""
@@ -181,7 +202,8 @@ def get_pedigrees(request):
                     desc_search=desc_search, dor_search=dor_search, dob_search=dob_search, dod_search=dod_search,
                     status_search=status_search, sex_search=sex_search, litter_search=litter_search,
                     father_search=father_search, father_notes_search=father_notes_search, mother_search=mother_search, 
-                    mother_notes_search=mother_notes_search, breed_search=breed_search, sale_hire_search=sale_hire_search)
+                    mother_notes_search=mother_notes_search, breed_search=breed_search, sale_hire_search=sale_hire_search,
+                    search_int=search_int, search_date=search_date)
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
@@ -239,7 +261,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         search="", breeder_search="", owner_search="", reg_no_search="", tag_no_search="", name_search="", desc_search="", 
         dor_search="", dob_search="", dod_search="", status_search="", sex_search="", litter_search="",
         father_search="", father_notes_search="", mother_search="", mother_notes_search="",
-        breed_search="", sale_hire_search=""):
+        breed_search="", sale_hire_search="", search_int="", search_date=""):
     
     # reg_no, name, litter_size, sale_or_hire - none of these can be None - the rest of the filterable fields can
 
@@ -292,21 +314,21 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
         if type == 'col' and dor_search:
             return Q(date_of_registration__icontains=dor_search)
         elif type=='all' and 'date_of_registration' in columns:
-            return Q(date_of_registration__icontains=search)
+            return Q(date_of_registration__icontains=search_date)
         return Q()
 
     def dob_cond(type):
         if type == 'col' and dob_search:
             return Q(dob__icontains=dob_search)
         elif type=='all' and 'dob' in columns:
-            return Q(dob__icontains=search)
+            return Q(dob__icontains=search_date)
         return Q()
 
     def dod_cond(type):
         if type == 'col' and dod_search:
             return Q(dod__icontains=dod_search)
         elif type=='all' and 'dod' in columns:
-            return Q(dod__icontains=search)
+            return Q(dod__icontains=search_date)
         return Q()
 
     def status_cond(type):
@@ -318,17 +340,10 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
 
     def sex_cond(type):
         if type == 'col' and sex_search:
-            return Q(sex__icontains=sex_search)
+            return Q(sex__iexact=sex_search)
         elif type=='all' and 'sex' in columns:
-            return Q(sex__icontains=search)
+            return Q(sex__iexact=search)
         return Q()
-
-    # make an int, if possible, to be used to include litter size in the search all
-    search_int = ''
-    try:
-        search_int = int(search)
-    except ValueError:
-        pass
 
     def litter_cond(type):
         if type == 'col' and litter_search:
@@ -379,16 +394,20 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
                     return Q(sale_or_hire=True)
                 elif sale_hire_search.lower() in 'false':
                     return Q(sale_or_hire=False)
+                else:
+                    return Q(sale_or_hire=None)
             except SyntaxError:
-                return Q()
-        elif type=='all' and 'sale_or_hire' in columns:
+                return Q(sale_or_hire=None)
+        elif type=='all' and 'sale_or_hire' in columns and search:
             try:
                 if search.lower() in 'true':
                     return Q(sale_or_hire=True)
                 elif search.lower() in 'false':
                     return Q(sale_or_hire=False)
+                else:
+                    return Q(sale_or_hire=None)
             except SyntaxError:
-                return Q()
+                return Q(sale_or_hire=None)
         return Q()
 
     # filter pedigrees
@@ -460,7 +479,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             mother_cond('all') |
             mother_notes_cond('all') |
             breed_cond('all') |
-            sale_hire_cond('col')),
+            sale_hire_cond('all')),
             breeder_cond('col'),
             owner_cond('col'),
             reg_no_cond('col'),
