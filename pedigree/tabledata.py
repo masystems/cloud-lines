@@ -111,6 +111,7 @@ def get_pedigrees(request):
             try:
                 litter_search = int(request.POST.get(f'columns[{litter_index}][search][value]'))
             except ValueError:
+                # invalid input
                 litter_search = -1
         else:
             litter_search = ''
