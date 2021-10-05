@@ -107,9 +107,13 @@ def get_pedigrees(request):
     # litter_search
     if 'litter_size' in attached_service.pedigree_columns.split(','):
         litter_index = int(attached_service.pedigree_columns.split(',').index('litter_size')) + 1
-        try:
-            litter_search = int(request.POST.get(f'columns[{litter_index}][search][value]'))
-        except ValueError:
+        if request.POST.get(f'columns[{litter_index}][search][value]'):
+            try:
+                litter_search = int(request.POST.get(f'columns[{litter_index}][search][value]'))
+            except ValueError:
+                # invalid input
+                litter_search = -1
+        else:
             litter_search = ''
     else:
         litter_search = ''
