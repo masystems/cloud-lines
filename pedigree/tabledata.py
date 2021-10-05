@@ -340,9 +340,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
 
     def sex_cond(type):
         if type == 'col' and sex_search:
-            return Q(sex__icontains=sex_search)
+            return Q(sex__iexact=sex_search)
         elif type=='all' and 'sex' in columns:
-            return Q(sex__icontains=search)
+            return Q(sex__iexact=search)
         return Q()
 
     def litter_cond(type):
