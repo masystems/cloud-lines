@@ -706,6 +706,39 @@ def update_pedigree_columns(request):
 
 
 @login_required(login_url="/account/login")
+def logo_upload(request):
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+
+    attached_service = get_main_account(request.user)
+
+    image = request.FILES['file[0]']
+    from PIL import Image
+    #from PIL.Image import core as _imaging
+    from django.core.files.base import ContentFile
+    import pyheif
+    from io import BytesIO
+    from os import path
+
+    filename, file_extension = path.splitext(str(request.FILES['file[0]']))
+    if file_extension == ".HEIC":
+        img_io = BytesIO()
+        heif_file = pyheif.read(request.FILES['file[0]'])
+        image = Image.frombytes(mode=heif_file.mode, size=heif_file.size, data=heif_file.data)
+        image.save(img_io, format='JPEG', quality=100)
+        image = ContentFile(img_io.getvalue(), f"{filename}.jpeg")
+
+    attached_service.image = image
+    attached_service.save()
+    return HttpResponse('')
+
+
+@login_required(login_url="/account/login")
 def metrics_switch(request):
     # permission check
     if request.method == 'GET':
