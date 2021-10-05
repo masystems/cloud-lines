@@ -390,16 +390,20 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
                     return Q(sale_or_hire=True)
                 elif sale_hire_search.lower() in 'false':
                     return Q(sale_or_hire=False)
+                else:
+                    return Q(sale_or_hire=None)
             except SyntaxError:
-                return Q()
-        elif type=='all' and 'sale_or_hire' in columns:
+                return Q(sale_or_hire=None)
+        elif type=='all' and 'sale_or_hire' in columns and search:
             try:
                 if search.lower() in 'true':
                     return Q(sale_or_hire=True)
                 elif search.lower() in 'false':
                     return Q(sale_or_hire=False)
+                else:
+                    return Q(sale_or_hire=None)
             except SyntaxError:
-                return Q()
+                return Q(sale_or_hire=None)
         return Q()
 
     # filter pedigrees
@@ -471,7 +475,7 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
             mother_cond('all') |
             mother_notes_cond('all') |
             breed_cond('all') |
-            sale_hire_cond('col')),
+            sale_hire_cond('all')),
             breeder_cond('col'),
             owner_cond('col'),
             reg_no_cond('col'),
