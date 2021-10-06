@@ -2,6 +2,9 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.views.decorators.cache import never_cache
+from django.utils.datastructures import MultiValueDictKeyError
+from django.core import serializers
 from .models import Breeder
 from pedigree.models import Pedigree
 from pedigree.functions import get_site_pedigree_column_headings
@@ -213,3 +216,27 @@ def breeder_check(request):
         attached_service = get_main_account(request.user)
         breeding_prefix = request.POST.get('breeding_prefix')
         return HttpResponse(Breeder.objects.filter(account=attached_service, breeding_prefix=breeding_prefix).exists())
+
+
+@login_required(login_url="/account/login")
+@user_passes_test(is_editor, "/account/login")
+@never_cache
+def get_breeder_details(request):
+    attached_service = get_main_account(request.user)
+    
+    # get the pedigree that was input
+    try:
+        breeder = Breeder.objects.get(account=attached_service, breeding_prefix=request.GET['id'])
+    except Breeder.DoesNotExist:
+        return HttpResponse(json.dumps({'result': 'fail'}))
+    except MultiValueDictKeyError:
+        return HttpResponse(json.dumps({'result': 'fail'}))
+
+    # if the input field required breeder to be free, return fail if the input breeder is not free
+    if request.GET.get('type'):
+        if (request.GET['type'] == 'free' and breeder.user):
+            return HttpResponse(json.dumps({'result': 'fail'}))
+    
+    breeder = serializers.serialize('json', [breeder], ensure_ascii=False)
+    return HttpResponse(json.dumps({'result': 'success',
+                                    'breeder': breeder}))

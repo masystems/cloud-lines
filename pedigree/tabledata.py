@@ -8,6 +8,7 @@ from .functions import get_site_pedigree_column_headings
 from json import dumps
 from django.urls import reverse
 from .views import update_pedigree_cf
+from breeder.models import Breeder
 
 
 @login_required(login_url='/accounts/login/')
@@ -536,5 +537,23 @@ def get_ta_pedigrees(request, sex, state, avoid):
                                        **filter_state).exclude(id=avoid)[:10]
 
     data = serialize('json', list(all_peds), fields=('reg_no', 'name', 'tag_no'))
+    return HttpResponse(data)
+
+def get_ta_breeders(request, type):
+    attached_service = get_main_account(request.user)
+    query = request.GET['query']
+
+    # only get breeder that currently don't have a user
+    if type == 'free':
+        breeders = Breeder.objects.filter(Q(breeding_prefix__icontains=query) |
+                                       Q(contact_name__icontains=query),
+                                       account=attached_service,
+                                       user=None)[:10]
+    elif type == 'all':
+        breeders = Breeder.objects.filter(Q(breeding_prefix__icontains=query) |
+                                       Q(contact_name__icontains=query),
+                                       account=attached_service)[:10]
+
+    data = serialize('json', list(breeders), fields=('breeding_prefix', 'contact_name'))
     return HttpResponse(data)
 
