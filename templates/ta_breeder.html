@@ -59,15 +59,14 @@
                         if (result.breeder) {
                             breeder_array = JSON.parse(result.breeder)
                             breeder = breeder_array[0]
-                            // append breeder name
-                            info_element.html(
-                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + breeder.fields.name + '</li>'
-                            );
-                            // if one exists, append breeder tag number
-                            if (breeder.fields.tag_no != '' && breeder.fields.tag_no != null) {
-                                info_element.html(info_element.html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + breeder.fields.tag_no + '</li>')
+                            // if one exists, append breeder contact name
+                            if (breeder.fields.contact_name != '' && breeder.fields.contact_name != null) {
+                                // append breeder name
+                                info_element.html(
+                                    '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + breeder.fields.contact_name + '</li>'
+                                );
+                                info_element.removeClass('d-none');
                             }
-                            info_element.removeClass('d-none');
                         }
                     } else {
                         // hide info
