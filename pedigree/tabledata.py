@@ -347,9 +347,9 @@ def get_filtered_pedigrees(attached_service, sort_by_col, start, end, columns,
 
     def litter_cond(type):
         if type == 'col' and litter_search:
-            return Q(litter_size__iexact=litter_search)
-        elif type=='all' and 'litter_size' in columns:
-            return Q(litter_size__iexact=search_int)
+            return Q(litter_size=litter_search)
+        elif type=='all' and 'litter_size' in columns and search_int:
+            return Q(litter_size=search_int)
         return Q()
 
     def father_cond(type):
