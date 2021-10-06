@@ -13,5 +13,7 @@ urlpatterns = [
     path('<int:pedigree_id>/certificate/<str:type>', views.GeneratePDF.as_view(), name='cert'),
     path('get-pedigrees', tabledata.get_pedigrees, name="get_pedigrees"),
     path('get_pedigree_details', views.get_pedigree_details, name="get_pedigree_details"),
+    path('get_breeder_details', views.get_breeder_details, name="get_breeder_details"),
     path('get-ta-pedigrees/<str:sex>/<str:state>/<str:avoid>', tabledata.get_ta_pedigrees, name="get_ta_pedigrees"),
+    path('get-ta-breeders/<str:type>', tabledata.get_ta_breeders, name="get_ta_breeders")
 ]

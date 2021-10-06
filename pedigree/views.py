@@ -950,6 +950,30 @@ def get_pedigree_details(request):
                                     'pedigree': pedigree}))
 
 
+@login_required(login_url="/account/login")
+@user_passes_test(is_editor, "/account/login")
+@never_cache
+def get_breeder_details(request):
+    attached_service = get_main_account(request.user)
+    
+    # get the pedigree that was input
+    try:
+        breeder = Breeder.objects.get(account=attached_service, breeding_prefix=request.GET['id'])
+    except Breeder.DoesNotExist:
+        return HttpResponse(json.dumps({'result': 'fail'}))
+    except MultiValueDictKeyError:
+        return HttpResponse(json.dumps({'result': 'fail'}))
+
+    # if the input field required breeder to be free, return fail if the input breeder is not free
+    if request.GET.get('type'):
+        if (request.GET['type'] == 'free' and breeder.user):
+            return HttpResponse(json.dumps({'result': 'fail'}))
+    
+    breeder = serializers.serialize('json', [breeder], ensure_ascii=False)
+    return HttpResponse(json.dumps({'result': 'success',
+                                    'breeder': breeder}))
+
+
 def update_pedigree_cf(attached_service, pedigree):
     # check custom fields are correct
     try:

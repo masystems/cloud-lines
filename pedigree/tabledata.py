@@ -8,6 +8,7 @@ from .functions import get_site_pedigree_column_headings
 from json import dumps
 from django.urls import reverse
 from .views import update_pedigree_cf
+from breeder.models import Breeder
 
 
 @login_required(login_url='/accounts/login/')
@@ -538,37 +539,21 @@ def get_ta_pedigrees(request, sex, state, avoid):
     data = serialize('json', list(all_peds), fields=('reg_no', 'name', 'tag_no'))
     return HttpResponse(data)
 
-def get_ta_breeders(request, sex, state, avoid):
+def get_ta_breeders(request, type):
     attached_service = get_main_account(request.user)
     query = request.GET['query']
 
-    # if sex is given, filter for the given sex
-    filter_sex = {}
-    if sex in ["male", "female", "castrated"]:
-        filter_sex = {'sex': sex}
-
-    # if state given, filter for the given state
-    filter_state = {}
-    if state in ["alive", "dead", "unknown"]:
-        filter_state = {'status': state}
-
-    if avoid == "any":
-        # don't need to avoid any self pedigrees
-        all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
-                                       Q(name__icontains=query) |
-                                       Q(tag_no__icontains=query),
+    # only get breeder that currently don't have a user
+    if type == 'free':
+        breeders = Breeder.objects.filter(Q(breeding_prefix__icontains=query) |
+                                       Q(contact_name__icontains=query),
                                        account=attached_service,
-                                       **filter_sex,
-                                       **filter_state)[:10]
-    else:
-        # need to avoid a self pedigree
-        all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
-                                       Q(name__icontains=query) |
-                                       Q(tag_no__icontains=query),
-                                       account=attached_service,
-                                       **filter_sex,
-                                       **filter_state).exclude(id=avoid)[:10]
+                                       user=None)[:10]
+    elif type == 'all':
+        breeders = Breeder.objects.filter(Q(breeding_prefix__icontains=query) |
+                                       Q(contact_name__icontains=query),
+                                       account=attached_service)[:10]
 
-    data = serialize('json', list(all_peds), fields=('reg_no', 'name', 'tag_no'))
+    data = serialize('json', list(breeders), fields=('breeding_prefix', 'contact_name'))
     return HttpResponse(data)
 
