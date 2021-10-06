@@ -14,7 +14,7 @@
             source: function (query, sync, async) {
                 return $.getJSON("{% url 'get_ta_breeders' 'free' %}", { query: query }, function (data) {
                     data = data.map(function(item) {
-                        item.display = item.fields.reg_no;
+                        item.display = item.fields.breeding_prefix;
                         return item;
                     })
                     async(data);
@@ -37,8 +37,6 @@
 
     // Ajax call to get and display name if a full breeder is in any of the fields
     $('#breeding_prefix').bind('keyup change click typeahead:select', function() {
-        // there is no single breeder we are editing, as this is metrics page
-        var breeder_reg = ''
         // get the element that has triggered this function
         var input_element = $(this)
         // get the corresponding info element and parent type
