@@ -71,7 +71,8 @@ def dashboard(request):
                                               'breed_groups': breed_groups,
                                               'breed_chart': breed_chart,
                                               'pedigree_chart': pedigree_chart,
-                                              'living_chart': living_chart})
+                                              'living_chart': living_chart,
+                                              'graphs': json.loads(request.user.user.first().graphs)})
                                               # 'updates': updates,
                                               # 'update_card_size': update_card_size})
 
