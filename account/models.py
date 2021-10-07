@@ -15,9 +15,10 @@ class UserDetail(models.Model):
     stripe_id = models.CharField(max_length=50, blank=True)
     current_service = models.ForeignKey('AttachedService', on_delete=models.SET_NULL, null=True, blank=True)
     graphs = models.TextField(default=dumps({
-        'g1': {'id': 'total_line', 'title': 'Total Pedigrees History', 'selected': True}, 
-        'g2': {'id': 'total_bar', 'title': 'Total Pedigrees', 'selected': True},
-        'g3': {'id': 'living_bar', 'title': 'Total Pedigrees Alive', 'selected': False}
+        'g1': {'id': 'total_line', 'title': 'Total Pedigrees History', 'selected': False}, 
+        'g2': {'id': 'total_bar', 'title': 'Total Pedigrees', 'selected': False},
+        'g3': {'id': 'living_bar', 'title': 'Total Pedigrees Alive', 'selected': False},
+        'max': {'reached': False}
     }), verbose_name="Dashboard Graphs")
 
     def __str__(self):
