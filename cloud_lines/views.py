@@ -48,6 +48,10 @@ def dashboard(request):
             breed_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).exclude(state='unapproved').count(),
                                    'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).exclude(state='unapproved').count()}
 
+        living_chart = {}
+        for breed in Breed.objects.filter(account=main_account):
+            living_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male') & Q(status='alive')).exclude(state='unapproved').count(),
+                                   'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female') & Q(status='alive')).exclude(state='unapproved').count()}
     else:
         return redirect('welcome')
 
@@ -66,7 +70,8 @@ def dashboard(request):
                                               'latest_breeders': latest_breeders,
                                               'breed_groups': breed_groups,
                                               'breed_chart': breed_chart,
-                                              'pedigree_chart': pedigree_chart,})
+                                              'pedigree_chart': pedigree_chart,
+                                              'living_chart': living_chart})
                                               # 'updates': updates,
                                               # 'update_card_size': update_card_size})
 

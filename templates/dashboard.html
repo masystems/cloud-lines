@@ -217,6 +217,52 @@
                         </script>
                     </div>
                 </div>
+                <div class="row">
+                    <!-- Column -->
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Living Pedigrees</h4>
+                                {% if breed_chart %}
+                                    <div id="living-chart"></div>
+                                {% else %}
+                                    {% if editor or contributor or breeds_editable|length > 0 %}
+                                        <p>You still need to <a href="{% url 'new_pedigree_form' %}">add your first Pedigree</a>!</p>
+                                    {% else %}
+                                        <p>The first pedigree still needs to be added!</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <script>
+                            $(function () {
+                                "use strict";
+                                // Morris bar chart
+                                Morris.Bar({
+                                    element: 'living-chart'
+                                    , data: [
+                                        {% for key, val in living_chart.items %}
+                                            {
+                                                y: '{{ key|escape }}'
+                                                {% for key, val in val.items %}
+                                                    , {{ key|title }}: {{ val|escape }}
+                                                {% endfor %}
+                                    },
+                                    {% endfor %}]
+                                    , xkey: 'y'
+                                    , ykeys: ['Male', 'Female']
+                                    , labels: ['Male', 'Female']
+                                    , barColors: ['#0275d8', '#FFC0CB']
+                                    , hideHover: 'auto'
+                                    , gridLineColor: '#eef0f2'
+                                    , resize: true
+                                    , gridIntegers: true
+                                    , ymin: 0
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
             </div>
 
             <div class="col-md-4 col-lg-4 col-xlg-4">
