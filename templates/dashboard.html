@@ -134,54 +134,14 @@
                             <div class="card-body">
                                 <h4 class="card-title">Checkbox Square</h4>
                                 <ul class="list-group list-group-horizontal-lg">
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="checkbox">
-                                            <input id="checkbox0" type="checkbox" checked>
-                                            <label class="mb-0" for="checkbox0"> Default </label>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="checkbox checkbox-custom">
-                                            <input id="checkbox11" type="checkbox" checked>
-                                            <label class="mb-0" for="checkbox11"> Custom </label>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="checkbox checkbox-primary">
-                                            <input id="checkbox2" type="checkbox" checked>
-                                            <label class="mb-0" for="checkbox2"> Primary </label>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="checkbox checkbox-success">
-                                            <input id="checkbox3" type="checkbox" checked>
-                                            <label class="mb-0" for="checkbox3"> Success </label>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="checkbox checkbox-info">
-                                            <input id="checkbox4" type="checkbox" checked>
-                                            <label class="mb-0" for="checkbox4"> Info </label>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="checkbox checkbox-warning">
-                                            <input id="checkbox5" type="checkbox" checked>
-                                            <label class="mb-0" for="checkbox5"> Warning </label>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="checkbox checkbox-danger">
-                                            <input id="checkbox6" type="checkbox" checked>
-                                            <label class="mb-0" for="checkbox6"> Danger </label>
-                                        </div>
-                                    </li>
-                                    <li class="list-group-item d-flex align-items-center">
-                                        <div class="checkbox checkbox-inverse">
-                                            <input id="checkbox6c" type="checkbox" checked>
-                                            <label class="mb-0" for="checkbox6c"> Inverse </label>
-                                        </div>
-                                    </li>
+                                    {% for graph, selected in graphs.items %}
+                                        <li class="list-group-item d-flex align-items-center">
+                                            <div class="checkbox checkbox-success">
+                                                <input id="{{ graph }}" name="{{ graph }}" type="checkbox" {% if selected %}checked{% endif %}>
+                                                <label class="mb-0" for="{{ graph }}"> {{ graph }} </label>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
