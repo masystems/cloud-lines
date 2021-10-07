@@ -1,0 +1,82 @@
+<!-- living females and males for metrics page -->
+<script>
+    // use the data to set up typeahead
+    $('#breeders-free .typeahead').typeahead(
+        {
+            hint: false,
+            highlight: true,
+            minLength: 1,
+        },
+        {
+            name: 'freeBreeders',
+            // the text entered in the field after typeahead selected
+            displayKey: 'display',
+            source: function (query, sync, async) {
+                return $.getJSON("{% url 'get_ta_breeders' 'free' %}", { query: query }, function (data) {
+                    data = data.map(function(item) {
+                        item.display = item.fields.breeding_prefix;
+                        return item;
+                    })
+                    async(data);
+                });
+            },
+            templates: {
+                // this returns each suggestion for the dropdown
+                suggestion: function (breeder) {
+                    // check which breeder attribute matches the input
+                    if (breeder.fields.breeding_prefix.toLowerCase().indexOf(breeder._query.toLowerCase()) >= 0) {
+                        return '<p>' + breeder.fields.breeding_prefix + '</p>'
+                    }
+                    else if (breeder.fields.contact_name.toLowerCase().indexOf(breeder._query.toLowerCase()) >= 0) {
+                        return '<p>' + breeder.fields.contact_name + '</p>'
+                    }
+                }
+            },
+        }
+    );
+
+    // Ajax call to get and display name if a full breeder is in any of the fields
+    $('#breeding_prefix').bind('keyup change click typeahead:select', function() {
+        // get the element that has triggered this function
+        var input_element = $(this)
+        // get the corresponding info element and parent type
+        var info_element = $('#breeder-info')
+        var breeder_type = 'free'
+        
+        $.ajax({
+            url: "{% url 'get_breeder_details' %}",
+            type: 'GET',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: {'id': input_element.val(), 'breeder_type': breeder_type},
+            success: function(data) {
+                result = JSON.parse(data)
+
+                if (result.result == 'success') {
+                    // don't display names if no text in field
+                    if (input_element.val() != '') {
+                        // display full match
+                        if (result.breeder) {
+                            breeder_array = JSON.parse(result.breeder)
+                            breeder = breeder_array[0]
+                            // if one exists, append breeder contact name
+                            if (breeder.fields.contact_name != '' && breeder.fields.contact_name != null) {
+                                // append breeder name
+                                info_element.html(
+                                    '<li class="text-muted"><i class="ti-angle-right"></i><strong>Contact Name:</strong> ' + breeder.fields.contact_name + '</li>'
+                                );
+                                info_element.removeClass('d-none');
+                            }
+                        }
+                    } else {
+                        // hide info
+                        info_element.addClass('d-none');
+                    }
+                } else {
+                    // hide info
+                    info_element.addClass('d-none');
+                }
+            }
+        });
+    });
+</script>

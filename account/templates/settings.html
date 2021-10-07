@@ -211,9 +211,11 @@
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="breeding_prefix" class="control-label">Breeding Prefix (optional)</label>
-                                                            <div id="breeders" class="col-sm-9">
+                                                            <div id="breeders-free" class="col-sm-9">
                                                                 <input type="text" class="typeahead form-control" id="breeding_prefix" name="breeding_prefix" placeholder="Breeding Prefix">
                                                             </div>
+                                                            <!-- hidden note which will show prefix and contact name of breeder if a full match is in the text field -->
+                                                            <ul class="list-icons d-none" id="breeder-info"></ul>
                                                         </div>
                                                         <input type="hidden" id="formType" name="formType" value="new">
                                                     </div>
@@ -938,4 +940,8 @@
             }
         });
     </script>
+
+    <!-- typeahead for breeder prefix field -->
+    {% include 'ta_breeder.html' %}
+
 {% endblock %}
