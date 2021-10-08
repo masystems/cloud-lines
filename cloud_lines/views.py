@@ -6,6 +6,7 @@ from .models import Service, Page, Gallery, Faq, Testimonial, LargeTierQueue, Bl
 from .forms import ContactForm, BlogForm
 from account.models import UserDetail, AttachedService
 from account.views import get_main_account, send_mail, has_permission, redirect_2_login
+from account.graphs import get_graphs
 from django.conf import settings
 import json
 import stripe
@@ -72,7 +73,8 @@ def dashboard(request):
                                               'breed_chart': breed_chart,
                                               'pedigree_chart': pedigree_chart,
                                               'living_chart': living_chart,
-                                              'graphs': json.loads(request.user.user.first().graphs)})
+                                              'user_graphs': json.loads(request.user.user.first().graphs),
+                                              'account_graphs': json.loads(get_graphs())})
                                               # 'updates': updates,
                                               # 'update_card_size': update_card_size})
 
