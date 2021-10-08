@@ -79,7 +79,16 @@ def dashboard(request):
                                               # 'update_card_size': update_card_size})
 
 
+@login_required(login_url="/account/login")
 def select_graph(request):
+    # check permission (this is only used to receive POST requests)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': True, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
     print(request.POST)
     return HttpResponse(json.dumps({'hello': 'hello'}))
 
