@@ -137,7 +137,7 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-7 col-md-7 float-left">Total {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %}</h4>
+                                                    <h4 class="card-title col-sm-7 col-md-7">Total {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %}</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     <div class="col-sm-5 col-md-5 ">
                                                         <div class="btn-group btn-block">
@@ -193,7 +193,23 @@
                                     {% elif user_graph == 'total_bar' %}
                                         <div class="card">
                                             <div class="card-body">
-                                                <h4 class="card-title">Breed Chart</h4>
+                                                <div class="row">
+                                                    <h4 class="card-title col-sm-7 col-md-7">Breed Chart</h4>
+                                                    <!-- graph options to change/remove graph -->
+                                                    <div class="col-sm-5 col-md-5 ">
+                                                        <div class="btn-group btn-block">
+                                                            <button id="select-graph" type="button" class="btn btn-success dropdown-toggle ml-1"
+                                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                Change/Remove Graph
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                {% for account_graph in account_graphs.values %}
+                                                                    <button onclick="selectGraph(this)" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 {% if breed_chart %}
                                                     <div id="morris-bar-chart"></div>
                                                 {% else %}
@@ -235,7 +251,23 @@
                                     {% elif user_graph == 'living_bar' %}
                                         <div class="card">
                                             <div class="card-body">
-                                                <h4 class="card-title">Living Pedigrees</h4>
+                                                <div class="row">
+                                                    <h4 class="card-title col-sm-7 col-md-7">Living Pedigrees</h4>
+                                                    <!-- graph options to change/remove graph -->
+                                                    <div class="col-sm-5 col-md-5 ">
+                                                        <div class="btn-group btn-block">
+                                                            <button id="select-graph" type="button" class="btn btn-success dropdown-toggle ml-1"
+                                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                Change/Remove Graph
+                                                            </button>
+                                                            <div class="dropdown-menu">
+                                                                {% for account_graph in account_graphs.values %}
+                                                                    <button onclick="selectGraph(this)" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 {% if breed_chart %}
                                                     <div id="living-chart"></div>
                                                 {% else %}
