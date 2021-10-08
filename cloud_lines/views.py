@@ -94,8 +94,15 @@ def select_graph(request):
 
     if request.POST.get('action') == 'remove':
         try:
+            # remove the graph
             graphs = json.loads(user.graphs)
             graphs['selected'].remove(request.POST.get('graph'))
+            
+            # unset whether max graphs is reached if we need to
+            if graphs['max_reached'] and len(graphs['selected']) < 2:
+                graphs['max_reached'] = False
+
+            # save changes
             user.graphs = json.dumps(graphs)
             user.save()
         except ValueError:
