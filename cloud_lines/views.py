@@ -89,8 +89,25 @@ def select_graph(request):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
-    print(request.POST)
-    return HttpResponse(json.dumps({'hello': 'hello'}))
+
+    user = request.user.user.first()
+
+    if request.POST.get('action') == 'remove':
+        try:
+            graphs = json.loads(user.graphs)
+            graphs['selected'].remove(request.POST.get('graph'))
+            user.graphs = json.dumps(graphs)
+            user.save()
+        except ValueError:
+            return HttpResponse(json.dumps({'result': 'fail'}))
+    elif request.POST.get('action') == 'change':
+        print('change')
+    elif request.POST.get('action') == 'add':
+        print('add')
+
+    #if not json.loads(user_detail.graphs).max_reached
+
+    return HttpResponse(json.dumps({'result': 'success'}))
 
 
 def home(request):

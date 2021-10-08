@@ -147,9 +147,9 @@
                                                             </button>
                                                             <div class="dropdown-menu">
                                                                 {% for account_graph in account_graphs.values %}
-                                                                    <button onclick="selectGraph(this)" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                                                                    <button onclick="selectGraph(this, 'change')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
                                                                 {% endfor %}
-                                                                <button onclick="selectGraph(this)" class="dropdown-item" name="remove" value='remove'><strong>Remove Graph</strong></button>
+                                                                <button onclick="selectGraph(this, 'remove')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'><strong>Remove Graph</strong></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -205,9 +205,9 @@
                                                             </button>
                                                             <div class="dropdown-menu">
                                                                 {% for account_graph in account_graphs.values %}
-                                                                    <button onclick="selectGraph(this)" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                                                                    <button onclick="selectGraph(this, 'change')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
                                                                 {% endfor %}
-                                                                <button onclick="selectGraph(this)" class="dropdown-item" name="remove" value='remove'><strong>Remove Graph</strong></button>
+                                                                <button onclick="selectGraph(this, 'remove')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'><strong>Remove Graph</strong></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -264,9 +264,9 @@
                                                             </button>
                                                             <div class="dropdown-menu">
                                                                 {% for account_graph in account_graphs.values %}
-                                                                    <button onclick="selectGraph(this)" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                                                                    <button onclick="selectGraph(this, 'change')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
                                                                 {% endfor %}
-                                                                <button onclick="selectGraph(this)" class="dropdown-item" name="remove" value='remove'><strong>Remove Graph</strong></button>
+                                                                <button onclick="selectGraph(this, 'remove')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'><strong>Remove Graph</strong></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -316,16 +316,38 @@
                     </div>
                 </div>
 
+                <!-- graph options to add graph -->
+                {% if not user_graphs.max_reached %}
+                    <div class="row">
+                        <!-- Column -->
+                        <div class="col-lg-5">
+                            <div class="card">
+                                <div class="btn-group btn-block">
+                                    <button id="select-graph" type="button" class="btn btn-success dropdown-toggle ml-1"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Add Graph
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        {% for account_graph in account_graphs.values %}
+                                            <button onclick="selectGraph(this, 'add')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
                 <!-- javascript for selecting a graph -->
                 <script>
-                    function selectGraph(graph) {
+                    function selectGraph(graph, action) {
                         $.ajax({
                             url: "{% url 'select_graph' %}",
                             type: 'post',
                             headers: {'X-CSRFToken': '{{ csrf_token }}'},
                             dataType: 'text',
                             async: true,
-                            data: {'graph': graph.value},
+                            data: {'graph': graph.value, 'action': action},
                             beforeSend: function() {
                                 //$('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
                             },
@@ -341,34 +363,15 @@
                                 //         var result = '';
                                 //         }
                                 console.log('selecting!')
+                                if (JSON.parse(data).result == 'success') {
+                                    location.reload()
+                                }
                             },
                             error: function(jqXHR, textStatus, errorThrown){
                             }
                         });
                     }
                 </script>
-
-                <!-- graph options to add graph -->
-                {% if not user_graphs.max_reached %}
-                    <div class="row">
-                        <!-- Column -->
-                        <div class="col-lg-5">
-                            <div class="card">
-                                <div class="btn-group btn-block">
-                                    <button id="select-graph" type="button" class="btn btn-success dropdown-toggle ml-1"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Add Graph
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        {% for account_graph in account_graphs.values %}
-                                            <button onclick="selectGraph(this)" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
             </div>
 
             <div class="col-md-4 col-lg-4 col-xlg-4">
