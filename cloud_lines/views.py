@@ -79,6 +79,11 @@ def dashboard(request):
                                               # 'update_card_size': update_card_size})
 
 
+def select_graph(request):
+    print(request.POST)
+    return HttpResponse(json.dumps({'hello': 'hello'}))
+
+
 def home(request):
     if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
         return redirect('dashboard')

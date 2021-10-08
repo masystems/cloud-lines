@@ -315,6 +315,39 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                <!-- javascript for selecting a graph -->
+                <script>
+                    function selectGraph(graph) {
+                        $.ajax({
+                            url: "{% url 'select_graph' %}",
+                            type: 'post',
+                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                            dataType: 'text',
+                            async: true,
+                            data: {'graph': graph.value},
+                            beforeSend: function() {
+                                //$('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                            },
+                            success: function(data) {
+                                // try {
+                                //         var result = JSON.parse(data);
+                                //         var coi_countDownDate = new Date(result.coi_date).getTime();
+                                //         var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
+                                //         infoMsg('COI now running, allow time for values to be updated')
+                                //     }
+                                // catch(err) {
+                                //         // not returned anything
+                                //         var result = '';
+                                //         }
+                                console.log('selecting!')
+                            },
+                            error: function(jqXHR, textStatus, errorThrown){
+                            }
+                        });
+                    }
+                </script>
+
                 <!-- graph options to add graph -->
                 {% if not user_graphs.max_reached %}
                     <div class="row">
