@@ -133,11 +133,11 @@
                         {% for user_graph in user_graphs.selected %}
                             {% for account_graph in account_graphs.values %}
                                 {% if user_graph == account_graph.id %}
-                                    {% if user_graph == 'total_line' %}
+                                    {% if user_graph == 'total_added' %}
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-8 col-md-8">Total {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %}</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">Total {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %} Added</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
@@ -168,7 +168,7 @@
                                                         ,{% endfor %}]
                                                     , xkey: 'y'
                                                     , ykeys: ['pedigrees_added']
-                                                    , labels: ['Pedigrees added']
+                                                    , labels: ['{{ account_graph.title }}']
                                                     , gridLineColor: '#eef0f2'
                                                     , lineColors: ['#009efb']
                                                     , lineWidth: 1
@@ -178,11 +178,11 @@
                                                     });
                                                 });
                                         </script>
-                                    {% elif user_graph == 'total_bar' %}
+                                    {% elif user_graph == 'registered' %}
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-8 col-md-8">Breed Chart</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">{% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %} Registered</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
@@ -224,11 +224,11 @@
                                                 });
                                             });
                                         </script>
-                                    {% elif user_graph == 'living_bar' %}
+                                    {% elif user_graph == 'current_alive' %}
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-8 col-md-8">Living Pedigrees</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">Current {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %} Alive</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
