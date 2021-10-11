@@ -10,7 +10,8 @@ from account.graphs import get_graphs
 from django.conf import settings
 import json
 import stripe
-from datetime import datetime, timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from pedigree.models import Pedigree
 from breed.models import Breed
 from breeder.models import Breeder
@@ -31,18 +32,20 @@ def dashboard(request):
     breed_groups = BreedGroup.objects.filter(account=main_account).order_by('-date_added').exclude(state='unapproved')[:5]
     latest_breeders = Breeder.objects.filter(account=main_account).order_by('-id')[:5]
 
-    current_month = datetime.now().month
-    date = datetime.now()
     if total_pedigrees > 0 \
             and Breed.objects.filter(account=main_account).exists() \
             and len(latest_breeders) > 0:
+        current_year = datetime.now().year
+        date = datetime.now() - relativedelta(years=9)
         total_added_chart = {}
-        for month in range(0, 12):
-            month_count = Pedigree.objects.filter(account=main_account, date_of_registration__month=current_month-month).count()
-            if month != 0:
+        previous_year_count = 0
+        for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
+            year_count = previous_year_count + Pedigree.objects.filter(account=main_account, date_added__year=current_year-year).count()
+            previous_year_count = year_count
+            total_added_chart[date.strftime("%Y")] = {'pedigrees_added': year_count}
+            if year != 0:
                 date = date.replace(day=1)
-                date = date - timedelta(days=1)
-            total_added_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
+                date = date + relativedelta(years=1)
 
         registered = {}
         for breed in Breed.objects.filter(account=main_account):
