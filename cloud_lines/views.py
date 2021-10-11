@@ -35,27 +35,36 @@ def dashboard(request):
     if total_pedigrees > 0 \
             and Breed.objects.filter(account=main_account).exists() \
             and len(latest_breeders) > 0:
-        current_year = datetime.now().year
-        date = datetime.now() - relativedelta(years=9)
+        
+        user_graphs = json.loads(request.user.user.first().graphs)
+        
+        # total pedigrees added graph
         total_added_chart = {}
-        previous_year_count = 0
-        for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
-            year_count = previous_year_count + Pedigree.objects.filter(account=main_account, date_added__year=current_year-year).count()
-            previous_year_count = year_count
-            total_added_chart[date.strftime("%Y")] = {'pedigrees_added': year_count}
-            if year != 0:
-                date = date.replace(day=1)
-                date = date + relativedelta(years=1)
+        if 'total_added' in user_graphs['selected']:
+            current_year = datetime.now().year
+            date = datetime.now() - relativedelta(years=9)
+            previous_year_count = 0
+            for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
+                year_count = previous_year_count + Pedigree.objects.filter(account=main_account, date_added__year=current_year-year).count()
+                previous_year_count = year_count
+                total_added_chart[date.strftime("%Y")] = {'pedigrees_added': year_count}
+                if year != 0:
+                    date = date.replace(day=1)
+                    date = date + relativedelta(years=1)
 
+        # number of pedigrees registered graph
         registered = {}
-        for breed in Breed.objects.filter(account=main_account):
-            registered[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).exclude(state='unapproved').count(),
-                                   'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).exclude(state='unapproved').count()}
+        if 'registered' in user_graphs['selected']:
+            for breed in Breed.objects.filter(account=main_account):
+                registered[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).exclude(state='unapproved').count(),
+                                    'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).exclude(state='unapproved').count()}
 
+        # number of pedigrees (male/female) currently alive graph
         current_alive_chart = {}
-        for breed in Breed.objects.filter(account=main_account):
-            current_alive_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male') & Q(status='alive')).exclude(state='unapproved').count(),
-                                   'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female') & Q(status='alive')).exclude(state='unapproved').count()}
+        if 'current_alive' in user_graphs['selected']:
+            for breed in Breed.objects.filter(account=main_account):
+                current_alive_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male') & Q(status='alive')).exclude(state='unapproved').count(),
+                                    'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female') & Q(status='alive')).exclude(state='unapproved').count()}
     else:
         return redirect('welcome')
 
