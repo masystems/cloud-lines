@@ -108,7 +108,6 @@ def select_graph(request):
         except ValueError:
             return HttpResponse(json.dumps({'result': 'fail'}))
     elif request.POST.get('action') == 'change':
-        print('change')
         try:
             # remove the graph
             graphs = json.loads(user.graphs)
@@ -121,7 +120,20 @@ def select_graph(request):
         except ValueError:
             return HttpResponse(json.dumps({'result': 'fail'}))
     elif request.POST.get('action') == 'add':
-        print('add')
+        try:
+            # remove the graph
+            graphs = json.loads(user.graphs)
+            graphs['selected'].append(request.POST.get('graph'))
+
+            # set whether max graphs is reached if we need to
+            if not graphs['max_reached'] and len(graphs['selected']) >= 2:
+                graphs['max_reached'] = True
+
+            # save changes
+            user.graphs = json.dumps(graphs)
+            user.save()
+        except ValueError:
+            return HttpResponse(json.dumps({'result': 'fail'}))
 
     #if not json.loads(user_detail.graphs).max_reached
 

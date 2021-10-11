@@ -290,7 +290,9 @@
                                     </button>
                                     <div class="dropdown-menu">
                                         {% for account_graph in account_graphs.values %}
-                                            <button onclick="selectGraph(this, 'add')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                                            {% if account_graph.id not in user_graphs.selected %}
+                                                <button onclick="selectGraph(this, 'add')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                                            {% endif %}
                                         {% endfor %}
                                     </div>
                                 </div>
