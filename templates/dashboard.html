@@ -137,7 +137,7 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-7 col-md-7">Total {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %}</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">Total {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %}</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
@@ -182,7 +182,7 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-7 col-md-7">Breed Chart</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">Breed Chart</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
@@ -228,7 +228,7 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-7 col-md-7">Living Pedigrees</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">Living Pedigrees</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
@@ -281,10 +281,10 @@
                 {% if not user_graphs.max_reached %}
                     <div class="row">
                         <!-- Column -->
-                        <div class="col-lg-5">
+                        <div class="col-lg-4 col-md-4 col-sm-4">
                             <div class="card">
                                 <div class="btn-group btn-block">
-                                    <button id="select-graph" type="button" class="btn btn-success dropdown-toggle ml-1"
+                                    <button id="select-graph" type="button" class="btn btn-secondary dropdown-toggle"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         Add Graph
                                     </button>
