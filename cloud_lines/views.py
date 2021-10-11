@@ -36,22 +36,22 @@ def dashboard(request):
     if total_pedigrees > 0 \
             and Breed.objects.filter(account=main_account).exists() \
             and len(latest_breeders) > 0:
-        pedigree_chart = {}
+        total_added_chart = {}
         for month in range(0, 12):
             month_count = Pedigree.objects.filter(account=main_account, date_of_registration__month=current_month-month).count()
             if month != 0:
                 date = date.replace(day=1)
                 date = date - timedelta(days=1)
-            pedigree_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
+            total_added_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
 
-        breed_chart = {}
+        registered = {}
         for breed in Breed.objects.filter(account=main_account):
-            breed_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).exclude(state='unapproved').count(),
+            registered[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).exclude(state='unapproved').count(),
                                    'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).exclude(state='unapproved').count()}
 
-        living_chart = {}
+        current_alive_chart = {}
         for breed in Breed.objects.filter(account=main_account):
-            living_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male') & Q(status='alive')).exclude(state='unapproved').count(),
+            current_alive_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male') & Q(status='alive')).exclude(state='unapproved').count(),
                                    'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female') & Q(status='alive')).exclude(state='unapproved').count()}
     else:
         return redirect('welcome')
@@ -70,9 +70,9 @@ def dashboard(request):
                                               'top_pedigrees': top_pedigrees,
                                               'latest_breeders': latest_breeders,
                                               'breed_groups': breed_groups,
-                                              'breed_chart': breed_chart,
-                                              'pedigree_chart': pedigree_chart,
-                                              'living_chart': living_chart,
+                                              'registered': registered,
+                                              'total_added_chart': total_added_chart,
+                                              'current_alive_chart': current_alive_chart,
                                               'user_graphs': json.loads(request.user.user.first().graphs),
                                               'site_graphs': json.loads(get_graphs())})
                                               # 'updates': updates,

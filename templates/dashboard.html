@@ -141,7 +141,7 @@
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
-                                                {% if pedigree_chart %}
+                                                {% if total_added_chart %}
                                                     <div id="morris-line-chart"></div>
                                                 {% else %}
                                                     <div class="alert alert-info">
@@ -161,7 +161,7 @@
                                                 Morris.Line({
                                                     element: 'morris-line-chart'
                                                     , resize: true
-                                                    , data: [{% for key, val in pedigree_chart.items %}
+                                                    , data: [{% for key, val in total_added_chart.items %}
                                                         {
                                                             y: '{{ key|escape }}'
                                                         ,{% for key, val in val.items %} {{ key }}: {{ val }} {% endfor %}}
@@ -186,7 +186,7 @@
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
-                                                {% if breed_chart %}
+                                                {% if registered %}
                                                     <div id="morris-bar-chart"></div>
                                                 {% else %}
                                                     {% if editor or contributor or breeds_editable|length > 0 %}
@@ -204,7 +204,7 @@
                                                 Morris.Bar({
                                                     element: 'morris-bar-chart'
                                                     , data: [
-                                                        {% for key, val in breed_chart.items %}
+                                                        {% for key, val in registered.items %}
                                                         {
                                                         y: '{{ key|escape }}'
                                                         {% for key, val in val.items %}
@@ -232,7 +232,7 @@
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
-                                                {% if living_chart %}
+                                                {% if current_alive_chart %}
                                                     <div id="living-chart"></div>
                                                 {% else %}
                                                     {% if editor or contributor or breeds_editable|length > 0 %}
@@ -250,7 +250,7 @@
                                                 Morris.Bar({
                                                     element: 'living-chart'
                                                     , data: [
-                                                        {% for key, val in living_chart.items %}
+                                                        {% for key, val in current_alive_chart.items %}
                                                             {
                                                                 y: '{{ key|escape }}'
                                                                 {% for key, val in val.items %}
