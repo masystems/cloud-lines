@@ -1,0 +1,17 @@
+<!-- button showing graph options to change/remove graph -->
+<div class="col-sm-5 col-md-5 ">
+    <div class="btn-group btn-block">
+        <button id="select-graph" type="button" class="btn btn-success dropdown-toggle ml-1"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Change/Remove Graph
+        </button>
+        <div class="dropdown-menu">
+            {% for account_graph in account_graphs.values %}
+                {% if account_graph.id != user_graph %}
+                    <button onclick="selectGraph(this, 'change')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                {% endif %}
+            {% endfor %}
+            <button onclick="selectGraph(this, 'remove')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'><strong>Remove Graph</strong></button>
+        </div>
+    </div>
+</div>
