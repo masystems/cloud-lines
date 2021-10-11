@@ -109,6 +109,17 @@ def select_graph(request):
             return HttpResponse(json.dumps({'result': 'fail'}))
     elif request.POST.get('action') == 'change':
         print('change')
+        try:
+            # remove the graph
+            graphs = json.loads(user.graphs)
+            graphs['selected'].remove(request.POST.get('change_from'))
+            graphs['selected'].append(request.POST.get('graph'))
+
+            # save changes
+            user.graphs = json.dumps(graphs)
+            user.save()
+        except ValueError:
+            return HttpResponse(json.dumps({'result': 'fail'}))
     elif request.POST.get('action') == 'add':
         print('add')
 

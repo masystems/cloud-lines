@@ -7,8 +7,8 @@
         </button>
         <div class="dropdown-menu">
             {% for account_graph in account_graphs.values %}
-                {% if account_graph.id != user_graph %}
-                    <button onclick="selectGraph(this, 'change')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+                {% if account_graph.id != user_graph and account_graph.id not in user_graphs.selected %}
+                    <button onclick="selectGraph(this, 'change', '{{ user_graph }}')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
                 {% endif %}
             {% endfor %}
             <button onclick="selectGraph(this, 'remove')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'><strong>Remove Graph</strong></button>

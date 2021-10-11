@@ -232,7 +232,7 @@
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
-                                                {% if breed_chart %}
+                                                {% if living_chart %}
                                                     <div id="living-chart"></div>
                                                 {% else %}
                                                     {% if editor or contributor or breeds_editable|length > 0 %}
@@ -301,14 +301,14 @@
 
                 <!-- javascript for selecting a graph -->
                 <script>
-                    function selectGraph(graph, action) {
+                    function selectGraph(graph, action, changeFrom='') {
                         $.ajax({
                             url: "{% url 'select_graph' %}",
                             type: 'post',
                             headers: {'X-CSRFToken': '{{ csrf_token }}'},
                             dataType: 'text',
                             async: true,
-                            data: {'graph': graph.value, 'action': action},
+                            data: {'graph': graph.value, 'action': action, 'change_from': changeFrom},
                             beforeSend: function() {
                                 //$('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
                             },
