@@ -6,12 +6,12 @@
             Change/Remove Graph
         </button>
         <div class="dropdown-menu">
-            {% for account_graph in account_graphs.values %}
-                {% if account_graph.id != user_graph and account_graph.id not in user_graphs.selected %}
-                    <button onclick="selectGraph(this, 'change', '{{ user_graph }}')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'>{{ account_graph.title }}</button>
+            {% for site_graph in site_graphs.values %}
+                {% if site_graph.id != user_graph and site_graph.id not in user_graphs.selected %}
+                    <button onclick="selectGraph(this, 'change', '{{ user_graph }}')" class="dropdown-item" name="{{ site_graph.id }}" value='{{ site_graph.id }}'>{{ site_graph.title }}</button>
                 {% endif %}
             {% endfor %}
-            <button onclick="selectGraph(this, 'remove')" class="dropdown-item" name="{{ account_graph.id }}" value='{{ account_graph.id }}'><strong>Remove Graph</strong></button>
+            <button onclick="selectGraph(this, 'remove')" class="dropdown-item" name="{{ site_graph.id }}" value='{{ site_graph.id }}'><strong>Remove Graph</strong></button>
         </div>
     </div>
 </div>

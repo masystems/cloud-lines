@@ -74,7 +74,7 @@ def dashboard(request):
                                               'pedigree_chart': pedigree_chart,
                                               'living_chart': living_chart,
                                               'user_graphs': json.loads(request.user.user.first().graphs),
-                                              'account_graphs': json.loads(get_graphs())})
+                                              'site_graphs': json.loads(get_graphs())})
                                               # 'updates': updates,
                                               # 'update_card_size': update_card_size})
 
