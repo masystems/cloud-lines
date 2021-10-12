@@ -207,72 +207,53 @@
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <!-- <div class="card">
-                                            <div class="card-body">
-                                                <h4 class="card-title">Product line Chart</h4>
-                                                <ul class="list-inline text-right">
-                                                    <li class="list-inline-item">
-                                                        <h5><i class="fa fa-circle mr-1 text-inverse"></i>iPhone</h5>
-                                                    </li>
-                                                    <li class="list-inline-item">
-                                                        <h5><i class="fa fa-circle mr-1 text-info"></i>iPad</h5>
-                                                    </li>
-                                                    <li class="list-inline-item">
-                                                        <h5><i class="fa fa-circle mr-1 text-success"></i>iPod</h5>
-                                                    </li>
-                                                </ul>
-                                                <div id="morris-area-chart"></div>
-                                            </div>
-                                        </div> -->
                                         <script>
                                             $(function () {
                                                 "use strict";
-
-                                            Morris.Area({
-        element: 'morris-area-chart',
-        data: [
-            {% for year, breed in registered.items %}
-                {% if year != 'breeds' %}
-                    {
-                        period: '{{ year }}',
-                        {% for breed, amount in breed.items %}
-                            '{{ breed }}': {{ amount }},
-                        {% endfor %}
-                    },
-                {% endif %}
-            {% endfor %}
-        ],
-        xkey: 'period',
-        ykeys: [
-            {% for breed in registered.breeds.keys %}
-                '{{ breed }}',
-            {% endfor %}
-        ],
-        labels: [
-            {% for breed in registered.breeds.keys %}
-                '{{ breed }}',
-            {% endfor %}
-        ],
-        pointSize: 3,
-        fillOpacity: 0,
-        pointStrokeColors:[
-            {% for colour in registered.breeds.values %}
-                '{{ colour }}',
-            {% endfor %}
-        ],
-        behaveLikeLine: true,
-        gridLineColor: '#e0e0e0',
-        lineWidth: 3,
-        hideHover: 'auto',
-        lineColors: [
-            {% for colour in registered.breeds.values %}
-                '{{ colour }}',
-            {% endfor %}
-        ],
-        resize: true
-        
-    });
-});
+                                                Morris.Area({
+                                                    element: 'morris-area-chart',
+                                                    data: [
+                                                        {% for year, breed in registered.items %}
+                                                            {% if year != 'breeds' %}
+                                                                {
+                                                                    period: '{{ year }}',
+                                                                    {% for breed, amount in breed.items %}
+                                                                        '{{ breed }}': {{ amount }},
+                                                                    {% endfor %}
+                                                                },
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    ],
+                                                    xkey: 'period',
+                                                    ykeys: [
+                                                        {% for breed in registered.breeds.keys %}
+                                                            '{{ breed }}',
+                                                        {% endfor %}
+                                                    ],
+                                                    labels: [
+                                                        {% for breed in registered.breeds.keys %}
+                                                            '{{ breed }}',
+                                                        {% endfor %}
+                                                    ],
+                                                    pointSize: 3,
+                                                    fillOpacity: 0,
+                                                    pointStrokeColors:[
+                                                        {% for colour in registered.breeds.values %}
+                                                            '{{ colour }}',
+                                                        {% endfor %}
+                                                    ],
+                                                    behaveLikeLine: true,
+                                                    gridLineColor: '#e0e0e0',
+                                                    lineWidth: 3,
+                                                    hideHover: 'auto',
+                                                    lineColors: [
+                                                        {% for colour in registered.breeds.values %}
+                                                            '{{ colour }}',
+                                                        {% endfor %}
+                                                    ],
+                                                    resize: true
+                                                });
+                                            });
                                         </script>
                                     {% elif user_graph == 'current_alive' %}
                                         <div class="card">
