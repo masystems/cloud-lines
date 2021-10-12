@@ -182,12 +182,23 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-8 col-md-8">{% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %} Registered</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">Animals Registered Per Year</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
                                                 {% if registered %}
-                                                    <div id="morris-bar-chart"></div>
+                                                    <ul class="list-inline text-center">
+                                                        <li class="list-inline-item">
+                                                            <h5><i class="fa fa-circle mr-1 text-dark"></i>iPhone</h5>
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <h5><i class="fa fa-circle mr-1 text-info"></i>iPad</h5>
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <h5><i class="fa fa-circle mr-1 text-secondary"></i>iPod</h5>
+                                                        </li>
+                                                    </ul>
+                                                    <div id="morris-area-chart"></div>
                                                 {% else %}
                                                     {% if editor or contributor or breeds_editable|length > 0 %}
                                                         <p>You still need to <a href="{% url 'new_pedigree_form' %}">add your first Pedigree</a>!</p>
@@ -197,32 +208,104 @@
                                                 {% endif %}
                                             </div>
                                         </div>
+                                        <!-- <div class="card">
+                                            <div class="card-body">
+                                                <h4 class="card-title">Product line Chart</h4>
+                                                <ul class="list-inline text-right">
+                                                    <li class="list-inline-item">
+                                                        <h5><i class="fa fa-circle mr-1 text-inverse"></i>iPhone</h5>
+                                                    </li>
+                                                    <li class="list-inline-item">
+                                                        <h5><i class="fa fa-circle mr-1 text-info"></i>iPad</h5>
+                                                    </li>
+                                                    <li class="list-inline-item">
+                                                        <h5><i class="fa fa-circle mr-1 text-success"></i>iPod</h5>
+                                                    </li>
+                                                </ul>
+                                                <div id="morris-area-chart"></div>
+                                            </div>
+                                        </div> -->
                                         <script>
                                             $(function () {
                                                 "use strict";
                                                 // Morris bar chart
-                                                Morris.Bar({
-                                                    element: 'morris-bar-chart'
-                                                    , data: [
-                                                        {% for key, val in registered.items %}
-                                                        {
-                                                        y: '{{ key|escape }}'
-                                                        {% for key, val in val.items %}
-                                                        , {{ key|title }}: {{ val|escape }}
-                                                        {% endfor %}
-                                                    },
-                                                    {% endfor %}]
-                                                    , xkey: 'y'
-                                                    , ykeys: ['Male', 'Female']
-                                                    , labels: ['Male', 'Female']
-                                                    , barColors: ['#0275d8', '#FFC0CB']
-                                                    , hideHover: 'auto'
-                                                    , gridLineColor: '#eef0f2'
-                                                    , resize: true
-                                                    , gridIntegers: true
-                                                    , ymin: 0
-                                                });
-                                            });
+                                                // Morris.Bar({
+                                                //     element: 'morris-bar-chart'
+                                                //     , data: [
+                                                //         {% for key, val in registered.items %}
+                                                //         {
+                                                //         y: '{{ key|escape }}'
+                                                //         {% for key, val in val.items %}
+                                                //         , {{ key|title }}: {{ val|escape }}
+                                                //         {% endfor %}
+                                                //     },
+                                                //     {% endfor %}]
+                                                //     , xkey: 'y'
+                                                //     , ykeys: ['Male', 'Female']
+                                                //     , labels: ['Male', 'Female']
+                                                //     , barColors: ['#0275d8', '#FFC0CB']
+                                                //     , hideHover: 'auto'
+                                                //     , gridLineColor: '#eef0f2'
+                                                //     , resize: true
+                                                //     , gridIntegers: true
+                                                //     , ymin: 0
+                                                // });
+                                            //});
+
+                                            Morris.Area({
+        element: 'morris-area-chart',
+        data: [{
+            period: '2010',
+            iphone: 50,
+            ipad: 80,
+            itouch: 20
+        }, {
+            period: '2011',
+            iphone: 130,
+            ipad: 100,
+            itouch: 80
+        }, {
+            period: '2012',
+            iphone: 80,
+            ipad: 60,
+            itouch: 70
+        }, {
+            period: '2013',
+            iphone: 70,
+            ipad: 200,
+            itouch: 140
+        }, {
+            period: '2014',
+            iphone: 180,
+            ipad: 150,
+            itouch: 140
+        }, {
+            period: '2015',
+            iphone: 105,
+            ipad: 100,
+            itouch: 80
+        },
+         {
+            period: '2016',
+            iphone: 250,
+            ipad: 150,
+            itouch: 200
+        }],
+        xkey: 'period',
+        ykeys: ['iphone', 'ipad', 'itouch'],
+        labels: ['iPhone', 'iPad', 'iPod Touch'],
+        pointSize: 3,
+        fillOpacity: 0,
+        pointStrokeColors:['#292b2c ', '#44AAAC', '#AC4476'],
+        behaveLikeLine: true,
+        gridLineColor: '#e0e0e0',
+        lineWidth: 3,
+        hideHover: 'auto',
+        lineColors: ['#292b2c ', '#44AAAC', '#AC4476'],
+        resize: true
+        
+    });
+});
                                         </script>
                                     {% elif user_graph == 'current_alive' %}
                                         <div class="card">
