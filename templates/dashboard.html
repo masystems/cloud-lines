@@ -227,80 +227,48 @@
                                         <script>
                                             $(function () {
                                                 "use strict";
-                                                // Morris bar chart
-                                                // Morris.Bar({
-                                                //     element: 'morris-bar-chart'
-                                                //     , data: [
-                                                //         {% for key, val in registered.items %}
-                                                //         {
-                                                //         y: '{{ key|escape }}'
-                                                //         {% for key, val in val.items %}
-                                                //         , {{ key|title }}: {{ val|escape }}
-                                                //         {% endfor %}
-                                                //     },
-                                                //     {% endfor %}]
-                                                //     , xkey: 'y'
-                                                //     , ykeys: ['Male', 'Female']
-                                                //     , labels: ['Male', 'Female']
-                                                //     , barColors: ['#0275d8', '#FFC0CB']
-                                                //     , hideHover: 'auto'
-                                                //     , gridLineColor: '#eef0f2'
-                                                //     , resize: true
-                                                //     , gridIntegers: true
-                                                //     , ymin: 0
-                                                // });
-                                            //});
 
                                             Morris.Area({
         element: 'morris-area-chart',
-        data: [{
-            period: '2010',
-            iphone: 50,
-            ipad: 80,
-            itouch: 20
-        }, {
-            period: '2011',
-            iphone: 130,
-            ipad: 100,
-            itouch: 80
-        }, {
-            period: '2012',
-            iphone: 80,
-            ipad: 60,
-            itouch: 70
-        }, {
-            period: '2013',
-            iphone: 70,
-            ipad: 200,
-            itouch: 140
-        }, {
-            period: '2014',
-            iphone: 180,
-            ipad: 150,
-            itouch: 140
-        }, {
-            period: '2015',
-            iphone: 105,
-            ipad: 100,
-            itouch: 80
-        },
-         {
-            period: '2016',
-            iphone: 250,
-            ipad: 150,
-            itouch: 200
-        }],
+        data: [
+            {% for year, breed in registered.items %}
+                {% if year != 'breeds' %}
+                    {
+                        period: '{{ year }}',
+                        {% for breed, amount in breed.items %}
+                            '{{ breed }}': {{ amount }},
+                        {% endfor %}
+                    },
+                {% endif %}
+            {% endfor %}
+        ],
         xkey: 'period',
-        ykeys: ['iphone', 'ipad', 'itouch'],
-        labels: ['iPhone', 'iPad', 'iPod Touch'],
+        ykeys: [
+            {% for breed in registered.breeds.keys %}
+                '{{ breed }}',
+            {% endfor %}
+        ],
+        labels: [
+            {% for breed in registered.breeds.keys %}
+                '{{ breed }}',
+            {% endfor %}
+        ],
         pointSize: 3,
         fillOpacity: 0,
-        pointStrokeColors:['#292b2c ', '#44AAAC', '#AC4476'],
+        pointStrokeColors:[
+            {% for colour in registered.breeds.values %}
+                '{{ colour }}',
+            {% endfor %}
+        ],
         behaveLikeLine: true,
         gridLineColor: '#e0e0e0',
         lineWidth: 3,
         hideHover: 'auto',
-        lineColors: ['#292b2c ', '#44AAAC', '#AC4476'],
+        lineColors: [
+            {% for colour in registered.breeds.values %}
+                '{{ colour }}',
+            {% endfor %}
+        ],
         resize: true
         
     });

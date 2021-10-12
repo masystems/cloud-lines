@@ -56,10 +56,27 @@ def dashboard(request):
         # number of pedigrees registered graph
         registered = {}
         if 'registered' in user_graphs['selected']:
-            for breed in Breed.objects.filter(account=main_account):
-                registered[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).exclude(state='unapproved').count(),
-                                    'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).exclude(state='unapproved').count()}
+            # get the dictionary of breeds mapped to amount of pedigrees for each year
+            current_year = datetime.now().year
+            date = datetime.now() - relativedelta(years=9)
+            previous_year_count = 0
+            for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
+                registered[date.year] = {}
+                for breed in Breed.objects.filter(account=main_account):
+                    registered[date.year][breed.breed_name] = Pedigree.objects.filter(breed=breed, 
+                                                        account=main_account, date_of_registration__year=date.year).exclude(state='unapproved').count()
+                
+                if year != 0:
+                    date = date.replace(day=1)
+                    date = date + relativedelta(years=1)
 
+            # make a dictionary of breeds and their colours
+            counter = 0
+            colours = ['#292b2c ', '#44AAAC', '#AC4476', '#0275d8', '#FFC0CB']
+            registered['breeds'] = {}
+            for breed in Breed.objects.filter(account=main_account):
+                registered['breeds'][breed.breed_name] = colours[counter]
+                counter += 1
         # number of pedigrees (male/female) currently alive graph
         current_alive_chart = {}
         if 'current_alive' in user_graphs['selected']:
