@@ -45,7 +45,8 @@ def dashboard(request):
             date = datetime.now() - relativedelta(years=9)
             previous_year_count = 0
             for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
-                year_count = previous_year_count + Pedigree.objects.filter(account=main_account, date_added__year=current_year-year).count()
+                year_count = previous_year_count + Pedigree.objects.filter(account=main_account, 
+                                    date_added__year=current_year-year).exclude(state='unapproved').count()
                 previous_year_count = year_count
                 total_added_chart[date.strftime("%Y")] = {'pedigrees_added': year_count}
                 if year != 0:
