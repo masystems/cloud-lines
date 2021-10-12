@@ -137,7 +137,7 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-8 col-md-8">Total {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %} Added</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">Total Animals in Database</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
@@ -228,7 +228,7 @@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <h4 class="card-title col-sm-8 col-md-8">Current {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %} Alive</h4>
+                                                    <h4 class="card-title col-sm-8 col-md-8">Number of Living Animals by Sex</h4>
                                                     <!-- graph options to change/remove graph -->
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
