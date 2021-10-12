@@ -187,16 +187,15 @@
                                                     {% include 'change_remove_graph.html' %}
                                                 </div>
                                                 {% if registered %}
-                                                    <ul class="list-inline text-center">
-                                                        <li class="list-inline-item">
-                                                            <h5><i class="fa fa-circle mr-1 text-dark"></i>iPhone</h5>
-                                                        </li>
-                                                        <li class="list-inline-item">
-                                                            <h5><i class="fa fa-circle mr-1 text-info"></i>iPad</h5>
-                                                        </li>
-                                                        <li class="list-inline-item">
-                                                            <h5><i class="fa fa-circle mr-1 text-secondary"></i>iPod</h5>
-                                                        </li>
+                                                    <ul class="list-inline text-center mt-3">
+                                                        {% for breed, colour in registered.breeds.items %}
+                                                            <li class="list-inline-item">
+                                                                <h5>
+                                                                    <i class="fa fa-circle mr-1" style="color: {{ colour }}"></i>
+                                                                    {{ breed }}
+                                                                </h5>
+                                                            </li>
+                                                        {% endfor %}
                                                     </ul>
                                                     <div id="morris-area-chart"></div>
                                                 {% else %}
