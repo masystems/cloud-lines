@@ -33,6 +33,7 @@ def new_breed_group_form(request):
         new_breed_group.save()
         # add group members
         for id in breed_group_form['group_members'].value():
+            print('M | ' in id)
             id = id[4:]
             pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
             new_breed_group.group_members.add(pedigree)
