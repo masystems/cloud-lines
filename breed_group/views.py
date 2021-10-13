@@ -57,7 +57,7 @@ def new_breed_group_form(request):
         breed_group_form = BreedGroupForm()
 
         # get next available group name
-        suggested_name = ''
+        suggested_name = 'BG12345'
         try:
             latest_added = BreedGroup.objects.filter(account=attached_service).latest('group_name')
             latest_name = latest_added.group_name
