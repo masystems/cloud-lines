@@ -8,6 +8,7 @@ from breed.models import Breed
 from account.views import is_editor, get_main_account
 from .forms import BreedGroupForm
 from approvals.models import Approval
+import re
 
 
 @login_required(login_url="/account/login")
@@ -55,10 +56,23 @@ def new_breed_group_form(request):
     else:
         breed_group_form = BreedGroupForm()
 
+        # get next available group name
+        suggested_name = ''
+        try:
+            latest_added = BreedGroup.objects.filter(account=attached_service).latest('group_name')
+            latest_name = latest_added.group_name
+            name_ints_re = re.search("[0-9]+", latest_name)
+            suggested_name = latest_name.replace(str(name_ints_re.group(0)), str(int(name_ints_re.group(0))+1).zfill(len(name_ints_re.group(0))))
+        except BreedGroup.DoesNotExist:
+            pass
+        except AttributeError:
+            pass
+
     return render(request, 'new_breed_group_form.html', {'breed_group_form': breed_group_form,
                                                          'pedigree': Pedigree.objects.filter(account=attached_service).exclude(state='unapproved'),
                                                          'breeders': Breeder.objects.filter(account=attached_service),
-                                                         'breeds': Breed.objects.filter(account=attached_service)})
+                                                         'breeds': Breed.objects.filter(account=attached_service),
+                                                         'suggested_name': suggested_name})
 
 
 @login_required(login_url="/account/login")
