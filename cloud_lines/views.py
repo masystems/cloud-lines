@@ -6,10 +6,12 @@ from .models import Service, Page, Gallery, Faq, Testimonial, LargeTierQueue, Bl
 from .forms import ContactForm, BlogForm
 from account.models import UserDetail, AttachedService
 from account.views import get_main_account, send_mail, has_permission, redirect_2_login
+from account.graphs import get_graphs
 from django.conf import settings
 import json
 import stripe
-from datetime import datetime, timedelta
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from pedigree.models import Pedigree
 from breed.models import Breed
 from breeder.models import Breeder
@@ -30,24 +32,57 @@ def dashboard(request):
     breed_groups = BreedGroup.objects.filter(account=main_account).order_by('-date_added').exclude(state='unapproved')[:5]
     latest_breeders = Breeder.objects.filter(account=main_account).order_by('-id')[:5]
 
-    current_month = datetime.now().month
-    date = datetime.now()
     if total_pedigrees > 0 \
             and Breed.objects.filter(account=main_account).exists() \
             and len(latest_breeders) > 0:
-        pedigree_chart = {}
-        for month in range(0, 12):
-            month_count = Pedigree.objects.filter(account=main_account, date_of_registration__month=current_month-month).count()
-            if month != 0:
-                date = date.replace(day=1)
-                date = date - timedelta(days=1)
-            pedigree_chart[date.strftime("%Y-%m")] = {'pedigrees_added': month_count}
+        
+        user_graphs = json.loads(request.user.user.first().graphs)
+        
+        # total pedigrees added graph
+        total_added_chart = {}
+        if 'total_added' in user_graphs['selected']:
+            current_year = datetime.now().year
+            date = datetime.now() - relativedelta(years=9)
+            previous_year_count = 0
+            for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
+                year_count = previous_year_count + Pedigree.objects.filter(account=main_account, 
+                                    date_added__year=current_year-year).exclude(state='unapproved').count()
+                previous_year_count = year_count
+                total_added_chart[date.strftime("%Y")] = {'pedigrees_added': year_count}
+                if year != 0:
+                    date = date.replace(day=1)
+                    date = date + relativedelta(years=1)
 
-        breed_chart = {}
-        for breed in Breed.objects.filter(account=main_account):
-            breed_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male')).exclude(state='unapproved').count(),
-                                   'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female')).exclude(state='unapproved').count()}
+        # number of pedigrees registered graph
+        registered = {}
+        if 'registered' in user_graphs['selected']:
+            # get the dictionary of breeds mapped to amount of pedigrees for each year
+            current_year = datetime.now().year
+            date = datetime.now() - relativedelta(years=9)
+            previous_year_count = 0
+            for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
+                registered[date.year] = {}
+                for breed in Breed.objects.filter(account=main_account):
+                    registered[date.year][breed.breed_name] = Pedigree.objects.filter(breed=breed, 
+                                                        account=main_account, date_of_registration__year=date.year).exclude(state='unapproved').count()
+                
+                if year != 0:
+                    date = date.replace(day=1)
+                    date = date + relativedelta(years=1)
 
+            # make a dictionary of breeds and their colours
+            counter = 0
+            colours = ['#292b2c ', '#44AAAC', '#AC4476', '#0275d8', '#FFC0CB']
+            registered['breeds'] = {}
+            for breed in Breed.objects.filter(account=main_account):
+                registered['breeds'][breed.breed_name] = colours[counter]
+                counter += 1
+        # number of pedigrees (male/female) currently alive graph
+        current_alive_chart = {}
+        if 'current_alive' in user_graphs['selected']:
+            for breed in Breed.objects.filter(account=main_account):
+                current_alive_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male') & Q(status='alive')).exclude(state='unapproved').count(),
+                                    'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female') & Q(status='alive')).exclude(state='unapproved').count()}
     else:
         return redirect('welcome')
 
@@ -65,10 +100,74 @@ def dashboard(request):
                                               'top_pedigrees': top_pedigrees,
                                               'latest_breeders': latest_breeders,
                                               'breed_groups': breed_groups,
-                                              'breed_chart': breed_chart,
-                                              'pedigree_chart': pedigree_chart,})
+                                              'registered': registered,
+                                              'total_added_chart': total_added_chart,
+                                              'current_alive_chart': current_alive_chart,
+                                              'user_graphs': json.loads(request.user.user.first().graphs),
+                                              'site_graphs': json.loads(get_graphs())})
                                               # 'updates': updates,
                                               # 'update_card_size': update_card_size})
+
+
+@login_required(login_url="/account/login")
+def select_graph(request):
+    # check permission (this is only used to receive POST requests)
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': True, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+
+    user = request.user.user.first()
+
+    if request.POST.get('action') == 'remove':
+        try:
+            # remove the graph
+            graphs = json.loads(user.graphs)
+            graphs['selected'].remove(request.POST.get('graph'))
+            
+            # unset whether max graphs is reached if we need to
+            if graphs['max_reached'] and len(graphs['selected']) < 2:
+                graphs['max_reached'] = False
+
+            # save changes
+            user.graphs = json.dumps(graphs)
+            user.save()
+        except ValueError:
+            return HttpResponse(json.dumps({'result': 'fail'}))
+    elif request.POST.get('action') == 'change':
+        try:
+            # remove the graph
+            graphs = json.loads(user.graphs)
+            graphs['selected'].remove(request.POST.get('change_from'))
+            graphs['selected'].append(request.POST.get('graph'))
+
+            # save changes
+            user.graphs = json.dumps(graphs)
+            user.save()
+        except ValueError:
+            return HttpResponse(json.dumps({'result': 'fail'}))
+    elif request.POST.get('action') == 'add':
+        try:
+            # remove the graph
+            graphs = json.loads(user.graphs)
+            graphs['selected'].append(request.POST.get('graph'))
+
+            # set whether max graphs is reached if we need to
+            if not graphs['max_reached'] and len(graphs['selected']) >= 2:
+                graphs['max_reached'] = True
+
+            # save changes
+            user.graphs = json.dumps(graphs)
+            user.save()
+        except ValueError:
+            return HttpResponse(json.dumps({'result': 'fail'}))
+
+    #if not json.loads(user_detail.graphs).max_reached
+
+    return HttpResponse(json.dumps({'result': 'success'}))
 
 
 def home(request):

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from cloud_lines.models import Service
 from cloud_lines.models import Bolton
+from json import dumps
 
 
 def user_directory_path(instance, filename):
@@ -13,6 +14,10 @@ class UserDetail(models.Model):
     phone = models.CharField(max_length=15, blank=False)
     stripe_id = models.CharField(max_length=50, blank=True)
     current_service = models.ForeignKey('AttachedService', on_delete=models.SET_NULL, null=True, blank=True)
+    graphs = models.TextField(default=dumps({
+        'selected': [],
+        'max_reached': False
+    }), verbose_name="Dashboard Graphs")
 
     def __str__(self):
         return str(self.user)

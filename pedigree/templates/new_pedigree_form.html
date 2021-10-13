@@ -91,7 +91,7 @@
                                 <input class="form-control" name='{{ field.name }}' type="text" value="{{ suggested_reg }}">
                         {% elif field.label == 'Mother' %}
                             <div id="mothers_new">
-                                <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}">
+                                <input id="id_mother" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}" {% if mother_reg != '' %}value="{{ mother_reg }}"{% endif %}>
                                 {% if service.site_mode == 'poultry' %}
                                     <small>Leave blank if using a breed group</small>
                                 {% endif %}
@@ -100,7 +100,7 @@
                             <ul class="list-icons d-none" id="mother-info"></ul>
                         {% elif field.label == 'Father'  %}
                             <div id="fathers_new">
-                                <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.father_title }}">
+                                <input id="id_father" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.father_title }}" {% if father_reg != '' %}value="{{ father_reg }}"{% endif %}>
                             </div>
                             <!-- hidden note which will show name and tag number of father if reg number has a match -->
                             <ul class="list-icons d-none" id="father-info"></ul>

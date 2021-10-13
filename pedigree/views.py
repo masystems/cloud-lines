@@ -531,6 +531,17 @@ def new_pedigree_form(request):
             reg_ints_re = re.search("[0-9]+", suggested_reg)
             suggested_reg = suggested_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1).zfill(len(reg_ints_re.group(0))))
 
+    mother_reg = ''
+    father_reg= ''
+    if request.GET.get('parent'):
+        parent = Pedigree.objects.filter(account=attached_service, id=request.GET.get('parent'))
+        if parent.exists():
+            parent = parent.first()
+            if parent.sex == 'female':
+                mother_reg = parent.reg_no
+            elif parent.sex == 'male':
+                father_reg = parent.reg_no
+
     return render(request, 'new_pedigree_form_base.html', {'pedigree_form': pedigree_form,
                                                            'pedigrees': Pedigree.objects.filter(account=attached_service),
                                                            'breeders': Breeder.objects.filter(account=attached_service),
@@ -539,7 +550,9 @@ def new_pedigree_form(request):
                                                            'custom_fields': custom_fields,
                                                            'breeder_form': BreederForm(),
                                                            'breed_form': BreedForm(),
-                                                           'suggested_reg': suggested_reg})
+                                                           'suggested_reg': suggested_reg,
+                                                           'mother_reg': mother_reg,
+                                                           'father_reg': father_reg})
 
 
 @login_required(login_url="/account/login")
