@@ -18,13 +18,24 @@ class UserDetail(models.Model):
         return str(self.user)
 
 
+class AttachedBolton(models.Model):
+    bolton = models.ManyToManyField(Bolton, related_name='boltons', blank=True)
+    stripe_sub_id = models.CharField(max_length=255, blank=True)
+    INCREMENTS = (
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+    )
+    increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True, blank=True)
+    active = models.BooleanField(default=False)
+
+
 class AttachedService(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name='attached_service', null=True, blank=True)
     admin_users = models.ManyToManyField(User, related_name='admin_users', blank=True)
     contributors = models.ManyToManyField(User, related_name='contributors', blank=True)
     read_only_users = models.ManyToManyField(User, related_name='read_only_users', blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
-    boltons = models.ManyToManyField(Bolton, related_name='boltons', blank=True)
+    boltons = models.ManyToManyField(AttachedBolton, related_name='boltons', blank=True)
     domain = models.CharField(max_length=250, blank=True)
     organisation_or_society_name = models.CharField(max_length=250, blank=True)
     image = models.ImageField(upload_to=user_directory_path, blank=True)
