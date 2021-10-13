@@ -126,97 +126,246 @@
                         </div>
                     </div>
                 </div>
+                <!-- display selected graphs -->
                 <div class="row">
                     <!-- Column -->
                     <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title">Total {% if service.site_mode == 'mammal' %}{{ service.animal_type|title }}{% else %}Birds{% endif %}</h4>
-                                {% if pedigree_chart %}
-                                    <div id="morris-line-chart"></div>
-                                {% else %}
-                                    <div class="alert alert-info">
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button>
-                                        <h3 class="text-info"><i class="fad fa-exclamation-circle"></i> Information</h3>
-                                        You have not added any {{ service.animal_type|title }} yet to your Cloudlines instance.
-                                        You can <a href="{% url 'new_pedigree_form' %}">click here</a> or click the 'Add New Pedigree' button above to get started.
-                                        Don't forget you need to have at least one breed added before you can add a pedigree!
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <script>
-                            $(function () {
-                                "use strict";
-                                // LINE CHART
-                                Morris.Line({
-                                    element: 'morris-line-chart'
-                                    , resize: true
-                                    , data: [{% for key, val in pedigree_chart.items %}
-                                        {
-                                            y: '{{ key|escape }}'
-                                        ,{% for key, val in val.items %} {{ key }}: {{ val }} {% endfor %}}
-                                        ,{% endfor %}]
-                                    , xkey: 'y'
-                                    , ykeys: ['pedigrees_added']
-                                    , labels: ['Pedigrees added']
-                                    , gridLineColor: '#eef0f2'
-                                    , lineColors: ['#009efb']
-                                    , lineWidth: 1
-                                    , hideHover: 'auto'
-                                    , gridIntegers: true
-                                    , ymin: 0
-                                    });
-                                });
-                        </script>
-                    </div>
-                </div>
-                <div class="row">
-                    <!-- Column -->
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title">Breed Chart</h4>
-                                {% if breed_chart %}
-                                    <div id="morris-bar-chart"></div>
-                                {% else %}
-                                    {% if editor or contributor or breeds_editable|length > 0 %}
-                                        <p>You still need to <a href="{% url 'new_pedigree_form' %}">add your first Pedigree</a>!</p>
-                                    {% else %}
-                                        <p>The first pedigree still needs to be added!</p>
+                        {% for user_graph in user_graphs.selected %}
+                            {% for site_graph in site_graphs.values %}
+                                {% if user_graph == site_graph.id %}
+                                    {% if user_graph == 'total_added' %}
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <h4 class="card-title col-sm-8 col-md-8">Total Animals in Database</h4>
+                                                    <!-- graph options to change/remove graph -->
+                                                    {% include 'change_remove_graph.html' %}
+                                                </div>
+                                                {% if total_added_chart %}
+                                                    <div id="morris-line-chart"></div>
+                                                {% else %}
+                                                    <div class="alert alert-info">
+                                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">×</span> </button>
+                                                        <h3 class="text-info"><i class="fad fa-exclamation-circle"></i> Information</h3>
+                                                        You have not added any {{ service.animal_type|title }} yet to your Cloudlines instance.
+                                                        You can <a href="{% url 'new_pedigree_form' %}">click here</a> or click the 'Add New Pedigree' button above to get started.
+                                                        Don't forget you need to have at least one breed added before you can add a pedigree!
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <script>
+                                            $(function () {
+                                                "use strict";
+                                                // LINE CHART
+                                                Morris.Line({
+                                                    element: 'morris-line-chart'
+                                                    , resize: true
+                                                    , data: [{% for key, val in total_added_chart.items %}
+                                                        {
+                                                            y: '{{ key|escape }}'
+                                                        ,{% for key, val in val.items %} {{ key }}: {{ val }} {% endfor %}}
+                                                        ,{% endfor %}]
+                                                    , xkey: 'y'
+                                                    , ykeys: ['pedigrees_added']
+                                                    , labels: ['{{ site_graph.title }}']
+                                                    , gridLineColor: '#eef0f2'
+                                                    , lineColors: ['#009efb']
+                                                    , lineWidth: 1
+                                                    , hideHover: 'auto'
+                                                    , gridIntegers: true
+                                                    , ymin: 0
+                                                    });
+                                                });
+                                        </script>
+                                    {% elif user_graph == 'registered' %}
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <h4 class="card-title col-sm-8 col-md-8">Animals Registered Per Year</h4>
+                                                    <!-- graph options to change/remove graph -->
+                                                    {% include 'change_remove_graph.html' %}
+                                                </div>
+                                                {% if registered %}
+                                                    <ul class="list-inline text-center mt-3">
+                                                        {% for breed, colour in registered.breeds.items %}
+                                                            <li class="list-inline-item">
+                                                                <h5>
+                                                                    <i class="fa fa-circle mr-1" style="color: {{ colour }}"></i>
+                                                                    {{ breed }}
+                                                                </h5>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                    <div id="morris-area-chart"></div>
+                                                {% else %}
+                                                    {% if editor or contributor or breeds_editable|length > 0 %}
+                                                        <p>You still need to <a href="{% url 'new_pedigree_form' %}">add your first Pedigree</a>!</p>
+                                                    {% else %}
+                                                        <p>The first pedigree still needs to be added!</p>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <script>
+                                            $(function () {
+                                                "use strict";
+                                                Morris.Area({
+                                                    element: 'morris-area-chart',
+                                                    data: [
+                                                        {% for year, breed in registered.items %}
+                                                            {% if year != 'breeds' %}
+                                                                {
+                                                                    period: '{{ year }}',
+                                                                    {% for breed, amount in breed.items %}
+                                                                        '{{ breed }}': {{ amount }},
+                                                                    {% endfor %}
+                                                                },
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    ],
+                                                    xkey: 'period',
+                                                    ykeys: [
+                                                        {% for breed in registered.breeds.keys %}
+                                                            '{{ breed }}',
+                                                        {% endfor %}
+                                                    ],
+                                                    labels: [
+                                                        {% for breed in registered.breeds.keys %}
+                                                            '{{ breed }}',
+                                                        {% endfor %}
+                                                    ],
+                                                    pointSize: 3,
+                                                    fillOpacity: 0,
+                                                    pointStrokeColors:[
+                                                        {% for colour in registered.breeds.values %}
+                                                            '{{ colour }}',
+                                                        {% endfor %}
+                                                    ],
+                                                    behaveLikeLine: true,
+                                                    gridLineColor: '#e0e0e0',
+                                                    lineWidth: 3,
+                                                    hideHover: 'auto',
+                                                    lineColors: [
+                                                        {% for colour in registered.breeds.values %}
+                                                            '{{ colour }}',
+                                                        {% endfor %}
+                                                    ],
+                                                    resize: true
+                                                });
+                                            });
+                                        </script>
+                                    {% elif user_graph == 'current_alive' %}
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <h4 class="card-title col-sm-8 col-md-8">Number of Living Animals by Sex</h4>
+                                                    <!-- graph options to change/remove graph -->
+                                                    {% include 'change_remove_graph.html' %}
+                                                </div>
+                                                {% if current_alive_chart %}
+                                                    <div id="living-chart"></div>
+                                                {% else %}
+                                                    {% if editor or contributor or breeds_editable|length > 0 %}
+                                                        <p>You still need to <a href="{% url 'new_pedigree_form' %}">add your first Pedigree</a>!</p>
+                                                    {% else %}
+                                                        <p>The first pedigree still needs to be added!</p>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <script>
+                                            $(function () {
+                                                "use strict";
+                                                // Morris bar chart
+                                                Morris.Bar({
+                                                    element: 'living-chart'
+                                                    , data: [
+                                                        {% for key, val in current_alive_chart.items %}
+                                                            {
+                                                                y: '{{ key|escape }}'
+                                                                {% for key, val in val.items %}
+                                                                    , {{ key|title }}: {{ val|escape }}
+                                                                {% endfor %}
+                                                    },
+                                                    {% endfor %}]
+                                                    , xkey: 'y'
+                                                    , ykeys: ['Male', 'Female']
+                                                    , labels: ['Male', 'Female']
+                                                    , barColors: ['#0275d8', '#FFC0CB']
+                                                    , hideHover: 'auto'
+                                                    , gridLineColor: '#eef0f2'
+                                                    , resize: true
+                                                    , gridIntegers: true
+                                                    , ymin: 0
+                                                });
+                                            });
+                                        </script>
                                     {% endif %}
                                 {% endif %}
-                            </div>
-                        </div>
-                        <script>
-                            $(function () {
-                                "use strict";
-                                // Morris bar chart
-                                Morris.Bar({
-                                    element: 'morris-bar-chart'
-                                    , data: [
-                                        {% for key, val in breed_chart.items %}
-                                        {
-                                        y: '{{ key|escape }}'
-                                        {% for key, val in val.items %}
-                                        , {{ key|title }}: {{ val|escape }}
-                                        {% endfor %}
-                                    },
-                                    {% endfor %}]
-                                    , xkey: 'y'
-                                    , ykeys: ['Male', 'Female']
-                                    , labels: ['Male', 'Female']
-                                    , barColors: ['#0275d8', '#FFC0CB']
-                                    , hideHover: 'auto'
-                                    , gridLineColor: '#eef0f2'
-                                    , resize: true
-                                    , gridIntegers: true
-                                    , ymin: 0
-                                });
-                            });
-                        </script>
+                            {% endfor %}
+                        {% endfor %}
                     </div>
                 </div>
+
+                <!-- graph options to add graph -->
+                {% if not user_graphs.max_reached %}
+                    <div class="row">
+                        <!-- Column -->
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                            <div class="card">
+                                <div class="btn-group btn-block">
+                                    <button id="select-graph" type="button" class="btn btn-secondary dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Add Graph
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        {% for site_graph in site_graphs.values %}
+                                            {% if site_graph.id not in user_graphs.selected %}
+                                                <button onclick="selectGraph(this, 'add')" class="dropdown-item" name="{{ site_graph.id }}" value='{{ site_graph.id }}'>{{ site_graph.title }}</button>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- javascript for selecting a graph -->
+                <script>
+                    function selectGraph(graph, action, changeFrom='') {
+                        $.ajax({
+                            url: "{% url 'select_graph' %}",
+                            type: 'post',
+                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                            dataType: 'text',
+                            async: true,
+                            data: {'graph': graph.value, 'action': action, 'change_from': changeFrom},
+                            beforeSend: function() {
+                                //$('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                            },
+                            success: function(data) {
+                                // try {
+                                //         var result = JSON.parse(data);
+                                //         var coi_countDownDate = new Date(result.coi_date).getTime();
+                                //         var coi_countDownInterval = setInterval(function() { coi_countDown(coi_countDownDate); }, 1000);
+                                //         infoMsg('COI now running, allow time for values to be updated')
+                                //     }
+                                // catch(err) {
+                                //         // not returned anything
+                                //         var result = '';
+                                //         }
+                                console.log('selecting!')
+                                if (JSON.parse(data).result == 'success') {
+                                    location.reload()
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown){
+                            }
+                        });
+                    }
+                </script>
             </div>
 
             <div class="col-md-4 col-lg-4 col-xlg-4">

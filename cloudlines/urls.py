@@ -30,6 +30,7 @@ urlpatterns = [
     path('impex/', include('impex.urls')),
     path('approvals/', include('approvals.urls')),
     path('dashboard', views.dashboard, name='dashboard'),
+    path('select_graph', views.select_graph, name='select_graph'),
     path('api/', include('api.urls')),
     path('metrics/', include('metrics.urls')),
     path('bolton/', include('boltons.urls')),
