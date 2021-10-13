@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from cloud_lines.models import Service
 from cloud_lines.models import Bolton
+from json import dumps
 
 
 def user_directory_path(instance, filename):
@@ -13,9 +14,24 @@ class UserDetail(models.Model):
     phone = models.CharField(max_length=15, blank=False)
     stripe_id = models.CharField(max_length=50, blank=True)
     current_service = models.ForeignKey('AttachedService', on_delete=models.SET_NULL, null=True, blank=True)
+    graphs = models.TextField(default=dumps({
+        'selected': [],
+        'max_reached': False
+    }), verbose_name="Dashboard Graphs")
 
     def __str__(self):
         return str(self.user)
+
+
+class AttachedBolton(models.Model):
+    bolton = models.ManyToManyField(Bolton, related_name='boltons', blank=True)
+    stripe_sub_id = models.CharField(max_length=255, blank=True)
+    INCREMENTS = (
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+    )
+    increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True, blank=True)
+    active = models.BooleanField(default=False)
 
 
 class AttachedService(models.Model):
@@ -24,7 +40,7 @@ class AttachedService(models.Model):
     contributors = models.ManyToManyField(User, related_name='contributors', blank=True)
     read_only_users = models.ManyToManyField(User, related_name='read_only_users', blank=True)
     service = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True)
-    boltons = models.ManyToManyField(Bolton, related_name='boltons', blank=True)
+    boltons = models.ManyToManyField(AttachedBolton, related_name='boltons', blank=True)
     domain = models.CharField(max_length=250, blank=True)
     organisation_or_society_name = models.CharField(max_length=250, blank=True)
     image = models.ImageField(upload_to=user_directory_path, blank=True)

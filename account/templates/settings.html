@@ -53,6 +53,7 @@
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#users" role="tab">Users</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#customisation" role="tab">Customisation</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#metrics" role="tab">Metrics</a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#boltons" role="tab">Boltons</a> </li>
                 </ul>
                 <!-- Tab panes -->
                 <div class="tab-content">
@@ -891,6 +892,22 @@
                             {% else %}
                                 <p>You must be an editor to enable/disable metrics.</p>
                             {% endif %}
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="boltons" role="tabpanel">
+                        <div class="card-body">
+                            <h5>Coming soon!</h5>
+                                {% for bolton in service.boltons.all %}
+                                    {% if bolton.name == "Membership" %}
+                                        <p class="text-left">Membership bolton is enabled.</p>
+                                        <div class="form-group">
+                                            <div class="mb-4">
+                                                    <button class="btn {% if service.metrics %}btn-danger{% else%}btn-success{% endif %}"
+                                                            id="metricsSwitch">{% if service.metrics %}Disable Metrics{% else%}Enable Metrics{% endif %}</button>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
                         </div>
                     </div>
                 </div>

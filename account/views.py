@@ -17,6 +17,7 @@ from pedigree.models import Pedigree
 from pedigree.functions import get_pedigree_column_headings
 from breed.models import Breed
 from breeder.models import Breeder
+from boltons.models import BirthNotification
 from approvals.models import Approval
 from money import Money
 from re import match
@@ -526,11 +527,17 @@ def settings(request):
                 # add each breed admin to context
                 breed_admins.append(breed_admin)
 
+    try:
+        birth_notification = BirthNotification.objects.get(account=attached_service)
+    except BirthNotification.DoesNotExist:
+        birth_notification = []
+
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
                                              'active_pedigree_columns': active_pedigree_columns,
                                              'breeds': breeds,
-                                             'breed_admins': breed_admins})
+                                             'breed_admins': breed_admins,
+                                             'birth_notification': birth_notification})
 
 
 @user_passes_test(is_editor, "/account/login")
