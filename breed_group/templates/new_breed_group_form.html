@@ -109,7 +109,7 @@
                                                 });
                                             </script>
                                         {% else %}
-                                            {{ field|attr:"class:form-control" }}
+                                            {% render_field field class+="form-control" value=suggested_name %}
                                         {% endif %}
                                         {% for error in field.errors %}
                                           <span class="help-block">{{ error }}</span>
