@@ -42,6 +42,16 @@ def new_breed_group_form(request):
         raise PermissionDenied()
     
     if request.method == 'POST':
+        # validate that input is given
+        if breed_group_form['breeder'].value() == '':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder was not given!'}))
+        elif breed_group_form['breed'].value() == '--Select Breed--':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breed was not given!'}))
+        elif breed_group_form['group_name'].value() == '':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group name was not given!'}))
+        elif len(breed_group_form['group_members'].value()) == 0:
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group members were not given!'}))
+        
         new_breed_group = BreedGroup()
         try:
             new_breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
