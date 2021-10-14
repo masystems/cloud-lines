@@ -54,16 +54,16 @@ def dashboard(request):
                     date = date + relativedelta(years=1)
 
         # number of pedigrees registered graph
-        registered = {}
+        registered_chart = {}
         if 'registered' in user_graphs['selected']:
             # get the dictionary of breeds mapped to amount of pedigrees for each year
             current_year = datetime.now().year
             date = datetime.now() - relativedelta(years=9)
             previous_year_count = 0
             for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
-                registered[date.year] = {}
+                registered_chart[date.year] = {}
                 for breed in Breed.objects.filter(account=main_account):
-                    registered[date.year][breed.breed_name] = Pedigree.objects.filter(breed=breed, 
+                    registered_chart[date.year][breed.breed_name] = Pedigree.objects.filter(breed=breed, 
                                                         account=main_account, date_of_registration__year=date.year).exclude(state='unapproved').count()
                 
                 if year != 0:
@@ -72,10 +72,10 @@ def dashboard(request):
 
             # make a dictionary of breeds and their colours
             counter = 0
-            colours = ['#292b2c ', '#44AAAC', '#AC4476', '#0275d8', '#FFC0CB']
-            registered['breeds'] = {}
+            colours = ['#292b2c', '#44AAAC', '#AC4476', '#0275d8', '#FFC0CB']
+            registered_chart['breeds'] = {}
             for breed in Breed.objects.filter(account=main_account):
-                registered['breeds'][breed.breed_name] = colours[counter]
+                registered_chart['breeds'][breed.breed_name] = colours[counter]
                 counter += 1
         # number of pedigrees (male/female) currently alive graph
         current_alive_chart = {}
@@ -83,6 +83,29 @@ def dashboard(request):
             for breed in Breed.objects.filter(account=main_account):
                 current_alive_chart[breed] = {'male': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='male') & Q(status='alive')).exclude(state='unapproved').count(),
                                     'female': Pedigree.objects.filter(Q(breed__breed_name=breed, account=main_account) & Q(sex='female') & Q(status='alive')).exclude(state='unapproved').count()}
+        # number of pedigrees born graph
+        born_chart = {}
+        if 'born' in user_graphs['selected']:
+            # get the dictionary of breeds mapped to amount of pedigrees for each year
+            current_year = datetime.now().year
+            date = datetime.now() - relativedelta(years=9)
+            previous_year_count = 0
+            for year in [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]:
+                born_chart[date.year] = {}
+                for breed in Breed.objects.filter(account=main_account):
+                    born_chart[date.year][breed.breed_name] = Pedigree.objects.filter(breed=breed, 
+                                                        account=main_account, dob__year=date.year).exclude(state='unapproved').count()
+                
+                if year != 0:
+                    date = date.replace(day=1)
+                    date = date + relativedelta(years=1)
+            # make a dictionary of breeds and their colours
+            counter = 0
+            colours = ['#292b2c', '#44AAAC', '#AC4476', '#0275d8', '#FFC0CB']
+            born_chart['breeds'] = {}
+            for breed in Breed.objects.filter(account=main_account):
+                born_chart['breeds'][breed.breed_name] = colours[counter]
+                counter += 1
     else:
         return redirect('welcome')
 
@@ -100,9 +123,10 @@ def dashboard(request):
                                               'top_pedigrees': top_pedigrees,
                                               'latest_breeders': latest_breeders,
                                               'breed_groups': breed_groups,
-                                              'registered': registered,
+                                              'registered_chart': registered_chart,
                                               'total_added_chart': total_added_chart,
                                               'current_alive_chart': current_alive_chart,
+                                              'born_chart': born_chart,
                                               'user_graphs': json.loads(request.user.user.first().graphs),
                                               'site_graphs': json.loads(get_graphs())})
                                               # 'updates': updates,
