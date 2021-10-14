@@ -51,12 +51,23 @@ def new_breed_group_form(request):
         new_breed_group.group_name = breed_group_form['group_name'].value()
         new_breed_group.account = attached_service
         new_breed_group.save()
+        
+        # variable to check that 1 male was given
+        male_count = 0
+        
         # add group members
         for id in breed_group_form['group_members'].value():
-            print('M | ' in id)
+            # increment male_count if it's male
+            if 'M | ' in id:
+                male_count += 1
+            
             id = id[4:]
             pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
             new_breed_group.group_members.add(pedigree)
+
+        # check number of males given is correct
+        if male_count != 1:
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of males must be one!'}))
 
         if request.user in attached_service.contributors.all():
             new_breed_group.state = 'unapproved'
