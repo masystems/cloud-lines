@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
+from django.core.exceptions import PermissionDenied
 from .models import BreedGroup
 from pedigree.models import Pedigree
 from breeder.models import Breeder
 from breed.models import Breed
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from .forms import BreedGroupForm
 from approvals.models import Approval
 import re
+from json import dumps
 
 
 @login_required(login_url="/account/login")
@@ -22,21 +24,66 @@ def breed_groups(request):
 def new_breed_group_form(request):
     breed_group_form = BreedGroupForm(request.POST or None, request.FILES or None)
     attached_service = get_main_account(request.user)
+    
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        # specify breeder to validate user is breeder
+        if Breeder.objects.filter(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).exists():
+            if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
+                                            breeder_users=[Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).user]):
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
+        # if breeder doesn't exist, allow contribs on through
+        else:
+            if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
+    else:
+        raise PermissionDenied()
+    
     if request.method == 'POST':
+        # validate that input is given
+        if breed_group_form['breeder'].value() == '':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder was not given!'}))
+        elif breed_group_form['breed'].value() == '--Select Breed--':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breed was not given!'}))
+        elif breed_group_form['group_name'].value() == '':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group name was not given!'}))
+        elif len(breed_group_form['group_members'].value()) == 0:
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group members were not given!'}))
+        
         new_breed_group = BreedGroup()
         try:
             new_breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
-            pass
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder does not exist!'}))
         new_breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         new_breed_group.group_name = breed_group_form['group_name'].value()
         new_breed_group.account = attached_service
         new_breed_group.save()
+        
+        # variable to check that 1 male was given and at least 1 female was given
+        male_count = 0
+        female_count = 0
+        
         # add group members
         for id in breed_group_form['group_members'].value():
+            # increment male_count if it's male, female_count if it's female
+            if 'M | ' in id:
+                male_count += 1
+            if 'F | ' in id:
+                female_count += 1
+            
             id = id[4:]
             pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
             new_breed_group.group_members.add(pedigree)
+
+        # check number of males and females given is correct
+        if male_count != 1:
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of males must be one!'}))
+        if female_count < 1:
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of females must be at least one!'}))
 
         if request.user in attached_service.contributors.all():
             new_breed_group.state = 'unapproved'
@@ -51,7 +98,7 @@ def new_breed_group_form(request):
         else:
             new_breed_group.save()
 
-        return redirect('breed_groups')
+        return HttpResponse(dumps({"result": "success"}))
 
     else:
         breed_group_form = BreedGroupForm()
@@ -82,9 +129,27 @@ def edit_breed_group_form(request, breed_group_id):
 
     breed_group_form = BreedGroupForm(request.POST or None, request.FILES or None, instance=breed_group)
     attached_service = get_main_account(request.user)
+    
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        # specify breeder to validate user is breeder
+        if Breeder.objects.filter(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).exists():
+            if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
+                                            breeder_users=[Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).user]):
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
+        # if breeder doesn't exist, allow contribs on through
+        else:
+            if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
+    else:
+        raise PermissionDenied()
+    
     members = []
     if request.method == 'POST':
-        if 'delete' in request.POST:
+        if request.POST.get('delete'):
             if request.user in attached_service.contributors.all():
                 # contributors are not allowed to delete pedigrees!
                 pass
@@ -94,11 +159,22 @@ def edit_breed_group_form(request, breed_group_id):
                 approvals = Approval.objects.filter(breed_group=breed_group)
                 for approval in approvals:
                     approval.delete()
-            return redirect('breed_groups')
+            return HttpResponse(dumps({"result": "success"}))
+        
+        # validate that input is given
+        if breed_group_form['breeder'].value() == '':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder was not given!'}))
+        elif breed_group_form['breed'].value() == '--Select Breed--':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breed was not given!'}))
+        elif breed_group_form['group_name'].value() == '':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group name was not given!'}))
+        elif len(breed_group_form['group_members'].value()) == 0:
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group members were not given!'}))
+        
         try:
             breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
-            pass
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder does not exist!'}))
         breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         breed_group.group_name = breed_group_form['group_name'].value()
 
@@ -132,11 +208,27 @@ def edit_breed_group_form(request, breed_group_id):
                     breed_group.group_members.add(pedigree)
 
         else:
+            # variable to check that 1 male was given and at least 1 female was given
+            male_count = 0
+            female_count = 0
+            
             # update group members
             for id in breed_group_form['group_members'].value():
+                # increment male_count if it's male, female_count if it's female
+                if 'M | ' in id:
+                    male_count += 1
+                if 'F | ' in id:
+                    female_count += 1
+                
                 id = id[4:]
                 pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
                 breed_group.group_members.add(pedigree)
+
+            # check number of males and females given is correct
+            if male_count != 1:
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of males must be one!'}))
+            if female_count < 1:
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of females must be at least one!'}))
 
             # delete any existed approvals
             approvals = Approval.objects.filter(breed_group=breed_group)
@@ -145,7 +237,7 @@ def edit_breed_group_form(request, breed_group_id):
             breed_group.state = 'approved'
             breed_group.save()
 
-        return redirect('breed_groups')
+        return HttpResponse(dumps({"result": "success"}))
     else:
         if breed_group.state == 'edited':
             approval = Approval.objects.get(breed_group=breed_group)
