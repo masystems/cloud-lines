@@ -194,22 +194,27 @@ def edit_breed_group_form(request, breed_group_id):
                     breed_group.group_members.add(pedigree)
 
         else:
-            # variable to check that 1 male was given
+            # variable to check that 1 male was given and at least 1 female was given
             male_count = 0
+            female_count = 0
             
             # update group members
             for id in breed_group_form['group_members'].value():
-                # increment male_count if it's male
+                # increment male_count if it's male, female_count if it's female
                 if 'M | ' in id:
                     male_count += 1
+                if 'F | ' in id:
+                    female_count += 1
                 
                 id = id[4:]
                 pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
                 breed_group.group_members.add(pedigree)
 
-            # check number of males given is correct
+            # check number of males and females given is correct
             if male_count != 1:
                 return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of males must be one!'}))
+            if female_count < 1:
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of females must be at least one!'}))
 
             # delete any existed approvals
             approvals = Approval.objects.filter(breed_group=breed_group)
