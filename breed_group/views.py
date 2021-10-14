@@ -8,6 +8,7 @@ from breed.models import Breed
 from account.views import is_editor, get_main_account
 from .forms import BreedGroupForm
 from approvals.models import Approval
+from json import dumps
 
 
 @login_required(login_url="/account/login")
@@ -51,7 +52,7 @@ def new_breed_group_form(request):
         else:
             new_breed_group.save()
 
-        return redirect('breed_groups')
+        return HttpResponse(dumps({"result": "success"}))
 
     else:
         breed_group_form = BreedGroupForm()
