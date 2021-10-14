@@ -56,7 +56,7 @@ def new_breed_group_form(request):
         try:
             new_breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
-            pass
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder does not exist!'}))
         new_breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         new_breed_group.group_name = breed_group_form['group_name'].value()
         new_breed_group.account = attached_service
@@ -160,7 +160,7 @@ def edit_breed_group_form(request, breed_group_id):
         try:
             breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
-            pass
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder does not exist!'}))
         breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         breed_group.group_name = breed_group_form['group_name'].value()
 
