@@ -72,7 +72,7 @@ def edit_breed_group_form(request, breed_group_id):
     attached_service = get_main_account(request.user)
     members = []
     if request.method == 'POST':
-        if 'delete' in request.POST:
+        if request.POST.get('delete'):
             if request.user in attached_service.contributors.all():
                 # contributors are not allowed to delete pedigrees!
                 pass
@@ -82,7 +82,7 @@ def edit_breed_group_form(request, breed_group_id):
                 approvals = Approval.objects.filter(breed_group=breed_group)
                 for approval in approvals:
                     approval.delete()
-            return redirect('breed_groups')
+            return HttpResponse(dumps({"result": "success"}))
         try:
             breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
@@ -133,7 +133,7 @@ def edit_breed_group_form(request, breed_group_id):
             breed_group.state = 'approved'
             breed_group.save()
 
-        return redirect('breed_groups')
+        return HttpResponse(dumps({"result": "success"}))
     else:
         if breed_group.state == 'edited':
             approval = Approval.objects.get(breed_group=breed_group)
