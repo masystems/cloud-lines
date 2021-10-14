@@ -23,6 +23,24 @@ def breed_groups(request):
 def new_breed_group_form(request):
     breed_group_form = BreedGroupForm(request.POST or None, request.FILES or None)
     attached_service = get_main_account(request.user)
+    
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        # specify breeder to validate user is breeder
+        if Breeder.objects.filter(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).exists():
+            if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
+                                            breeder_users=[Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).user]):
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
+        # if breeder doesn't exist, allow contribs on through
+        else:
+            if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
+    else:
+        raise PermissionDenied()
+    
     if request.method == 'POST':
         new_breed_group = BreedGroup()
         try:
@@ -82,7 +100,7 @@ def edit_breed_group_form(request, breed_group_id):
             if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
                                             breeder_users=[Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).user]):
                 return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
-        # if breeder doesn't exist, allow contribs on through as that error will be handled later
+        # if breeder doesn't exist, allow contribs on through
         else:
             if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
                 return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
