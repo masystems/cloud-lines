@@ -177,7 +177,12 @@
                 }
                 else {
                     console.log('ERROR')
-                    errorMsg('Your form had errors!')
+                    if (result.msg) {
+                        errorMsg(result.msg)
+                    }
+                    else {
+                        errorMsg('Your form had errors!')
+                    }
                 }
             },
             error: function(jqXHR, textStatus, errorThrown){

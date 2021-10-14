@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core import serializers
+from django.core.exceptions import PermissionDenied
 from .models import BreedGroup
 from pedigree.models import Pedigree
 from breeder.models import Breeder
 from breed.models import Breed
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from .forms import BreedGroupForm
 from approvals.models import Approval
 from json import dumps
@@ -70,6 +71,24 @@ def edit_breed_group_form(request, breed_group_id):
 
     breed_group_form = BreedGroupForm(request.POST or None, request.FILES or None, instance=breed_group)
     attached_service = get_main_account(request.user)
+    
+    # check if user has permission, passing in ids of mother and father from kinship queue item
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        # specify breeder to validate user is breeder
+        if Breeder.objects.filter(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).exists():
+            if not has_permission(request, {'read_only': False, 'contrib': 'breeder', 'admin': True, 'breed_admin': True},
+                                            breeder_users=[Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value()).user]):
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
+        # if breeder doesn't exist, allow contribs on through as that error will be handled later
+        else:
+            if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'You do not have permission!'}))
+    else:
+        raise PermissionDenied()
+    
     members = []
     if request.method == 'POST':
         if request.POST.get('delete'):
