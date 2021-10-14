@@ -131,6 +131,17 @@ def edit_breed_group_form(request, breed_group_id):
                 for approval in approvals:
                     approval.delete()
             return HttpResponse(dumps({"result": "success"}))
+        
+        # validate that input is given
+        if breed_group_form['breeder'].value() == '':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder was not given!'}))
+        elif breed_group_form['breed'].value() == '--Select Breed--':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Breed was not given!'}))
+        elif breed_group_form['group_name'].value() == '':
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group name was not given!'}))
+        elif len(breed_group_form['group_members'].value()) == 0:
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group members were not given!'}))
+        
         try:
             breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
