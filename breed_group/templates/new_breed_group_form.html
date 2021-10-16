@@ -32,7 +32,7 @@
                 </div>
             {% endif %}
             <div class="card-body">
-                <form action="{% url 'new_breed_group_form' %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                <form id="newBGForm" class="form-horizontal">
                     {% csrf_token %}
                     <div class="form-body">
                         <h3 class="box-title">Breed Info</h3>
@@ -109,7 +109,7 @@
                                                 });
                                             </script>
                                         {% else %}
-                                            {{ field|attr:"class:form-control" }}
+                                            {% render_field field class+="form-control" value=suggested_name %}
                                         {% endif %}
                                         {% for error in field.errors %}
                                           <span class="help-block">{{ error }}</span>
@@ -125,7 +125,7 @@
                                 <div class="col-md-6">
                                     <div class="row">
                                         <div class="col-md-offset-3 col-md-9">
-                                            <button type="submit" class="btn btn-success">{% if contributor %}Submit for approval{% else %}Submit{% endif %}</button>
+                                            <button id="submitNewBGForm" class="btn btn-success">{% if contributor %}Submit for approval{% else %}Submit{% endif %}</button>
                                             <a href="{% url 'breed_groups' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
                                         </div>
                                     </div>
@@ -136,7 +136,7 @@
                     </div>
                 </form>
             </div>
-        </form>
+        </div>
     </div>
 
     </div>
@@ -144,5 +144,45 @@
 {% else %}
 <h1>Oops, you shouldn't be here!</h1>
 {% endif %}
+
+{% endblock %}
+
+{% block footer %}
+
+<!-- ajax call to submit the new breed group form -->
+<script>
+    $('#submitNewBGForm').click( function(e) {
+        e.preventDefault()
+        $.ajax({
+            url: "{% url 'new_breed_group_form' %}",
+            type: 'post',
+            dataType: 'text',
+            data: $('#newBGForm').serialize(),
+            success: function(result) {
+                result = JSON.parse(result)
+                if (result.result == 'success') {
+                    window.location.replace("{% url 'breed_groups' %}")
+                }
+                else {
+                    console.log('ERROR')
+                    if (result.msg) {
+                        errorMsg(result.msg)
+                    }
+                    else {
+                        errorMsg('Your form had errors!')
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
+    });
+</script>
 
 {% endblock %}

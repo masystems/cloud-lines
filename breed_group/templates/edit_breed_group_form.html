@@ -31,7 +31,7 @@
                 </div>
             {% endif %}
             <div class="card-body">
-                <form action="{% url 'edit_breed_group_form' breed_group.id %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                <form id="editBGForm" class="form-horizontal">
                     {% csrf_token %}
                     <div class="form-body">
                         <h3 class="box-title">Breed Info</h3>
@@ -133,9 +133,9 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             {% if breed_group.state != 'approved' %}
-                                                <button type="submit" class="btn btn-success">Approve</button>
+                                                <button id="submitEditBGForm" class="btn btn-success">Approve</button>
                                             {% else %}
-                                                <button type="submit" class="btn btn-success">{% if contributor %}Submit for approval{% else %}Save{% endif %}</button>
+                                                <button id="submitEditBGForm" class="btn btn-success">{% if contributor %}Submit for approval{% else %}Save{% endif %}</button>
                                             {% endif %}
                                             <a href="{% url 'breed_groups' %}"><button type="button" name="submit" class="btn btn-inverse">Cancel</button></a>
                                             {% if editor %}
@@ -150,13 +150,84 @@
                     </div>
                 </form>
             </div>
-        </form>
-    </div>
-
+        </div>
     </div>
 
 {% else %}
     <h1>Oops, you shouldn't be here!</h1>
 {% endif %}
+
+{% endblock %}
+
+{% block footer %}
+
+<!-- ajax call to submit the edit breed group form -->
+<script>
+    $('#submitEditBGForm').click( function(e) {
+        e.preventDefault()
+        $.ajax({
+            url: "{% url 'edit_breed_group_form' breed_group.id %}",
+            type: 'post',
+            dataType: 'text',
+            data: $('#editBGForm').serialize(),
+            success: function(result) {
+                result = JSON.parse(result)
+                if (result.result == 'success') {
+                    window.location.replace("{% url 'breed_groups' %}")
+                }
+                else {
+                    console.log('ERROR')
+                    if (result.msg) {
+                        errorMsg(result.msg)
+                    }
+                    else {
+                        errorMsg('Your form had errors!')
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
+    });
+
+    $('.confirmDeleteBtn').click( function(e) {
+        e.preventDefault()
+
+        var input = $("<input>")
+                .attr("name", "delete")
+                .attr("type", "hidden").val("delete");
+            $('#editBGForm').append(input);
+
+        $.ajax({
+            url: "{% url 'edit_breed_group_form' breed_group.id %}",
+            type: 'post',
+            dataType: 'text',
+            data: $('#editBGForm').serialize(),
+            success: function(result) {
+                result = JSON.parse(result)
+                if (result.result == 'success') {
+                    window.location.replace("{% url 'breed_groups' %}")
+                }
+                else {
+                    errorMsg('Your form had errors!')
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                console.log('jqXHR:');
+                console.log(jqXHR);
+                console.log('textStatus:');
+                console.log(textStatus);
+                console.log('errorThrown:');
+                console.log(errorThrown);
+            }
+        });
+    });
+</script>
 
 {% endblock %}
