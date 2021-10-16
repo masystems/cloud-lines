@@ -56,6 +56,7 @@ class ServicesViews(viewsets.ModelViewSet):
 
 
 class AttachedServiceViews(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
     serializer_class = ApiAttachedServiceSerializer
     filter_backends = [SearchFilter]
     permission_classes = [IsAuthenticated]
