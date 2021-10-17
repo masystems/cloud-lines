@@ -578,14 +578,6 @@ def custom_field_edit(request):
         if request.POST.get('location') == 'pedigree':
             # make sure an empty "objects" var is created so that it's not edited localed
             objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-            data = '{"domain": "%s", "account": %d}' % attached_service.domain, attached_service.id
-
-            # get auth token
-            token_res = requests.post(url=f'{django_settings.ORCH_URL}/api-token-auth/',
-                                      data={'username': django_settings.ORCH_USER, 'password': django_settings.ORCH_PASS})
-            ## create header
-            headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
-            post_res = requests.post(url=f'{django_settings.ORCH_URL}/api/custom_fields/update_fields/', headers=headers, data=data)
         elif request.POST.get('location') == 'breeder':
             objects = Breeder.objects.filter(account=attached_service)
         elif request.POST.get('location') == 'breed':
@@ -604,6 +596,7 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(object_custom_fields)
             object.save()
+        update_custom_fields(attached_service)
         return HttpResponse(json.dumps({'success': True}))
 
     elif request.POST.get('formType') == 'edit':
@@ -635,6 +628,7 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(custom_fields)
             object.save()
+        update_custom_fields(attached_service)
         return HttpResponse(json.dumps({'success': True}))
 
     elif request.POST.get('formType') == 'delete':
@@ -660,8 +654,20 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(custom_fields_updated)
             object.save()
-
+        update_custom_fields(attached_service)
         return HttpResponse(json.dumps({'success': True}))
+
+
+def update_custom_fields(attached_service):
+    data = '{"domain": "%s", "account": %d}' % attached_service.domain, attached_service.id
+
+    # get auth token
+    token_res = requests.post(url=f'{django_settings.ORCH_URL}/api-token-auth/',
+                              data={'username': django_settings.ORCH_USER, 'password': django_settings.ORCH_PASS})
+    ## create header
+    headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
+    post_res = requests.post(url=f'{django_settings.ORCH_URL}/api/custom_fields/update_fields/', headers=headers,
+                             data=data)
 
 
 @login_required(login_url="/account/login")
