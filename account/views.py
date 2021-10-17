@@ -662,11 +662,11 @@ def update_custom_fields(attached_service):
     data = '{"domain": "%s", "account": %s}' % (attached_service.domain, attached_service.id)
 
     # get auth token
-    token_res = requests.post(url=f'{django_settings.ORCH_URL}/api-token-auth/',
+    token_res = requests.post(url=urljoin(django_settings.ORCH_URL, '/api-token-auth/'),
                               data={'username': django_settings.ORCH_USER, 'password': django_settings.ORCH_PASS})
     ## create header
     headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
-    post_res = requests.post(url=f'{django_settings.ORCH_URL}/api/custom_fields/update_fields/', headers=headers,
+    post_res = requests.post(url=urljoin(django_settings.ORCH_URL, '/api/custom_fields/update_fields/'), headers=headers,
                              data=data)
 
 
