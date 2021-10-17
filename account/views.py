@@ -659,7 +659,7 @@ def custom_field_edit(request):
 
 
 def update_custom_fields(attached_service):
-    data = '{"domain": "%s", "account": %d}' % attached_service.domain, attached_service.id
+    data = '{"domain": "%s", "account": %s}' % attached_service.domain, attached_service.id
 
     # get auth token
     token_res = requests.post(url=f'{django_settings.ORCH_URL}/api-token-auth/',
