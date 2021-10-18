@@ -38,13 +38,12 @@
 
     // Ajax call to get and display name if a full female reg number is in the field
     $('#id_pedigree').bind('keyup change click typeahead:select', function() {
-        console.log('HELLO')
         $.ajax({
             url: "{% url 'get_pedigree_details' %}",
             type: 'GET',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
-            data: {'id': $(this).val(), 'form_type': $(this).attr('form_type'), 'pedigree': ped_reg, 'parent_type': 'mother'},
+            data: {'id': $(this).val(), 'form_type': 'breed_group', 'breed': $('#breed').val()},
             success: function(data) {
                 result = JSON.parse(data)
                 if (result.result == 'success') {
@@ -52,15 +51,16 @@
                     if ($('#id_pedigree').val() != '') {
                         // display full match
                         if (result.pedigree) {
-                            mother_array = JSON.parse(result.pedigree)
-                            mother = mother_array[0]
+                            //console.log(result.pedigree)
+                            ped_array = JSON.parse(result.pedigree)
+                            pedigree = ped_array[0]
                             // append mother name
                             $('#pedigree-info').html(
-                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + mother.fields.name + '</li>'
+                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + pedigree.fields.name + '</li>'
                             );
                             // if one exists, append mother tag number
-                            if (mother.fields.tag_no != '' && mother.fields.tag_no != null) {
-                                $('#pedigree-info').html($('#mother-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + mother.fields.tag_no + '</li>')
+                            if (pedigree.fields.tag_no != '' && pedigree.fields.tag_no != null) {
+                                $('#pedigree-info').html($('#mother-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + pedigree.fields.tag_no + '</li>')
                             }
                             $('#pedigree-info').removeClass('d-none');
                         }
