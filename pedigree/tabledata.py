@@ -209,7 +209,7 @@ def get_pedigrees(request):
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees.all():
             # update pedigree custom fields if they need updating
-            update_pedigree_cf(attached_service, pedigree)
+            # update_pedigree_cf(attached_service, pedigree)
 
             # allow access to pedigree view page, or don't (include disabled if not)
             href = ''
