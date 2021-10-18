@@ -109,20 +109,23 @@
                                                 });
                                             </script> -->
                                             
-                                            <div id="pedigrees_all">
-                                                <input id="id_pedigree" form_type="edit" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
-                                                {% if service.site_mode == 'poultry' %}
-                                                    <small>Enter a pedigree to include in the breed group</small>
-                                                {% endif %}
+                                            <!-- <div id="pedigrees_all" class="input-group">
+                                                <input id="id_pedigree" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary" type="button">Button</button>
+                                                </div>
+                                            </div> -->
+                                            <div id="pedigrees_all" class="input-group">
+                                                <input id="id_pedigree" type="text" class="typeahead form-control" placeholder="Pedigree">
+                                                <span class="input-group-btn"><button class="btn btn-outline-secondary" data-placement="right" type="button">Button</button></span>
                                             </div>
+                                            
+                                            <small>Enter a pedigree to include in the breed group</small>
                                             <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
                                             <ul class="list-icons d-none" id="pedigree-info"></ul>
                                             <div class="list-group">
-                                                <button type="button" class="list-group-item">Cras justo odio</button>
-                                                <button type="button" class="list-group-item">Dapibus ac facilisis in</button>
-                                                <button type="button" class="list-group-item">Morbi leo risus</button>
-                                                <button type="button" class="list-group-item">Porta ac consectetur ac</button>
-                                                <button type="button" class="list-group-item">Vestibulum at eros</button>
+                                                <button type="button" class="list-group-item">F | bertha</button>
+                                                <button type="button" class="list-group-item">M | twanzy</button>
                                             </div>
                                         {% else %}
                                             {% render_field field class+="form-control" value=suggested_name %}
