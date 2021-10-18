@@ -56,12 +56,8 @@
                             pedigree = ped_array[0]
                             // append mother name
                             $('#pedigree-info').html(
-                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + pedigree.fields.name + '</li>'
+                                '<li class="text-muted"><i class="ti-angle-right"></i><strong>Name:</strong> ' + pedigree.fields.name + '</li><li class="text-muted"><i class="ti-angle-right"></i><strong>Sex:</strong> ' + pedigree.fields.sex + '</li>'
                             );
-                            // if one exists, append mother tag number
-                            if (pedigree.fields.tag_no != '' && pedigree.fields.tag_no != null) {
-                                $('#pedigree-info').html($('#mother-info').html() + '<li class="text-muted"><i class="ti-angle-right"></i><strong>Tag Number:</strong> ' + pedigree.fields.tag_no + '</li>')
-                            }
                             $('#pedigree-info').removeClass('d-none');
                         }
                     } else {
