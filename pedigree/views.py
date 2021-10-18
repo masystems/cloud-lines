@@ -957,6 +957,11 @@ def get_pedigree_details(request):
     if request.GET.get('status'):
         if (request.GET['status'] == 'alive' and pedigree.status != 'alive'):
             return HttpResponse(json.dumps({'result': 'fail'}))
+
+    # if the input field required the pedigree to be of a certain breed, return fail if the breed is incorrect
+    if request.GET.get('breed'):
+        if pedigree.breed.breed_name != request.GET.get('breed'):
+            return HttpResponse(json.dumps({'result': 'fail'}))
     
     pedigree = serializers.serialize('json', [pedigree], ensure_ascii=False)
     return HttpResponse(json.dumps({'result': 'success',
