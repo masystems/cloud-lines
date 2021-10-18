@@ -76,7 +76,7 @@
                                                 <small>Changes to the above selection will refresh the available birds in the group members field below.</small>
                                             </div>
                                         {% elif field.label == 'Group members' %}
-                                            <div class="mb-4" id="members">
+                                            <!-- <div class="mb-4" id="members">
                                                 <select multiple id="public-methods" name='{{ field.name }}'>
                                                     {% for pedigree in pedigree.all %}
                                                         <option value="{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}">{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}</option>
@@ -107,7 +107,23 @@
                                                         $("#refresh").click();
                                                     });
                                                 });
-                                            </script>
+                                            </script> -->
+                                            
+                                            <div id="pedigrees_all">
+                                                <input id="id_pedigree" form_type="edit" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
+                                                {% if service.site_mode == 'poultry' %}
+                                                    <small>Hello</small>
+                                                {% endif %}
+                                            </div>
+                                            <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
+                                            <ul class="list-icons d-none" id="mother-info"></ul>
+                                            <div class="list-group">
+                                                <button type="button" class="list-group-item">Cras justo odio</button>
+                                                <button type="button" class="list-group-item">Dapibus ac facilisis in</button>
+                                                <button type="button" class="list-group-item">Morbi leo risus</button>
+                                                <button type="button" class="list-group-item">Porta ac consectetur ac</button>
+                                                <button type="button" class="list-group-item">Vestibulum at eros</button>
+                                            </div>
                                         {% else %}
                                             {% render_field field class+="form-control" value=suggested_name %}
                                         {% endif %}
@@ -148,6 +164,8 @@
 {% endblock %}
 
 {% block footer %}
+<!-- typeahead for the members field -->
+{% include 'ta_pedigrees.html' %}
 
 <!-- ajax call to submit the new breed group form -->
 <script>
