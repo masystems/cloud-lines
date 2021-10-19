@@ -122,15 +122,15 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-2 pl-0">
-                                                    <button class="btn btn-secondary" type="button">Add</button>
+                                                    <button id="addMemberBtn" class="btn btn-secondary" type="button">Add</button>
                                                 </div>
                                             </div>
                                             <small>Enter a pedigree to include in the breed group</small>
                                             <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
                                             <ul class="list-icons d-none" id="pedigree-info"></ul>
-                                            <div class="list-group">
-                                                <button type="button" class="list-group-item">F | bertha</button>
-                                                <button type="button" class="list-group-item">M | twanzy</button>
+                                            <div id="membersList" class="list-group">
+                                                <button type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">F | bertha</button>
+                                                <button type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | twanzy</button>
                                             </div>
                                         {% else %}
                                             {% render_field field class+="form-control" value=suggested_name %}
@@ -209,6 +209,20 @@
             }
         });
     });
+
+    $('#addMemberBtn').click( function(e) {
+        e.preventDefault()
+        // give error if breed not selected
+        if ($('#breed').val() == '--Select Breed--') {
+            errorMsg('You must select a breed!')
+        }
+        // give error if reg isn't complete
+        else if ($('#pedigree-info').hasClass('d-none')) {
+            errorMsg('Matching pedigree is not in the database!')
+        } else {
+            $('#membersList').append('<button type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | ' + $("#id_pedigree").val() + '</button>')
+        }
+    })
 </script>
 
 {% endblock %}
