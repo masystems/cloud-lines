@@ -128,10 +128,8 @@
                                             <small>Enter a pedigree to include in the breed group</small>
                                             <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
                                             <ul class="list-icons d-none" id="pedigree-info"></ul>
-                                            <div id="membersList" class="list-group">
-                                                <button type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">F | bertha</button>
-                                                <button type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | twanzy</button>
-                                            </div>
+                                            <!-- hidden list to display selected members -->
+                                            <div id="membersList" class="list-group"></div>
                                         {% else %}
                                             {% render_field field class+="form-control" value=suggested_name %}
                                         {% endif %}
@@ -219,6 +217,10 @@
         // give error if reg isn't complete
         else if ($('#pedigree-info').hasClass('d-none')) {
             errorMsg('Matching pedigree is not in the database!')
+        }
+        // give error if member has already been added
+        else if ($('#membersList').html().indexOf('>M | ' + $("#id_pedigree").val() + '</button>') != -1) {
+            errorMsg('Member has already been added!')
         } else {
             var member = $("#id_pedigree").val()
             $('#membersList').append('<button id="member-' + member + '" onclick="removeMember(this)" type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | ' + $("#id_pedigree").val() + '</button>')
@@ -227,7 +229,10 @@
 
     // remove member from members list
     function removeMember(member){
+        // remove member
         $('#' + member.id).remove()
+        // hide list if there are no members in it
+        console.log($('#membersList').html().indexOf('button') == -1)
     }
 </script>
 
