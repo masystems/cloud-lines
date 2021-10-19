@@ -58,7 +58,7 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
 
         # update and get custom fields
         try:
-            update_pedigree_cf(context['attached_service'], context['lvl1'])
+            #update_pedigree_cf(context['attached_service'], context['lvl1'])
             context['custom_fields'] = json.loads(context['lvl1'].custom_fields)
         except json.decoder.JSONDecodeError:
             context['custom_fields'] = {}

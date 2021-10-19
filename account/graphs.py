@@ -17,4 +17,9 @@ def get_graphs():
             "title": "Number of Living Animals by Sex",
             "desc": "The current number of living males and females"
         },
+        "g4": {
+            "id": "born",
+            "title": "Animals Born Per Year",
+            "desc": "The number of pedigrees born each year for the last ten years"
+        },
     })
