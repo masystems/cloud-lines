@@ -220,9 +220,15 @@
         else if ($('#pedigree-info').hasClass('d-none')) {
             errorMsg('Matching pedigree is not in the database!')
         } else {
-            $('#membersList').append('<button type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | ' + $("#id_pedigree").val() + '</button>')
+            var member = $("#id_pedigree").val()
+            $('#membersList').append('<button id="member-' + member + '" onclick="removeMember(this)" type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | ' + $("#id_pedigree").val() + '</button>')
         }
     })
+
+    // remove member from members list
+    function removeMember(member){
+        $('#' + member.id).remove()
+    }
 </script>
 
 {% endblock %}
