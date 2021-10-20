@@ -194,12 +194,6 @@ def edit_breed_group_form(request, breed_group_id):
             current_members.append(member)
         breed_group.group_members.clear()
 
-        # # update group members
-        # for id in breed_group_form['group_members'].value():
-        #     id = id[4:]
-        #     pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
-        #     breed_group.group_members.add(pedigree)
-
         if request.user in attached_service.contributors.all():
             if not Approval.objects.filter(breed_group=breed_group).exists():
                 BreedGroup.objects.filter(id=breed_group.id).update(state='edited')
@@ -222,18 +216,6 @@ def edit_breed_group_form(request, breed_group_id):
             # variable to check that 1 male was given and at least 1 female was given
             male_count = 0
             female_count = 0
-            
-            # # update group members
-            # for id in breed_group_form['group_members'].value():
-            #     # increment male_count if it's male, female_count if it's female
-            #     if 'M | ' in id:
-            #         male_count += 1
-            #     if 'F | ' in id:
-            #         female_count += 1
-                
-            #     id = id[4:]
-            #     pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
-            #     breed_group.group_members.add(pedigree)
             
             # get the input members
             member_index = 0
