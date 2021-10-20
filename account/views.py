@@ -12,7 +12,7 @@ from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings as django_settings
 from .models import UserDetail, AttachedService
-from cloud_lines.models import Service, Page
+from cloud_lines.models import Service, Page, Bolton
 from pedigree.models import Pedigree
 from pedigree.functions import get_pedigree_column_headings
 from breed.models import Breed
@@ -527,17 +527,14 @@ def settings(request):
                 # add each breed admin to context
                 breed_admins.append(breed_admin)
 
-    try:
-        birth_notification = BirthNotification.objects.get(account=attached_service)
-    except BirthNotification.DoesNotExist:
-        birth_notification = []
+    boltons = Bolton.objects.all()
 
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
                                              'active_pedigree_columns': active_pedigree_columns,
                                              'breeds': breeds,
                                              'breed_admins': breed_admins,
-                                             'birth_notification': birth_notification})
+                                             'boltons': boltons})
 
 
 @user_passes_test(is_editor, "/account/login")

@@ -556,4 +556,3 @@ def get_ta_breeders(request, type):
 
     data = serialize('json', list(breeders), fields=('breeding_prefix', 'contact_name'))
     return HttpResponse(data)
-
