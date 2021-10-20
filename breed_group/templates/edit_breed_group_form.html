@@ -185,11 +185,19 @@
 {% endblock %}
 
 {% block footer %}
+<!-- typeahead for the members field -->
+{% include 'ta_pedigrees.html' %}
 
 <!-- ajax call to submit the edit breed group form -->
 <script>
     $('#submitEditBGForm').click( function(e) {
         e.preventDefault()
+        
+        // set the names of the members
+        $('#membersList > div > input').each( function (index) {
+            $(this).attr("name", "member-" + index)
+        })
+        
         $.ajax({
             url: "{% url 'edit_breed_group_form' breed_group.id %}",
             type: 'post',
@@ -253,6 +261,38 @@
             }
         });
     });
+
+    $('#addMemberBtn').click( function(e) {
+        e.preventDefault()
+        // give error if breed not selected
+        if ($('#breed').val() == '--Select Breed--') {
+            errorMsg('You must select a breed!')
+        }
+        // give error if reg isn't complete
+        else if ($('#pedigree-info').hasClass('d-none')) {
+            errorMsg('Matching pedigree is not in the database!')
+        }
+        // give error if member has already been added
+        else if ($('#membersList').html().indexOf(' | ' + $("#id_pedigree").val() + '"') != -1) {
+            errorMsg('Member has already been added!')
+        }
+        // give error if there is a sex that is neither male nor female
+        else if ($('#pedigree-info').html().indexOf('castrated') != -1 || $('#pedigree-info').html().indexOf('unknown') != -1) {
+            errorMsg('Sex must be male or female!')
+        } else {
+            var member = $("#id_pedigree").val()
+            // add a male/female member
+            var sex = 'M'
+            if ($('#pedigree-info').html().indexOf('female') != -1) {sex = 'F'}
+            $('#membersList').append('<div id="member-' + member + '" class="input-group"><input value="' + sex + ' | ' + member + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button" onclick="removeMember(`member-' + member + '`)">Remove</button></div></div>')
+        }
+    })
+
+    // remove member from members list
+    function removeMember(member){
+        // remove member
+        $('#' + member).remove()
+    }
 </script>
 
 {% endblock %}
