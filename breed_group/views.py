@@ -179,7 +179,7 @@ def edit_breed_group_form(request, breed_group_id):
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breed was not given!'}))
         elif breed_group_form['group_name'].value() == '':
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Group name was not given!'}))
-        elif len(breed_group_form['group_members'].value()) == 0:
+        elif not request.POST.get('member-0'):
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Group members were not given!'}))
         
         try:
@@ -194,11 +194,11 @@ def edit_breed_group_form(request, breed_group_id):
             current_members.append(member)
         breed_group.group_members.clear()
 
-        # update group members
-        for id in breed_group_form['group_members'].value():
-            id = id[4:]
-            pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
-            breed_group.group_members.add(pedigree)
+        # # update group members
+        # for id in breed_group_form['group_members'].value():
+        #     id = id[4:]
+        #     pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
+        #     breed_group.group_members.add(pedigree)
 
         if request.user in attached_service.contributors.all():
             if not Approval.objects.filter(breed_group=breed_group).exists():
@@ -223,8 +223,27 @@ def edit_breed_group_form(request, breed_group_id):
             male_count = 0
             female_count = 0
             
-            # update group members
-            for id in breed_group_form['group_members'].value():
+            # # update group members
+            # for id in breed_group_form['group_members'].value():
+            #     # increment male_count if it's male, female_count if it's female
+            #     if 'M | ' in id:
+            #         male_count += 1
+            #     if 'F | ' in id:
+            #         female_count += 1
+                
+            #     id = id[4:]
+            #     pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
+            #     breed_group.group_members.add(pedigree)
+            
+            # get the input members
+            member_index = 0
+            member_inputs = []
+            while request.POST.get(f'member-{member_index}'):
+                member_inputs.append(request.POST.get(f'member-{member_index}'))
+                member_index += 1
+            # create list of group members to be added after the members are checked
+            group_members = []
+            for id in member_inputs:
                 # increment male_count if it's male, female_count if it's female
                 if 'M | ' in id:
                     male_count += 1
@@ -233,12 +252,20 @@ def edit_breed_group_form(request, breed_group_id):
                 
                 id = id[4:]
                 pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
-                breed_group.group_members.add(pedigree)
+                group_members.append(pedigree)
 
             # check number of males and females given is correct
             if male_count != 1:
+                # reset group members
+                breed_group.group_members.clear()
+                for pedigree in current_members:
+                    breed_group.group_members.add(pedigree)
                 return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of males must be one!'}))
             if female_count < 1:
+                # reset group members
+                breed_group.group_members.clear()
+                for pedigree in current_members:
+                    breed_group.group_members.add(pedigree)
                 return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of females must be at least one!'}))
 
             # delete any existed approvals
@@ -246,6 +273,11 @@ def edit_breed_group_form(request, breed_group_id):
             for approval in approvals:
                 approval.delete()
             breed_group.state = 'approved'
+
+            # add group members to breed group
+            for member in group_members:
+                breed_group.group_members.add(member)
+            
             breed_group.save()
 
         return HttpResponse(dumps({"result": "success"}))
