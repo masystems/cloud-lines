@@ -76,38 +76,21 @@
                                                 <small>Changes to the above selection will refresh the available birds in the group members field below.</small>
                                             </div>
                                         {% elif field.label == 'Group members' %}
-                                            <div class="mb-4" id="members">
-                                                <select multiple id="public-methods" name='{{ field.name }}'>
-                                                    {% for pedigree in pedigree.all %}
-                                                        <option value="{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}">{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                                <div class="button-box mt-3">
-                                                    <a id="select-all" class="btn btn-outline-info" href="#">select all</a>
-                                                    <a id="deselect-all" class="btn btn-outline-danger" href="#">deselect all</a>
-                                                    <a id="refresh" class="btn btn-outline-warning" href="#">refresh</a>
+                                            <div class="row pr-4">
+                                                <div class="col-10 pr-0">
+                                                    <div id="pedigrees_all" class="input-group">
+                                                        <input id="id_pedigree" type="text" class="typeahead form-control" placeholder="Pedigree">
+                                                    </div>
+                                                </div>
+                                                <div class="col-2 pl-0">
+                                                    <button id="addMemberBtn" class="btn btn-info" type="button">Add</button>
                                                 </div>
                                             </div>
-                                             <script>
-                                                 $(document).ready(function(){
-                                                    $("#breeds").change(function(){
-                                                        var breed = $( "#breeds option:selected" ).text();
-                                                        var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.breed.breed_name }}', {% endfor %} };
-                                                        $('#public-methods').empty();
-
-                                                        $.each(options, function(key, value) {
-                                                            if (value.includes(breed)) {
-                                                                var option = document.createElement('option');
-                                                                    option.setAttribute("value", key);
-                                                                var val = document.createTextNode(key);
-                                                                    option.appendChild(val);
-                                                                document.getElementById("public-methods").appendChild(option);
-                                                            }
-                                                        });
-                                                        $("#refresh").click();
-                                                    });
-                                                });
-                                            </script>
+                                            <small>Enter a pedigree to include in the breed group</small>
+                                            <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
+                                            <ul class="list-icons d-none" id="pedigree-info"></ul>
+                                            <!-- hidden list to display selected members -->
+                                            <div id="membersList"></div>
                                         {% else %}
                                             {% render_field field class+="form-control" value=suggested_name %}
                                         {% endif %}
@@ -148,11 +131,19 @@
 {% endblock %}
 
 {% block footer %}
+<!-- typeahead for the members field -->
+{% include 'ta_pedigrees.html' %}
 
 <!-- ajax call to submit the new breed group form -->
 <script>
     $('#submitNewBGForm').click( function(e) {
         e.preventDefault()
+        
+        // set the names of the members
+        $('#membersList > div > input').each( function (index) {
+            $(this).attr("name", "member-" + index)
+        })
+        
         $.ajax({
             url: "{% url 'new_breed_group_form' %}",
             type: 'post',
@@ -183,6 +174,38 @@
             }
         });
     });
+
+    $('#addMemberBtn').click( function(e) {
+        e.preventDefault()
+        // give error if breed not selected
+        if ($('#breed').val() == '--Select Breed--') {
+            errorMsg('You must select a breed!')
+        }
+        // give error if reg isn't complete
+        else if ($('#pedigree-info').hasClass('d-none')) {
+            errorMsg('Matching pedigree is not in the database!')
+        }
+        // give error if member has already been added
+        else if ($('#membersList').html().indexOf(' | ' + $("#id_pedigree").val() + '"') != -1) {
+            errorMsg('Member has already been added!')
+        }
+        // give error if there is a sex that is neither male nor female
+        else if ($('#pedigree-info').html().indexOf('castrated') != -1 || $('#pedigree-info').html().indexOf('unknown') != -1) {
+            errorMsg('Sex must be male or female!')
+        } else {
+            var member = $("#id_pedigree").val()
+            // add a male/female member
+            var sex = 'M'
+            if ($('#pedigree-info').html().indexOf('female') != -1) {sex = 'F'}
+            $('#membersList').append('<div id="member-' + member + '" class="input-group"><input value="' + sex + ' | ' + member + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button" onclick="removeMember(`member-' + member + '`)">Remove</button></div></div>')
+        }
+    })
+
+    // remove member from members list
+    function removeMember(member){
+        // remove member
+        $('#' + member).remove()
+    }
 </script>
 
 {% endblock %}

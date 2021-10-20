@@ -9,6 +9,7 @@ from json import dumps
 from django.urls import reverse
 from .views import update_pedigree_cf
 from breeder.models import Breeder
+from breed.models import Breed
 
 
 @login_required(login_url='/accounts/login/')
@@ -519,6 +520,12 @@ def get_ta_pedigrees(request, sex, state, avoid):
     if state in ["alive", "dead", "unknown"]:
         filter_state = {'status': state}
 
+    # if breed given, filter for the given breed
+    filter_breed = {}
+    if request.GET.get('breed'):
+        if Breed.objects.filter(account=attached_service, breed_name=request.GET.get('breed')).exists():
+            filter_breed = {'breed__breed_name': request.GET.get('breed')}
+
     if avoid == "any":
         # don't need to avoid any self pedigrees
         all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
@@ -526,7 +533,8 @@ def get_ta_pedigrees(request, sex, state, avoid):
                                        Q(tag_no__icontains=query),
                                        account=attached_service,
                                        **filter_sex,
-                                       **filter_state)[:10]
+                                       **filter_state,
+                                       **filter_breed)[:10]
     else:
         # need to avoid a self pedigree
         all_peds = Pedigree.objects.filter(Q(reg_no__icontains=query) |
@@ -534,7 +542,8 @@ def get_ta_pedigrees(request, sex, state, avoid):
                                        Q(tag_no__icontains=query),
                                        account=attached_service,
                                        **filter_sex,
-                                       **filter_state).exclude(id=avoid)[:10]
+                                       **filter_state,
+                                       **filter_breed).exclude(id=avoid)[:10]
 
     data = serialize('json', list(all_peds), fields=('reg_no', 'name', 'tag_no'))
     return HttpResponse(data)
