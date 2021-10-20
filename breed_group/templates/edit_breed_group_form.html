@@ -81,43 +81,6 @@
                                         {% elif field.label == 'Group name' %}
                                             {% render_field field class="form-control" value=breed_group.group_name %}
                                         {% elif field.label == 'Group members' %}
-                                            <!-- <div class="mb-4" id="members">
-                                                <select multiple id="public-methods" name='{{ field.name }}'>
-                                                    {% for pedigree in pedigree.all %}
-                                                        {% if pedigree.reg_no in members %}
-                                                            <option value="{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}" selected>{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}</option>
-                                                        {% else %}
-                                                            <option value="{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}">{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}</option>
-                                                        {% endif%}
-                                                    {% endfor %}
-                                                </select>
-                                                <div class="button-box mt-3">
-                                                    <a id="select-all" class="btn btn-outline-info" href="#">select all</a>
-                                                    <a id="deselect-all" class="btn btn-outline-danger" href="#">deselect all</a>
-                                                    <a id="refresh" class="btn btn-outline-warning" href="#">refresh</a>
-                                                </div>
-                                            </div>
-                                             <script>
-                                                 $(document).ready(function(){
-                                                    $("#breeds").change(function(){
-                                                        var breed = $( "#breeds option:selected" ).text();
-                                                        var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.breed.breed_name }}', {% endfor %} };
-                                                        $('#public-methods').empty();
-
-                                                        $.each(options, function(key, value) {
-                                                            if (value.includes(breed)) {
-                                                                var option = document.createElement('option');
-                                                                    option.setAttribute("value", key);
-                                                                var val = document.createTextNode(key);
-                                                                    option.appendChild(val);
-                                                                document.getElementById("public-methods").appendChild(option);
-                                                            }
-                                                        });
-                                                        $("#refresh").click();
-                                                    });
-                                                });
-                                            </script> -->
-
                                             <div class="row pr-4">
                                                 <div class="col-10 pr-0">
                                                     <div id="pedigrees_all" class="input-group">
