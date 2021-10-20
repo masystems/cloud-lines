@@ -76,45 +76,6 @@
                                                 <small>Changes to the above selection will refresh the available birds in the group members field below.</small>
                                             </div>
                                         {% elif field.label == 'Group members' %}
-                                            <!-- <div class="mb-4" id="members">
-                                                <select multiple id="public-methods" name='{{ field.name }}'>
-                                                    {% for pedigree in pedigree.all %}
-                                                        <option value="{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}">{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                                <div class="button-box mt-3">
-                                                    <a id="select-all" class="btn btn-outline-info" href="#">select all</a>
-                                                    <a id="deselect-all" class="btn btn-outline-danger" href="#">deselect all</a>
-                                                    <a id="refresh" class="btn btn-outline-warning" href="#">refresh</a>
-                                                </div>
-                                            </div>
-                                             <script>
-                                                 $(document).ready(function(){
-                                                    $("#breeds").change(function(){
-                                                        var breed = $( "#breeds option:selected" ).text();
-                                                        var options = { {% for pedigree in pedigree.all %}'{% if pedigree.sex == 'female' %}F | {% else %}M | {% endif %}{{ pedigree.reg_no }}': '{{ pedigree.breed.breed_name }}', {% endfor %} };
-                                                        $('#public-methods').empty();
-
-                                                        $.each(options, function(key, value) {
-                                                            if (value.includes(breed)) {
-                                                                var option = document.createElement('option');
-                                                                    option.setAttribute("value", key);
-                                                                var val = document.createTextNode(key);
-                                                                    option.appendChild(val);
-                                                                document.getElementById("public-methods").appendChild(option);
-                                                            }
-                                                        });
-                                                        $("#refresh").click();
-                                                    });
-                                                });
-                                            </script> -->
-                                            
-                                            <!-- <div id="pedigrees_all" class="input-group">
-                                                <input id="id_pedigree" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ service.mother_title }}" value="{% if pedigree.parent_mother != None %}{{ pedigree.parent_mother }}{% endif %}">
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-outline-secondary" type="button">Button</button>
-                                                </div>
-                                            </div> -->
                                             <div class="row pr-4">
                                                 <div class="col-10 pr-0">
                                                     <div id="pedigrees_all" class="input-group">
@@ -122,7 +83,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-2 pl-0">
-                                                    <button id="addMemberBtn" class="btn btn-secondary" type="button">Add</button>
+                                                    <button id="addMemberBtn" class="btn btn-info" type="button">Add</button>
                                                 </div>
                                             </div>
                                             <small>Enter a pedigree to include in the breed group</small>
@@ -130,6 +91,12 @@
                                             <ul class="list-icons d-none" id="pedigree-info"></ul>
                                             <!-- hidden list to display selected members -->
                                             <div id="membersList" class="list-group"></div>
+                                            <div class="input-group">
+                                                <input value="twanzy" type="text" class="form-control" aria-describedby="basic-addon2" readonly>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-secondary" type="button">Remove</button>
+                                                </div>
+                                            </div>
                                         {% else %}
                                             {% render_field field class+="form-control" value=suggested_name %}
                                         {% endif %}
@@ -231,8 +198,6 @@
     function removeMember(member){
         // remove member
         $('#' + member.id).remove()
-        // hide list if there are no members in it
-        console.log($('#membersList').html().indexOf('button') == -1)
     }
 </script>
 
