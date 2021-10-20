@@ -65,16 +65,13 @@ def new_breed_group_form(request):
             new_breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder does not exist!'}))
-        new_breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
-        new_breed_group.group_name = breed_group_form['group_name'].value()
-        new_breed_group.account = attached_service
-        new_breed_group.save()
         
         # variable to check that 1 male was given and at least 1 female was given
         male_count = 0
         female_count = 0
         
-        # add group members
+        # create list of group members to be added after the breed group is saved
+        group_members = []
         for id in breed_group_form['group_members'].value():
             # increment male_count if it's male, female_count if it's female
             if 'M | ' in id:
@@ -84,13 +81,22 @@ def new_breed_group_form(request):
             
             id = id[4:]
             pedigree = Pedigree.objects.get(account=attached_service, reg_no=id)
-            new_breed_group.group_members.add(pedigree)
+            group_members.append(pedigree)
 
         # check number of males and females given is correct
         if male_count != 1:
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of males must be one!'}))
         if female_count < 1:
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of females must be at least one!'}))
+        
+        new_breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
+        new_breed_group.group_name = breed_group_form['group_name'].value()
+        new_breed_group.account = attached_service
+        new_breed_group.save()
+
+        # add group members to breed group
+        for member in group_members:
+            new_breed_group.group_members.add(member)
 
         if request.user in attached_service.contributors.all():
             new_breed_group.state = 'unapproved'
