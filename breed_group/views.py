@@ -47,7 +47,8 @@ def new_breed_group_form(request):
         print(request.POST)
         print(f'breed_group_form - {breed_group_form}')
         print(f"breed_group_form - {breed_group_form}['group_members']")
-        
+        member_index = 0
+        print(request.POST.get(f'member-{member_index}'))
 
         # validate that input is given
         if breed_group_form['breeder'].value() == '':
@@ -56,7 +57,7 @@ def new_breed_group_form(request):
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breed was not given!'}))
         elif breed_group_form['group_name'].value() == '':
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Group name was not given!'}))
-        elif len(breed_group_form['group_members'].value()) == 0:
+        elif not request.POST.get('member-0'):
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Group members were not given!'}))
         
         new_breed_group = BreedGroup()
