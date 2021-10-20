@@ -43,6 +43,12 @@ def new_breed_group_form(request):
         raise PermissionDenied()
     
     if request.method == 'POST':
+        print('------------------')
+        print(request.POST)
+        print(f'breed_group_form - {breed_group_form}')
+        print(f"breed_group_form - {breed_group_form}['group_members']")
+        
+
         # validate that input is given
         if breed_group_form['breeder'].value() == '':
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder was not given!'}))
