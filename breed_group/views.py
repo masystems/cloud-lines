@@ -43,13 +43,6 @@ def new_breed_group_form(request):
         raise PermissionDenied()
     
     if request.method == 'POST':
-        print('------------------')
-        print(request.POST)
-        print(f'breed_group_form - {breed_group_form}')
-        print(f"breed_group_form - {breed_group_form}['group_members']")
-        member_index = 0
-        print(request.POST.get(f'member-{member_index}'))
-
         # validate that input is given
         if breed_group_form['breeder'].value() == '':
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder was not given!'}))
@@ -70,9 +63,15 @@ def new_breed_group_form(request):
         male_count = 0
         female_count = 0
         
+        # get the input members
+        member_index = 0
+        member_inputs = []
+        while request.POST.get(f'member-{member_index}'):
+            member_inputs.append(request.POST.get(f'member-{member_index}'))
+            member_index += 1
         # create list of group members to be added after the breed group is saved
         group_members = []
-        for id in breed_group_form['group_members'].value():
+        for id in member_inputs:
             # increment male_count if it's male, female_count if it's female
             if 'M | ' in id:
                 male_count += 1
