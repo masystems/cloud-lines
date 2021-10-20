@@ -81,7 +81,7 @@
                                         {% elif field.label == 'Group name' %}
                                             {% render_field field class="form-control" value=breed_group.group_name %}
                                         {% elif field.label == 'Group members' %}
-                                            <div class="mb-4" id="members">
+                                            <!-- <div class="mb-4" id="members">
                                                 <select multiple id="public-methods" name='{{ field.name }}'>
                                                     {% for pedigree in pedigree.all %}
                                                         {% if pedigree.reg_no in members %}
@@ -116,7 +116,32 @@
                                                         $("#refresh").click();
                                                     });
                                                 });
-                                            </script>
+                                            </script> -->
+
+                                            <div class="row pr-4">
+                                                <div class="col-10 pr-0">
+                                                    <div id="pedigrees_all" class="input-group">
+                                                        <input id="id_pedigree" type="text" class="typeahead form-control" placeholder="Pedigree">
+                                                    </div>
+                                                </div>
+                                                <div class="col-2 pl-0">
+                                                    <button id="addMemberBtn" class="btn btn-info" type="button">Add</button>
+                                                </div>
+                                            </div>
+                                            <small>Enter a pedigree to include in the breed group</small>
+                                            <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
+                                            <ul class="list-icons d-none" id="pedigree-info"></ul>
+                                            <!-- hidden list to display selected members -->
+                                            <div id="membersList">
+                                                {% for member in breed_group.group_members.all %}
+                                                    <div id="member-{{ member.reg_no }}" class="input-group">
+                                                        <input value="{% if member.sex == 'female' %}F{% else %}M{% endif %} | {{ member.reg_no }}" type="text" class="form-control" aria-describedby="basic-addon2" readonly>
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="removeMember('member-{{ member.reg_no }}')">Remove</button>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
                                         {% endif %}
                                         {% for error in field.errors %}
                                           <span class="help-block">{{ error }}</span>
