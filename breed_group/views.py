@@ -128,7 +128,6 @@ def new_breed_group_form(request):
             pass
 
     return render(request, 'new_breed_group_form.html', {'breed_group_form': breed_group_form,
-                                                         'pedigree': Pedigree.objects.filter(account=attached_service).exclude(state='unapproved'),
                                                          'breeders': Breeder.objects.filter(account=attached_service),
                                                          'breeds': Breed.objects.filter(account=attached_service),
                                                          'suggested_name': suggested_name})
