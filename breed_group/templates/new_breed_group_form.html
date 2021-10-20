@@ -185,7 +185,10 @@
         } else {
             var member = $("#id_pedigree").val()
             //$('#membersList').append('<button id="member-' + member + '" onclick="removeMember(this)" type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | ' + $("#id_pedigree").val() + '</button>')
-            $('#membersList').append('<div class="input-group"><input value="M | ' + member + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button">Remove</button></div></div>')
+            // add a male/female member
+            var sex = 'M'
+            if ($('#pedigree-info').html().indexOf('female') != -1) {sex = 'F'}
+            $('#membersList').append('<div class="input-group"><input name="member1" value="' + sex + ' | ' + member + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button">Remove</button></div></div>')
         }
     })
 
