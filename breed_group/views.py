@@ -294,7 +294,6 @@ def edit_breed_group_form(request, breed_group_id):
 
     return render(request, 'edit_breed_group_form.html', {'breed_group_form': breed_group_form,
                                                           'breed_group': breed_group,
-                                                          'pedigree': Pedigree.objects.filter(account=attached_service).exclude(state='unapproved'),
                                                           'members': members,
                                                           'breeders': Breeder.objects.filter(account=attached_service),
                                                           'breeds': Breed.objects.filter(account=attached_service)})
