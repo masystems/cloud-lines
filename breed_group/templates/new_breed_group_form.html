@@ -90,13 +90,7 @@
                                             <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
                                             <ul class="list-icons d-none" id="pedigree-info"></ul>
                                             <!-- hidden list to display selected members -->
-                                            <div id="membersList" class="list-group"></div>
-                                            <div class="input-group">
-                                                <input value="twanzy" type="text" class="form-control" aria-describedby="basic-addon2" readonly>
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-outline-secondary" type="button">Remove</button>
-                                                </div>
-                                            </div>
+                                            <div id="membersList"></div>
                                         {% else %}
                                             {% render_field field class+="form-control" value=suggested_name %}
                                         {% endif %}
@@ -186,11 +180,12 @@
             errorMsg('Matching pedigree is not in the database!')
         }
         // give error if member has already been added
-        else if ($('#membersList').html().indexOf('>M | ' + $("#id_pedigree").val() + '</button>') != -1) {
+        else if ($('#membersList').html().indexOf(' | ' + $("#id_pedigree").val() + '"') != -1) {
             errorMsg('Member has already been added!')
         } else {
             var member = $("#id_pedigree").val()
-            $('#membersList').append('<button id="member-' + member + '" onclick="removeMember(this)" type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | ' + $("#id_pedigree").val() + '</button>')
+            //$('#membersList').append('<button id="member-' + member + '" onclick="removeMember(this)" type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | ' + $("#id_pedigree").val() + '</button>')
+            $('#membersList').append('<div class="input-group"><input value="M | ' + member + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button">Remove</button></div></div>')
         }
     })
 
