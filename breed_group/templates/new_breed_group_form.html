@@ -190,18 +190,17 @@
             errorMsg('Member has already been added!')
         } else {
             var member = $("#id_pedigree").val()
-            //$('#membersList').append('<button id="member-' + member + '" onclick="removeMember(this)" type="button" class="list-group-item" data-toggle="tooltip" data-placement="top" title="Remove Member">M | ' + $("#id_pedigree").val() + '</button>')
             // add a male/female member
             var sex = 'M'
             if ($('#pedigree-info').html().indexOf('female') != -1) {sex = 'F'}
-            $('#membersList').append('<div class="input-group"><input value="' + sex + ' | ' + member + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button">Remove</button></div></div>')
+            $('#membersList').append('<div id="member-' + member + '" class="input-group"><input value="' + sex + ' | ' + member + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button" onclick="removeMember(`member-' + member + '`)">Remove</button></div></div>')
         }
     })
 
     // remove member from members list
     function removeMember(member){
         // remove member
-        $('#' + member.id).remove()
+        $('#' + member).remove()
     }
 </script>
 
