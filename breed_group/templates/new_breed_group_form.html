@@ -188,6 +188,10 @@
         // give error if member has already been added
         else if ($('#membersList').html().indexOf(' | ' + $("#id_pedigree").val() + '"') != -1) {
             errorMsg('Member has already been added!')
+        }
+        // give error if there is a sex that is neither male nor female
+        else if ($('#pedigree-info').html().indexOf('castrated') != -1 || $('#pedigree-info').html().indexOf('unknown') != -1) {
+            errorMsg('Sex must be male or female!')
         } else {
             var member = $("#id_pedigree").val()
             // add a male/female member
