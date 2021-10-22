@@ -87,6 +87,10 @@ def new_breed_group_form(request):
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of males must be one!'}))
         if female_count < 1:
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of females must be at least one!'}))
+
+        # check group id is not taken
+        if BreedGroup.objects.filter(account=attached_service, group_id=breed_group_form['group_id'].value()).exists():
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group ID is already in use!'}))
         
         new_breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         new_breed_group.group_id = breed_group_form['group_id'].value()
