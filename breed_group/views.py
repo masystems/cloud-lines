@@ -190,6 +190,12 @@ def edit_breed_group_form(request, breed_group_id):
             breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder does not exist!'}))
+        
+        # if changed, check group_id hasn't been taken
+        if breed_group.group_id != breed_group_form['group_id'].value():
+            if BreedGroup.objects.filter(account=attached_service, group_id=breed_group_form['group_id'].value()).exists():
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'Group ID is already in use!'}))
+        
         breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         breed_group.group_id = breed_group_form['group_id'].value()
 
