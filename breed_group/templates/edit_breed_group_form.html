@@ -23,7 +23,7 @@
     <div class="container pt-5">
         <div class="card ">
             <div class="card-header">
-                <h4 class="mb-0 ">Edit Breed Group: {{ breed_group.group_name }}</h4>
+                <h4 class="mb-0 ">Edit Breed Group: {{ breed_group.group_id }}</h4>
             </div>
             {% if contributor %}
                 <div class="alert alert-warning alert-rounded mt-2"> <i class="ti-alert"></i> Edits to this breed group will need to be approved by an editor.
@@ -78,8 +78,8 @@
                                                 </select>
                                                 <small>Changes to the above selection will refresh the available birds in the group members field below.</small>
                                             </div>
-                                        {% elif field.label == 'Group name' %}
-                                            {% render_field field class="form-control" value=breed_group.group_name %}
+                                        {% elif field.label == 'Group id' %}
+                                            {% render_field field class="form-control" value=breed_group.group_id %}
                                         {% elif field.label == 'Group members' %}
                                             <div class="row pr-4">
                                                 <div class="col-10 pr-0">
@@ -132,7 +132,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                {% include 'delete.html' with name=breed_group.group_name %}
+                                {% include 'delete.html' with name=breed_group.group_id %}
                             </div>
                         </div>
                     </div>

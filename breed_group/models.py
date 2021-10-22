@@ -23,4 +23,4 @@ class BreedGroup(models.Model):
     date_added = models.DateTimeField(auto_now_add=True, blank=True)
 
     def __str__(self):
-        return self.group_name
+        return self.group_id
