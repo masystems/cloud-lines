@@ -17,7 +17,6 @@ from pedigree.models import Pedigree
 from pedigree.functions import get_pedigree_column_headings
 from breed.models import Breed
 from breeder.models import Breeder
-from boltons.models import BirthNotification
 from approvals.models import Approval
 from money import Money
 from re import match
