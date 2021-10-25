@@ -108,7 +108,7 @@
                                 <tbody id="breedgpTable">
                                     {% for group in groups.all %}
                                         <tr>
-                                            <td>{{ group.group_name }}</td>
+                                            <td>{{ group.group_id }}</td>
                                             <td>{{ group.breed }}</td>
                                             <td>{% for member in group.group_members.all %}
                                                     {% if member.sex == 'male' %}

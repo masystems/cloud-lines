@@ -710,7 +710,7 @@ vertical-align: middle;
                     {% endif %}
                     {% if groups %}
                     <li>
-                        <div class="bg-light-warning"><i class="far fa-object-ungroup"></i></div> Member of <span class="font-weight-normal">{% for group in groups %}{{ group.group_name }}, {% endfor %}</span></li>
+                        <div class="bg-light-warning"><i class="far fa-object-ungroup"></i></div> Member of <span class="font-weight-normal">{% for group in groups %}{{ group.group_id }}, {% endfor %}</span></li>
                     {% endif %}
                     <li>
                         <div class="bg-light-warning"><i class="far fa-chart-bar"></i></div> COI <span class="font-weight-normal">{{ lvl1.coi }}</span></li>
