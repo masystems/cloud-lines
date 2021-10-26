@@ -10,6 +10,7 @@ from .serializers import ApiLargeTierQueueSerializer, \
     ApiBreedSerializer, \
     ApiBreedGroupSerializer, \
     ApiFaqSerializer, \
+    ApiBoltonSerializer, \
     ApiKinshipSerializer, \
     ApiDataValidationSerializer, \
     ApiServiceSerializer, \
@@ -20,7 +21,7 @@ from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
-from cloud_lines.models import Service, Faq
+from cloud_lines.models import Service, Faq, Bolton
 from account.models import UserDetail, AttachedService
 from metrics.models import KinshipQueue, DataValidatorQueue
 from rest_framework.filters import SearchFilter
@@ -133,6 +134,12 @@ class FaqViews(viewsets.ModelViewSet):
     queryset = Faq.objects.all()
     filter_backends = [SearchFilter]
 
+
+@permission_classes((AllowAny, ))
+class BoltonViews(viewsets.ModelViewSet):
+    serializer_class = ApiBoltonSerializer
+    queryset = Bolton.objects.all()
+    filter_backends = [SearchFilter]
 
 # class Authenticate(viewsets.ModelViewSet):
 #     queryset = Update.objects.all()
