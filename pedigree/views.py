@@ -212,7 +212,7 @@ def get_parents(child, account):
                     if member.parent_mother not in mothers:
                         mothers.append(member.parent_mother)
                 # set father if male
-                elif member.sex == 'female':
+                elif member.sex == 'male':
                     father = member
         # if all mothers are the same
         if len(mothers) == 1:
