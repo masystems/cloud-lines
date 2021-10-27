@@ -203,17 +203,17 @@ def get_parents(child, account):
                             break
     # if child is a breed group
     elif type(child) == BreedGroup:
-        # get mothers of the females of the group
+        # get mothers and fathers of the females of the group
         mothers = []
+        fathers = []
         if child.group_members:
             for member in child.group_members.all():
-                # append mother to list if female
+                # append mother and/or father to list if mothers and/or fathers
                 if member.sex == 'female':
                     if member.parent_mother not in mothers:
                         mothers.append(member.parent_mother)
-                # set father if male
-                elif member.sex == 'male':
-                    father = member
+                    if member.parent_father not in fathers:
+                        fathers.append(member.parent_father)
         # if all mothers are the same
         if len(mothers) == 1:
             # if all mothers exist
@@ -223,7 +223,15 @@ def get_parents(child, account):
                     mother = Pedigree.objects.exclude(state='unapproved').get(account=account, reg_no=mothers[0])
                 except Pedigree.DoesNotExist:
                     pass
-    print(father)
+        # if all fathers are the same
+        if len(fathers) == 1:
+            # if all fathers exist
+            if fathers[0]:
+                # set father
+                try:
+                    father = Pedigree.objects.exclude(state='unapproved').get(account=account, reg_no=fathers[0])
+                except Pedigree.DoesNotExist:
+                    pass
     return father, mother
 
 
