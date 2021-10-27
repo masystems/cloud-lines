@@ -56,62 +56,62 @@
                             {% endfor %}
 
                             {% for field in breed_group_form.visible_fields %}
-                            <div class="col-lg-6 col-md-12">
-                                <div class="form-group row">
-                                    <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
-                                    <div class="col-md-9">
-                                        {% if field.label == 'Breeder' %}
-                                            <div id="breeders">
-                                                <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ breed_group.breeder }}" value="{{ breed_group.breeder }}" required>
-                                            </div>
-                                        {% elif field.label == 'Breed' %}
-                                            <div id="breeds" class="form-group">
-                                                <select id="breed" name='{{ field.name }}' class="form-control custom-select">
-                                                    <option>--Select Breed--</option>
-                                                    {% for breed in breeds %}
-                                                        {% if breed_group.breed == breed %}
-                                                            <option value="{{ breed }}" selected>{{ breed }}</option>
-                                                        {% else %}
-                                                            <option value="{{ breed }}">{{ breed }}</option>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </select>
-                                                <small>Changes to the above selection will refresh the available birds in the group members field below.</small>
-                                            </div>
-                                        {% elif field.label == 'Group name' %}
-                                            {% render_field field class="form-control" value=breed_group.group_name %}
-                                        {% elif field.label == 'Group members' %}
-                                            <div class="row pr-4">
-                                                <div class="col-10 pr-0">
-                                                    <div id="pedigrees_all" class="input-group">
-                                                        <input id="id_pedigree" type="text" class="typeahead form-control" placeholder="Pedigree">
-                                                    </div>
+                                <div class="col-lg-6 col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 text-right col-form-label">{{ field.label|title }}</label>
+                                        <div class="col-md-9">
+                                            {% if field.label == 'Breeder' %}
+                                                <div id="breeders">
+                                                    <input class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ breed_group.breeder }}" value="{{ breed_group.breeder }}" required>
                                                 </div>
-                                                <div class="col-2 pl-0">
-                                                    <button id="addMemberBtn" class="btn btn-info" type="button">Add</button>
+                                            {% elif field.label == 'Breed' %}
+                                                <div id="breeds" class="form-group">
+                                                    <select id="breed" name='{{ field.name }}' class="form-control custom-select">
+                                                        <option>--Select Breed--</option>
+                                                        {% for breed in breeds %}
+                                                            {% if breed_group.breed == breed %}
+                                                                <option value="{{ breed }}" selected>{{ breed }}</option>
+                                                            {% else %}
+                                                                <option value="{{ breed }}">{{ breed }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                    <small>Changes to the above selection will refresh the available birds in the group members field below.</small>
                                                 </div>
-                                            </div>
-                                            <small>Enter a pedigree to include in the breed group</small>
-                                            <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
-                                            <ul class="list-icons d-none" id="pedigree-info"></ul>
-                                            <!-- hidden list to display selected members -->
-                                            <div id="membersList">
-                                                {% for member in breed_group.group_members.all %}
-                                                    <div id="member-{{ member.reg_no }}" class="input-group">
-                                                        <input value="{% if member.sex == 'female' %}F{% else %}M{% endif %} | {{ member.reg_no }}" type="text" class="form-control" aria-describedby="basic-addon2" readonly>
-                                                        <div class="input-group-append">
-                                                            <button class="btn btn-outline-secondary" type="button" onclick="removeMember('member-{{ member.reg_no }}')">Remove</button>
+                                            {% elif field.label == 'Group ID' %}
+                                                {% render_field field class="form-control" value=breed_group.group_name %}
+                                            {% elif field.label == 'Group members' %}
+                                                <div class="row pr-4">
+                                                    <div class="col-10 pr-0">
+                                                        <div id="pedigrees_all" class="input-group">
+                                                            <input id="id_pedigree" type="text" class="typeahead form-control" placeholder="Pedigree">
                                                         </div>
                                                     </div>
-                                                {% endfor %}
-                                            </div>
-                                        {% endif %}
-                                        {% for error in field.errors %}
-                                          <span class="help-block">{{ error }}</span>
-                                        {% endfor %}
+                                                    <div class="col-2 pl-0">
+                                                        <button id="addMemberBtn" class="btn btn-info" type="button">Add</button>
+                                                    </div>
+                                                </div>
+                                                <small>Enter a pedigree to include in the breed group</small>
+                                                <!-- hidden note which will show name of mother if reg number has a match, or suggestions if partial match -->
+                                                <ul class="list-icons d-none" id="pedigree-info"></ul>
+                                                <!-- hidden list to display selected members -->
+                                                <div id="membersList">
+                                                    {% for member in breed_group.group_members.all %}
+                                                        <div id="member-{{ member.reg_no }}" class="input-group">
+                                                            <input value="{% if member.sex == 'female' %}F{% else %}M{% endif %} | {{ member.reg_no }}" type="text" class="form-control" aria-describedby="basic-addon2" readonly>
+                                                            <div class="input-group-append">
+                                                                <button class="btn btn-outline-secondary" type="button" onclick="removeMember('member-{{ member.reg_no }}')">Remove</button>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            {% for error in field.errors %}
+                                            <span class="help-block">{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             {% endfor %}
                         </div>
                         <hr>
