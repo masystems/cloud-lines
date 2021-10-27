@@ -6,7 +6,7 @@
                class="btn btn-outline-info waves-effect waves-light mt-1 ml-1" role="button">
                 <span class="btn-label"> <strong>All Breed Groups</strong></span></a>
             <ul class="list-icons">
-                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Group Name:</strong> {{ breed_group.group_name }}</li>
+                <li class="text-muted"><i class="ti-angle-right"></i> <strong>Group ID:</strong> {{ breed_group.group_name }}</li>
                 <li class="text-muted"><i class="ti-angle-right"></i> <strong>Breeder:</strong> <a href="{% url 'breeder' breed_group.breeder.id %}">{{ breed_group.breeder }}</a></li>
             </ul>
         </span>
