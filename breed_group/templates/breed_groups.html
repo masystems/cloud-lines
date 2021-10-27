@@ -49,7 +49,7 @@
                         <tbody>
                             {% for group in groups.all %}
                                 <tr>
-                                    <td>{{ group.group_id }}</td>
+                                    <td>{{ group.group_name }}</td>
                                     <td class="d-none d-sm-table-cell">{{ group.breeder }}</td>
                                     <td>{{ group.breed }}</td>
                                     <td class="d-none d-sm-table-cell">{% for member in group.group_members.all %}

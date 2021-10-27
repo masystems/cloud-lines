@@ -546,7 +546,7 @@
                                             <span class="round">{{ breed_group.group_members.all.count }}</span>
                                         </td>
                                         <td>
-                                            <h6>{{ breed_group.group_id }}</h6><small class="text-muted">{{ breed_group.date_added|date:'M-Y' }}</small></td>
+                                            <h6>{{ breed_group.group_name }}</h6><small class="text-muted">{{ breed_group.date_added|date:'M-Y' }}</small></td>
                                         <td>{% for member in breed_group.group_members.all %}
                                                 {{ member.reg_no }}
                                             {% endfor %}</td>

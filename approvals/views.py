@@ -129,7 +129,7 @@ def declined(request):
                 image.delete()
 
         elif approval.breed_group:
-            message_approval_id = approval.breed_group.group_id
+            message_approval_id = approval.breed_group.group_name
             if approval.type == 'new':
                 # delete new entry
                 approval.breed_group.delete()

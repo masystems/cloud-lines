@@ -477,7 +477,7 @@ $(document).ready(function() {
 
     breeders = [{% for breeder in breeders.all %}'{{ breeder.breeding_prefix }}', {% endfor %}];
     breeds = [{% for breed in breeds.all %}'{{ breed.breed_name }}', {% endfor %}];
-    var breed_groups = [{% for group in breed_groups.all %}'{{ group.group_id }}', {% endfor %}];
+    var breed_groups = [{% for group in breed_groups.all %}'{{ group.group_name }}', {% endfor %}];
 
     $('#breeders .typeahead').typeahead({
       hint: true,

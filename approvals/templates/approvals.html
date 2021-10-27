@@ -74,7 +74,7 @@
                                 {% if approval.pedigree %}
                                     <td>{{ approval.pedigree.reg_no }}</td>
                                 {% elif approval.breed_group %}
-                                    <td>{{ approval.breed_group.group_id }}</td>
+                                    <td>{{ approval.breed_group.group_name }}</td>
                                 {% else %}
                                     <td></td>
                                 {% endif %}
@@ -277,7 +277,7 @@
                                                                         </tr>
                                                                         <tr>
                                                                             <td>Group ID</td>
-                                                                            <td>{{ val.group_id }}</td>
+                                                                            <td>{{ val.group_name }}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td>Group Members</td>
@@ -472,10 +472,10 @@
                                                                             <td><code>From</code> {{ approval.breed_group.breed }} <code>to</code> {{ val.breed }}</td>
                                                                         </tr>
                                                                     {% endif %}
-                                                                    {% if val.group_id|upper != approval.breed_group.group_id|upper %}
+                                                                    {% if val.group_name|upper != approval.breed_group.group_name|upper %}
                                                                         <tr>
                                                                             <td>Group ID</td>
-                                                                            <td><code>From</code> {{ approval.breed_group.group_id }} <code>to</code> {{ val.group_id }}</td>
+                                                                            <td><code>From</code> {{ approval.breed_group.group_name }} <code>to</code> {{ val.group_name }}</td>
                                                                         </tr>
                                                                     {% endif %}
                                                                     {% if val.group_members %}

@@ -182,7 +182,7 @@ def generate_hirearchy(context):
         if context['lvl1'].parent_mother:
             context['lvl2_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl1'].parent_mother)
         elif context['lvl1'].breed_group:
-            context['lvl2_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_id=context['lvl1'].breed_group)
+            context['lvl2_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl1'].breed_group)
     except:
         context['lvl2_2'] = ''
 
@@ -214,7 +214,7 @@ def generate_hirearchy(context):
         if context['lvl2_1'].parent_mother:
             context['lvl3_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_mother)
         elif context['lvl2_1'].breed_group:
-            context['lvl3_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_id=context['lvl2_1'].breed_group)
+            context['lvl3_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl2_1'].breed_group)
     except:
         context['lvl3_2'] = ''
 
@@ -229,7 +229,7 @@ def generate_hirearchy(context):
         if context['lvl2_2'].parent_mother:
             context['lvl3_4'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl2_2'].parent_mother)
         elif context['lvl2_2'].breed_group:
-            context['lvl3_4_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_id=context['lvl2_2'].breed_group)
+            context['lvl3_4_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl2_2'].breed_group)
     except:
         context['lvl3_4'] = ''
 
@@ -245,7 +245,7 @@ def generate_hirearchy(context):
         if context['lvl3_1'].parent_mother:
             context['lvl4_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_1'].parent_mother)
         elif context['lvl3_1'].breed_group:
-            context['lvl4_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_id=context['lvl3_1'].breed_group)
+            context['lvl4_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_1'].breed_group)
     except:
         context['lvl4_1'] = ''
 
@@ -260,7 +260,7 @@ def generate_hirearchy(context):
         if context['lvl3_2'].parent_mother:
             context['lvl4_4'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_2'].parent_mother)
         elif context['lvl3_2'].breed_group:
-            context['lvl4_4_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_id=context['lvl3_2'].breed_group)
+            context['lvl4_4_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_2'].breed_group)
     except:
         context['lvl4_4'] = ''
 
@@ -275,7 +275,7 @@ def generate_hirearchy(context):
         if context['lvl3_3'].parent_mother:
             context['lvl4_6'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_3'].parent_mother)
         elif context['lvl3_3'].breed_group:
-            context['lvl4_6_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_id=context['lvl3_3'].breed_group)
+            context['lvl4_6_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_3'].breed_group)
     except:
         context['lvl4_6'] = ''
 
@@ -290,7 +290,7 @@ def generate_hirearchy(context):
         if context['lvl3_4'].parent_mother:
             context['lvl4_8'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_4'].parent_mother)
         elif context['lvl3_4'].breed_group:
-            context['lvl4_8_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_id=context['lvl3_4'].breed_group)
+            context['lvl4_8_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_4'].breed_group)
     except:
         context['lvl4_8'] = ''
 
@@ -391,7 +391,7 @@ def new_pedigree_form(request):
         if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['father'].value().strip()).exists() and pedigree_form['father'].value() not in ['Father', '', 'None', None]:
             pedigree_form.add_error('father', 'Selected father does not exist.')
             pre_checks = False
-        if not BreedGroup.objects.filter(account=attached_service, group_id=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
+        if not BreedGroup.objects.filter(account=attached_service, group_name=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
             pedigree_form.add_error('breed_group', 'Selected breed group does not exist.')
             pre_checks = False
         if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
@@ -636,7 +636,7 @@ def edit_pedigree_form(request, id):
         if not Pedigree.objects.filter(account=attached_service, reg_no=pedigree_form['father'].value().strip()).exists() and pedigree_form['father'].value() not in ['Father', '', 'None', None]:
             pedigree_form.add_error('father', 'Selected father does not exist.')
             pre_checks = False
-        if not BreedGroup.objects.filter(account=attached_service, group_id=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
+        if not BreedGroup.objects.filter(account=attached_service, group_name=pedigree_form['breed_group'].value()).exists() and pedigree_form['breed_group'].value() not in ['Group pedigree was born from', '', 'None', None]:
             pedigree_form.add_error('breed_group', 'Selected breed group does not exist.')
             pre_checks = False
         if not Breed.objects.filter(account=attached_service, breed_name=pedigree_form['breed'].value()).exists() and pedigree_form['breed'].value() not in ['Breed', '', 'None', None]:
