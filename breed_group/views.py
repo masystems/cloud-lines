@@ -49,7 +49,7 @@ def new_breed_group_form(request):
         elif breed_group_form['breed'].value() == '--Select Breed--':
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breed was not given!'}))
         elif breed_group_form['group_name'].value() == '':
-            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group name was not given!'}))
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group ID was not given!'}))
         elif not request.POST.get('member-0'):
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Group members were not given!'}))
         
@@ -87,6 +87,10 @@ def new_breed_group_form(request):
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of males must be one!'}))
         if female_count < 1:
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Number of females must be at least one!'}))
+
+        # check group ID is not taken
+        if BreedGroup.objects.filter(account=attached_service, group_name=breed_group_form['group_name'].value()).exists():
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group ID is already in use!'}))
         
         new_breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         new_breed_group.group_name = breed_group_form['group_name'].value()
@@ -115,7 +119,7 @@ def new_breed_group_form(request):
     else:
         breed_group_form = BreedGroupForm()
 
-        # get next available group name
+        # get next available group ID
         suggested_name = 'BG12345'
         try:
             latest_added = BreedGroup.objects.filter(account=attached_service).latest('group_name')
@@ -135,8 +139,8 @@ def new_breed_group_form(request):
 
 @login_required(login_url="/account/login")
 @user_passes_test(is_editor, "/account/login")
-def edit_breed_group_form(request, breed_group_id):
-    breed_group = get_object_or_404(BreedGroup, id=breed_group_id)
+def edit_breed_group_form(request, breed_group_name):
+    breed_group = get_object_or_404(BreedGroup, id=breed_group_name)
 
     breed_group_form = BreedGroupForm(request.POST or None, request.FILES or None, instance=breed_group)
     attached_service = get_main_account(request.user)
@@ -178,7 +182,7 @@ def edit_breed_group_form(request, breed_group_id):
         elif breed_group_form['breed'].value() == '--Select Breed--':
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breed was not given!'}))
         elif breed_group_form['group_name'].value() == '':
-            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group name was not given!'}))
+            return HttpResponse(dumps({'result': 'fail', 'msg': 'Group ID was not given!'}))
         elif not request.POST.get('member-0'):
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Group members were not given!'}))
         
@@ -186,6 +190,12 @@ def edit_breed_group_form(request, breed_group_id):
             breed_group.breeder = Breeder.objects.get(account=attached_service, breeding_prefix=breed_group_form['breeder'].value())
         except Breeder.DoesNotExist:
             return HttpResponse(dumps({'result': 'fail', 'msg': 'Breeder does not exist!'}))
+        
+        # if changed, check group_name hasn't been taken
+        if breed_group.group_name != breed_group_form['group_name'].value():
+            if BreedGroup.objects.filter(account=attached_service, group_name=breed_group_form['group_name'].value()).exists():
+                return HttpResponse(dumps({'result': 'fail', 'msg': 'Group ID is already in use!'}))
+        
         breed_group.breed = Breed.objects.get(account=attached_service, breed_name=breed_group_form['breed'].value())
         breed_group.group_name = breed_group_form['group_name'].value()
 

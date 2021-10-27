@@ -276,7 +276,7 @@
                                                                             <td>{{ val.breed }}</td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td>Group Name</td>
+                                                                            <td>Group ID</td>
                                                                             <td>{{ val.group_name }}</td>
                                                                         </tr>
                                                                         <tr>
@@ -474,7 +474,7 @@
                                                                     {% endif %}
                                                                     {% if val.group_name|upper != approval.breed_group.group_name|upper %}
                                                                         <tr>
-                                                                            <td>Group Name</td>
+                                                                            <td>Group ID</td>
                                                                             <td><code>From</code> {{ approval.breed_group.group_name }} <code>to</code> {{ val.group_name }}</td>
                                                                         </tr>
                                                                     {% endif %}

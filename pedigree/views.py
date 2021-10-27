@@ -168,86 +168,127 @@ class GeneratePDF(View):
         return HttpResponse("Not found")
 
 
+def get_parents(child, account):
+    father, mother = '', ''
+    
+    # if child is a pedigree
+    if type(child) == Pedigree:
+        # if child has a father
+        if child.parent_father:
+            #set father
+            try:
+                father = Pedigree.objects.exclude(state='unapproved').get(account=account, reg_no=child.parent_father)
+            except Pedigree.DoesNotExist:
+                pass
+        # if child has a mother, it wasn't born from a breed group
+        if child.parent_mother:
+            # set mother
+            try:
+                mother = Pedigree.objects.exclude(state='unapproved').get(account=account, reg_no=child.parent_mother)
+            except Pedigree.DoesNotExist:
+                pass
+        # if born from a breed group
+        elif child.breed_group:
+            # set breed group as mother
+            try:
+                mother = BreedGroup.objects.get(account=account, group_name=child.breed_group)
+            except BreedGroup.DoesNotExist:
+                pass
+            # set male of breed group as father
+            if mother:
+                if mother.group_members:
+                    for member in mother.group_members.all():
+                        if member.sex == 'male':
+                            father = member
+                            break
+    # if child is a breed group
+    elif type(child) == BreedGroup:
+        # get mothers and fathers and parent breed groups of the females of the group
+        groups = []
+        mothers = []
+        fathers = []
+        if child.group_members:
+            for member in child.group_members.all():
+                # append mother and/or father to list if mothers and/or fathers
+                if member.sex == 'female':
+                    if member.breed_group not in groups:
+                        groups.append(member.breed_group)
+                    if member.parent_mother not in mothers:
+                        mothers.append(member.parent_mother)
+                    if member.parent_father not in fathers:
+                        fathers.append(member.parent_father)
+        # if all parent groups are the same
+        if len(groups) == 1:
+            # if all groups exist
+            if groups[0]:
+                # set group as mother
+                try:
+                    mother = BreedGroup.objects.get(account=account, group_name=groups[0])
+                except BreedGroup.DoesNotExist:
+                    pass
+                # set male of group as father
+                if mother.group_members:
+                    for member in mother.group_members.all():
+                        if member.sex == 'male':
+                            father = member
+                            break
+                # set male of group as father
+        # if all mothers are the same
+        if len(mothers) == 1:
+            # if all mothers exist
+            if mothers[0]:
+                # set mother
+                try:
+                    mother = Pedigree.objects.exclude(state='unapproved').get(account=account, reg_no=mothers[0])
+                except Pedigree.DoesNotExist:
+                    pass
+        # if all fathers are the same
+        if len(fathers) == 1:
+            # if all fathers exist
+            if fathers[0]:
+                # set father
+                try:
+                    father = Pedigree.objects.exclude(state='unapproved').get(account=account, reg_no=fathers[0])
+                except Pedigree.DoesNotExist:
+                    pass
+    return father, mother
+
+
 def generate_hirearchy(context):
-    # lvl 2
-    # 1
-    try:
-        context['lvl2_1'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl1'].parent_father)
-    except ObjectDoesNotExist:
-        context['lvl2_1'] = ''
+    # lvl 2 (2_1 and 2_2)
+    father, mother = get_parents(context['lvl1'], context['attached_service'])
+    context['lvl2_1'] = father
+    if type(mother) == Pedigree:
+        context['lvl2_2'] = mother
+    elif type(mother) == BreedGroup:
+        context['lvl2_2_grp'] = mother
 
+    # lvl 3 (3_1 and 3_2)
+    father, mother = get_parents(context['lvl2_1'], context['attached_service'])
+    context['lvl3_1'] = father
+    if type(mother) == Pedigree:
+        context['lvl3_2'] = mother
+    elif type(mother) == BreedGroup:
+        context['lvl3_2_grp'] = mother
 
-    # 2
-    try:
-        if context['lvl1'].parent_mother:
-            context['lvl2_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl1'].parent_mother)
-        elif context['lvl1'].breed_group:
-            context['lvl2_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl1'].breed_group)
-    except:
-        context['lvl2_2'] = ''
+    # lvl 3 (3_3 and 3_4)
+    if 'lvl2_2' in context.keys():
+        father, mother = get_parents(context['lvl2_2'], context['attached_service'])
+    elif 'lvl2_2_grp' in context.keys():
+        father, mother = get_parents(context['lvl2_2_grp'], context['attached_service'])
+    context['lvl3_3'] = father
+    if type(mother) == Pedigree:
+        context['lvl3_4'] = mother
+    elif type(mother) == BreedGroup:
+        context['lvl3_4_grp'] = mother
 
-    # lvl 3
-    # 1
-    try:
-        context['lvl3_1'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'],
-                                                                             reg_no=context['lvl2_1'].parent_father)
-    except :
-        context['lvl3_1'] = ''
-    # try:
-    #     if context['lvl2_1'].parent_father:
-    #         context['lvl3_1'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_father)
-    # except KeyError:
-    #     try:
-    #         if context['lvl2_2_grp']:
-    #             for pedigree in context['lvl2_2_grp'].group_members.all():
-    #                 if pedigree.sex == 'male':
-    #                     context['lvl3_1'] = pedigree
-    #         else:
-    #             context['lvl3_1'] = ''
-    #     except KeyError:
-    #         context['lvl3_1'] = ''
-    # except ObjectDoesNotExist:
-    #     context['lvl3_1'] = ''
-
-    # 2
-    try:
-        if context['lvl2_1'].parent_mother:
-            context['lvl3_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl2_1'].parent_mother)
-        elif context['lvl2_1'].breed_group:
-            context['lvl3_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl2_1'].breed_group)
-    except:
-        context['lvl3_2'] = ''
-
-    # 3
-    try:
-        context['lvl3_3'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl2_2'].parent_father)
-    except:
-        context['lvl3_3'] = ''
-
-    # 4
-    try:
-        if context['lvl2_2'].parent_mother:
-            context['lvl3_4'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl2_2'].parent_mother)
-        elif context['lvl2_2'].breed_group:
-            context['lvl3_4_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl2_2'].breed_group)
-    except:
-        context['lvl3_4'] = ''
-
-    # lvl 4
-    # 1
-    try:
-        context['lvl4_1'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_1'].parent_father)
-    except:
-        context['lvl4_1'] = ''
-
-    # 2
-    try:
-        if context['lvl3_1'].parent_mother:
-            context['lvl4_2'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_1'].parent_mother)
-        elif context['lvl3_1'].breed_group:
-            context['lvl4_2_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_1'].breed_group)
-    except:
-        context['lvl4_1'] = ''
+    # lvl 4 (4_1 and 4_2)
+    father, mother = get_parents(context['lvl3_1'], context['attached_service'])
+    context['lvl4_1'] = father
+    if type(mother) == Pedigree:
+        context['lvl4_2'] = mother
+    elif type(mother) == BreedGroup:
+        context['lvl4_2_grp'] = mother
 
     # 3
     try:
@@ -264,36 +305,36 @@ def generate_hirearchy(context):
     except:
         context['lvl4_4'] = ''
 
-    # 5
-    try:
-        context['lvl4_5'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_3'].parent_father)
-    except:
-        context['lvl4_5'] = ''
+    # lvl 4 (4_3 and 4_4)
+    if 'lvl3_2' in context.keys():
+        father, mother = get_parents(context['lvl3_2'], context['attached_service'])
+    elif 'lvl3_2_grp' in context.keys():
+        father, mother = get_parents(context['lvl3_2_grp'], context['attached_service'])
+    context['lvl4_3'] = father
+    if type(mother) == Pedigree:
+        context['lvl4_4'] = mother
+    elif type(mother) == BreedGroup:
+        context['lvl4_4_grp'] = mother
 
-    # 6
-    try:
-        if context['lvl3_3'].parent_mother:
-            context['lvl4_6'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_3'].parent_mother)
-        elif context['lvl3_3'].breed_group:
-            context['lvl4_6_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_3'].breed_group)
-    except:
-        context['lvl4_6'] = ''
+    # lvl 4 (4_5 and 4_6)
+    father, mother = get_parents(context['lvl3_3'], context['attached_service'])
+    context['lvl4_5'] = father
+    if type(mother) == Pedigree:
+        context['lvl4_6'] = mother
+    elif type(mother) == BreedGroup:
+        context['lvl4_6_grp'] = mother
 
-    # 7
-    try:
-        context['lvl4_7'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_4'].parent_father)
-    except:
-        context['lvl4_7'] = ''
-
-    # 8
-    try:
-        if context['lvl3_4'].parent_mother:
-            context['lvl4_8'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_4'].parent_mother)
-        elif context['lvl3_4'].breed_group:
-            context['lvl4_8_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_4'].breed_group)
-    except:
-        context['lvl4_8'] = ''
-
+    # lvl 4 (4_7 and 4_8)
+    if 'lvl3_3' in context.keys():
+        father, mother = get_parents(context['lvl3_3'], context['attached_service'])
+    elif 'lvl3_3_grp' in context.keys():
+        father, mother = get_parents(context['lvl3_3_grp'], context['attached_service'])
+    context['lvl4_7'] = father
+    if type(mother) == Pedigree:
+        context['lvl4_8'] = mother
+    elif type(mother) == BreedGroup:
+        context['lvl4_8_grp'] = mother
+    #print(context)
     return context
 
 

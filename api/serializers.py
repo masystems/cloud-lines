@@ -5,7 +5,7 @@ from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
-from cloud_lines.models import Service, Faq
+from cloud_lines.models import Service, Faq, Bolton
 from account.models import AttachedService
 from metrics.models import KinshipQueue, DataValidatorQueue
 from django.contrib.auth.models import User
@@ -126,6 +126,12 @@ class ApiBreedGroupSerializer(serializers.ModelSerializer):
 class ApiFaqSerializer(serializers.ModelSerializer):
     class Meta:
         model = Faq
+        fields = '__all__'
+
+
+class ApiBoltonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bolton
         fields = '__all__'
 
 
