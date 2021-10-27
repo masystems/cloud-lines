@@ -32,7 +32,9 @@ def change_bolton_state(request, bolton_id, state):
     # ensure account is != small tier
 
     # get bolton from API
-    #bolton = requests.get(settings.BOLTON_URL)
+    boltons = requests.get('http://localhost:8000/api/bolton').json()
+    from pprint import pprint
+    pprint(boltons)
     #if state == 'enable' and :
 
     # if activation request

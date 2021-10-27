@@ -908,13 +908,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for bolton in boltons.all %}
+                                        {% for bolton in boltons.results %}
                                             <tr>
                                                 <td>{{ bolton.name }}</td>
                                                 <td>£{{ bolton.price }}</td>
                                                 <td>{{ bolton.description}}</td>
                                                 <td>{% for active_bolton in service.boltons.all %}
-                                                        {% if active_bolton.bolton == bolton %}
+                                                        {% if active_bolton.bolton == bolton.id %}
                                                             <button class="btn btn-primary" value="{{ active_bolton.id }}">Deactivate</button>
                                                         {% else %}
                                                             <button class="btn btn-secondary" data-toggle="modal" data-target="#multiple-one{{ active_bolton.id }}" value="{{ active_bolton.id }}">Activate</button>
@@ -946,7 +946,7 @@
                                                                             <p>Create a subscription payment of £{{ active_bolton.bolton.price }} per month.</p>
                                                                             <button type="button" class="btn btn-danger"
                                                                                 data-dismiss="modal">Close</button>
-                                                                            <a href="{% url 'change_bolton_state' active_bolton.bolton.id 'changeme' %}">
+                                                                            <a href="{% url 'change_bolton_state' active_bolton.bolton 'enable' %}">
                                                                                 <button type="button" class="btn btn-secondary">
                                                                                         Confirm</button>
                                                                             </a>

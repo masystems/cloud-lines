@@ -24,7 +24,7 @@ class UserDetail(models.Model):
 
 
 class AttachedBolton(models.Model):
-    bolton = models.ForeignKey(Bolton, on_delete=models.CASCADE, related_name='bolton_service', null=True, blank=True)
+    bolton = models.CharField(max_length=10)
     stripe_sub_id = models.CharField(max_length=255, blank=True)
     INCREMENTS = (
         ('monthly', 'Monthly'),

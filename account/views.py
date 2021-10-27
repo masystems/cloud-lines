@@ -526,8 +526,10 @@ def settings(request):
                 # add each breed admin to context
                 breed_admins.append(breed_admin)
 
-    boltons = Bolton.objects.all()
-
+    #boltons = requests.get('https://cloud-lines.com/api/bolton').json()
+    boltons = requests.get('http://localhost:8000/api/bolton').json()
+    from pprint import pprint
+    pprint(boltons)
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
                                              'active_pedigree_columns': active_pedigree_columns,
