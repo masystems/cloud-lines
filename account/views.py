@@ -527,7 +527,7 @@ def settings(request):
                 breed_admins.append(breed_admin)
 
     #boltons = requests.get('https://cloud-lines.com/api/bolton').json()
-    boltons = requests.get('http://localhost:8000/api/bolton').json()
+    boltons = requests.get(settings.BOLTON_API_URL).json()
     from pprint import pprint
     pprint(boltons)
     return render(request, 'settings.html', {'custom_fields': custom_fields,

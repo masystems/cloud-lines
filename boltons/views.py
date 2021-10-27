@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
+from django.conf import settings
 from account.views import is_editor, get_main_account
 import requests
 
@@ -32,7 +33,7 @@ def change_bolton_state(request, bolton_id, state):
     # ensure account is != small tier
 
     # get bolton from API
-    boltons = requests.get('http://localhost:8000/api/bolton').json()
+    boltons = requests.get(settings.BOLTON_API_URL).json()
     from pprint import pprint
     pprint(boltons)
     #if state == 'enable' and :
