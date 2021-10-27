@@ -96,6 +96,7 @@ class PedigreeImageViews(viewsets.ModelViewSet):
 
 
 class BreederViews(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
     serializer_class = ApiBreederSerializer
     filter_backends = [SearchFilter]
     permission_classes = [IsAuthenticated]
