@@ -4,6 +4,7 @@ from django.views.generic.base import TemplateView
 from django.conf import settings
 from account.views import is_editor, get_main_account
 import requests
+from json.decoder import JSONDecodeError
 
 # Create your views here.
 class MembershipBase(LoginRequiredMixin, TemplateView):
@@ -33,9 +34,12 @@ def change_bolton_state(request, bolton_id, state):
     # ensure account is != small tier
 
     # get bolton from API
-    boltons = requests.get(settings.BOLTON_API_URL).json()
+    try:
+        boltons = requests.get(settings.BOLTON_API_URL).json()
+    except:
+        boltons = []
     from pprint import pprint
-    pprint(boltons)
+    #pprint(boltons)
     #if state == 'enable' and :
 
     # if activation request
