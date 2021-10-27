@@ -6,8 +6,8 @@ from account.models import AttachedService
 class ReportQueue(models.Model):
     account = models.ForeignKey(AttachedService, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    from_date = models.DateField(blank=True)
-    to_date = models.DateField(blank=True)
+    from_date = models.DateField(null=True, blank=True)
+    to_date = models.DateField(null=True, blank=True)
     file_name = models.CharField(max_length=255, blank=True)
     file_type = models.CharField(max_length=255, blank=True)
     complete = models.BooleanField(default=False)
