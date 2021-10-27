@@ -203,17 +203,36 @@ def get_parents(child, account):
                             break
     # if child is a breed group
     elif type(child) == BreedGroup:
-        # get mothers and fathers of the females of the group
+        # get mothers and fathers and parent breed groups of the females of the group
+        groups = []
         mothers = []
         fathers = []
         if child.group_members:
             for member in child.group_members.all():
                 # append mother and/or father to list if mothers and/or fathers
                 if member.sex == 'female':
+                    if member.breed_group not in groups:
+                        groups.append(member.breed_group)
                     if member.parent_mother not in mothers:
                         mothers.append(member.parent_mother)
                     if member.parent_father not in fathers:
                         fathers.append(member.parent_father)
+        # if all parent groups are the same
+        if len(groups) == 1:
+            # if all groups exist
+            if groups[0]:
+                # set group as mother
+                try:
+                    mother = BreedGroup.objects.get(account=account, group_name=groups[0])
+                except BreedGroup.DoesNotExist:
+                    pass
+                # set male of group as father
+                if mother.group_members:
+                    for member in mother.group_members.all():
+                        if member.sex == 'male':
+                            father = member
+                            break
+                # set male of group as father
         # if all mothers are the same
         if len(mothers) == 1:
             # if all mothers exist
