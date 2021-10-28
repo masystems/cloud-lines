@@ -92,6 +92,7 @@
                         <table id="owned_table" class="table table-bordered table-striped">
                             <thead>
                                 <tr>
+                                    <th>Action</th>
                                     {% for col in columns %}
                                         {% for ped_col, data in column_data.items %}
                                             {% if col == data.db_id %}
@@ -200,6 +201,7 @@
                     data: {'owner': '{{ breeder.id }}'},
                 },
                 "columns": [
+                    { data: "action" },
                     {% for col in columns %}
                         {% for ped_col, data in column_data.items %}
                             {% if col == data.db_id %}

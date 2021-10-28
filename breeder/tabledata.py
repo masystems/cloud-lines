@@ -2,9 +2,10 @@ from django.shortcuts import HttpResponse
 from django.db.models import Q
 from pedigree.models import Pedigree
 from .models import Breeder
-from account.views import get_main_account
+from account.views import get_main_account, has_permission
 from pedigree.functions import get_site_pedigree_column_headings
 from json import dumps
+from django.urls import reverse
 
 def get_pedigrees_owned(request):
     attached_service = get_main_account(request.user)
@@ -45,6 +46,30 @@ def get_pedigrees_owned(request):
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees:
             row = {}
+            
+            # allow access to pedigree view page, or don't (include disabled if not)
+            href = ''
+            disabled = ''
+
+            # check whether they have permission to access pedigree view page
+            breeder_users = []
+            if pedigree.breeder:
+                if pedigree.breeder.user:
+                    breeder_users.append(pedigree.breeder.user)
+            if pedigree.current_owner:
+                if pedigree.current_owner.user:
+                    breeder_users.append(pedigree.current_owner.user)
+
+            if has_permission(request, {'read_only': 'breeder', 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                        pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
+                href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+            else:
+                disabled = 'disabled'
+
+            row = {}
+            row['action'] = f"""<a {href}><button class='btn btn-info' {disabled}>View</button></a>"""
+            
             for col in columns:
                 for data in column_data:
                     if col == column_data[data]['db_id']:
