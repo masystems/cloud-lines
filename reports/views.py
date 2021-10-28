@@ -39,7 +39,12 @@ def census(request, type):
     ## create header
     headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
     ## get pedigrees
-    data = '{"queue_id": %d}' % queue_item.id
+    if attached_service.domain:
+        domain = attached_service.domain
+    else:
+        domain = "https://cloud-lines.com"
+
+    data = '{"queue_id": %d, "domain": "%s"}' % (queue_item.id, domain)
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/census/', headers=headers, data=data)
 
