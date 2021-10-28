@@ -203,6 +203,7 @@
                     url: "{% url 'get_pedigrees_owned' %}",
                     type: "POST",
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: {'owner': '{{ breeder.id }}'},
                 },
                 "columns": [
                     {% for col in columns %}

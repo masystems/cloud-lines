@@ -1,6 +1,7 @@
 from django.shortcuts import HttpResponse
 from django.db.models import Q
 from pedigree.models import Pedigree
+from .models import Breeder
 from account.views import get_main_account
 from pedigree.functions import get_site_pedigree_column_headings
 from json import dumps
@@ -25,29 +26,21 @@ def get_pedigrees_owned(request):
         else:
             sort_by_col = f"-reg_no"
     
-    pedigrees = [
-        {'breeder__breeding_prefix': 'breeder__breeding_prefix',
-        'current_owner__breeding_prefix': 'current_owner__breeding_prefix',
-        'reg_no': 'reg_no',
-        'name': 'name'},
-        {'breeder__breeding_prefix': 'breeder__breeding_prefix2',
-        'current_owner__breeding_prefix': 'current_owner__breeding_prefix2',
-        'reg_no': 'reg_no2',
-        'name': 'name2'},
-    ]
+    owner = Breeder.objects.get(id=request.POST.get('owner'))
 
     pedigrees = []
+    
     all_pedigrees = Pedigree.objects.filter(Q(breeder__breeding_prefix__icontains=search)|
-                    Q(current_owner__breeding_prefix__icontains=search)|
                     Q(reg_no__icontains=search)|
                     Q(name=search),
-                    account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
+                    account=attached_service,
+                    current_owner=owner).order_by(sort_by_col).distinct()[start:start + end]
     
     total_pedigrees = Pedigree.objects.filter(Q(breeder__breeding_prefix__icontains=search)|
-                    Q(current_owner__breeding_prefix__icontains=search)|
                     Q(reg_no__icontains=search)|
                     Q(name=search),
-                    account=attached_service).distinct().count()
+                    account=attached_service,
+                    current_owner=owner).distinct().count()
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees:
@@ -64,8 +57,8 @@ def get_pedigrees_owned(request):
     
     complete_data = {
             "draw": 0,
-            "recordsTotal": 12,#all_pedigrees.count(),
-            "recordsFiltered": 13,#total_pedigrees,
+            "recordsTotal": all_pedigrees.count(),
+            "recordsFiltered": total_pedigrees,
             "data": pedigrees
         }
     return HttpResponse(dumps(complete_data))
