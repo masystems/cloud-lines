@@ -325,10 +325,10 @@ def generate_hirearchy(context):
         context['lvl4_6_grp'] = mother
 
     # lvl 4 (4_7 and 4_8)
-    if 'lvl3_3' in context.keys():
-        father, mother = get_parents(context['lvl3_3'], context['attached_service'])
-    elif 'lvl3_3_grp' in context.keys():
-        father, mother = get_parents(context['lvl3_3_grp'], context['attached_service'])
+    if 'lvl3_4' in context.keys():
+        father, mother = get_parents(context['lvl3_4'], context['attached_service'])
+    elif 'lvl3_4_grp' in context.keys():
+        father, mother = get_parents(context['lvl3_4_grp'], context['attached_service'])
     context['lvl4_7'] = father
     if type(mother) == Pedigree:
         context['lvl4_8'] = mother
