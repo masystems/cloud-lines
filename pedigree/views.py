@@ -290,21 +290,6 @@ def generate_hirearchy(context):
     elif type(mother) == BreedGroup:
         context['lvl4_2_grp'] = mother
 
-    # 3
-    try:
-        context['lvl4_3'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_2'].parent_father)
-    except:
-        context['lvl4_3'] = ''
-
-    # 4
-    try:
-        if context['lvl3_2'].parent_mother:
-            context['lvl4_4'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], reg_no=context['lvl3_2'].parent_mother)
-        elif context['lvl3_2'].breed_group:
-            context['lvl4_4_grp'] = BreedGroup.objects.get(account=context['attached_service'], group_name=context['lvl3_2'].breed_group)
-    except:
-        context['lvl4_4'] = ''
-
     # lvl 4 (4_3 and 4_4)
     if 'lvl3_2' in context.keys():
         father, mother = get_parents(context['lvl3_2'], context['attached_service'])
