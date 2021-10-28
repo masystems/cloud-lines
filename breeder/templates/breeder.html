@@ -86,6 +86,39 @@
                             </div>
                         </div>
                         <hr>
+                        {% load custom_tags %}
+                        <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} currently owned by {{ breeder.breeding_prefix }} (new)</h3>
+                        <table id="{{ table_id }}" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    {% for col in columns %}
+                                        {% for ped_col, data in column_data.items %}
+                                            {% if col == data.db_id %}
+                                                <th scope="col">{{ data.name }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pedigree in pedigrees.all %}
+                                    <tr {% if editor or contributor or breeds_editable|length > 0 and pedigree.breed__breed_name in breeds_editable %}onclick="window.location='{% url 'pedigree' pedigree.id %}';" style="cursor: pointer;"{% endif %}>
+                                        {% for col in columns %}
+                                            {% for ped_col, data in column_data.items %}
+                                                {% if col == data.db_id %}
+                                                    <th scope="row">
+                                                        {% autoescape off %}
+                                                            {% pedigree_column_data pedigree data %}
+                                                        {% endautoescape %}
+                                                    </th>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <hr>
                         <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} currently owned by {{ breeder.breeding_prefix }}</h3>
                         {% include 'pedigree_table.html' with pedigrees=owner_pedigrees %}
 
@@ -160,6 +193,26 @@
     <script>
         $(document).ready(function() {
             $('.table.table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                orderCellsTop: true,
+                fixedHeader: true,
+                stateSave: true,
+                "ajax": {
+                    url: "{% url 'get_pedigrees_owned' %}",
+                    type: "POST",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                },
+                "columns": [
+                    {% for col in columns %}
+                        {% for ped_col, data in column_data.items %}
+                            {% if col == data.db_id %}
+                                { data: "{{ data.db_id }}" },
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                ],
                 "language": {
                     "search": "Filter records:"
                   }
