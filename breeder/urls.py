@@ -13,5 +13,6 @@ urlpatterns = [
     path('breeder_check', views.breeder_check, name='breeder_check'),
     path('get_breeder_details', views.get_breeder_details, name="get_breeder_details"),
     path('get-ta-breeders/<str:type>', tabledata.get_ta_breeders, name="get_ta_breeders"),
-    path('get_pedigrees_owned', breeder_tabledata.get_pedigrees_owned, name='get_pedigrees_owned')
+    path('get_pedigrees_owned', breeder_tabledata.get_pedigrees_owned, name='get_pedigrees_owned'),
+    path('get_pedigrees_bred', breeder_tabledata.get_pedigrees_bred, name='get_pedigrees_bred')
 ]

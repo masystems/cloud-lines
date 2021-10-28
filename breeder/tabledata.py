@@ -25,7 +25,7 @@ def get_pedigrees_owned(request):
             break
         else:
             sort_by_col = f"-reg_no"
-    
+
     owner = Breeder.objects.get(id=request.POST.get('owner'))
 
     pedigrees = []
@@ -41,6 +41,64 @@ def get_pedigrees_owned(request):
                     Q(name=search),
                     account=attached_service,
                     current_owner=owner).distinct().count()
+
+    if all_pedigrees.count() > 0:
+        for pedigree in all_pedigrees:
+            row = {}
+            for col in columns:
+                for data in column_data:
+                    if col == column_data[data]['db_id']:
+                        try:
+                            exec(f"row[column_data[data]['db_id']] = pedigree.{column_data[data]['db_id_internal']}")
+                        except AttributeError:
+                            row[column_data[data]['db_id']] = ""
+                        break
+            pedigrees.append(row)
+    
+    complete_data = {
+            "draw": 0,
+            "recordsTotal": all_pedigrees.count(),
+            "recordsFiltered": total_pedigrees,
+            "data": pedigrees
+        }
+    return HttpResponse(dumps(complete_data))
+
+
+def get_pedigrees_bred(request):
+    attached_service = get_main_account(request.user)
+    columns, column_data = get_site_pedigree_column_headings(attached_service)
+    start = int(request.POST.get('start', 0))
+    end = int(request.POST.get('length', 20))
+    search = request.POST.get('search[value]', "")
+    sort_by = request.POST.get(f'columns[{request.POST.get("order[0][column]")}][data]')
+    # desc or asc
+    if request.POST.get('order[0][dir]') == 'asc':
+        direction = ""
+    else:
+        direction = "-"
+    # sort map
+    for data in column_data:
+        if sort_by == column_data[data]['db_id']:
+            sort_by_col = f"{direction}{column_data[data]['db_id']}"
+            break
+        else:
+            sort_by_col = f"-reg_no"
+    
+    breeder = Breeder.objects.get(id=request.POST.get('breeder'))
+
+    pedigrees = []
+    
+    all_pedigrees = Pedigree.objects.filter(Q(current_owner__breeding_prefix__icontains=search)|
+                    Q(reg_no__icontains=search)|
+                    Q(name=search),
+                    account=attached_service,
+                    breeder=breeder).order_by(sort_by_col).distinct()[start:start + end]
+    
+    total_pedigrees = Pedigree.objects.filter(Q(breeder__breeding_prefix__icontains=search)|
+                    Q(reg_no__icontains=search)|
+                    Q(name=search),
+                    account=attached_service,
+                    breeder=breeder).distinct().count()
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees:

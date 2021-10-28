@@ -87,6 +87,7 @@
                         </div>
                         <hr>
                         {% load custom_tags %}
+                        <!-- pedigrees owned -->
                         <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} currently owned by {{ breeder.breeding_prefix }}</h3>
                         <table id="owned_table" class="table table-bordered table-striped">
                             <thead>
@@ -101,12 +102,23 @@
                                 </tr>
                             </thead>
                         </table>
-                        <!-- <hr>
-                        <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} currently owned by {{ breeder.breeding_prefix }}</h3>
-                        {% include 'pedigree_table.html' with pedigrees=owner_pedigrees %} -->
+                        <!-- {% include 'pedigree_table.html' with pedigrees=owner_pedigrees %} -->
                         <hr>
                         <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} bred by {{ breeder.breeding_prefix }}</h3>
-                        {% include 'pedigree_table.html' with pedigrees=breeder_pedigrees %}
+                        <!-- {% include 'pedigree_table.html' with pedigrees=breeder_pedigrees %} -->
+                        <table id="bred_table" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    {% for col in columns %}
+                                        {% for ped_col, data in column_data.items %}
+                                            {% if col == data.db_id %}
+                                                <th scope="col">{{ data.name }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                        </table>
                         <hr>
                         {% if service.site_mode == 'poultry' %}
                             <h3>Breed groups by {{ breeder.breeding_prefix }}</h3>
@@ -186,6 +198,35 @@
                     type: "POST",
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
                     data: {'owner': '{{ breeder.id }}'},
+                },
+                "columns": [
+                    {% for col in columns %}
+                        {% for ped_col, data in column_data.items %}
+                            {% if col == data.db_id %}
+                                { data: "{{ data.db_id }}" },
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                ],
+                "language": {
+                    "search": "Filter records:"
+                  }
+            });
+        } );
+
+        $(document).ready(function() {
+            $('#bred_table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                orderCellsTop: true,
+                fixedHeader: true,
+                stateSave: true,
+                "ajax": {
+                    url: "{% url 'get_pedigrees_bred' %}",
+                    type: "POST",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: {'breeder': '{{ breeder.id }}'},
                 },
                 "columns": [
                     {% for col in columns %}
