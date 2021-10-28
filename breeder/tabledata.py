@@ -45,8 +45,6 @@ def get_pedigrees_owned(request):
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees:
-            row = {}
-            
             # allow access to pedigree view page, or don't (include disabled if not)
             href = ''
             disabled = ''
@@ -127,7 +125,29 @@ def get_pedigrees_bred(request):
 
     if all_pedigrees.count() > 0:
         for pedigree in all_pedigrees:
+            # allow access to pedigree view page, or don't (include disabled if not)
+            href = ''
+            disabled = ''
+
+            # check whether they have permission to access pedigree view page
+            breeder_users = []
+            if pedigree.breeder:
+                if pedigree.breeder.user:
+                    breeder_users.append(pedigree.breeder.user)
+            if pedigree.current_owner:
+                if pedigree.current_owner.user:
+                    breeder_users.append(pedigree.current_owner.user)
+
+            if has_permission(request, {'read_only': 'breeder', 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                        pedigrees=[pedigree],
+                                        breeder_users=breeder_users):
+                href = f"""href='{reverse("pedigree", args=[pedigree.id])}'"""
+            else:
+                disabled = 'disabled'
+
             row = {}
+            row['action'] = f"""<a {href}><button class='btn btn-info' {disabled}>View</button></a>"""
+            
             for col in columns:
                 for data in column_data:
                     if col == column_data[data]['db_id']:
