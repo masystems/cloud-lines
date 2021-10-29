@@ -143,6 +143,16 @@ def get_pedigrees_bred(request):
             break
         else:
             sort_by_col = f"-reg_no"
+
+    # search_date (convert into date like we do for the filter date inputs but for the search input)
+    search_date = ''
+    search_list = search.split('-')
+    if len(search_list) == 3:
+        search_date = f'{search_list[2]}-{search_list[1]}-{search_list[0]}'
+    elif len(search_list) == 2:
+        search_date = f'{search_list[1]}-{search_list[0]}'
+    else:
+        search_date = search_list[0]
     
     breeder = Breeder.objects.get(id=request.POST.get('breeder'))
 
@@ -150,13 +160,39 @@ def get_pedigrees_bred(request):
     
     all_pedigrees = Pedigree.objects.filter(Q(current_owner__breeding_prefix__icontains=search)|
                     Q(reg_no__icontains=search)|
-                    Q(name=search),
+                    Q(tag_no__icontains=search)|
+                    Q(name__icontains=search)|
+                    Q(description__icontains=search)|
+                    Q(date_of_registration__icontains=search_date)|
+                    Q(dob__icontains=search_date)|
+                    Q(dod__icontains=search_date)|
+                    Q(status__icontains=search)|
+                    Q(sex__iexact=search)|
+                    Q(parent_father__reg_no__icontains=search)|
+                    Q(parent_father_notes__icontains=search)|
+                    Q(parent_mother__reg_no__icontains=search)|
+                    Q(parent_mother__reg_no__icontains=search)|
+                    Q(parent_mother_notes__icontains=search)|
+                    Q(breed__breed_name__icontains=search),
                     account=attached_service,
                     breeder=breeder).order_by(sort_by_col).distinct()[start:start + end]
     
-    total_pedigrees = Pedigree.objects.filter(Q(breeder__breeding_prefix__icontains=search)|
+    total_pedigrees = Pedigree.objects.filter(Q(current_owner__breeding_prefix__icontains=search)|
                     Q(reg_no__icontains=search)|
-                    Q(name=search),
+                    Q(tag_no__icontains=search)|
+                    Q(name__icontains=search)|
+                    Q(description__icontains=search)|
+                    Q(date_of_registration__icontains=search_date)|
+                    Q(dob__icontains=search_date)|
+                    Q(dod__icontains=search_date)|
+                    Q(status__icontains=search)|
+                    Q(sex__iexact=search)|
+                    Q(parent_father__reg_no__icontains=search)|
+                    Q(parent_father_notes__icontains=search)|
+                    Q(parent_mother__reg_no__icontains=search)|
+                    Q(parent_mother__reg_no__icontains=search)|
+                    Q(parent_mother_notes__icontains=search)|
+                    Q(breed__breed_name__icontains=search),
                     account=attached_service,
                     breeder=breeder).distinct().count()
 
