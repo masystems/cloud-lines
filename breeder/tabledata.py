@@ -38,6 +38,18 @@ def get_pedigrees_owned(request):
     else:
         search_date = search_list[0]
 
+    # condition for litter size
+    def litter_cond():
+        # search_int (make an int, if possible, to be used to include litter size in the search all)
+        search_int = ''
+        try:
+            search_int = int(search)
+        except ValueError:
+            pass
+        if search_int:
+            return Q(litter_size=search_int)
+        return Q()
+
     owner = Breeder.objects.get(id=request.POST.get('owner'))
 
     pedigrees = []
@@ -71,6 +83,7 @@ def get_pedigrees_owned(request):
                     Q(dod__icontains=search_date)|
                     Q(status__icontains=search)|
                     Q(sex__iexact=search)|
+                    litter_cond()|
                     Q(parent_father__reg_no__icontains=search)|
                     Q(parent_father_notes__icontains=search)|
                     Q(parent_mother__reg_no__icontains=search)|
@@ -159,6 +172,18 @@ def get_pedigrees_bred(request):
         search_date = f'{search_list[1]}-{search_list[0]}'
     else:
         search_date = search_list[0]
+
+    # condition for litter size
+    def litter_cond():
+        # search_int (make an int, if possible, to be used to include litter size in the search all)
+        search_int = ''
+        try:
+            search_int = int(search)
+        except ValueError:
+            pass
+        if search_int:
+            return Q(litter_size=search_int)
+        return Q()
     
     breeder = Breeder.objects.get(id=request.POST.get('breeder'))
 
@@ -174,6 +199,7 @@ def get_pedigrees_bred(request):
                     Q(dod__icontains=search_date)|
                     Q(status__icontains=search)|
                     Q(sex__iexact=search)|
+                    litter_cond()|
                     Q(parent_father__reg_no__icontains=search)|
                     Q(parent_father_notes__icontains=search)|
                     Q(parent_mother__reg_no__icontains=search)|
