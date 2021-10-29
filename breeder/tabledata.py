@@ -50,6 +50,19 @@ def get_pedigrees_owned(request):
             return Q(litter_size=search_int)
         return Q()
 
+    def sale_hire_cond():
+        if 'sale_or_hire' in columns and search:
+            try:
+                if search.lower() in 'true':
+                    return Q(sale_or_hire=True)
+                elif search.lower() in 'false':
+                    return Q(sale_or_hire=False)
+                else:
+                    return Q(sale_or_hire=None)
+            except SyntaxError:
+                return Q(sale_or_hire=None)
+        return Q()
+
     owner = Breeder.objects.get(id=request.POST.get('owner'))
 
     pedigrees = []
@@ -64,12 +77,14 @@ def get_pedigrees_owned(request):
                     Q(dod__icontains=search_date)|
                     Q(status__icontains=search)|
                     Q(sex__iexact=search)|
+                    litter_cond()|
                     Q(parent_father__reg_no__icontains=search)|
                     Q(parent_father_notes__icontains=search)|
                     Q(parent_mother__reg_no__icontains=search)|
                     Q(parent_mother__reg_no__icontains=search)|
                     Q(parent_mother_notes__icontains=search)|
-                    Q(breed__breed_name__icontains=search),
+                    Q(breed__breed_name__icontains=search)|
+                    sale_hire_cond(),
                     account=attached_service,
                     current_owner=owner).order_by(sort_by_col).distinct()[start:start + end]
     
@@ -89,7 +104,8 @@ def get_pedigrees_owned(request):
                     Q(parent_mother__reg_no__icontains=search)|
                     Q(parent_mother__reg_no__icontains=search)|
                     Q(parent_mother_notes__icontains=search)|
-                    Q(breed__breed_name__icontains=search),
+                    Q(breed__breed_name__icontains=search)|
+                    sale_hire_cond(),
                     account=attached_service,
                     current_owner=owner).distinct().count()
 
@@ -184,6 +200,19 @@ def get_pedigrees_bred(request):
         if search_int:
             return Q(litter_size=search_int)
         return Q()
+
+    def sale_hire_cond():
+        if 'sale_or_hire' in columns and search:
+            try:
+                if search.lower() in 'true':
+                    return Q(sale_or_hire=True)
+                elif search.lower() in 'false':
+                    return Q(sale_or_hire=False)
+                else:
+                    return Q(sale_or_hire=None)
+            except SyntaxError:
+                return Q(sale_or_hire=None)
+        return Q()
     
     breeder = Breeder.objects.get(id=request.POST.get('breeder'))
 
@@ -205,7 +234,8 @@ def get_pedigrees_bred(request):
                     Q(parent_mother__reg_no__icontains=search)|
                     Q(parent_mother__reg_no__icontains=search)|
                     Q(parent_mother_notes__icontains=search)|
-                    Q(breed__breed_name__icontains=search),
+                    Q(breed__breed_name__icontains=search)|
+                    sale_hire_cond(),
                     account=attached_service,
                     breeder=breeder).order_by(sort_by_col).distinct()[start:start + end]
     
@@ -219,12 +249,14 @@ def get_pedigrees_bred(request):
                     Q(dod__icontains=search_date)|
                     Q(status__icontains=search)|
                     Q(sex__iexact=search)|
+                    litter_cond()|
                     Q(parent_father__reg_no__icontains=search)|
                     Q(parent_father_notes__icontains=search)|
                     Q(parent_mother__reg_no__icontains=search)|
                     Q(parent_mother__reg_no__icontains=search)|
                     Q(parent_mother_notes__icontains=search)|
-                    Q(breed__breed_name__icontains=search),
+                    Q(breed__breed_name__icontains=search)|
+                    sale_hire_cond(),
                     account=attached_service,
                     breeder=breeder).distinct().count()
 
