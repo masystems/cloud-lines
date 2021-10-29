@@ -38,6 +38,56 @@ def get_pedigrees_owned(request):
     else:
         search_date = search_list[0]
 
+    def breeder_cond():
+        if 'breeder__breeding_prefix' in columns and search:
+            return Q(breeder__breeding_prefix__icontains=search)
+        return Q()
+
+    def reg_no_cond():
+        if 'reg_no' in columns and search:
+            return Q(reg_no__icontains=search)
+        return Q()
+
+    def tag_no_cond():
+        if 'tag_no' in columns and search:
+            return Q(tag_no__icontains=search)
+        return Q()
+
+    def name_cond():
+        if 'name' in columns and search:
+            return Q(name__icontains=search)
+        return Q()
+
+    def description_cond():
+        if 'description' in columns and search:
+            return Q(description__icontains=search)
+        return Q()
+
+    def date_of_registration_cond():
+        if 'date_of_registration' in columns and search_date:
+            return Q(date_of_registration__icontains=search_date)
+        return Q()
+
+    def dob_cond():
+        if 'dob' in columns and search_date:
+            return Q(dob__icontains=search_date)
+        return Q()
+
+    def dod_cond():
+        if 'dod' in columns and search_date:
+            return Q(dod__icontains=search_date)
+        return Q()
+
+    def status_cond():
+        if 'status' in columns and search:
+            return Q(status__icontains=search)
+        return Q()
+    
+    def sex_cond():
+        if 'sex' in columns and search:
+            return Q(sex__iexact=search)
+        return Q()
+    
     # condition for litter size
     def litter_cond():
         # search_int (make an int, if possible, to be used to include litter size in the search all)
@@ -48,6 +98,31 @@ def get_pedigrees_owned(request):
             pass
         if search_int:
             return Q(litter_size=search_int)
+        return Q()
+
+    def father_cond():
+        if 'parent_father__reg_no' in columns and search:
+            return Q(parent_father__reg_no__icontains=search)
+        return Q()
+
+    def father_notes_cond():
+        if 'parent_father_notes' in columns and search:
+            return Q(parent_father_notes__icontains=search)
+        return Q()
+
+    def mother_cond():
+        if 'parent_mother__reg_no' in columns and search:
+            return Q(parent_mother__reg_no__icontains=search)
+        return Q()
+
+    def mother_notes_cond():
+        if 'parent_mother_notes' in columns and search:
+            return Q(parent_mother_notes__icontains=search)
+        return Q()
+
+    def breed_cond():
+        if 'breed__breed_name' in columns and search:
+            return Q(breed__breed_name__icontains=search)
         return Q()
 
     def sale_hire_cond():
@@ -67,44 +142,44 @@ def get_pedigrees_owned(request):
 
     pedigrees = []
     
-    all_pedigrees = Pedigree.objects.filter(Q(breeder__breeding_prefix__icontains=search)|
-                    Q(reg_no__icontains=search)|
-                    Q(tag_no__icontains=search)|
-                    Q(name__icontains=search)|
-                    Q(description__icontains=search)|
-                    Q(date_of_registration__icontains=search_date)|
-                    Q(dob__icontains=search_date)|
-                    Q(dod__icontains=search_date)|
-                    Q(status__icontains=search)|
-                    Q(sex__iexact=search)|
+    all_pedigrees = Pedigree.objects.filter(
+                    breeder_cond()|
+                    reg_no_cond()|
+                    tag_no_cond()|
+                    name_cond()|
+                    description_cond()|
+                    date_of_registration_cond()|
+                    dob_cond()|
+                    dod_cond()|
+                    status_cond()|
+                    sex_cond()|
                     litter_cond()|
-                    Q(parent_father__reg_no__icontains=search)|
-                    Q(parent_father_notes__icontains=search)|
-                    Q(parent_mother__reg_no__icontains=search)|
-                    Q(parent_mother__reg_no__icontains=search)|
-                    Q(parent_mother_notes__icontains=search)|
-                    Q(breed__breed_name__icontains=search)|
+                    father_cond()|
+                    father_notes_cond()|
+                    mother_cond()|
+                    mother_notes_cond()|
+                    breed_cond()|
                     sale_hire_cond(),
                     account=attached_service,
                     current_owner=owner).order_by(sort_by_col).distinct()[start:start + end]
     
-    total_pedigrees = Pedigree.objects.filter(Q(breeder__breeding_prefix__icontains=search)|
-                    Q(reg_no__icontains=search)|
-                    Q(tag_no__icontains=search)|
-                    Q(name__icontains=search)|
-                    Q(description__icontains=search)|
-                    Q(date_of_registration__icontains=search_date)|
-                    Q(dob__icontains=search_date)|
-                    Q(dod__icontains=search_date)|
-                    Q(status__icontains=search)|
-                    Q(sex__iexact=search)|
+    total_pedigrees = Pedigree.objects.filter(
+                    breeder_cond()|
+                    reg_no_cond()|
+                    tag_no_cond()|
+                    name_cond()|
+                    description_cond()|
+                    date_of_registration_cond()|
+                    dob_cond()|
+                    dod_cond()|
+                    status_cond()|
+                    sex_cond()|
                     litter_cond()|
-                    Q(parent_father__reg_no__icontains=search)|
-                    Q(parent_father_notes__icontains=search)|
-                    Q(parent_mother__reg_no__icontains=search)|
-                    Q(parent_mother__reg_no__icontains=search)|
-                    Q(parent_mother_notes__icontains=search)|
-                    Q(breed__breed_name__icontains=search)|
+                    father_cond()|
+                    father_notes_cond()|
+                    mother_cond()|
+                    mother_notes_cond()|
+                    breed_cond()|
                     sale_hire_cond(),
                     account=attached_service,
                     current_owner=owner).distinct().count()
