@@ -124,6 +124,21 @@
                         <hr>
                         {% if service.site_mode == 'poultry' %}
                             <h3>Breed groups by {{ breeder.breeding_prefix }}</h3>
+                            <table id="groups_table" class="table table-sm table-hover">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Action</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Breed</th>
+                                    <th scope="col">Male</th>
+                                    <th scope="col">Female</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        {% endif %}
+                        <hr>
+                        {% if service.site_mode == 'poultry' %}
+                            <h3>Breed groups by {{ breeder.breeding_prefix }}</h3>
                             <table class="table table-sm table-hover">
                                 <thead>
                                 <tr>
@@ -213,9 +228,9 @@
                 ],
                 "language": {
                     "search": "Filter records:"
-                  }
+                }
             });
-        } );
+        });
 
         $(document).ready(function() {
             $('#bred_table').DataTable({
@@ -243,9 +258,36 @@
                 ],
                 "language": {
                     "search": "Filter records:"
-                  }
+                }
             });
-        } );
+        });
+
+        $(document).ready(function() {
+            $('#groups_table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                orderCellsTop: true,
+                fixedHeader: true,
+                stateSave: true,
+                "ajax": {
+                    url: "{% url 'get_groups_bred' %}",
+                    type: "POST",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: {'breeder': '{{ breeder.id }}'},
+                },
+                "columns": [
+                    { data: "action" },
+                    { data: "group_name" },
+                    { data: "breed" },
+                    { data: "male" },
+                    { data: "female" }
+                ],
+                "language": {
+                    "search": "Filter records:"
+                }
+            });
+        });
     </script>
 
 {% endblock %}
