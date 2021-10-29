@@ -202,7 +202,7 @@ def get_groups_bred(request):
                     breeder=breeder).distinct().count()
 
     if all_groups.count() > 0:
-        for group in BreedGroup.objects.filter(account=attached_service, breeder=Breeder.objects.get(id=request.POST.get('breeder'))):
+        for group in all_groups:
             # allow access to pedigree view page, or don't (include disabled if not)
             href = ''
             disabled = ''
