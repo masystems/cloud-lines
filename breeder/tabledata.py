@@ -114,13 +114,19 @@ def get_pedigrees_owned(request):
                             row[column_data[data]['db_id']] = ""
                         break
             pedigrees.append(row)
-    
-    complete_data = {
-        "draw": 0,
-        "recordsTotal": all_pedigrees.count(),
-        "recordsFiltered": total_pedigrees,
-        "data": pedigrees
-    }
+        complete_data = {
+            "draw": 0,
+            "recordsTotal": all_pedigrees.count(),
+            "recordsFiltered": total_pedigrees,
+            "data": pedigrees
+        }
+    else:
+        complete_data = {
+            "draw": 0,
+            "recordsTotal": 0,
+            "recordsFiltered": 0,
+            "data": []
+        }
     return HttpResponse(dumps(complete_data))
 
 
@@ -230,13 +236,19 @@ def get_pedigrees_bred(request):
                             row[column_data[data]['db_id']] = ""
                         break
             pedigrees.append(row)
-    
-    complete_data = {
-        "draw": 0,
-        "recordsTotal": all_pedigrees.count(),
-        "recordsFiltered": total_pedigrees,
-        "data": pedigrees
-    }
+        complete_data = {
+            "draw": 0,
+            "recordsTotal": all_pedigrees.count(),
+            "recordsFiltered": total_pedigrees,
+            "data": pedigrees
+        }
+    else:
+        complete_data = {
+            "draw": 0,
+            "recordsTotal": 0,
+            "recordsFiltered": 0,
+            "data": []
+        }
     
     return HttpResponse(dumps(complete_data))
 
@@ -332,13 +344,18 @@ def get_groups_bred(request):
                         </span> | 
                     """
             groups.append(row)
-    
-    
-    complete_data = {
-        "draw": 0,
-        "recordsTotal": all_groups.count(),
-        "recordsFiltered": total_groups,
-        "data": groups
-    }
+        complete_data = {
+            "draw": 0,
+            "recordsTotal": all_groups.count(),
+            "recordsFiltered": total_groups,
+            "data": groups
+        }
+    else:
+        complete_data = {
+            "draw": 0,
+            "recordsTotal": 0,
+            "recordsFiltered": 0,
+            "data": []
+        }
     
     return HttpResponse(dumps(complete_data))
