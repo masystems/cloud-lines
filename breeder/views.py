@@ -8,7 +8,6 @@ from django.core import serializers
 from .models import Breeder
 from pedigree.models import Pedigree
 from pedigree.functions import get_site_pedigree_column_headings
-from breed_group.models import BreedGroup
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from .forms import BreederForm
 import csv
@@ -33,7 +32,7 @@ def breeder(request, breeder_id):
     owner_pedigrees = Pedigree.objects.filter(account=attached_service,
                                                 current_owner__breeding_prefix__exact=breeder).exclude(
         state='unapproved').values('id', *columns)[:500]
-    groups = BreedGroup.objects.filter(breeder=breeder)
+    
     # get custom fields
     try:
         custom_fields = json.loads(breeder.custom_fields)
@@ -42,7 +41,6 @@ def breeder(request, breeder_id):
     return render(request, 'breeder.html', {'breeder': breeder,
                                             'breeder_pedigrees': breeder_pedigrees,
                                             'owner_pedigrees': owner_pedigrees,
-                                            'groups': groups,
                                             'custom_fields': custom_fields,
                                             'columns': columns,
                                             'column_data': column_data
