@@ -258,18 +258,18 @@ def generate_hirearchy(context):
     # lvl 2 (2_1 and 2_2)
     father, mother = get_parents(context['lvl1'], context['attached_service'])
     context['lvl2_1'] = father
-    if type(mother) == Pedigree:
-        context['lvl2_2'] = mother
-    elif type(mother) == BreedGroup:
+    if type(mother) == BreedGroup:
         context['lvl2_2_grp'] = mother
+    else:
+        context['lvl2_2'] = mother
 
     # lvl 3 (3_1 and 3_2)
     father, mother = get_parents(context['lvl2_1'], context['attached_service'])
     context['lvl3_1'] = father
-    if type(mother) == Pedigree:
-        context['lvl3_2'] = mother
-    elif type(mother) == BreedGroup:
+    if type(mother) == BreedGroup:
         context['lvl3_2_grp'] = mother
+    else:
+        context['lvl3_2'] = mother
 
     # lvl 3 (3_3 and 3_4)
     if 'lvl2_2' in context.keys():
@@ -277,18 +277,18 @@ def generate_hirearchy(context):
     elif 'lvl2_2_grp' in context.keys():
         father, mother = get_parents(context['lvl2_2_grp'], context['attached_service'])
     context['lvl3_3'] = father
-    if type(mother) == Pedigree:
-        context['lvl3_4'] = mother
-    elif type(mother) == BreedGroup:
+    if type(mother) == BreedGroup:
         context['lvl3_4_grp'] = mother
+    else:
+        context['lvl3_4'] = mother
 
     # lvl 4 (4_1 and 4_2)
     father, mother = get_parents(context['lvl3_1'], context['attached_service'])
     context['lvl4_1'] = father
-    if type(mother) == Pedigree:
-        context['lvl4_2'] = mother
-    elif type(mother) == BreedGroup:
+    if type(mother) == BreedGroup:
         context['lvl4_2_grp'] = mother
+    else:
+        context['lvl4_2'] = mother
 
     # lvl 4 (4_3 and 4_4)
     if 'lvl3_2' in context.keys():
@@ -296,18 +296,18 @@ def generate_hirearchy(context):
     elif 'lvl3_2_grp' in context.keys():
         father, mother = get_parents(context['lvl3_2_grp'], context['attached_service'])
     context['lvl4_3'] = father
-    if type(mother) == Pedigree:
-        context['lvl4_4'] = mother
-    elif type(mother) == BreedGroup:
+    if type(mother) == BreedGroup:
         context['lvl4_4_grp'] = mother
+    else:
+        context['lvl4_4'] = mother
 
     # lvl 4 (4_5 and 4_6)
     father, mother = get_parents(context['lvl3_3'], context['attached_service'])
     context['lvl4_5'] = father
-    if type(mother) == Pedigree:
-        context['lvl4_6'] = mother
-    elif type(mother) == BreedGroup:
+    if type(mother) == BreedGroup:
         context['lvl4_6_grp'] = mother
+    else:
+        context['lvl4_6'] = mother
 
     # lvl 4 (4_7 and 4_8)
     if 'lvl3_4' in context.keys():
@@ -315,11 +315,11 @@ def generate_hirearchy(context):
     elif 'lvl3_4_grp' in context.keys():
         father, mother = get_parents(context['lvl3_4_grp'], context['attached_service'])
     context['lvl4_7'] = father
-    if type(mother) == Pedigree:
-        context['lvl4_8'] = mother
-    elif type(mother) == BreedGroup:
+    if type(mother) == BreedGroup:
         context['lvl4_8_grp'] = mother
-    #print(context)
+    else:
+        context['lvl4_8'] = mother
+    
     return context
 
 
