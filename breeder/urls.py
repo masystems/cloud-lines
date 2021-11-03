@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 from pedigree import tabledata
+from . import tabledata as breeder_tabledata
 
 urlpatterns = [
     path('', views.breeders, name='breeders'),
@@ -11,5 +12,8 @@ urlpatterns = [
     path('breeder_csv/', views.breeder_csv),
     path('breeder_check', views.breeder_check, name='breeder_check'),
     path('get_breeder_details', views.get_breeder_details, name="get_breeder_details"),
-    path('get-ta-breeders/<str:type>', tabledata.get_ta_breeders, name="get_ta_breeders")
+    path('get-ta-breeders/<str:type>', tabledata.get_ta_breeders, name="get_ta_breeders"),
+    path('get_pedigrees_owned', breeder_tabledata.get_pedigrees_owned, name='get_pedigrees_owned'),
+    path('get_pedigrees_bred', breeder_tabledata.get_pedigrees_bred, name='get_pedigrees_bred'),
+    path('get_groups_bred', breeder_tabledata.get_groups_bred, name='get_groups_bred')
 ]

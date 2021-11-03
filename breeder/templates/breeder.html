@@ -86,50 +86,54 @@
                             </div>
                         </div>
                         <hr>
+                        {% load custom_tags %}
+                        <!-- pedigrees owned -->
                         <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} currently owned by {{ breeder.breeding_prefix }}</h3>
-                        {% include 'pedigree_table.html' with pedigrees=owner_pedigrees %}
-
+                        <table id="owned_table" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    {% for col in columns %}
+                                        {% for ped_col, data in column_data.items %}
+                                            {% if col == data.db_id %}
+                                                <th scope="col">{{ data.name }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                        </table>
+                        <!-- {% include 'pedigree_table.html' with pedigrees=owner_pedigrees %} -->
                         <hr>
                         <h3>{% if service.site_mode == 'mammal' %}Pedigrees {% else %}Birds {% endif %} bred by {{ breeder.breeding_prefix }}</h3>
-                        {% include 'pedigree_table.html' with pedigrees=breeder_pedigrees %}
+                        <!-- {% include 'pedigree_table.html' with pedigrees=breeder_pedigrees %} -->
+                        <table id="bred_table" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    {% for col in columns %}
+                                        {% for ped_col, data in column_data.items %}
+                                            {% if col == data.db_id %}
+                                                <th scope="col">{{ data.name }}</th>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                        </table>
                         <hr>
                         {% if service.site_mode == 'poultry' %}
                             <h3>Breed groups by {{ breeder.breeding_prefix }}</h3>
-                            <table class="table table-sm table-hover">
+                            <table id="groups_table" class="table table-bordered table-striped">
                                 <thead>
-                                <tr>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Breed</th>
-                                    <th scope="col">Male</th>
-                                    <th scope="col">Female</th>
-                                    <th scope="col"></th>
-                                </tr>
+                                    <tr>
+                                        <th scope="col">Action</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Breed</th>
+                                        <th scope="col">Male</th>
+                                        <th scope="col">Female</th>
+                                    </tr>
                                 </thead>
-                                <tbody id="breedgpTable">
-                                    {% for group in groups.all %}
-                                        <tr>
-                                            <td>{{ group.group_name }}</td>
-                                            <td>{{ group.breed }}</td>
-                                            <td>{% for member in group.group_members.all %}
-                                                    {% if member.sex == 'male' %}
-                                                        {% include 'relative.html' with pedigree=member %}
-                                                    {% endif %}
-                                                {% endfor %}</td>
-                                            <td>{% for member in group.group_members.all %}
-                                                    {% if member.sex == 'female' %}
-                                                        {% include 'relative.html' with pedigree=member %} |
-                                                    {% endif %}
-                                                {% endfor %}</td>
-                                            <td>{% if editor %}
-                                                    <a href="{% url 'edit_breed_group_form' group.id %}" class="btn btn-outline-info"><i class="fad fa-pencil-alt"></i> Edit
-                                                    </a>
-                                                {% else %}
-                                                    <button class="btn btn-outline-info" data-toggle="modal" data-target="#login"><i class="fad fa-pencil-alt"></i> Edit</button>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
                             </table>
                         {% endif %}
                     </div>
@@ -159,12 +163,91 @@
 
     <script>
         $(document).ready(function() {
-            $('.table.table').DataTable({
+            $('#owned_table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                orderCellsTop: true,
+                fixedHeader: true,
+                stateSave: true,
+                "ajax": {
+                    url: "{% url 'get_pedigrees_owned' %}",
+                    type: "POST",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: {'owner': '{{ breeder.id }}'},
+                },
+                "columns": [
+                    { data: "action" },
+                    {% for col in columns %}
+                        {% for ped_col, data in column_data.items %}
+                            {% if col == data.db_id %}
+                                { data: "{{ data.db_id }}" },
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                ],
                 "language": {
                     "search": "Filter records:"
-                  }
+                }
             });
-        } );
+        });
+
+        $(document).ready(function() {
+            $('#bred_table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                orderCellsTop: true,
+                fixedHeader: true,
+                stateSave: true,
+                "ajax": {
+                    url: "{% url 'get_pedigrees_bred' %}",
+                    type: "POST",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: {'breeder': '{{ breeder.id }}'},
+                },
+                "columns": [
+                    { data: "action" },
+                    {% for col in columns %}
+                        {% for ped_col, data in column_data.items %}
+                            {% if col == data.db_id %}
+                                { data: "{{ data.db_id }}" },
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                ],
+                "language": {
+                    "search": "Filter records:"
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            $('#groups_table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                orderCellsTop: true,
+                fixedHeader: true,
+                stateSave: true,
+                "ajax": {
+                    url: "{% url 'get_groups_bred' %}",
+                    type: "POST",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: {'breeder': '{{ breeder.id }}'},
+                },
+                "columns": [
+                    { data: "action" },
+                    { data: "group_name" },
+                    { data: "breed" },
+                    { data: "male" },
+                    { data: "female" }
+                ],
+                "language": {
+                    "search": "Filter records:"
+                }
+            });
+        });
     </script>
 
 {% endblock %}
