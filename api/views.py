@@ -79,8 +79,17 @@ class PedigreeViews(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        main_account = get_main_account(user)
+        if self.request.GET.get('account'):
+            main_account = AttachedService.objects.get(id=self.request.GET.get('account'))
+            if self.request.user.is_superuser or \
+                    self.request.user == main_account.user.user or \
+                    self.request.user in main_account.admin_users.all():
+                pass
+            else:
+                return False
+        else:
+            user = self.request.user
+            main_account = get_main_account(user)
         return Pedigree.objects.filter(account=main_account)
 
 
