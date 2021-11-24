@@ -11,7 +11,7 @@ from django.utils.html import strip_tags
 from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings as django_settings
-from .models import UserDetail, AttachedService
+from .models import UserDetail, AttachedService, AttachedBolton
 from cloud_lines.models import Service, Page, Bolton
 from pedigree.models import Pedigree
 from pedigree.functions import get_pedigree_column_headings
@@ -528,10 +528,14 @@ def settings(request):
 
     try:
         boltons = requests.get(django_settings.BOLTON_API_URL).json()
+        count = 0
+        for bolton in boltons['results']:
+            if AttachedBolton.objects.filter(bolton=bolton['id'], active=True).exists():
+                boltons['results'][count]['active'] = True
+            count += 1
     except:
         boltons = []
-    # from pprint import pprint
-    # pprint(boltons)
+
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
                                              'active_pedigree_columns': active_pedigree_columns,

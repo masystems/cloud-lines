@@ -121,4 +121,4 @@ LOGIN_REDIRECT_URL = '/dashboard'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 20000
 
-BOLTON_API_URL = "https://cloud-lines.com/api/bolton"
+BOLTON_API_URL = "https://cloud-lines.com/api/bolton/"

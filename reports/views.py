@@ -44,7 +44,8 @@ def census(request, type):
     else:
         domain = "https://cloud-lines.com"
 
-    data = '{"queue_id": %d, "domain": "%s"}' % (queue_item.id, domain)
+    #data = '{"queue_id": %d, "domain": "%s"}' % (queue_item.id, domain)
+    data = '{"queue_id": %d, "domain": "%s"}' % (7, domain)
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/census/', headers=headers, data=data)
 
