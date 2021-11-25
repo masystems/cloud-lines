@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from django.core.exceptions import PermissionDenied
+from rest_framework.authtoken.models import Token
 from django.conf import settings
 from io import BytesIO
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
@@ -32,7 +33,9 @@ def census(request, type):
     attached_service = get_main_account(request.user)
     queue_item = ReportQueue.objects.create(account=attached_service,
                                             user=request.user,
-                                            file_name="")
+                                            file_name="",
+                                            file_type=type,
+                                            complete=False)
 
     token_res = requests.post(url=f'{settings.ORCH_URL}/api-token-auth/',
                               data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
@@ -44,8 +47,10 @@ def census(request, type):
     else:
         domain = "https://cloud-lines.com"
 
-    #data = '{"queue_id": %d, "domain": "%s"}' % (queue_item.id, domain)
-    data = '{"queue_id": %d, "domain": "%s"}' % (7, domain)
+    token, created = Token.objects.get_or_create(user=request.user)
+
+    # queue_item.id
+    data = '{"queue_id": %d, "domain": "%s", "token": "%s"}' % (7, domain, token)
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/census/', headers=headers, data=data)
 
