@@ -12,6 +12,7 @@ from .models import ReportQueue
 from xhtml2pdf import pisa
 from datetime import datetime
 from json import dumps
+import urllib.parse
 import xlwt
 import requests
 
@@ -24,8 +25,8 @@ def reports(request):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
-    
-    return render(request, 'reports.html')
+    attached_service = get_main_account(request.user)
+    return render(request, 'reports.html', {'queue_items': ReportQueue.objects.filter(account=attached_service)})
 
 
 @login_required(login_url="/account/login")
@@ -56,6 +57,29 @@ def census(request, type):
 
     return HttpResponse(dumps(post_res.json()))
 
+@login_required(login_url="/account/login")
+def census_results_complete(request):
+    # get queue item
+    stud_item = ReportQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
+
+    if len(stud_item) > 0:
+        # process only the first item in the queue list
+        item = stud_item[0]
+        # check if item is complete
+        tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
+        export_file = requests.get(urllib.parse.urljoin(tld, f"reports/{item.file_name}.{item.file_type}"))
+        # set item to complete if it's true
+        if export_file.status_code == 200:
+            item.complete = True
+            item.download_url = urllib.parse.urljoin(tld, f"reports/{item.file_name}.{item.file_type}")
+            item.save()
+
+        return HttpResponse(dumps({'result': 'success',
+                                   'complete': item.complete,
+                                   'download_url': item.download_url}))
+    # queue item not found
+    else:
+        return HttpResponse(dumps({'result': 'fail'}))
 
 def render_to_pdf(template_src, context_dict):
     template = get_template(template_src)
