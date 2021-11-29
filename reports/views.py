@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.template.loader import get_template
 from django.core.exceptions import PermissionDenied
@@ -55,7 +55,7 @@ def census(request, type):
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/census/', headers=headers, data=data)
 
-    return HttpResponse(dumps(post_res.json()))
+    return redirect('reports')
 
 @login_required(login_url="/account/login")
 def census_results_complete(request):
