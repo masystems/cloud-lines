@@ -67,11 +67,12 @@ def census_results_complete(request):
         item = stud_item[0]
         # check if item is complete
         tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
-        export_file = requests.get(urllib.parse.urljoin(tld, f"reports/{item.file_name}.{item.file_type}"))
+        print(tld)
+        export_file = requests.get(urllib.parse.urljoin(tld, f"reports/{item.file_name}"))
+        print(urllib.parse.urljoin(tld, f"reports/{item.file_name}.{item.file_type}"))
         # set item to complete if it's true
         if export_file.status_code == 200:
             item.complete = True
-            item.download_url = urllib.parse.urljoin(tld, f"reports/{item.file_name}.{item.file_type}")
             item.save()
 
         return HttpResponse(dumps({'result': 'success',
