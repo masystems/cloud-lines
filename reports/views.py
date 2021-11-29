@@ -50,8 +50,7 @@ def census(request, type):
 
     token, created = Token.objects.get_or_create(user=request.user)
 
-    # queue_item.id
-    data = '{"queue_id": %d, "domain": "%s", "token": "%s"}' % (7, domain, token)
+    data = '{"queue_id": %d, "domain": "%s", "token": "%s"}' % (queue_item.id, domain, token)
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/census/', headers=headers, data=data)
 
