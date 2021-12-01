@@ -46,6 +46,7 @@ class Gallery(models.Model):
 class Bolton(models.Model):
     name = models.CharField(max_length=50)
     price = models.FloatField()
+    stripe_price_id = models.CharField(max_length=250, blank=True)
     description = models.TextField()
     visible_to_public = models.BooleanField(default=True)
 
