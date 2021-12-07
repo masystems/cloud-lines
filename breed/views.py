@@ -122,7 +122,7 @@ def edit_breed_form(request, breed_id):
                 
                 # check they're not the owner
                 if breed_admin == attached_service.user.user:
-                    return HttpResponse(json.dumps({"result": "fail", "msg": f"{username} is the owner of {attached_service.organisation_or_society_name}!"}))
+                    return HttpResponse(json.dumps({"result": "fail", "msg": f"{username} is the owner of the account!"}))
                 
                 # remove from admins, if they're there
                 if breed_admin in attached_service.admin_users.all():
