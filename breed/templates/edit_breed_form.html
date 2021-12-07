@@ -188,6 +188,49 @@
         });
     </script>
 
+    <!-- delete the breed -->
+    <script>
+        $('.confirmDeleteBtn').click(function(e){
+            e.preventDefault()
+
+            // add hidden input so backend knows to delete the breed
+            var input = $("<input>")
+                .attr("name", "delete")
+                .attr("type", "hidden").val("delete");
+            $('#editBreedForm').append(input);
+
+            $.ajax({
+                url: "{% url 'edit_breed_form' breed.id %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#editBreedForm').serialize(),
+                success: function(result) {
+                    result = JSON.parse(result)
+                    if (result.result == 'success') {
+                        window.location.replace("{% url 'breeds' %}")
+                    }
+                    else {
+                        console.log('ERROR')
+                        if (result.msg) {
+                            errorMsg(result.msg)
+                        }
+                        else {
+                            errorMsg('Your form had errors!')
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
+        })
+    </script>
+
     <!-- typeahead -->
     {% include 'ta_user.html' %}
     <script>

@@ -104,7 +104,7 @@ def edit_breed_form(request, breed_id):
     if request.method == 'POST':
         if 'delete' in request.POST:
             breed.delete()
-            return redirect('breeds')
+            return HttpResponse(json.dumps({"result": "success"}))
 
         if breed_form.is_valid():
             # go through the input breed admins
