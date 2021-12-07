@@ -25,7 +25,7 @@
                 <h4 class="mb-0 ">Edit Breed: {{ breed.breed_name }}</h4>
             </div>
             <div class="card-body">
-                <form id="editBreedForm" class="form-horizontal">
+                <form id="editBreedForm" class="form-horizontal" action="{% url 'edit_breed_form' breed.id%}" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-body">
                         <h3 class="box-title">Breed Info</h3>
