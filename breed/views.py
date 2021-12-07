@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.datastructures import MultiValueDictKeyError
+from django.contrib.auth.models import User
 from .models import Breed
 from .forms import BreedForm
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
@@ -114,7 +115,21 @@ def edit_breed_form(request, breed_id):
             breed.custom_fields = json.dumps(custom_fields)
             breed.save()
 
-            return redirect('breeds')
+            # flush breed admins
+            breed.breed_admins.clear()
+            # go through the input breed admins
+            breed_admin_index = 0
+            while request.POST.get(f'breed_admin-{breed_admin_index}'):
+                username = request.POST.get(f'breed_admin-{breed_admin_index}')
+                # try to add each breed admin to breed
+                try:
+                    breed.breed_admins.add(User.objects.get(username=username))
+                except User.DoesNotExist:
+                    return HttpResponse(json.dumps({"result": "fail", "msg": f"{username} is not a user!"}))
+                breed_admin_index += 1
+            breed.save()
+
+            return HttpResponse(json.dumps({"result": "success"}))
         else:
             print('tits')
 

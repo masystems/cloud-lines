@@ -25,7 +25,7 @@
                 <h4 class="mb-0 ">Edit Breed: {{ breed.breed_name }}</h4>
             </div>
             <div class="card-body">
-                <form action="{% url 'edit_breed_form' breed.id%}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                <form id="editBreedForm" class="form-horizontal">
                     {% csrf_token %}
                     <div class="form-body">
                         <h3 class="box-title">Breed Info</h3>
@@ -125,7 +125,7 @@
                             <div class="col-12">
                                 <div class="row">
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-success">Submit</button>
+                                        <button type="button" id="submitEditBreedForm" class="btn btn-success">Submit</button>
                                         <a href="{% url 'breeds' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
                                         <button type="button" id="deleteBreed" data-toggle="modal" data-target="#delete" class="model_img img-fluid btn btn-danger float-right">Delete</button>
                                     </div>
@@ -146,8 +146,50 @@
 {% endblock %}
 
 {% block footer %}
+    <!-- submit the form -->
+    <script>
+        $('#submitEditBreedForm').click( function(e) {
+            e.preventDefault()
+            
+            // set the names of the members
+            $('#breedAdminsList > div > input').each( function (index) {
+                $(this).attr("name", "breed_admin-" + index)
+            })
+            
+            $.ajax({
+                url: "{% url 'edit_breed_form' breed.id %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#editBreedForm').serialize(),
+                success: function(result) {
+                    result = JSON.parse(result)
+                    if (result.result == 'success') {
+                        window.location.replace("{% url 'breeds' %}")
+                    }
+                    else {
+                        console.log('ERROR')
+                        if (result.msg) {
+                            errorMsg(result.msg)
+                        }
+                        else {
+                            errorMsg('Your form had errors!')
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
+        });
+    </script>
+
+    <!-- typeahead -->
     {% include 'ta_user.html' %}
-    
     <script>
         $('#addBreedAdminBtn').click( function(e) {
             e.preventDefault()
