@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from pedigree import tabledata
 
 urlpatterns = [
     # path('signup', views.signup, name='signup'),
@@ -21,5 +22,7 @@ urlpatterns = [
     path('update_card', views.update_card, name='update_card'),
     path('update_user', views.update_user, name='update_user'),
     path('subdomain_check', views.subdomain_check, name='subdomain_check'),
-    path('cancel_sub', views.cancel_sub, name='cancel_sub')
+    path('cancel_sub', views.cancel_sub, name='cancel_sub'),
+    path('get-ta-users', tabledata.get_ta_users, name="get_ta_users"),
+    path('get_user_details', views.get_user_details, name='get_user_details')
 ]

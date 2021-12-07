@@ -88,7 +88,7 @@
                                         {% elif field.label == 'Breed admins' %}
                                             <div class="row pr-4">
                                                 <div class="col-10 pr-0">
-                                                    <div id="breeders" class="input-group">
+                                                    <div id="users" class="input-group">
                                                         <input id="id_breed_admin" type="text" class="typeahead form-control" placeholder="Breed Admin">
                                                     </div>
                                                 </div>
@@ -98,7 +98,7 @@
                                             </div>
                                             <small>Enter a user to include in the breed admins of the breed.</small>
                                             <!-- hidden note which will show name of breed admin if username has a match, or suggestions if partial match -->
-                                            <ul class="list-icons d-none" id="breed_admin_info"></ul>
+                                            <ul class="list-icons d-none" id="breed_admin-info"></ul>
                                             <!-- hidden list to display selected breed admins -->
                                             <div id="breedAdminsList">
                                                 {% for breed_admin in breed.breed_admins.all %}
@@ -146,6 +146,8 @@
 {% endblock %}
 
 {% block footer %}
+    {% include 'ta_user.html' %}
+    
     <script>
         $('#addBreedAdminBtn').click( function(e) {
             e.preventDefault()
