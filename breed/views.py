@@ -107,13 +107,6 @@ def edit_breed_form(request, breed_id):
             return redirect('breeds')
 
         if breed_form.is_valid():
-            breed_form.save()
-
-            for id, field in custom_fields.items():
-                custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
-
-            breed.custom_fields = json.dumps(custom_fields)
-            
             # go through the input breed admins
             breed_admin_index = 0
             breed_admins = []
@@ -145,6 +138,13 @@ def edit_breed_form(request, breed_id):
                 
                 # append breed admin to list
                 breed_admins.append(breed_admin)
+            
+            breed_form.save()
+
+            for id, field in custom_fields.items():
+                custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
+
+            breed.custom_fields = json.dumps(custom_fields)
             
             # flush breed admins
             breed.breed_admins.clear()
