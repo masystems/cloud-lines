@@ -85,6 +85,31 @@
                                                 <p class="">This feature is available for Small Society, Large Society and Organisation accounts.
                                                     Metrics can be enabled in the <a href="{% url 'settings' %}">Site Settings</a> section.</p>
                                             {% endif %}
+                                        {% elif field.label == 'Breed admins' %}
+                                            <div class="row pr-4">
+                                                <div class="col-10 pr-0">
+                                                    <div id="breeders" class="input-group">
+                                                        <input id="id_breed_admin" type="text" class="typeahead form-control" placeholder="Breed Admin">
+                                                    </div>
+                                                </div>
+                                                <div class="col-2 pl-0">
+                                                    <button id="addBreedAdminBtn" class="btn btn-info" type="button">Add</button>
+                                                </div>
+                                            </div>
+                                            <small>Enter a user to include in the breed admins of the breed.</small>
+                                            <!-- hidden note which will show name of breed admin if username has a match, or suggestions if partial match -->
+                                            <ul class="list-icons d-none" id="breed_admin_info"></ul>
+                                            <!-- hidden list to display selected breed admins -->
+                                            <div id="breedAdminsList">
+                                                {% for breed_admin in breed.breed_admins.all %}
+                                                    <div id="breed_admin-{{ breed_admin.username }}" class="input-group">
+                                                        <input value="{{ breed_admin.username }}" type="text" class="form-control" aria-describedby="basic-addon2" readonly>
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-secondary" type="button" onclick="removeBreedAdmin('breed_admin-{{ breed_admin.username }}')">Remove</button>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
                                         {% endif %}
                                         {% for error in field.errors %}
                                           <span class="help-block">{{ error }}</span>
@@ -118,4 +143,30 @@
 
 
 
+{% endblock %}
+
+{% block footer %}
+    <script>
+        $('#addBreedAdminBtn').click( function(e) {
+            e.preventDefault()
+            // give error if username isn't complete
+            if ($('#breed_admin-info').hasClass('d-none')) {
+                errorMsg('Matching user is not in the database!')
+            }
+            // give error if user has already been added as a breed admin
+            else if ($('#breedAdminsList').html().indexOf('"' + $("#id_breed_admin").val() + '"') != -1) {
+                errorMsg('Breed admin has already been added!')
+            }
+            else {
+                var breed_admin = $("#id_breed_admin").val()
+                $('#breedAdminsList').append('<div id="breed_admin-' + breed_admin + '" class="input-group"><input value="' + breed_admin + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button" onclick="removeBreedAdmin(`breed_admin-' + breed_admin + '`)">Remove</button></div></div>')
+            }
+        })
+
+        // remove breed_admin from breed_admins list
+        function removeBreedAdmin(breed_admin){
+            // remove breed_admin
+            $('#' + breed_admin).remove()
+        }
+    </script>
 {% endblock %}
