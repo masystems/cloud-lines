@@ -48,8 +48,14 @@
         }
 
         cookieAlert.offsetHeight; // Force browser to trigger reflow (https://stackoverflow.com/a/39451131)
+
         // Hide the alert if we can find the "acceptCookies" cookie
         if (getCookie("acceptCookies")) {
+            cookieAlert.classList.remove("show");
+        }
+
+        // Hide the alert if we can't find any of the third party cookies
+        if (!getCookie("_ga") && !getCookie("_gid") && !getCookie("__gads") && !getCookie("_gat_gtag_UA_148376956_1")) {
             cookieAlert.classList.remove("show");
         }
 
