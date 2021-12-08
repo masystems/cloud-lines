@@ -1,0 +1,41 @@
+<div class="alert text-center cookiealert show" role="alert">
+    We use cookies to improve your experience. By clicking accept you are confirming that you agree with our <a href="https://cookiesandyou.com/" target="_blank">cookies policy</a>.
+
+    <button type="button" class="btn btn-light btn-sm acceptcookies ml-1">
+        Accept
+    </button>
+    <button type="button" class="btn btn-info btn-sm acceptcookies">
+        Deny
+    </button>
+</div>
+<!-- cookie alert -->
+<script>
+    $('.acceptcookies').click(function(){
+        $('.cookiealert').removeClass('show')
+    })
+</script>
+<style>
+    .cookiealert.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0%);
+        transition-delay: 1000ms;
+    }
+
+    .cookiealert {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        margin: 0 !important;
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        border-radius: 0;
+        transform: translateY(100%);
+        transition: all 500ms ease-out;
+        transition-delay: 0s;
+        color: #ecf0f1;
+        background: #212327;
+    }
+</style>
