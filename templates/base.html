@@ -286,6 +286,19 @@
         <!-- End Container fluid  -->
         <!-- ============================================================== -->
         <!-- ============================================================== -->
+        <!-- Cookies Alert  -->
+        <!-- ============================================================== -->
+        <div class="alert text-center cookiealert show" role="alert">
+            <b>Do you like cookies?</b> 🍪 We use cookies to ensure you get the best experience on our website. <a href="https://cookiesandyou.com/" target="_blank">Learn more</a>
+        
+            <button type="button" class="btn btn-primary btn-sm acceptcookies">
+                I agree
+            </button>
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Cookies Alert  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
         <!-- footer -->
         <!-- ============================================================== -->
         <footer class="footer">
@@ -510,6 +523,32 @@ $(document).ready(function() {
     });
 });
 </script>
+
+<style>
+    .cookiealert.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0%);
+        transition-delay: 1000ms;
+    }
+
+    .cookiealert {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        margin: 0 !important;
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        border-radius: 0;
+        transform: translateY(100%);
+        transition: all 500ms ease-out;
+        transition-delay: 0s;
+        color: #ecf0f1;
+        background: #212327;
+    }
+</style>
 
 {% include 'toastr.html' %}
 
