@@ -58,17 +58,18 @@
     <script>
         $('#submitNewBreedForm').click( function(e) {
             e.preventDefault()
-            
             // set the names of the members
             $('#breedAdminsList > div > input').each( function (index) {
                 $(this).attr("name", "breed_admin-" + index)
             })
             
             $.ajax({
+                type: 'POST',
                 url: "{% url 'new_breed_form' %}",
-                type: 'post',
-                dataType: 'text',
-                data: $('#newBreedForm').serialize(),
+                enctype: 'multipart/form-data',
+                data: new FormData($('#newBreedForm')[0]),
+                processData: false,
+                contentType: false,
                 success: function(result) {
                     result = JSON.parse(result)
                     if (result.result == 'success') {
