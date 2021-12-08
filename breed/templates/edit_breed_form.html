@@ -157,10 +157,12 @@
             })
             
             $.ajax({
+                type: 'POST',
                 url: "{% url 'edit_breed_form' breed.id %}",
-                type: 'post',
-                dataType: 'text',
-                data: $('#editBreedForm').serialize(),
+                enctype: 'multipart/form-data',
+                data: new FormData($('#editBreedForm')[0]),
+                processData: false,
+                contentType: false,
                 success: function(result) {
                     result = JSON.parse(result)
                     if (result.result == 'success') {
