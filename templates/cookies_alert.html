@@ -41,9 +41,10 @@
 
         var cookieAlert = document.querySelector(".cookiealert");
         var acceptCookies = document.querySelector(".acceptcookies");
+        var denyCookies = document.querySelector(".denycookies");
 
         if (!cookieAlert) {
-        return;
+            return;
         }
 
         cookieAlert.offsetHeight; // Force browser to trigger reflow (https://stackoverflow.com/a/39451131)
@@ -60,6 +61,20 @@
 
             // dispatch the accept event
             window.dispatchEvent(new Event("cookieAlertAccept"))
+        });
+
+        // When clicking on the deny button, delete unneeded cookies
+        denyCookies.addEventListener("click", function () {
+            // remove google cookies
+            document.cookie = "_ga=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "_gid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "__gads=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "_gat_gtag_UA_148376956_1=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            
+            cookieAlert.classList.remove("show");
+
+            // dispatch the accept event
+            window.dispatchEvent(new Event("cookieAlertDeny"))
         });
     })();
 </script>
