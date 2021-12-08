@@ -36,7 +36,7 @@
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-md-offset-3 col-md-9">
-                                        <button type="button" id="submitEditBreedForm" class="btn btn-success">Submit</button>
+                                        <button type="button" id="submitNewBreedForm" class="btn btn-success">Submit</button>
                                         <a href="{% url 'breeds' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
                                     </div>
                                 </div>
@@ -54,6 +54,48 @@
 
 {% endblock %}
 {% block footer %}
+    <!-- submit the form -->
+    <script>
+        $('#submitNewBreedForm').click( function(e) {
+            e.preventDefault()
+            
+            // set the names of the members
+            $('#breedAdminsList > div > input').each( function (index) {
+                $(this).attr("name", "breed_admin-" + index)
+            })
+            
+            $.ajax({
+                url: "{% url 'new_breed_form' %}",
+                type: 'post',
+                dataType: 'text',
+                data: $('#newBreedForm').serialize(),
+                success: function(result) {
+                    result = JSON.parse(result)
+                    if (result.result == 'success') {
+                        window.location.replace("{% url 'breeds' %}")
+                    }
+                    else {
+                        console.log('ERROR')
+                        if (result.msg) {
+                            errorMsg(result.msg)
+                        }
+                        else {
+                            errorMsg('Your form had errors!')
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
+        });
+    </script>
+
     <!-- typeahead -->
     {% include 'ta_user.html' %}
     <script>
