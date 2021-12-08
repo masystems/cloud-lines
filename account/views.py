@@ -3,6 +3,9 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
+from django.utils.datastructures import MultiValueDictKeyError
+from django.core import serializers
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import PermissionDenied
@@ -998,3 +1001,20 @@ def send_mail(subject, name, body,
     msg.send()
 
     return
+
+
+@login_required(login_url="/account/login")
+@user_passes_test(is_editor, "/account/login")
+@never_cache
+def get_user_details(request):
+    # get the user that was input
+    try:
+        user = User.objects.get(username=request.GET['id'])
+    except User.DoesNotExist:
+        return HttpResponse(json.dumps({'result': 'fail'}))
+    except MultiValueDictKeyError:
+        return HttpResponse(json.dumps({'result': 'fail'}))
+    
+    user = serializers.serialize('json', [user], ensure_ascii=False)
+    return HttpResponse(json.dumps({'result': 'success',
+                                    'user': user}))

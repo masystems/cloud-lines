@@ -25,17 +25,18 @@
                 <h4 class="mb-0 ">Add New Breed Form</h4>
             </div>
             <div class="card-body">
-                <form action="{% url 'new_breed_form' %}" method="POST" class="form-horizontal" enctype="multipart/form-data">
+                <form id="newBreedForm" class="form-horizontal">
                     {% csrf_token %}
                     <div class="form-body">
-                    {% include 'new_breed_form.html' %}
+                        {% include 'new_breed_form.html' %}
+                    </div>
                     <hr>
                     <div class="form-actions">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-md-offset-3 col-md-9">
-                                        <button type="submit" class="btn btn-success">Submit</button>
+                                        <button type="button" id="submitNewBreedForm" class="btn btn-success">Submit</button>
                                         <a href="{% url 'breeds' %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
                                     </div>
                                 </div>
@@ -51,4 +52,74 @@
 <h1>Oops, you shouldn't be here!</h1>
 {% endif %}
 
+{% endblock %}
+{% block footer %}
+    <!-- submit the form -->
+    <script>
+        $('#submitNewBreedForm').click( function(e) {
+            e.preventDefault()
+            // set the names of the members
+            $('#breedAdminsList > div > input').each( function (index) {
+                $(this).attr("name", "breed_admin-" + index)
+            })
+            
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'new_breed_form' %}",
+                enctype: 'multipart/form-data',
+                data: new FormData($('#newBreedForm')[0]),
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                    result = JSON.parse(result)
+                    if (result.result == 'success') {
+                        window.location.replace("{% url 'breeds' %}")
+                    }
+                    else {
+                        console.log('ERROR')
+                        if (result.msg) {
+                            errorMsg(result.msg)
+                        }
+                        else {
+                            errorMsg('Your form had errors!')
+                        }
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown){
+                    console.log('jqXHR:');
+                    console.log(jqXHR);
+                    console.log('textStatus:');
+                    console.log(textStatus);
+                    console.log('errorThrown:');
+                    console.log(errorThrown);
+                }
+            });
+        });
+    </script>
+
+    <!-- typeahead -->
+    {% include 'ta_user.html' %}
+    <script>
+        $('#addBreedAdminBtn').click( function(e) {
+            e.preventDefault()
+            // give error if username isn't complete
+            if ($('#breed_admin-info').hasClass('d-none')) {
+                errorMsg('Matching user is not in the database!')
+            }
+            // give error if user has already been added as a breed admin
+            else if ($('#breedAdminsList').html().indexOf('"' + $("#id_breed_admin").val() + '"') != -1) {
+                errorMsg('Breed admin has already been added!')
+            }
+            else {
+                var breed_admin = $("#id_breed_admin").val()
+                $('#breedAdminsList').append('<div id="breed_admin-' + breed_admin + '" class="input-group"><input value="' + breed_admin + '" type="text" class="form-control" aria-describedby="basic-addon2" readonly><div class="input-group-append"><button class="btn btn-outline-secondary" type="button" onclick="removeBreedAdmin(`breed_admin-' + breed_admin + '`)">Remove</button></div></div>')
+            }
+        })
+
+        // remove breed_admin from breed_admins list
+        function removeBreedAdmin(breed_admin){
+            // remove breed_admin
+            $('#' + breed_admin).remove()
+        }
+    </script>
 {% endblock %}
