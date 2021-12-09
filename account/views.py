@@ -806,6 +806,10 @@ def register(request):
 
         # if google response good!
         if google_response_json['success']:
+            # check user has agreed to both things
+            if not request.POST.get('privacy') or not request.POST.get('data_protection'):
+                return redirect('cl_login')
+            
             username = request.POST.get('register-form-username')
             raw_password = request.POST.get('register-form-password')
             email = request.POST.get('register-form-email')
