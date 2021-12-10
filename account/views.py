@@ -451,7 +451,7 @@ def site_login(request):
                 data_protection_needed = True
                 # if they are not an owner or they have agreed to the latest
                 if (not AttachedService.objects.filter(user=user_detail).exists()) or \
-                            (get_data_protection_version() == user_detail.data_protection_version and user_detail.privacy_agreed):
+                            (get_data_protection_version() == user_detail.data_protection_version and user_detail.data_protection_agreed):
                     data_protection_needed = False
                 
                 # go back to login if user needs to agree
