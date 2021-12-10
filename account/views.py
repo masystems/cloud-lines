@@ -439,27 +439,33 @@ def site_login(request):
                 user_detail.data_protection_version = get_data_protection_version()
                 user_detail.save()
             
-            if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
-                pass
-            else:
-                # check if need to agree with privacy policy (if they haven't agreed to the latest)
-                privacy_needed = True
-                if get_privacy_version() == user_detail.privacy_version and user_detail.privacy_agreed:
-                    privacy_needed = False
-                
-                # check if need to agree with data protection policy
-                data_protection_needed = True
-                # if they are not an owner or they have agreed to the latest
-                if (not AttachedService.objects.filter(user=user_detail).exists()) or \
-                            (get_data_protection_version() == user_detail.data_protection_version and user_detail.data_protection_agreed):
-                    data_protection_needed = False
-                
-                # go back to login if user needs to agree
-                if privacy_needed or data_protection_needed:
+            # check if need to agree with privacy policy (if they haven't agreed to the latest)
+            privacy_needed = True
+            if get_privacy_version() == user_detail.privacy_version and user_detail.privacy_agreed:
+                privacy_needed = False
+            
+            # check if need to agree with data protection policy
+            data_protection_needed = True
+            # if they are not an owner or they have agreed to the latest
+            if (not AttachedService.objects.filter(user=user_detail).exists()) or \
+                        (get_data_protection_version() == user_detail.data_protection_version and user_detail.data_protection_agreed):
+                data_protection_needed = False
+            
+            # go back to login if user needs to agree
+            if privacy_needed or data_protection_needed:
+                # large tier
+                if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+                    return render(request, 'lt_login.html', {'error': 'Tick if you agree with the above.',
+                        'privacy_needed': privacy_needed, 'data_protection_needed': data_protection_needed,
+                        'detail': user_detail
+                    })
+                # small tier
+                else:
                     return render(request, 'cl_login.html', {'error': 'Tick if you agree with the above.',
                         'privacy_needed': privacy_needed, 'data_protection_needed': data_protection_needed,
                         'detail': user_detail
                     })
+            
             # log in and go to dashboard
             auth.login(request, user)
             return redirect('dashboard')
