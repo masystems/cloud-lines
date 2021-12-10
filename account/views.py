@@ -427,8 +427,6 @@ def site_login(request):
     if request.method == 'POST':
         user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
         if user is not None:
-            auth.login(request, user)
-            
             # check user has previously agreed to what they need to
             user_detail =  UserDetail.objects.get(user=user)
             if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
@@ -452,7 +450,8 @@ def site_login(request):
                         'privacy_needed': privacy_needed, 'data_protection_needed': data_protection_needed,
                         'detail': user_detail
                     })
-            
+            # log in and go to dashboard
+            auth.login(request, user)
             return redirect('dashboard')
         else:
             if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
