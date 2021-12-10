@@ -427,8 +427,18 @@ def site_login(request):
     if request.method == 'POST':
         user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
         if user is not None:
-            # check user has previously agreed to what they need to
             user_detail =  UserDetail.objects.get(user=user)
+            # set privacy agreed if it was agreed to
+            if request.POST.get('privacy'):
+                user_detail.privacy_agreed = datetime.now()
+                user_detail.privacy_version = get_privacy_version()
+                user_detail.save()
+            # set data protection agreed if it was agreed to
+            if request.POST.get('data_protection'):
+                user_detail.data_protection_agreed = datetime.now()
+                user_detail.data_protection_version = get_data_protection_version()
+                user_detail.save()
+            
             if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
                 pass
             else:
