@@ -31,6 +31,7 @@ import time
 import json
 import requests
 import logging
+from datetime import datetime
 
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.shortcuts import resolve_url
@@ -426,6 +427,46 @@ def site_login(request):
     if request.method == 'POST':
         user = auth.authenticate(username=request.POST['username'], password=request.POST['password'])
         if user is not None:
+            user_detail =  UserDetail.objects.get(user=user)
+            # set privacy agreed if it was agreed to
+            if request.POST.get('privacy'):
+                user_detail.privacy_agreed = datetime.now()
+                user_detail.privacy_version = get_privacy_version()
+                user_detail.save()
+            # set data protection agreed if it was agreed to
+            if request.POST.get('data_protection'):
+                user_detail.data_protection_agreed = datetime.now()
+                user_detail.data_protection_version = get_data_protection_version()
+                user_detail.save()
+            
+            # check if need to agree with privacy policy (if they haven't agreed to the latest)
+            privacy_needed = True
+            if get_privacy_version() == user_detail.privacy_version and user_detail.privacy_agreed:
+                privacy_needed = False
+            
+            # check if need to agree with data protection policy
+            data_protection_needed = True
+            # if they are not an owner or they have agreed to the latest
+            if (not AttachedService.objects.filter(user=user_detail).exists()) or \
+                        (get_data_protection_version() == user_detail.data_protection_version and user_detail.data_protection_agreed):
+                data_protection_needed = False
+            
+            # go back to login if user needs to agree
+            if privacy_needed or data_protection_needed:
+                # large tier
+                if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
+                    return render(request, 'lt_login.html', {'error': 'Tick if you agree with the above.',
+                        'privacy_needed': privacy_needed, 'data_protection_needed': data_protection_needed,
+                        'detail': user_detail
+                    })
+                # small tier
+                else:
+                    return render(request, 'cl_login.html', {'error': 'Tick if you agree with the above.',
+                        'privacy_needed': privacy_needed, 'data_protection_needed': data_protection_needed,
+                        'detail': user_detail
+                    })
+            
+            # log in and go to dashboard
             auth.login(request, user)
             return redirect('dashboard')
         else:
@@ -806,6 +847,10 @@ def register(request):
 
         # if google response good!
         if google_response_json['success']:
+            # check user has agreed to both things
+            if not request.POST.get('privacy') or not request.POST.get('data_protection'):
+                return redirect('cl_login')
+            
             username = request.POST.get('register-form-username')
             raw_password = request.POST.get('register-form-password')
             email = request.POST.get('register-form-email')
@@ -818,8 +863,11 @@ def register(request):
 
             # update user details
             user_detail = UserDetail.objects.create(user=user,
-                                                    phone=request.POST.get('register-form-phone')
-                                                    )
+                                                    phone=request.POST.get('register-form-phone'),
+                                                    privacy_agreed=datetime.now(),
+                                                    privacy_version=get_privacy_version(),
+                                                    data_protection_agreed=datetime.now(),
+                                                    data_protection_version=get_data_protection_version())
             # login
             login(request, user)
 
@@ -1018,3 +1066,10 @@ def get_user_details(request):
     user = serializers.serialize('json', [user], ensure_ascii=False)
     return HttpResponse(json.dumps({'result': 'success',
                                     'user': user}))
+
+
+def get_privacy_version():
+    return '2.0'
+
+def get_data_protection_version():
+    return '2.0'
