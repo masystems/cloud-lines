@@ -1066,4 +1066,4 @@ def get_privacy_version():
     return '2.0'
 
 def get_data_protection_version():
-    return ''
+    return '2.0'
