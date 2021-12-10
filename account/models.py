@@ -18,6 +18,10 @@ class UserDetail(models.Model):
         'selected': [],
         'max_reached': False
     }), verbose_name="Dashboard Graphs")
+    privacy_agreed = models.DateTimeField(null=True, blank=True)
+    privacy_version = models.CharField(max_length=10, blank=True)
+    data_protection_agreed = models.DateTimeField(null=True, blank=True)
+    data_protection_version = models.CharField(max_length=10, blank=True)
 
     def __str__(self):
         return str(self.user)

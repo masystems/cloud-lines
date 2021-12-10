@@ -31,6 +31,7 @@ import time
 import json
 import requests
 import logging
+from datetime import datetime
 
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.shortcuts import resolve_url
@@ -822,8 +823,11 @@ def register(request):
 
             # update user details
             user_detail = UserDetail.objects.create(user=user,
-                                                    phone=request.POST.get('register-form-phone')
-                                                    )
+                                                    phone=request.POST.get('register-form-phone'),
+                                                    privacy_agreed=datetime.now(),
+                                                    privacy_version=get_privacy_version(),
+                                                    data_protection_agreed=datetime.now(),
+                                                    data_protection_version=get_data_protection_version())
             # login
             login(request, user)
 
@@ -1022,3 +1026,10 @@ def get_user_details(request):
     user = serializers.serialize('json', [user], ensure_ascii=False)
     return HttpResponse(json.dumps({'result': 'success',
                                     'user': user}))
+
+
+def get_privacy_version():
+    return '2.0'
+
+def get_data_protection_version():
+    return ''
