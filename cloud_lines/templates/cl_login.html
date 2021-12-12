@@ -78,9 +78,39 @@
 							<input type="checkbox" onclick="showPassword()"> Show Password
 						</div>
 
+						<!-- GDPR checkboxes -->
+						{% if privacy_needed or data_protection_needed %}
+							<div class="mb-2">
+								{% if privacy_needed %}
+									<div class="checkbox checkbox-success col_full">
+										<div class="row">
+											<div class="col-1">
+												<input id="privacy" name="privacy" type="checkbox" required>
+											</div>
+											<div class="col-11">
+												<label for="privacy" for="checkbox" class="ml-1">I agree with the <a href="{% static 'docs/MA Systems Ltd Privacy Notice v2.0.docx' %}">Privacy Policy</a></label>
+											</div>
+										</div>
+									</div>
+								{% endif %}
+								{% if data_protection_needed %}
+									<div class="checkbox checkbox-success col_full">
+										<div class="row">
+											<div class="col-1">
+												<input id="data_protection" name="data_protection" type="checkbox" required>
+											</div>
+											<div class="col-11">
+												<label for="data_protection" for="checkbox" class="ml-1">I agree with the <a href="{% static 'docs/MA Systems Ltd Privacy Notice v2.0.docx' %}">Data Protection Policy</a></label>
+											</div>
+										</div>
+									</div>
+								{% endif %}
+							</div>
+						{% endif %}
+
 						{% if error %}
 							<div class="style-msg errormsg">
-								<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Username or password not recognised, try again!</div>
+								<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> {{ error }}</div>
 							</div>
 						{% endif %}
 						<div class="col_full nobottommargin">
@@ -164,6 +194,18 @@
 						<div class="clear"></div>
 						<!-- hidden fields-->
 						<input type="hidden" id="service" name="service" value=""/>
+
+						<!-- GDPR checkboxes -->
+						<div class="mb-2">
+							<div class="checkbox checkbox-success">
+								<input id="privacy" name="privacy" type="checkbox" required>
+								<label for="privacy" for="checkbox" class="ml-1">I agree with the <a href="{% static 'docs/MA Systems Ltd Privacy Notice v2.0.docx' %}">Privacy Policy</a></label>
+							</div>
+							<div class="checkbox checkbox-success">
+								<input id="data_protection" name="data_protection" type="checkbox" required>
+								<label for="data_protection" for="checkbox" class="ml-1">I agree with the <a href="{% static 'docs/MA Systems Ltd Privacy Notice v2.0.docx' %}">Data Protection Policy</a></label>
+							</div>
+						</div>
 
 						<div class="col_full nobottommargin">
 							<button class="button button-3d button-black nomargin" id="register-form-submit" name="register-form-submit" type="submit" value="register">Register Now</button>

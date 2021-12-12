@@ -10,6 +10,7 @@ from django.urls import reverse
 from .views import update_pedigree_cf
 from breeder.models import Breeder
 from breed.models import Breed
+from django.contrib.auth.models import User
 
 
 @login_required(login_url='/accounts/login/')
@@ -564,4 +565,15 @@ def get_ta_breeders(request, type):
                                        account=attached_service)[:10]
 
     data = serialize('json', list(breeders), fields=('breeding_prefix', 'contact_name'))
+    return HttpResponse(data)
+
+def get_ta_users(request):
+    query = request.GET['query']
+
+    users = User.objects.filter(Q(username__icontains=query) |
+                                Q(first_name__icontains=query) |
+                                Q(last_name__icontains=query) |
+                                Q(email__icontains=query))[:10]
+
+    data = serialize('json', list(users), fields=('username', 'first_name', 'last_name', 'email'))
     return HttpResponse(data)

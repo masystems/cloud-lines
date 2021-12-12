@@ -55,6 +55,31 @@
                         <p class="">This feature is available for Small Society, Large Society and Organisation accounts.
                             Metrics can be enabled in the <a href="{% url 'settings' %}">Site Settings</a> section.</p>
                     {% endif%}
+                {% elif "Breed admins" in field.label %}
+                    <div class="row pr-4">
+                        <div class="col-10 pr-0">
+                            <div id="users" class="input-group">
+                                <input id="id_breed_admin" type="text" class="typeahead form-control" placeholder="Breed Admin">
+                            </div>
+                        </div>
+                        <div class="col-2 pl-0">
+                            <button id="addBreedAdminBtn" class="btn btn-info" type="button">Add</button>
+                        </div>
+                    </div>
+                    <small>Enter a user to include in the breed admins of the breed.</small>
+                    <!-- hidden note which will show name of breed admin if username has a match, or suggestions if partial match -->
+                    <ul class="list-icons d-none" id="breed_admin-info"></ul>
+                    <!-- hidden list to display selected breed admins -->
+                    <div id="breedAdminsList">
+                        {% for breed_admin in breed.breed_admins.all %}
+                            <div id="breed_admin-{{ breed_admin.username }}" class="input-group">
+                                <input value="{{ breed_admin.username }}" type="text" class="form-control" aria-describedby="basic-addon2" readonly>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="removeBreedAdmin('breed_admin-{{ breed_admin.username }}')">Remove</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% else %}
                     {% if 'Group' not in field.label %}
                         {{ field|attr:"class:form-control" }}
