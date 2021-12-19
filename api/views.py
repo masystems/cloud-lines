@@ -90,7 +90,14 @@ class PedigreeViews(viewsets.ModelViewSet):
         else:
             user = self.request.user
             main_account = get_main_account(user)
-        return Pedigree.objects.filter(account=main_account)
+
+        if self.request.GET.get('from_date') and self.request.GET.get('to_date'):
+            return Pedigree.objects.filter(account=main_account,
+                                           date_of_registration__range=[self.request.GET.get('from_date'),
+                                                                        self.request.GET.get('to_date')],
+                                           status='alive')
+        else:
+            return Pedigree.objects.filter(account=main_account)
 
 
 class PedigreeImageViews(viewsets.ModelViewSet):
