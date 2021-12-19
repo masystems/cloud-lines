@@ -32,11 +32,30 @@ def reports(request):
 @login_required(login_url="/account/login")
 def census(request, type):
     attached_service = get_main_account(request.user)
-    queue_item = ReportQueue.objects.create(account=attached_service,
-                                            user=request.user,
-                                            file_name="",
-                                            file_type=type,
-                                            complete=False)
+    if type != "form":
+        queue_item = ReportQueue.objects.create(account=attached_service,
+                                                user=request.user,
+                                                file_name="",
+                                                file_type=type,
+                                                complete=False)
+    elif type == "form":
+        start_date_object = datetime.strptime(request.POST.get('from_date'), '%d/%m/%Y')
+        start_date = start_date_object.strftime('%Y-%m-%d')
+        end_date_object = datetime.strptime(request.POST.get('end_date'), '%d/%m/%Y')
+        end_date = end_date_object.strftime('%Y-%m-%d')
+
+        if 'xls_submit' in request.POST:
+            type = 'xls'
+        else:
+            type = 'pdf'
+
+        queue_item = ReportQueue.objects.create(account=attached_service,
+                                                user=request.user,
+                                                from_date=start_date,
+                                                to_date=end_date,
+                                                file_name="",
+                                                file_type=type,
+                                                complete=False)
 
     token_res = requests.post(url=f'{settings.ORCH_URL}/api-token-auth/',
                               data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
@@ -66,9 +85,7 @@ def census_results_complete(request):
         item = stud_item[0]
         # check if item is complete
         tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
-        print(tld)
         export_file = requests.get(urllib.parse.urljoin(tld, f"reports/{item.file_name}"))
-        print(urllib.parse.urljoin(tld, f"reports/{item.file_name}.{item.file_type}"))
         # set item to complete if it's true
         if export_file.status_code == 200:
             item.complete = True
