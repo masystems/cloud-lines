@@ -306,7 +306,7 @@ def kinship(request):
             'file_name': file_name,
             'domain': attached_service.domain,
             'kin_q_id': kin.id,
-            'token': token}
+            'token': str(token)}
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother.id}/{father.id}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
