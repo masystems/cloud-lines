@@ -192,7 +192,8 @@ def coi(request):
 
     token, created = Token.objects.get_or_create(user=request.user)
 
-    data = '{"data_path": "%s", "file_name": "%s", "domain": "%s", "token": "%s"}' % (remote_output, file_name, attached_service.domain, token)
+    data = '{"data_path": "%s", "file_name": "%s", "domain": "%s", "token": "%s"}' % (
+    remote_output, file_name, attached_service.domain, token)
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
                             json=dumps(data, cls=DjangoJSONEncoder))
@@ -300,10 +301,12 @@ def kinship(request):
     kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father,
                                       file=file_name)
     kin.save()
+    token, created = Token.objects.get_or_create(user=request.user)
     data = {'data_path': remote_output,
             'file_name': file_name,
             'domain': attached_service.domain,
-            'kin_q_id': kin.id}
+            'kin_q_id': kin.id,
+            'token': token}
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother.id}/{father.id}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
