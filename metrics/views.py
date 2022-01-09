@@ -125,10 +125,13 @@ def data_validation(request):
 
     multi_part_upload_with_s3(local_output, remote_output)
 
+    token, created = Token.objects.get_or_create(user=request.user)
+
     data = {'data_path': remote_output,
             'file_name': file_name,
             'domain': attached_service.domain,
-            'dv_q_id': dv.id}
+            'dv_q_id': dv.id,
+            'token': str(token)}
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/data_validator/',
                             json=dumps(data, cls=DjangoJSONEncoder))
