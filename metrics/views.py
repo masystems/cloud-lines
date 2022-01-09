@@ -390,9 +390,12 @@ def mean_kinship(request):
 
         multi_part_upload_with_s3(local_output, remote_output)
 
+        token, created = Token.objects.get_or_create(user=request.user)
+
         data = {'data_path': remote_output,
                 'file_name': file_name,
-                'domain': attached_service.domain}
+                'domain': attached_service.domain,
+                'token': str(token)}
 
         coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
                                 json=dumps(data, cls=DjangoJSONEncoder), stream=True)
@@ -502,6 +505,8 @@ def stud_advisor(request):
 
     multi_part_upload_with_s3(local_output, remote_output)
 
+    token, created = Token.objects.get_or_create(user=request.user)
+
     mother_details = stud_advisor_mother_details(request, mother)
 
     data = {'data_path': remote_output,
@@ -510,7 +515,8 @@ def stud_advisor(request):
             'mother_id': mother.id,
             'mother_mk': mother.mean_kinship,
             'mother_breed_mean_coi': mother_details['breed_mean_coi'],
-            'mother_breed_mk_threshold': mother.breed.mk_threshold}
+            'mother_breed_mk_threshold': mother.breed.mk_threshold,
+            'token': str(token)}
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/stud_advisor/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
