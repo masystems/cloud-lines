@@ -192,8 +192,10 @@ def coi(request):
 
     token, created = Token.objects.get_or_create(user=request.user)
 
-    data = '{"data_path": "%s", "file_name": "%s", "domain": "%s", "token": "%s"}' % (
-    remote_output, file_name, attached_service.domain, token)
+    data = {'data_path': remote_output,
+            'file_name': file_name,
+            'domain': attached_service.domain,
+            'token': str(token)}
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
                             json=dumps(data, cls=DjangoJSONEncoder))
