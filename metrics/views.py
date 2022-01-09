@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.conf import settings
+from rest_framework.authtoken.models import Token
 from account.views import is_editor, get_main_account
 from pedigree.models import Pedigree
 from breed.models import Breed
@@ -16,7 +17,6 @@ import urllib.parse
 import urllib.request
 from time import time
 from boto3.s3.transfer import TransferConfig
-from threading import Thread
 from itertools import chain
 
 from account.views import has_permission, redirect_2_login
@@ -190,9 +190,12 @@ def coi(request):
 
     multi_part_upload_with_s3(local_output, remote_output)
 
+    token, created = Token.objects.get_or_create(user=request.user)
+
     data = {'data_path': remote_output,
             'file_name': file_name,
-            'domain': attached_service.domain}
+            'domain': attached_service.domain,
+            'token': str(token)}
 
     coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
                             json=dumps(data, cls=DjangoJSONEncoder))
@@ -300,10 +303,12 @@ def kinship(request):
     kin = KinshipQueue.objects.create(account=attached_service, user=request.user, mother=mother, father=father,
                                       file=file_name)
     kin.save()
+    token, created = Token.objects.get_or_create(user=request.user)
     data = {'data_path': remote_output,
             'file_name': file_name,
             'domain': attached_service.domain,
-            'kin_q_id': kin.id}
+            'kin_q_id': kin.id,
+            'token': str(token)}
 
     coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother.id}/{father.id}/kinship/',
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
