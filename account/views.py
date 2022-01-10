@@ -14,6 +14,7 @@ from django.utils.html import strip_tags
 from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings as django_settings
+from rest_framework.authtoken.models import Token
 from .models import UserDetail, AttachedService, AttachedBolton
 from cloud_lines.models import Service, Page, Bolton
 from pedigree.models import Pedigree
@@ -644,7 +645,7 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(object_custom_fields)
             object.save()
-        update_custom_fields(attached_service)
+        update_custom_fields(request, attached_service)
         return HttpResponse(json.dumps({'success': True}))
 
     elif request.POST.get('formType') == 'edit':
@@ -676,7 +677,7 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(custom_fields)
             object.save()
-        update_custom_fields(attached_service)
+        update_custom_fields(request, attached_service)
         return HttpResponse(json.dumps({'success': True}))
 
     elif request.POST.get('formType') == 'delete':
@@ -702,12 +703,13 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(custom_fields_updated)
             object.save()
-        update_custom_fields(attached_service)
+        update_custom_fields(request, attached_service)
         return HttpResponse(json.dumps({'success': True}))
 
 
-def update_custom_fields(attached_service):
-    data = '{"domain": "%s", "account": %s}' % (attached_service.domain, attached_service.id)
+def update_custom_fields(request, attached_service):
+    token, created = Token.objects.get_or_create(user=request.user)
+    data = '{"domain": "%s", "account": %s, "token": "%s"}' % (attached_service.domain, attached_service.id, token)
 
     # get auth token
     token_res = requests.post(url=urljoin(django_settings.ORCH_URL, '/api-token-auth/'),
