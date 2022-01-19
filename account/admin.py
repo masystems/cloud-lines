@@ -20,7 +20,15 @@ class UserDetailAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserDetail, UserDetailAdmin)
-admin.site.register(AttachedService)
+
+
+class AttachedServiceAdmin(admin.ModelAdmin):
+    list_display = ('user', 'service')
+    list_display_links = ['user', 'service']
+    search_fields = ('user', 'service')
+    list_filter = ('user', 'service')
+
+admin.site.register(AttachedService, AttachedServiceAdmin)
 
 
 class AttachedBoltonAdmin(admin.ModelAdmin):
