@@ -114,7 +114,7 @@ class PedigreeImageViews(viewsets.ModelViewSet):
 class BreederViews(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
     serializer_class = ApiBreederSerializer
-    filter_backends = [SearchFilter]
+    filter_backends = [DjangoFilterBackend]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
