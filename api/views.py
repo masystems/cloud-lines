@@ -115,6 +115,7 @@ class BreederViews(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
     serializer_class = ApiBreederSerializer
     filter_backends = [DjangoFilterBackend]
+    filter_fields = '__all__'
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
