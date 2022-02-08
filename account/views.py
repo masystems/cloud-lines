@@ -25,6 +25,7 @@ from approvals.models import Approval
 from money import Money
 from re import match
 from urllib.parse import urljoin
+from threading import Thread
 import random
 import string
 import stripe
@@ -645,7 +646,7 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(object_custom_fields)
             object.save()
-        update_custom_fields(request, attached_service)
+        Thread(target=update_custom_fields, args=(request, attached_service)).start()
         return HttpResponse(json.dumps({'success': True}))
 
     elif request.POST.get('formType') == 'edit':
@@ -677,7 +678,7 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(custom_fields)
             object.save()
-        update_custom_fields(request, attached_service)
+        Thread(target=update_custom_fields, args=(request, attached_service)).start()
         return HttpResponse(json.dumps({'success': True}))
 
     elif request.POST.get('formType') == 'delete':
@@ -703,7 +704,7 @@ def custom_field_edit(request):
 
             object.custom_fields = json.dumps(custom_fields_updated)
             object.save()
-        update_custom_fields(request, attached_service)
+        Thread(target=update_custom_fields, args=(request, attached_service)).start()
         return HttpResponse(json.dumps({'success': True}))
 
 
