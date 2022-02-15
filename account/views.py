@@ -369,10 +369,10 @@ def user_edit(request):
                 if request.POST.get(breed.breed_name):
                     breed.breed_admins.add(existing_user)
                     breed.save()
-                    # remove from other permissions
-                    main_account.admin_users.remove(existing_user)
-                    main_account.read_only_users.remove(existing_user)
-                    main_account.contributors.remove(existing_user)
+            # remove from other permissions
+            main_account.admin_users.remove(existing_user)
+            main_account.read_only_users.remove(existing_user)
+            main_account.contributors.remove(existing_user)
         elif request.POST.get('status') == 'Contributor':
             main_account.contributors.add(existing_user)
             # remove from other permissions
@@ -384,7 +384,7 @@ def user_edit(request):
             main_account.admin_users.remove(existing_user)
             main_account.contributors.remove(existing_user)
         main_account.save()
-        
+
         # set breeder
         # get old breeder and prefix if exists
         old_breeder = existing_user.breeder.all()
