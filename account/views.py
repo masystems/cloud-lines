@@ -352,10 +352,7 @@ def user_edit(request):
                 # error because breeder already has a user
                 return HttpResponse(json.dumps({'fail': True, 'msg': 'A User is already assigned to this Breeder!'}))
 
-        # remove user from admins and read only users and contributors
-        main_account.admin_users.remove(existing_user)
-        main_account.read_only_users.remove(existing_user)
-        main_account.contributors.remove(existing_user)
+        # remove user from breeds
         for breed in Breed.objects.filter(account=main_account):
             if not request.POST.get(breed.breed_name):
                 breed.breed_admins.remove(existing_user)
@@ -364,15 +361,29 @@ def user_edit(request):
         # add user to the request group
         if request.POST.get('status') == 'Editor':
             main_account.admin_users.add(existing_user)
+            # remove from other permissions
+            main_account.read_only_users.remove(existing_user)
+            main_account.contributors.remove(existing_user)
         elif request.POST.get('status') == 'Breed Editor':
             for breed in Breed.objects.filter(account=main_account):
                 if request.POST.get(breed.breed_name):
                     breed.breed_admins.add(existing_user)
                     breed.save()
+            # remove from other permissions
+            main_account.admin_users.remove(existing_user)
+            main_account.read_only_users.remove(existing_user)
+            main_account.contributors.remove(existing_user)
         elif request.POST.get('status') == 'Contributor':
             main_account.contributors.add(existing_user)
+            # remove from other permissions
+            main_account.admin_users.remove(existing_user)
+            main_account.read_only_users.remove(existing_user)
         else:
             main_account.read_only_users.add(existing_user)
+            # remove from other permissions
+            main_account.admin_users.remove(existing_user)
+            main_account.contributors.remove(existing_user)
+        main_account.save()
 
         # set breeder
         # get old breeder and prefix if exists
