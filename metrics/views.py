@@ -133,7 +133,7 @@ def data_validation(request):
             'dv_q_id': dv.id,
             'token': str(token)}
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/data_validator/',
+    coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, "/api/metrics/data_validator/"),
                             json=dumps(data, cls=DjangoJSONEncoder))
 
     response = {'status': 'success'}
@@ -200,7 +200,7 @@ def coi(request):
             'domain': attached_service.domain,
             'token': str(token)}
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/coi/',
+    coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, "/api/metrics/coi/"),
                             json=dumps(data, cls=DjangoJSONEncoder))
 
     #coi_dict = loads(coi_raw.json())
@@ -313,7 +313,7 @@ def kinship(request):
             'kin_q_id': kin.id,
             'token': str(token)}
 
-    coi_raw = requests.post(f'http://metrics.cloud-lines.com/api/metrics/{mother.id}/{father.id}/kinship/',
+    coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, f'/api/metrics/{mother.id}/{father.id}/kinship/'),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
     response = {'status': 'message',
@@ -400,7 +400,7 @@ def mean_kinship(request):
                 'domain': attached_service.domain,
                 'token': str(token)}
 
-        coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/mean_kinship/',
+        coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, '/api/metrics/mean_kinship/'),
                                 json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
         # coi_dict = loads(coi_raw.json())
@@ -521,7 +521,7 @@ def stud_advisor(request):
             'mother_breed_mk_threshold': mother.breed.mk_threshold,
             'token': str(token)}
 
-    coi_raw = requests.post('http://metrics.cloud-lines.com/api/metrics/stud_advisor/',
+    coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, '/api/metrics/stud_advisor/'),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
     sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name, mk_threshold=mother.breed.mk_threshold)
     response = {'status': 'message',
