@@ -16,7 +16,7 @@
         </div>
         <div class="col-md-6 col-4 align-self-center">
 
-            {% if editor or contributor %}
+            {% if editor or contributor or breeds_editable|length > 0 %}
                 <a href="{% url 'new_breed_group_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Create
                 </a>
             {% else %}
@@ -62,7 +62,7 @@
                                                 {% include 'relative.html' with pedigree=member %}
                                             {% endif %}
                                         {% endfor %}</td>
-                                    <td>{% if editor or contributor %}
+                                    <td>{% if editor or contributor or breeds_editable|length %}
                                             {% if group.state != 'approved' %}
                                                 <a href="{% url 'approvals' %}"><button class="btn btn-warning">Pending Approval</button></a>
                                             {% else %}

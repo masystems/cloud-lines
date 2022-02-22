@@ -167,7 +167,7 @@ def is_editor(user):
 
 def has_permission(request, permissions, pedigrees=[], breeder_users=[]):
     has_permission = False
-    
+
     try:
         account = get_main_account(request.user)
 
@@ -179,6 +179,7 @@ def has_permission(request, permissions, pedigrees=[], breeder_users=[]):
                 has_permission = True
         # if user is a breed admin
         elif Breed.objects.filter(account=account, breed_admins__in=[request.user]).exists():
+
             # if its a straight yes or no
             if permissions['breed_admin'] in (True, False):
                 if permissions['breed_admin']:

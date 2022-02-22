@@ -955,9 +955,14 @@ def create_approval(request, pedigree, attached_service, state, type):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 @never_cache
 def get_pedigree_details(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        return redirect_2_login(request)
     attached_service = get_main_account(request.user)
     
     # get the pedigree that was input
