@@ -20,12 +20,11 @@ def breed_groups(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def new_breed_group_form(request):
     breed_group_form = BreedGroupForm(request.POST or None, request.FILES or None)
     attached_service = get_main_account(request.user)
     
-    # check if user has permission, passing in ids of mother and father from kinship queue item
+    # check if user has permission
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
@@ -138,7 +137,6 @@ def new_breed_group_form(request):
 
 
 @login_required(login_url="/account/login")
-@user_passes_test(is_editor, "/account/login")
 def edit_breed_group_form(request, breed_group_name):
     breed_group = get_object_or_404(BreedGroup, id=breed_group_name)
 
