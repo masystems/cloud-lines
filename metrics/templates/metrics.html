@@ -571,10 +571,16 @@
             });
 
         });
-    
+
+    stopTableUpdate = false
     // function called every 10 seconds to update results table
-    window.setInterval(function(){
+    updateTable = window.setInterval(function(){
         // iterate through each row of results table
+        if (stopTableUpdate) {
+            clearInterval(updateTable)
+            warningMsg("Page timedout, refresh to see table updates.")
+            return
+        }
         $('.results-row').each(function (i, row) {
             // ignore if row is complete
             if ($(row).attr('complete') == 'False') {
@@ -613,7 +619,11 @@
                 });
             }
         })
-    }, 10000);
+    }, 1000)
+    function stopUpdate() {
+        stopTableUpdate = true
+    }
+    setTimeout(stopUpdate, 300000)
 </script>
 <script type="text/javascript" src="{% static 'js/jquery.sortElements.js' %}"></script>
 
