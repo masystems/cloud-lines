@@ -512,6 +512,9 @@ def stud_advisor(request):
 
     mother_details = stud_advisor_mother_details(request, mother)
 
+    sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name,
+                                         mk_threshold=mother.breed.mk_threshold)
+
     data = {'data_path': remote_output,
             'file_name': file_name,
             'domain': attached_service.domain,
@@ -519,11 +522,12 @@ def stud_advisor(request):
             'mother_mk': mother.mean_kinship,
             'mother_breed_mean_coi': mother_details['breed_mean_coi'],
             'mother_breed_mk_threshold': mother.breed.mk_threshold,
-            'token': str(token)}
+            'token': str(token),
+            'queue_id': sa.id}
 
     coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, '/api/metrics/stud_advisor/'),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-    sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name, mk_threshold=mother.breed.mk_threshold)
+
     response = {'status': 'message',
                 'msg': "",
                 'item_id': sa.id

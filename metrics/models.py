@@ -46,6 +46,8 @@ class StudAdvisorQueue(models.Model):
                                        help_text="This value is the mean kinship threshold of the breed of the mother "
                                                  "at the time this stud advice was created.",
                                        blank=True, null=True, default=0.0000)
+    failed = models.BooleanField(default=False)
+    failed_message = models.CharField(max_length=250)
 
 
 class DataValidatorQueue(models.Model):
