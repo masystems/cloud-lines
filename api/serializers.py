@@ -7,7 +7,7 @@ from breed.models import Breed
 from breed_group.models import BreedGroup
 from cloud_lines.models import Service, Faq, Bolton
 from account.models import AttachedService
-from metrics.models import KinshipQueue, DataValidatorQueue
+from metrics.models import KinshipQueue, DataValidatorQueue, StudAdvisorQueue
 from django.contrib.auth.models import User
 
 
@@ -163,4 +163,10 @@ class ApiKinshipSerializer(serializers.ModelSerializer):
 class ApiDataValidationSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataValidatorQueue
+        fields = '__all__'
+
+
+class ApiStudAdvisorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudAdvisorQueue
         fields = '__all__'
