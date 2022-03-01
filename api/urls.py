@@ -15,6 +15,7 @@ router.register('faq', views.FaqViews, basename='faq')
 router.register('bolton', views.BoltonViews, basename='bolton')
 router.register('kinship', views.KinshipViews, basename='kinship')
 router.register('data_validation', views.DataValidatorViews, basename='data_validation')
+router.register('stud_advisor', views.StudAdvisorViews, basename='stud_advisor')
 router.register('attached-service', views.AttachedServiceViews, basename='AttachedService')
 #router.register('authenticate', views.Authenticate)
 

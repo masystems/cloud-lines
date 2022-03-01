@@ -14,6 +14,7 @@ from .serializers import ApiLargeTierQueueSerializer, \
     ApiKinshipSerializer, \
     ApiDataValidationSerializer, \
     ApiServiceSerializer, \
+    ApiStudAdvisorSerializer, \
     ApiAuthentication
 from cloud_lines.models import LargeTierQueue
 from reports.models import ReportQueue
@@ -23,7 +24,7 @@ from breed.models import Breed
 from breed_group.models import BreedGroup
 from cloud_lines.models import Service, Faq, Bolton
 from account.models import UserDetail, AttachedService
-from metrics.models import KinshipQueue, DataValidatorQueue
+from metrics.models import KinshipQueue, DataValidatorQueue, StudAdvisorQueue
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import permission_classes
@@ -187,6 +188,17 @@ class DataValidatorViews(viewsets.ModelViewSet):
         main_account = get_main_account(user)
         return DataValidatorQueue.objects.all()
 
+
+class StudAdvisorViews(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication)
+    serializer_class = ApiStudAdvisorSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        main_account = get_main_account(user)
+        return StudAdvisorQueue.objects.all()
 
 ########## Auth ###########
 from rest_framework.authtoken.views import ObtainAuthToken
