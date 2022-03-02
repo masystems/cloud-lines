@@ -527,12 +527,18 @@ def stud_advisor(request):
 
     coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, '/api/metrics/stud_advisor/'),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
-
-    response = {'status': 'message',
-                'msg': "",
-                'item_id': sa.id
-                }
-    return HttpResponse(dumps(response))
+    if coi_raw.status_code == 200:
+        response = {'status': 'message',
+                    'msg': "",
+                    'item_id': sa.id
+                    }
+        return HttpResponse(dumps(response))
+    else:
+        response = {'status': 'fail',
+                    'msg': "Failed to communicate with the server!",
+                    'item_id': ''
+                    }
+        return HttpResponse(dumps(response))
 
 
 def stud_advisor_results(request, id):
