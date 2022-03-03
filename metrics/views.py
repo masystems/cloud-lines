@@ -2,7 +2,7 @@ from django.shortcuts import render, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.conf import settings
 from rest_framework.authtoken.models import Token
-from account.views import is_editor, get_main_account
+from account.views import is_editor, get_main_account, send_mail
 from pedigree.models import Pedigree
 from breed.models import Breed
 from django.core.serializers.json import DjangoJSONEncoder
@@ -534,6 +534,8 @@ def stud_advisor(request):
                     }
         return HttpResponse(dumps(response))
     else:
+        sa.delete()
+        send_mail('Metrics server down', "Metrics", "Check Metrics server")
         response = {'status': 'fail',
                     'msg': "Failed to communicate with the server!",
                     'item_id': ''
