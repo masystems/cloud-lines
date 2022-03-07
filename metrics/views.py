@@ -316,10 +316,18 @@ def kinship(request):
     coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, f'/api/metrics/{mother.id}/{father.id}/kinship/'),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
-    response = {'status': 'message',
-                'msg': "",
-                'item_id': kin.id
-                }
+    if coi_raw.status_code == 200:
+        response = {'status': 'message',
+                    'msg': "",
+                    'item_id': kin.id
+                    }
+    else:
+        kin.delete()
+        send_mail('Metrics server down', "Metrics", "Check Metrics server")
+        response = {'status': 'fail',
+                    'msg': "Failed to communicate with the server!",
+                    'item_id': ''
+                    }
     return HttpResponse(dumps(response))
 
 
