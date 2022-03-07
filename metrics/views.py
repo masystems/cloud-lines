@@ -7,7 +7,7 @@ from pedigree.models import Pedigree
 from breed.models import Breed
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import CoiLastRun, MeanKinshipLastRun, StudAdvisorQueue, KinshipQueue, DataValidatorQueue
-from json import dumps, loads, load
+from json import dumps, loads
 from datetime import datetime, timedelta
 import logging
 import requests
@@ -588,7 +588,15 @@ def results_complete(request):
     # get queue item
     stud_item = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
     kin_item = KinshipQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
-    queue_items = sorted(chain(stud_item, kin_item))
+    if stud_item.count() > 0:
+        res = sort_queue_items(stud_item)
+        return res
+    if kin_item.count() > 0:
+        res = sort_queue_items(kin_item)
+        return res
+
+
+def sort_queue_items(queue_items):
     if len(queue_items) > 0:
         # process only the first item in the queue list
         item = queue_items[0]
