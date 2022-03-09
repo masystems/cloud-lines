@@ -7,7 +7,7 @@ from pedigree.models import Pedigree
 from breed.models import Breed
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import CoiLastRun, MeanKinshipLastRun, StudAdvisorQueue, KinshipQueue, DataValidatorQueue
-from json import dumps, loads, load
+from json import dumps, loads
 from datetime import datetime, timedelta
 import logging
 import requests
@@ -316,10 +316,18 @@ def kinship(request):
     coi_raw = requests.post(urllib.parse.urljoin(settings.METRICS_URL, f'/api/metrics/{mother.id}/{father.id}/kinship/'),
                             json=dumps(data, cls=DjangoJSONEncoder), stream=True)
 
-    response = {'status': 'message',
-                'msg': "",
-                'item_id': kin.id
-                }
+    if coi_raw.status_code == 200:
+        response = {'status': 'message',
+                    'msg': "",
+                    'item_id': kin.id
+                    }
+    else:
+        kin.delete()
+        send_mail('Metrics server down', "Metrics", "Check Metrics server")
+        response = {'status': 'fail',
+                    'msg': "Failed to communicate with the server!",
+                    'item_id': ''
+                    }
     return HttpResponse(dumps(response))
 
 
@@ -578,33 +586,34 @@ def stud_advisor_results(request, id):
 
 def results_complete(request):
     # get queue item
-    stud_item = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
-    kin_item = KinshipQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
-    queue_items = sorted(chain(stud_item, kin_item))
-    if len(queue_items) > 0:
-        # process only the first item in the queue list
-        item = queue_items[0]
-        # check if item is complete
-        tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
-        results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
-
-        # set item to complete if it's true
-        try:
-            # for kinship queue items that don't create a result file on s3
-            if item.result:
-                item.complete = True
-                item.save()
-        except AttributeError:
-            pass
-
-        if results_file.status_code == 200:
-            item.complete = True
-            item.save()
-
+    stud_items = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
+    kin_items = KinshipQueue.objects.filter(id=request.POST.get('item_id'),
+                                           result__isnull=False,
+                                           complete=True)
+    if stud_items.count() > 0:
+        res = get_results_from_s3(stud_items)
+        return res
+    if kin_items.count() > 0:
+        item = kin_items[0]
         return HttpResponse(dumps({'result': 'success', 'complete': item.complete}))
-    # queue item not found
+
+
+def get_results_from_s3(queue_items):
+
+    # process only the first item in the queue list
+    item = queue_items[0]
+    # check if item is complete
+    tld = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/"
+    results_file = requests.get(urllib.parse.urljoin(tld, f"metrics/results-{item.file}"))
+
+    if results_file.status_code == 200:
+        item.complete = True
+        item.save()
     else:
+        # queue item not found
         return HttpResponse(dumps({'result': 'fail'}))
+
+    return HttpResponse(dumps({'result': 'success', 'complete': item.complete}))
 
 
 def poprep_export(request):
