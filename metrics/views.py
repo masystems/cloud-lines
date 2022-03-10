@@ -586,10 +586,27 @@ def stud_advisor_results(request, id):
 
 def results_complete(request):
     # get queue item
-    stud_items = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'), complete=False)
+    stud_items = StudAdvisorQueue.objects.filter(id=request.POST.get('item_id'),
+                                                 complete=False,
+                                                 failed=False)
     kin_items = KinshipQueue.objects.filter(id=request.POST.get('item_id'),
-                                           result__isnull=False,
-                                           complete=True)
+                                            result__isnull=False,
+                                            complete=True,
+                                            failed=False)
+    hrs24 = datetime.now() - timedelta(days=1)
+    for stud in stud_items:
+        if stud.created < hrs24:
+            stud.failed = True
+            stud.complete = True
+            stud.save()
+            return HttpResponse(dumps({'result': 'fail', 'status': 'expired'}))
+    for kin in kin_items:
+        if kin.created < hrs24:
+            kin.failed = True
+            kin.complete = True
+            kin.save()
+            return HttpResponse(dumps({'result': 'fail', 'status': 'expired'}))
+
     if stud_items.count() > 0:
         res = get_results_from_s3(stud_items)
         return res

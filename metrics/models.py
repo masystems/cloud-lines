@@ -32,6 +32,7 @@ class KinshipQueue(models.Model):
     email_sent = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False)
+    failed = models.BooleanField(default=False)
 
 
 class StudAdvisorQueue(models.Model):
