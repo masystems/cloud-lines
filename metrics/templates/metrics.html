@@ -350,7 +350,15 @@
                                     <td>Stud Advisor: {{ item.mother.reg_no }}</td>
                                 {% endif %}
                                 <td>{{ item.created }}</td>
-                                <td class="complete">{% if item.complete %}<i class="fad fa-check text-success"></i>{% else %}<i class="fas fa-cog fa-spin text-info"></i>{% endif %}</td>
+                                <td class="complete">
+                                    {% if item.complete and not item.failed %}
+                                        <i class="fad fa-check text-success"></i>
+                                    {% elif item.complete and item.failed %}
+                                        <i class="fad fa-times text-danger"></i>
+                                    {% else %}
+                                        <i class="fas fa-cog fa-spin text-info"></i>
+                                    {% endif %}
+                                </td>
                                 {% if item.father %}
                                     <td class="results"><a href="{% url 'kinship_results' item.id %}">
                                         <button class="btn btn-info" {% if not item.complete or not editor and item.mother.breed.breed_name not in breeds_editable and item.father.breed.breed_name not in breeds_editable and not contributor %}disabled{% endif %}>View</button> 
@@ -613,7 +621,8 @@
                             }
                         } else {
                             // queue item with the given id doesn't exist
-                            console.log('failed to update results table');
+                            $(row).attr('complete', 'True');
+                            $(row).find('td[class*="complete"]').html('<i class="fad fa-times text-danger"></i>');
                         }
                     }
                 });
