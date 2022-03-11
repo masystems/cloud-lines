@@ -619,7 +619,7 @@
                                     $(row).find('td[class*="results"]').html('<a href="stud_advisor_results/' + itemId + '"><button class="btn btn-info">View</button> </a> ');
                                 }
                             }
-                        else if (result.status == 'expired') {
+                        } else if (result.status == 'expired') {
                             $(row).attr('complete', 'True');
                             $(row).find('td[class*="complete"]').html('<i class="fad fa-times text-danger"></i>');
                         } else {
