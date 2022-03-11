@@ -613,6 +613,7 @@ def results_complete(request):
     if kin_items.count() > 0:
         item = kin_items[0]
         return HttpResponse(dumps({'result': 'success', 'complete': item.complete}))
+    return HttpResponse(dumps({'result': 'fail'}))
 
 
 def get_results_from_s3(queue_items):
