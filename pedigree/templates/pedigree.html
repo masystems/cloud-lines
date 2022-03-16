@@ -150,7 +150,12 @@ vertical-align: middle;
                         </div>
                         {% if editor or contributor %}
                             <form action="{% url 'image_upload' lvl1.id %}" class="dropzone" id="imageUploads"></form>
-                            <script src="{% static 'assets/plugins/dropzone-master/dist/dropzone.js' %}"></script>
+                            <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+                            <link
+                              rel="stylesheet"
+                              href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css"
+                              type="text/css"
+                            />
                             <script>
                                 Dropzone.options.imageUploads= {
                                 url: "{% url 'image_upload' lvl1.id %}",
