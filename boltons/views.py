@@ -110,7 +110,6 @@ def change_bolton_state(request, bolton_id, req_state):
 
     # if deactivation request
     elif req_state == "disable":
-        print("deactivate")
         attached_bolton = AttachedBolton.objects.get(bolton=bolton['id'], active=True)
         # ensure bolton is deactivated
         attached_bolton.active = False

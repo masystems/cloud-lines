@@ -945,14 +945,38 @@
                                                                         <p>Create a subscription payment of £{{ active_bolton.bolton.price }} per month.</p>
                                                                         <button type="button" class="btn btn-danger"
                                                                             data-dismiss="modal">Close</button>
-                                                                        <a href="{% url 'change_bolton_state' bolton.id 'enable' %}">
-                                                                            <button type="button" class="btn btn-secondary">
+                                                                            <button id="enable{{ bolton.id }}" type="button" class="btn btn-secondary">
                                                                                     Confirm</button>
-                                                                        </a>
+                                                                        <p id="procMsg{{ bolton.id }}" class="d-none mt-2">Processing... page will now refresh when completed.</p>
                                                                     </div>
                                                                 </div><!-- /.modal-content -->
                                                             </div><!-- /.modal-dialog -->
                                                         </div><!-- /.modal -->
+                                                        <script>
+                                                            $('#enable{{ bolton.id }}').click( function() {
+                                                                $('#enable{{ bolton.id }}').prop('disabled', true);
+                                                                $('#procMsg{{ bolton.id }}').removeClass('d-none')
+                                                                $.ajax({
+                                                                    url: "{% url 'change_bolton_state' bolton.id 'enable' %}",
+                                                                    type: 'GET',
+                                                                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                                                    dataType: 'text',
+                                                                    success: function(data) {
+                                                                        result = JSON.parse(data);
+
+                                                                        if (result.result == 'success') {
+                                                                            $('#varification{{ active_bolton.id }}').modal('toggle')
+                                                                            location.reload();
+                                                                        } else {
+                                                                            // queue item with the given id doesn't exist
+                                                                            errorMsg("Failed to enable bolton")
+                                                                            $('#procMsg{{ bolton.id }}').html(result.feedback)
+                                                                            $('#enable{{ bolton.id }}').prop('disabled', false);
+                                                                        }
+                                                                    }
+                                                                });
+                                                            });
+                                                        </script>
                                                     {% endif %}
                                                 </td>
                                             </tr>
