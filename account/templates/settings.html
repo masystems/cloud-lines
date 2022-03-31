@@ -914,15 +914,15 @@
                                                 <td>£{{ bolton.price }}</td>
                                                 <td>{{ bolton.description}}</td>
                                                 <td>{% if bolton.active %}
-                                                        <button class="btn btn-warning" data-toggle="modal" data-target="#deactivate{{ active_bolton.id }}"  value="{{ active_bolton.id }}">Deactivate</button>
+                                                        <button class="btn btn-warning" data-toggle="modal" data-target="#deactivate{{ bolton.id }}"  value="{{ bolton.id }}">Deactivate</button>
                                                         <!-- Modal -->
-                                                        <div id="deactivate{{ active_bolton.id }}" class="modal fade" tabindex="-1" role="dialog"
+                                                        <div id="deactivate{{ bolton.id }}" class="modal fade" tabindex="-1" role="dialog"
                                                             aria-labelledby="multiple-twoModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog">
                                                                 <div class="modal-content modal-filled bg-warning">
                                                                     <div class="modal-body p-4 text-white">
-                                                                        <h5 class="mt-0">Deactivate {{ active_bolton.bolton.name }}</h5>
-                                                                        <p>Cancel your subscription payment of £{{ active_bolton.bolton.price }} per month.</p>
+                                                                        <h5 class="mt-0">Deactivate {{ bolton.name }}</h5>
+                                                                        <p>Cancel your subscription payment of £{{ bolton.price }} per month?</p>
                                                                         <button type="button" class="btn btn-danger"
                                                                             data-dismiss="modal">Close</button>
                                                                         <a href="{% url 'change_bolton_state' bolton.id 'disable' %}">
@@ -934,15 +934,15 @@
                                                             </div><!-- /.modal-dialog -->
                                                         </div><!-- /.modal -->
                                                     {% else %}
-                                                        <button class="btn btn-success" data-toggle="modal" data-target="#varification{{ active_bolton.id }}" value="{{ active_bolton.id }}">Activate</button>
+                                                        <button class="btn btn-success" data-toggle="modal" data-target="#varification{{ bolton.id }}" value="{{ bolton.id }}">Activate</button>
                                                         <!-- Modal -->
-                                                        <div id="varification{{ active_bolton.id }}" class="modal fade" tabindex="-1" role="dialog"
+                                                        <div id="varification{{ bolton.id }}" class="modal fade" tabindex="-1" role="dialog"
                                                             aria-labelledby="multiple-twoModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog">
                                                                 <div class="modal-content modal-filled bg-success">
                                                                     <div class="modal-body p-4 text-white">
-                                                                        <h5 class="mt-0">Activate {{ active_bolton.bolton.name }}</h5>
-                                                                        <p>Create a subscription payment of £{{ active_bolton.bolton.price }} per month.</p>
+                                                                        <h5 class="mt-0">Activate {{ bolton.bolton.name }}</h5>
+                                                                        <p>Create a subscription payment of £{{ bolton.price }} per month? <strong class="text-danger">This will create a charge on the attached card.</strong></p>
                                                                         <button type="button" class="btn btn-danger"
                                                                             data-dismiss="modal">Close</button>
                                                                             <button id="enable{{ bolton.id }}" type="button" class="btn btn-secondary">
@@ -965,7 +965,7 @@
                                                                         result = JSON.parse(data);
 
                                                                         if (result.result == 'success') {
-                                                                            $('#varification{{ active_bolton.id }}').modal('toggle')
+                                                                            $('#varification{{ bolton.id }}').modal('toggle')
                                                                             location.reload();
                                                                         } else {
                                                                             // queue item with the given id doesn't exist
