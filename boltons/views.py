@@ -46,6 +46,8 @@ def change_bolton_state(request, bolton_id, req_state):
     except:
         return redirect('settings')
 
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
     # if activation request
     if req_state == "enable":
         # ensure bolton is not already active
@@ -81,10 +83,10 @@ def change_bolton_state(request, bolton_id, req_state):
                           # 'receipt': receipt.data[0].receipt_url
                           }
 
-                AttachedBolton.objects.get_or_create(bolton=bolton['id'],
-                                                     stripe_sub_id=subscription.id,
-                                                     increment="monthly",
-                                                     active=True)
+                AttachedBolton.objects.create(bolton=bolton['id'],
+                                              stripe_sub_id=subscription.id,
+                                              increment="monthly",
+                                              active=True)
 
                 # send confirmation email
                 body = f"""<p>This email confirms the successful creation of your new Cloud-Lines bolton.
@@ -99,14 +101,9 @@ def change_bolton_state(request, bolton_id, req_state):
                                 """
                 send_mail(f"New Bolton Added: {bolton['name']}",
                            request.user.get_full_name(), body,
-                           send_to=request.user.email)  # , reply_to=request.user.email)
-                # send_email(f"Organisation Confirmation: {membership_package.organisation_name}",
-                # request.user.get_full_name(), body, reply_to=request.user.email)
+                           send_to=request.user.email)
 
                 return HttpResponse(dumps(result))
-        # check valid payment option exists
-        # set up subscription in stripe
-        # enable bolt on
 
     # if deactivation request
     elif req_state == "disable":
