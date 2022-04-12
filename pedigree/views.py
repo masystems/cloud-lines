@@ -323,49 +323,6 @@ def generate_hirearchy(context):
     return context
 
 
-# @login_required(login_url="/account/login")
-# def search_results(request):
-#     if request.POST:
-#         attached_service = get_main_account(request.user)
-#         search_string = request.POST['search']
-
-#         columns, column_data = get_site_pedigree_column_headings(attached_service)
-
-#         # lvl 1
-#         try:
-#             pedigrees = Pedigree.objects.filter(Q(account=attached_service,
-#                                                 reg_no__icontains=search_string.upper()) | Q(account=attached_service,
-#                                                                       name__icontains=search_string)).exclude(state='unapproved').values('id', *columns)[:500]
-
-#         except ObjectDoesNotExist:
-#             breeders = Breeder.objects
-#             error = "No pedigrees found using: "
-#             return render(request, 'search.html', {'breeders': breeders,
-#                                                    'error': error,
-#                                                    'search_string': search_string})
-
-#         if len(pedigrees) > 1:
-#             return render(request, 'multiple_results.html', {'search_string': search_string,
-#                                                              'pedigrees': pedigrees,
-#                                                              'columns': columns,
-#                                                              'column_data': column_data})
-#         else:
-#             try:
-#                 lvl1 = Pedigree.objects.exclude(state='unapproved').get(Q(account=attached_service,
-#                                                                           reg_no__icontains=search_string.upper()) | Q(account=attached_service,
-#                                                                                                                       name__icontains=search_string))
-#             except ObjectDoesNotExist:
-#                 breeders = Breeder.objects
-#                 error = "No pedigrees found using: "
-#                 return render(request, 'search.html', {'breeders': breeders,
-#                                                        'error': error,
-#                                                        'search_string': search_string,
-#                                                        'columns': columns,
-#                                                        'column_data': column_data})
-
-#         return redirect('pedigree', pedigree_id=lvl1.id)
-
-
 @login_required(login_url="/account/login")
 @never_cache
 def new_pedigree_form(request):

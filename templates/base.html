@@ -223,24 +223,32 @@
                             class="hide-menu"> Metrics</span></a></li>
                     {% endif %}
 
-
-                    {% if editor or breeds_editable|length > 0 %}
-                        <li><a href="{% url 'reports' %}"><i class="fad fa-file-chart-line"></i><span
-                                class="hide-menu"> Reports</span></a></li>
+                    {% if service.boltons.all %}
+                    <li>
+                        <a class="has-arrow " href="#" aria-expanded="false"><i class="fad fa-puzzle-piece"></i><span
+                                class="hide-menu"> Boltons</span></a>
+                        <ul aria-expanded="false" class="collapse">
+                            {% if birth_notification %}
+                                <li><a href="{% url 'bn_home' %}">Birth Notifications</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
                     {% endif %}
-
 
                     {% if editor %}
                     <li>
-                        <a class="has-arrow " href="#" aria-expanded="false"><i class="fad fa-arrow-alt-circle-down"></i><span
-                                class="hide-menu"> Impex Database</span></a>
+                        <a class="has-arrow " href="#" aria-expanded="false"><i class="fad fa-wrench"></i><span
+                                class="hide-menu"> Tools</span></a>
                         <ul aria-expanded="false" class="collapse">
-                            {% if add_pedigree %}
-                                <li><a href="{% url 'import' %}">Import</a></li>
-                            {% else %}
-                                <li><a href="#" data-toggle="modal" data-target="#upgrade">Import</a></li>
+                            {% if editor or breeds_editable|length > 0 %}
+                                <li><a href="{% url 'reports' %}">Reports</a></li>
                             {% endif %}
-                            <li><a href="{% url 'export' %}">Export</a></li>
+                            {% if add_pedigree %}
+                                <li><a href="{% url 'import' %}">Import Database</a></li>
+                            {% else %}
+                                <li><a href="#" data-toggle="modal" data-target="#upgrade">Import Database</a></li>
+                            {% endif %}
+                            <li><a href="{% url 'export' %}">Export Database</a></li>
                         </ul>
                     </li>
                     {% endif %}
@@ -296,7 +304,7 @@
         <!-- footer -->
         <!-- ============================================================== -->
         <footer class="footer">
-            ©2022 MA Systems Ltd | V2.3
+            ©2022 MA Systems Ltd | V2.4
         </footer>
         <!-- ============================================================== -->
         <!-- End footer -->

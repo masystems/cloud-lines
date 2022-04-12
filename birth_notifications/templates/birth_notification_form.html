@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block header %}
+
+    <script src="{% static 'assets/plugins/jsPDF-1.3.2/dist/jspdf.min.js' %}"></script>
+    <script src="https://unpkg.com/jspdf-autotable"></script>
+{% endblock %}
+
+
+{% block content %}
+<style>
+    table th {
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+<!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Birth Notification Form</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item">Birth Notifications</li>
+                <li class="breadcrumb-item active">Form</li>
+            </ol>
+        </div>
+        <div class="col-md-6 col-3 align-self-center">
+
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+
+    <div class="row">
+        <div class="col-xl-9 col-lg-9">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Birth Notification Form</h4>
+
+                    <form id="bnForm" method="POST">
+                        {% csrf_token %}
+                        <div class="form-row">
+
+                            {% for field in bn_form.visible_fields %}
+                                <div class="col-md-6 pt-2">
+                                    {% if field.label == 'Mother' %}
+                                        <div id="mothers-alive">
+                                            <label class="col-sm-6 col-form-label">{{ field.label }}</label>
+                                            <input id="id_mother" class="typeahead form-control mt-2" name='motherx' type="text" placeholder="{{ service.mother_title }}" required>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <!-- hidden note which will show name and tag number of female if reg number has a match -->
+                                            <ul class="list-icons d-none" id="mother-info"></ul>
+                                        </div>
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    {% elif field.label == 'Father' %}
+                                        <div id="fathers-alive">
+                                            <label class="col-sm-6 col-form-label">{{ field.label }}</label>
+                                            <input id="id_father" class="typeahead form-control mt-2" name='fatherx' type="text" placeholder="{{ service.father_title }}" required>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <!-- hidden note which will show name and tag number of male if reg number has a match -->
+                                            <ul class="list-icons d-none" id="father-info"></ul>
+                                        </div>
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <label class="col-sm-6 col-form-label">{{ field.label }}</label>
+                                        {{ field|attr:"class:form-control" }}
+                                        {{ field.help_text }}
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button class="btn btn-success float-right" type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Information</h4>
+                    <p>Can have some information here?</p>
+
+                    <hr>
+                    <p>and some information here?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block footer %}
+    <!-- code for the reg number field typeaheads -->
+    {% include 'ta_metrics.html' %}
+
+{% endblock %}

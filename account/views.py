@@ -121,8 +121,13 @@ def site_mode(request):
         else:
             add_breed = True
 
+        # boltons
+        # default values
+        birth_notification = False
+
         return {'service': attached_service,
                 'attached_services': attached_services,
+                'birth_notification': attached_service.boltons.filter(bolton="1").exists(),
                 'add_pedigree': pedigrees,
                 'admins': admins,
                 'users': users,

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Bolton
+from cloud_lines.models import Bolton
 
 
 class BoltonAdmin(admin.ModelAdmin):

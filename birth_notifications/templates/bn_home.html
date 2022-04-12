@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Birth Notifications</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active">Birth Notifications</li>
+            </ol>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+        <!-- Start Page Content -->
+        <!-- ============================================================== -->
+        <!-- Row -->
+        <div class="row">
+            <!-- Column -->
+            <div class="col-md-8 col-lg-8 col-xlg-8">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3 col-xlg-3">
+                        <div class="card card-inverse card-info">
+                            <a href="{% url 'birth_notification_form' %}">
+                                <div class="box text-center">
+                                    <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
+                                    <h6 class="text-white">Add New Birth</h6>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Column -->
+                    <div class="col-md-6 col-lg-3 col-xlg-3">
+                        <div class="card card-inverse card-success">
+                            <a href="{% url 'new_breeder_form' %}">
+                                <div class="box text-center">
+                                    <h1 class="font-light text-white" id="livingValue">{{ total_living }}</h1>
+                                    <h6 class="text-white">Total Living</h6>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Column -->
+                    <div class="col-md-6 col-lg-3 col-xlg-3">
+                        <div class="card card-inverse card-dark">
+                            <a href="#" data-toggle="modal" data-target="#upgrade">
+                                <div class="box text-center">
+                                    <h1 class="font-light text-white" id="deceasedValue">{{ total_deceased }}</h1>
+                                    <h6 class="text-white">Total Dead</h6>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Column -->
+                    <div class="col-md-6 col-lg-3 col-xlg-3">
+                        <div class="card card-inverse card-primary">
+                            <div class="box text-center">
+                                <h1 class="font-light text-white" id="bnValue">{{ birth_notifications|length }}</h1>
+                                <h6 class="text-white">Total Notifications</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        function animateValue(obj, start, end, duration) {
+                          let startTimestamp = null;
+                          const step = (timestamp) => {
+                            if (!startTimestamp) startTimestamp = timestamp;
+                            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                            obj.innerHTML = Math.floor(progress * (end - start) + start);
+                            if (progress < 1) {
+                              window.requestAnimationFrame(step);
+                            }
+                          };
+                          window.requestAnimationFrame(step);
+                        }
+
+                        const livingObj = document.getElementById("livingValue");
+                        animateValue(livingObj, 0, {{ total_living }}, 1000);
+
+                        const deceasedObj = document.getElementById("deceasedValue");
+                        animateValue(deceasedObj, 0, {{ total_deceased }}, 1000);
+
+                        const bnObj = document.getElementById("bnValue");
+                        animateValue(bnObj, 0, {{ birth_notifications|length }}, 1000);
+                    </script>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-4 col-xlg-4">
+                <!-- Card -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex no-block align-items-center">
+                            <h4 class="card-title">Latest Births Added</h4>
+                        </div>
+                        <div class="table-responsive mt-2">
+                            <table class="table stylish-table">
+                                <thead>
+                                    <tr>
+                                        <th>BN No.</th>
+                                        <th>Living</th>
+                                        <th>Deceased</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for notification in birth_notifications.all reversed %}
+                                        <tr onclick="window.location='{% url 'bn_home' %}';" style="cursor: pointer;">
+                                            <td>{{ notification.bn_number }}</td>
+                                            <td>{{ notification.living_males|add:notification.living_females }}</td>
+                                            <td>{{ notification.deceased_males|add:notification.deceased_females }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Row -->
+        <div class="row">
+<!-- Column -->
+
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- End PAge Content -->
+        <!-- ============================================================== -->
+
+{% endblock %}
