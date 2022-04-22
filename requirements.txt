@@ -67,7 +67,7 @@ pycparser==2.19
 pydot==1.4.1
 pyheif==0.5.1
 pyparsing==2.4.6
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 Pyphen==0.9.5
 python-dateutil==2.6.1
 python-jsonrpc-server==0.3.4
