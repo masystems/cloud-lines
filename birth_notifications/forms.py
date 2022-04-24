@@ -7,7 +7,7 @@ class BirthNotificationForm(forms.ModelForm):
     class Meta:
         model = BirthNotification
         fields = '__all__'
-        exclude = ('account', 'user', 'attached_bolton')
+        exclude = ('account', 'user', 'attached_bolton', 'births', 'complete')
         help_texts = {
             # 'breed_name': _('e.g. Greyhound, Siamese, Shetland, etc'),
             # 'image': _('A great picture to depict the breed.'),

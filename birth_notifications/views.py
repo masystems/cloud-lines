@@ -6,7 +6,7 @@ from django.views.generic.base import TemplateView
 from django.conf import settings
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from account.models import AttachedBolton
-from .models import BirthNotification
+from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm
 from pedigree.models import Pedigree
 import re
@@ -31,15 +31,19 @@ class BnHome(BirthNotificationBase):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        total_living = 0
-        total_deceased = 0
-        for bn in context['birth_notifications']:
-            total_living += bn.living_males
-            total_living += bn.living_females
-            total_deceased += bn.deceased_males
-            total_deceased += bn.deceased_females
-        context['total_living'] = total_living
-        context['total_deceased'] = total_deceased
+        context['total_living'] = BnChild.objects.filter(status="alive").count()
+        context['total_deceased'] = BnChild.objects.filter(status="deceased").count()
+        context['approvals'] = BirthNotification.objects.filter(complete=False)
+        return context
+
+
+class BirthNotificationView(BirthNotificationBase):
+    template_name = 'birth_notification.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['bn'] = BirthNotification.objects.get(id=self.kwargs['id'])
         return context
 
 

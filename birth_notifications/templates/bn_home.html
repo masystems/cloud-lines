@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block header %}
+    <link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 
     <!-- ============================================================== -->
@@ -90,6 +95,49 @@
                         animateValue(bnObj, 0, {{ birth_notifications|length }}, 1000);
                     </script>
                 </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Approvals</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>User</th>
+                                                <th>Births</th>
+                                                <th>BN No.</th>
+                                                <th>Date Added</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for approval in approvals %}
+                                                <tr>
+                                                    <td>
+                                                        {{ approval.user.get_full_name }}
+                                                    </td>
+                                                    <td>
+                                                        {{ approval.births.count }}
+                                                    </td>
+                                                    <td>
+                                                        {{ approval.bn_number }}
+                                                    </td>
+                                                    <td>
+                                                        {{ approval.date_added }}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'birth_notification' approval.id %}"><i class="fad fa-search text-info pl-2"></i></a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="col-md-4 col-lg-4 col-xlg-4">
@@ -104,7 +152,7 @@
                                 <thead>
                                     <tr>
                                         <th>BN No.</th>
-                                        <th>Living</th>
+                                        <th>Births</th>
                                         <th>Deceased</th>
                                     </tr>
                                 </thead>
@@ -112,8 +160,8 @@
                                     {% for notification in birth_notifications.all reversed %}
                                         <tr onclick="window.location='{% url 'bn_home' %}';" style="cursor: pointer;">
                                             <td>{{ notification.bn_number }}</td>
-                                            <td>{{ notification.living_males|add:notification.living_females }}</td>
-                                            <td>{{ notification.deceased_males|add:notification.deceased_females }}</td>
+                                            <td>{{ notification.births.all.count }}</td>
+                                            <td>{{ notification.births.all.count }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>

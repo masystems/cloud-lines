@@ -24,7 +24,7 @@
             <h3 class="text-themecolor m-b-0 m-t-0">Birth Notification Form</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-                <li class="breadcrumb-item">Birth Notifications</li>
+                <li class="breadcrumb-item"><a href="{% url 'bn_home' %}">Birth Notifications</a></li>
                 <li class="breadcrumb-item active">Form</li>
             </ol>
         </div>
@@ -84,9 +84,109 @@
                                     {% endif %}
                                 </div>
                             {% endfor %}
+
+                            <div class="row pt-2">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <!-- Table -->
+                                            <table id="birthTable" class="table table-responsive">
+                                                <tr>
+                                                    <th>Tag No.</th>
+                                                    <th>Status</th>
+                                                    <th>sex</th>
+                                                    <th></th>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <input type="text" class="form-control">
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-control">
+                                                            <option value="alive">Alive</option>
+                                                            <option value="deceased">Deceased</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-control">
+                                                            <option value="male">Male</option>
+                                                            <option value="female">Female</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><button class="btn" onclick="DeleteRow(this)"><i class="fad fa-trash-alt fa-lg text-danger"></i></button></td>
+                                                </tr>
+                                            </table>
+                                            <button id="addRow" type="button" class="btn btn-outline-success">Add new row</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <button class="btn btn-success float-right" type="submit">Submit</button>
                     </form>
+                    <script>
+                        function DeleteRow(o) {
+                         //no clue what to put here?
+                         var p=o.parentNode.parentNode;
+                             p.parentNode.removeChild(p);
+                        }
+
+                        function addRow(){
+                            var birthTable = document.getElementById('birthTable');
+                            var birthTd, birthInput;
+                            var birthTr = document.createElement('tr');
+
+                            // tag no
+                            tagnoTd = document.createElement('td');
+                            tagnoInput = document.createElement('input');
+                            tagnoInput.setAttribute('type','text');
+                            tagnoInput.setAttribute('class','form-control');
+                            tagnoTd.appendChild(tagnoInput);
+                            birthTr.appendChild(tagnoTd);
+
+                            // status
+                            statusTd = document.createElement('td');
+                            statusSelect = document.createElement('select');
+                                var aliveOpt = document.createElement('option');
+                                    aliveOpt.value = "alive";
+                                    aliveOpt.innerHTML = "Alive";
+                                var deceasedOpt = document.createElement('option');
+                                    deceasedOpt.value = "deceased";
+                                    deceasedOpt.innerHTML = "Deceased";
+                                statusSelect.appendChild(aliveOpt);
+                                statusSelect.appendChild(deceasedOpt);
+                            statusSelect.setAttribute('class','form-control');
+                            statusTd.appendChild(statusSelect);
+                            birthTr.appendChild(statusTd);
+
+                            // sex
+                            sexTd = document.createElement('td');
+                            sexSelect = document.createElement('select');
+                                var maleOpt = document.createElement('option');
+                                    maleOpt.value = "male";
+                                    maleOpt.innerHTML = "Male";
+                                var femaleOpt = document.createElement('option');
+                                    femaleOpt.value = "female";
+                                    femaleOpt.innerHTML = "Female";
+                                sexSelect.appendChild(maleOpt);
+                                sexSelect.appendChild(femaleOpt);
+                            sexSelect.setAttribute('class','form-control');
+                            sexTd.appendChild(sexSelect);
+                            birthTr.appendChild(sexTd);
+
+                            // delete row
+                            deleteTd = document.createElement('td');
+                            deleteBtn = document.createElement('button');
+                            deleteBtn.setAttribute('class','btn');
+                            deleteBtn.innerHTML = '<i class="fad fa-trash-alt fa-lg text-danger"></i>'
+                            deleteBtn.onclick = function() { DeleteRow(this); }
+                            deleteTd.appendChild(deleteBtn);
+                            birthTr.appendChild(deleteTd);
+
+                          birthTable.appendChild(birthTr);
+                        }
+                        document.getElementById('addRow').onclick=addRow;
+                    </script>
                 </div>
             </div>
         </div>
