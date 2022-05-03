@@ -99,21 +99,21 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <input type="text" class="form-control">
+                                                        <input type="text" class="form-control" name="tag_no">
                                                     </td>
                                                     <td>
-                                                        <select class="form-control">
+                                                        <select class="form-control" name="status">
                                                             <option value="alive">Alive</option>
                                                             <option value="deceased">Deceased</option>
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <select class="form-control">
+                                                        <select class="form-control" name="sex">
                                                             <option value="male">Male</option>
                                                             <option value="female">Female</option>
                                                         </select>
                                                     </td>
-                                                    <td><button class="btn" onclick="DeleteRow(this)"><i class="fad fa-trash-alt fa-lg text-danger"></i></button></td>
+                                                    <td><button type="button" class="btn" onclick="DeleteRow(this)"><i class="fad fa-trash-alt fa-lg text-danger"></i></button></td>
                                                 </tr>
                                             </table>
                                             <button id="addRow" type="button" class="btn btn-outline-success">Add new row</button>
@@ -141,6 +141,7 @@
                             tagnoInput = document.createElement('input');
                             tagnoInput.setAttribute('type','text');
                             tagnoInput.setAttribute('class','form-control');
+                            tagnoInput.setAttribute('name','tag_no');
                             tagnoTd.appendChild(tagnoInput);
                             birthTr.appendChild(tagnoTd);
 
@@ -156,6 +157,7 @@
                                 statusSelect.appendChild(aliveOpt);
                                 statusSelect.appendChild(deceasedOpt);
                             statusSelect.setAttribute('class','form-control');
+                            statusSelect.setAttribute('name','status');
                             statusTd.appendChild(statusSelect);
                             birthTr.appendChild(statusTd);
 
@@ -171,6 +173,7 @@
                                 sexSelect.appendChild(maleOpt);
                                 sexSelect.appendChild(femaleOpt);
                             sexSelect.setAttribute('class','form-control');
+                            sexSelect.setAttribute('name','sex');
                             sexTd.appendChild(sexSelect);
                             birthTr.appendChild(sexTd);
 
@@ -180,6 +183,7 @@
                             deleteBtn.setAttribute('class','btn');
                             deleteBtn.innerHTML = '<i class="fad fa-trash-alt fa-lg text-danger"></i>'
                             deleteBtn.onclick = function() { DeleteRow(this); }
+                            deleteBtn.setAttribute('type','button');
                             deleteTd.appendChild(deleteBtn);
                             birthTr.appendChild(deleteTd);
 

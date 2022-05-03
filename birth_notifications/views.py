@@ -7,7 +7,7 @@ from django.conf import settings
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
 from account.models import AttachedBolton
 from .models import BirthNotification, BnChild
-from .forms import BirthNotificationForm
+from .forms import BirthNotificationForm, BirthForm
 from pedigree.models import Pedigree
 import re
 
@@ -63,7 +63,6 @@ def birth_notification_form(request):
 
     if request.method == 'POST':
         bn_form = BirthNotificationForm(request.POST or None)
-
         if bn_form.is_valid():
             new_bn = BirthNotification()
             ### mother ###
@@ -82,14 +81,21 @@ def birth_notification_form(request):
                 pass
             new_bn.user = request.user
             new_bn.account = attached_service
-            new_bn.living_males = bn_form['living_males'].value().strip()
-            new_bn.living_females = bn_form['living_females'].value().strip()
-            new_bn.deceased_males = bn_form['deceased_males'].value().strip()
-            new_bn.deceased_females = bn_form['deceased_females'].value().strip()
-            new_bn.service_method = bn_form['service_method'].value().strip()
             new_bn.bn_number = bn_form['bn_number'].value().strip()
             new_bn.comments = bn_form['comments'].value().strip()
             new_bn.save()
+
+            # births
+            bn_child_form = dict(request.POST.lists())
+            birth_line = 0
+            for birth in bn_child_form['tag_no']:
+                child = BnChild.objects.create(tag_no=bn_child_form['tag_no'][birth_line],
+                                               status=bn_child_form['status'][birth_line],
+                                               sex=bn_child_form['sex'][birth_line])
+                new_bn.births.add(child)
+                new_bn.save()
+                birth_line += 1
+
             return redirect('bn_home')
         else:
             print(bn_form.errors)
