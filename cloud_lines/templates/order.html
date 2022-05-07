@@ -123,16 +123,19 @@
 									<label>Payment Increment:</label>
 									<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc" required>
 										<option value="None">------</option>
-										<option value="Monthly" {% if attached_service_upgrade and service.increment == 'monthly' %}selected{% endif %}>Monthly</option>
-										<option value="Yearly" {% if attached_service_upgrade and service.increment == 'yearly' %}selected{% endif %}>Yearly</option>
+										<option value="Monthly" {% if upgrade and service.increment == 'monthly' %}selected{% endif %}>Monthly</option>
+										<option value="Yearly" {% if upgrade and service.increment == 'yearly' %}selected{% endif %}>Yearly</option>
 									</select>
 								</div>
 							</div>
 
+
 							<div class="row form-billing ">
 								<div id="subDomainDiv" class="col-6 form-group d-none">
 									<label>Domain Prefix:</label>
-									<input type="text" class="form-control required" name="checkout-form-sub-domain" id="checkout-form-sub-domain" placeholder="e.g. rbst">
+
+									<input type="text" class="form-control required" name="checkout-form-sub-domain" id="checkout-form-sub-domain" {% if upgrade %}value="{{ service.domain }}" readonly {% endif %} placeholder="e.g. rbst">
+
 									<span><code>https://<i id="subDomain">rbst</i>.cloud-lines.com</code> <i id="subdomain_message"></i></span>
 								</div>
 							</div>
@@ -140,7 +143,7 @@
 							<div class="row form-billing">
 								<div class="col-6 form-group">
 									<label>Animal Type (optional, plural):</label>
-									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if attached_service_upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}"{% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
+									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}" {% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
 									</select>
 
 								</div>
@@ -148,8 +151,8 @@
 									<label>Animal Category (optional):</label>
 									<select class="form-control required" name="checkout-form-site-mode" id="checkout-form-site-mode" required>
 										<option value="None">------</option>
-										<option value="mammal" {% if attached_service_upgrade and service.site_mode == 'mammal' %}selected{% endif %}>Mammal</option>
-										<option value="poultry" {% if attached_service_upgrade and service.site_mode == 'poultry' %}selected{% endif %}>Poultry</option>
+										<option value="mammal" {% if upgrade and service.site_mode == 'mammal' %}selected{% endif %}>Mammal</option>
+										<option value="poultry" {% if upgrade and service.site_mode == 'poultry' %}selected{% endif %}>Poultry</option>
 									</select>
 								</div>
 							</div>

@@ -382,9 +382,9 @@ def order(request, service=None):
             pass
 
         # get the attached_service to upgrade
-        if AttachedService.objects.filter(user=UserDetail.objects.get(user=request.user),
+        if AttachedService.objects.filter(user=context['user_detail'],
                                           id=request.GET['upgrade']).exists():
-            context['attached_service_upgrade'] = request.GET['upgrade']
+            context['upgrade'] = True
 
     context['services'] = Service.objects.filter(active=True)
 
