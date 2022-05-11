@@ -419,8 +419,6 @@ def order_service(request):
     # if upgade
     if request.POST.get('checkout-form-upgrade'):
         try:
-            print(user_detail)
-            print(request.POST.get('checkout-form-upgrade'))
             attached_service = AttachedService.objects.filter(user=user_detail,
                                                               id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
                                                                                                                    site_mode=request.POST.get('checkout-form-site-mode'),
@@ -428,7 +426,6 @@ def order_service(request):
                                                                                                                    service=service,
                                                                                                                    increment=request.POST.get('checkout-form-payment-inc').lower(),
                                                                                                                    active=False)
-            print(attached_service)
         except AttachedService.DoesNotExist:
             pass
     else:
