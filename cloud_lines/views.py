@@ -385,6 +385,7 @@ def order(request, service=None):
         if AttachedService.objects.filter(user=context['user_detail'],
                                           id=request.GET['upgrade']).exists():
             context['upgrade'] = True
+            context['attached_service_upgrade'] = request.GET['upgrade']
 
     context['services'] = Service.objects.filter(active=True)
 
@@ -418,14 +419,16 @@ def order_service(request):
     # if upgade
     if request.POST.get('checkout-form-upgrade'):
         try:
+            print(user_detail)
+            print(request.POST.get('checkout-form-upgrade'))
             attached_service = AttachedService.objects.filter(user=user_detail,
-                                                                id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                                                                                    site_mode=request.POST.get('checkout-form-site-mode'),
-                                                                                                                    domain=domain,
-                                                                                                                    install_available=False,
-                                                                                                                    service=service,
-                                                                                                                    increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                                                                                    active=False)
+                                                              id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
+                                                                                                                   site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                                                                   install_available=False,
+                                                                                                                   service=service,
+                                                                                                                   increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                                                                                   active=False)
+            print(attached_service)
         except AttachedService.DoesNotExist:
             pass
     else:
@@ -439,7 +442,7 @@ def order_service(request):
                                                             increment=request.POST.get('checkout-form-payment-inc').lower(),
                                                             active=False)
 
-    return HttpResponse(json.dumps(attached_service.id))
+    return HttpResponse(json.dumps(attached_service))
 
 
 @login_required(login_url="/account/login")
