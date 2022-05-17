@@ -627,8 +627,11 @@ def order_subscribe(request):
             To access your new service click <a href="https://cloud-lines.com/dashboard"> HERE</a>. You should
             find everything you need to get started there but do let is know if you have any questions.
         """.format(attached_service.service.service_name,)
-    send_mail('New subscription!', request.user, body, send_to=request.user.email)
-    send_mail('New subscription!', request.user, body, reply_to=request.user.email)
+    try:
+        send_mail('New subscription!', request.user, body, send_to=request.user.email)
+        send_mail('New subscription!', request.user, body, reply_to=request.user.email)
+    except Exception as err:
+        print(err)
 
     # set new default attached service
     UserDetail.objects.filter(user=request.user).update(current_service=attached_service)
