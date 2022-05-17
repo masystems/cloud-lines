@@ -28,6 +28,10 @@ class UserDetail(models.Model):
 
 
 class AttachedBolton(models.Model):
+    """
+    1 == birth notifications
+    2 == ???
+    """
     bolton = models.CharField(max_length=10)
     stripe_sub_id = models.CharField(max_length=255, blank=True)
     INCREMENTS = (

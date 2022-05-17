@@ -382,8 +382,9 @@ def order(request, service=None):
             pass
 
         # get the attached_service to upgrade
-        if AttachedService.objects.filter(user=UserDetail.objects.get(user=request.user),
+        if AttachedService.objects.filter(user=context['user_detail'],
                                           id=request.GET['upgrade']).exists():
+            context['upgrade'] = True
             context['attached_service_upgrade'] = request.GET['upgrade']
 
     context['services'] = Service.objects.filter(active=True)
@@ -419,13 +420,12 @@ def order_service(request):
     if request.POST.get('checkout-form-upgrade'):
         try:
             attached_service = AttachedService.objects.filter(user=user_detail,
-                                                                id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                                                                                    site_mode=request.POST.get('checkout-form-site-mode'),
-                                                                                                                    domain=domain,
-                                                                                                                    install_available=False,
-                                                                                                                    service=service,
-                                                                                                                    increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                                                                                    active=False)
+                                                              id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
+                                                                                                                   site_mode=request.POST.get('checkout-form-site-mode'),
+                                                                                                                   install_available=False,
+                                                                                                                   service=service,
+                                                                                                                   increment=request.POST.get('checkout-form-payment-inc').lower(),
+                                                                                                                   active=False)
         except AttachedService.DoesNotExist:
             pass
     else:
@@ -439,7 +439,7 @@ def order_service(request):
                                                             increment=request.POST.get('checkout-form-payment-inc').lower(),
                                                             active=False)
 
-    return HttpResponse(json.dumps(attached_service.id))
+    return HttpResponse(json.dumps(attached_service))
 
 
 @login_required(login_url="/account/login")
@@ -627,8 +627,11 @@ def order_subscribe(request):
             To access your new service click <a href="https://cloud-lines.com/dashboard"> HERE</a>. You should
             find everything you need to get started there but do let is know if you have any questions.
         """.format(attached_service.service.service_name,)
-    send_mail('New subscription!', request.user, body, send_to=request.user.email)
-    send_mail('New subscription!', request.user, body, reply_to=request.user.email)
+    try:
+        send_mail('New subscription!', request.user, body, send_to=request.user.email)
+        send_mail('New subscription!', request.user, body, reply_to=request.user.email)
+    except Exception as err:
+        print(err)
 
     # set new default attached service
     UserDetail.objects.filter(user=request.user).update(current_service=attached_service)

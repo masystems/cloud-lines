@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'approvals',
     'metrics',
     'boltons',
+    'birth_notifications',
     'reports',
     'widget_tweaks',
     'django_s3_storage',

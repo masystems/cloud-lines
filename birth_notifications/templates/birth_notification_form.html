@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block header %}
+
+    <script src="{% static 'assets/plugins/jsPDF-1.3.2/dist/jspdf.min.js' %}"></script>
+    <script src="https://unpkg.com/jspdf-autotable"></script>
+{% endblock %}
+
+
+{% block content %}
+<style>
+    table th {
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+<!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Birth Notification Form</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'bn_home' %}">Birth Notifications</a></li>
+                <li class="breadcrumb-item active">Form</li>
+            </ol>
+        </div>
+        <div class="col-md-6 col-3 align-self-center">
+
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+
+
+    <div class="row">
+        <div class="col-xl-9 col-lg-9">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Birth Notification Form</h4>
+
+                    <form id="bnForm" method="POST">
+                        {% csrf_token %}
+                        <div class="form-row">
+
+                            {% for field in bn_form.visible_fields %}
+                                <div class="col-md-6 pt-2">
+                                    {% if field.label == 'Mother' %}
+                                        <div id="mothers-alive">
+                                            <label class="col-sm-6 col-form-label">{{ field.label }}</label>
+                                            <input id="id_mother" class="typeahead form-control mt-2" name='motherx' type="text" placeholder="{{ service.mother_title }}" required>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <!-- hidden note which will show name and tag number of female if reg number has a match -->
+                                            <ul class="list-icons d-none" id="mother-info"></ul>
+                                        </div>
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    {% elif field.label == 'Father' %}
+                                        <div id="fathers-alive">
+                                            <label class="col-sm-6 col-form-label">{{ field.label }}</label>
+                                            <input id="id_father" class="typeahead form-control mt-2" name='fatherx' type="text" placeholder="{{ service.father_title }}" required>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <!-- hidden note which will show name and tag number of male if reg number has a match -->
+                                            <ul class="list-icons d-none" id="father-info"></ul>
+                                        </div>
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <label class="col-sm-6 col-form-label">{{ field.label }}</label>
+                                        {{ field|attr:"class:form-control" }}
+                                        {{ field.help_text }}
+                                        {% for error in field.errors %}
+                                          <span class="help-block">{{ error }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                            <div class="row pt-2">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <!-- Table -->
+                                            <table id="birthTable" class="table table-responsive">
+                                                <tr>
+                                                    <th>Tag No.</th>
+                                                    <th>Status</th>
+                                                    <th>sex</th>
+                                                    <th></th>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <input type="text" class="form-control" name="tag_no">
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-control" name="status">
+                                                            <option value="alive">Alive</option>
+                                                            <option value="deceased">Deceased</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-control" name="sex">
+                                                            <option value="male">Male</option>
+                                                            <option value="female">Female</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><button type="button" class="btn" onclick="DeleteRow(this)"><i class="fad fa-trash-alt fa-lg text-danger"></i></button></td>
+                                                </tr>
+                                            </table>
+                                            <button id="addRow" type="button" class="btn btn-outline-success">Add new row</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-success float-right" type="submit">Submit</button>
+                    </form>
+                    <script>
+                        function DeleteRow(o) {
+                         //no clue what to put here?
+                         var p=o.parentNode.parentNode;
+                             p.parentNode.removeChild(p);
+                        }
+
+                        function addRow(){
+                            var birthTable = document.getElementById('birthTable');
+                            var birthTd, birthInput;
+                            var birthTr = document.createElement('tr');
+
+                            // tag no
+                            tagnoTd = document.createElement('td');
+                            tagnoInput = document.createElement('input');
+                            tagnoInput.setAttribute('type','text');
+                            tagnoInput.setAttribute('class','form-control');
+                            tagnoInput.setAttribute('name','tag_no');
+                            tagnoTd.appendChild(tagnoInput);
+                            birthTr.appendChild(tagnoTd);
+
+                            // status
+                            statusTd = document.createElement('td');
+                            statusSelect = document.createElement('select');
+                                var aliveOpt = document.createElement('option');
+                                    aliveOpt.value = "alive";
+                                    aliveOpt.innerHTML = "Alive";
+                                var deceasedOpt = document.createElement('option');
+                                    deceasedOpt.value = "deceased";
+                                    deceasedOpt.innerHTML = "Deceased";
+                                statusSelect.appendChild(aliveOpt);
+                                statusSelect.appendChild(deceasedOpt);
+                            statusSelect.setAttribute('class','form-control');
+                            statusSelect.setAttribute('name','status');
+                            statusTd.appendChild(statusSelect);
+                            birthTr.appendChild(statusTd);
+
+                            // sex
+                            sexTd = document.createElement('td');
+                            sexSelect = document.createElement('select');
+                                var maleOpt = document.createElement('option');
+                                    maleOpt.value = "male";
+                                    maleOpt.innerHTML = "Male";
+                                var femaleOpt = document.createElement('option');
+                                    femaleOpt.value = "female";
+                                    femaleOpt.innerHTML = "Female";
+                                sexSelect.appendChild(maleOpt);
+                                sexSelect.appendChild(femaleOpt);
+                            sexSelect.setAttribute('class','form-control');
+                            sexSelect.setAttribute('name','sex');
+                            sexTd.appendChild(sexSelect);
+                            birthTr.appendChild(sexTd);
+
+                            // delete row
+                            deleteTd = document.createElement('td');
+                            deleteBtn = document.createElement('button');
+                            deleteBtn.setAttribute('class','btn');
+                            deleteBtn.innerHTML = '<i class="fad fa-trash-alt fa-lg text-danger"></i>'
+                            deleteBtn.onclick = function() { DeleteRow(this); }
+                            deleteBtn.setAttribute('type','button');
+                            deleteTd.appendChild(deleteBtn);
+                            birthTr.appendChild(deleteTd);
+
+                          birthTable.appendChild(birthTr);
+                        }
+                        document.getElementById('addRow').onclick=addRow;
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Information</h4>
+                    <p>Can have some information here?</p>
+
+                    <hr>
+                    <p>and some information here?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block footer %}
+    <!-- code for the reg number field typeaheads -->
+    {% include 'ta_metrics.html' %}
+
+{% endblock %}

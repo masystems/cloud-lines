@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+    <link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+        <div class="col-md-6 col-8 align-self-center">
+            <h3 class="text-themecolor m-b-0 m-t-0">Birth Notification ({{ bn.bn_number }})</h3>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'bn_home' %}">Birth Notifications</a></li>
+                <li class="breadcrumb-item active">Birth Notification ({{ bn.bn_number }})</li>
+            </ol>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+        <!-- Start Page Content -->
+        <!-- ============================================================== -->
+        <!-- Row -->
+        <div class="row">
+            <!-- Column -->
+            <div class="col-md-12 col-lg-12 col-xlg-12">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">{{ bn.bn_number }} Details</h4>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <dl class="row">
+                                            <dt class="col-sm-3">User</dt>
+                                            <dd class="col-sm-9">{{ bn.user.get_full_name }}</dd>
+                                            <dt class="col-sm-3">{{ service.mother_title }}</dt>
+                                            <dd class="col-sm-9">{{ bn.mother.reg_no }}</dd>
+                                            <dt class="col-sm-3">{{ service.father_title }}</dt>
+                                            <dd class="col-sm-9">{{ bn.father.reg_no }}</dd>
+                                            <dt class="col-sm-3">Total Births</dt>
+                                            <dd class="col-sm-9">{{ bn.births.count }}</dd>
+                                            <dt class="col-sm-3">BN No.</dt>
+                                            <dd class="col-sm-9">{{ bn.bn_number }}</dd>
+
+                                        </dl>
+                                    </div>
+                                    <div class="col-6">
+                                        <dl class="row">
+                                            <dt class="col-sm-3">Comments</dt>
+                                            <dd class="col-sm-9">{{ bn.comments }}</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Births</h4>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered" style="width:100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Tag No</th>
+                                                <th>Status</th>
+                                                <th>Sex</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for birth in bn.births.all %}
+                                                <tr>
+                                                    <td>
+                                                        {{ birth.tag_no }}
+                                                    </td>
+                                                    <td>
+                                                        {{ birth.status }}
+                                                    </td>
+                                                    <td>
+                                                        {{ birth.sex }}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'birth_notification' bn.id %}"><i class="fad fa-search text-info pl-2"></i></a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Row -->
+        <div class="row">
+<!-- Column -->
+
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- End PAge Content -->
+        <!-- ============================================================== -->
+
+{% endblock %}

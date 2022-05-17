@@ -1,14 +1,6 @@
-from .models import AttachedService
-from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
-
-# class InstallForm(ModelForm):
-#     class Meta:
-#         model = AttachedService
-#         fields = '__all__'
 
 
 class SignUpForm(UserCreationForm):

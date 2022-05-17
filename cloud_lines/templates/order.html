@@ -123,16 +123,19 @@
 									<label>Payment Increment:</label>
 									<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc" required>
 										<option value="None">------</option>
-										<option value="Monthly" {% if attached_service_upgrade and service.increment == 'monthly' %}selected{% endif %}>Monthly</option>
-										<option value="Yearly" {% if attached_service_upgrade and service.increment == 'yearly' %}selected{% endif %}>Yearly</option>
+										<option value="Monthly" {% if upgrade and service.increment == 'monthly' %}selected{% endif %}>Monthly</option>
+										<option value="Yearly" {% if upgrade and service.increment == 'yearly' %}selected{% endif %}>Yearly</option>
 									</select>
 								</div>
 							</div>
 
+
 							<div class="row form-billing ">
 								<div id="subDomainDiv" class="col-6 form-group d-none">
 									<label>Domain Prefix:</label>
-									<input type="text" class="form-control required" name="checkout-form-sub-domain" id="checkout-form-sub-domain" placeholder="e.g. rbst">
+
+									<input type="text" class="form-control required" name="checkout-form-sub-domain" id="checkout-form-sub-domain" {% if service.domain %}value="{{ service.domain }}" readonly {% endif %} placeholder="e.g. rbst">
+
 									<span><code>https://<i id="subDomain">rbst</i>.cloud-lines.com</code> <i id="subdomain_message"></i></span>
 								</div>
 							</div>
@@ -140,7 +143,7 @@
 							<div class="row form-billing">
 								<div class="col-6 form-group">
 									<label>Animal Type (optional, plural):</label>
-									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if attached_service_upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}"{% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
+									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}" {% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
 									</select>
 
 								</div>
@@ -148,8 +151,8 @@
 									<label>Animal Category (optional):</label>
 									<select class="form-control required" name="checkout-form-site-mode" id="checkout-form-site-mode" required>
 										<option value="None">------</option>
-										<option value="mammal" {% if attached_service_upgrade and service.site_mode == 'mammal' %}selected{% endif %}>Mammal</option>
-										<option value="poultry" {% if attached_service_upgrade and service.site_mode == 'poultry' %}selected{% endif %}>Poultry</option>
+										<option value="mammal" {% if upgrade and service.site_mode == 'mammal' %}selected{% endif %}>Mammal</option>
+										<option value="poultry" {% if upgrade and service.site_mode == 'poultry' %}selected{% endif %}>Poultry</option>
 									</select>
 								</div>
 							</div>
@@ -780,7 +783,7 @@
 
 						<div class="line"></div>
 						<a href="#" class="button button-3d nomargin tab-linker" rel="2">Previous</a>
-						<a href="#" id="card-button" class="button button-3d nomargin fright" rel="4">Complete Order</a>
+						<a href="#" id="card-button" class="button button-3d nomargin fright" rel="4">Complete {% if upgrade %}Upgrade{% else %}Order{% endif %}</a>
 						<button id="selectCardButton" type="button" style="display: none;" class="tab-linker" rel="4"></button>
 
 						<script>
@@ -951,17 +954,22 @@
 							<h2>Thank You.</h2>
 							<strong>Your order has been processed.</strong>
 
-
-							<div class="title-block mt-3 text-left">
-								<h2 id="buildStatusMsg"></h2>
-								<span id="buildStatusNote">Note: You Cloud-Lines dashboard is now ready to use! Use the links below to get started.</span>
-							</div>
-							<div id="buildMessage" class="mt-1 d-none">
-								<p><code>Please allow 24 hours (normally only 20 minutes) for your bespoke address to start working.</code></p>
-							</div>
-							<div id="buildProgressDiv" class="progress active mt-2 d-none">
-								<div id="buildProgress" class="progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; height:20px; background-color:#1ABC9C !important" role="progressbar"></div>
-							</div>
+							{% if not upgrade %}
+								<div class="title-block mt-3 text-left">
+									<h2 id="buildStatusMsg"></h2>
+									<span id="buildStatusNote">Note: You Cloud-Lines dashboard is now ready to use! Use the links below to get started.</span>
+								</div>
+								<div id="buildMessage" class="mt-1 d-none">
+									<p><code>Please allow 24 hours (normally only 20 minutes) for your bespoke address to start working.</code></p>
+								</div>
+								<div id="buildProgressDiv" class="progress active mt-2 d-none">
+									<div id="buildProgress" class="progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; height:20px; background-color:#1ABC9C !important" role="progressbar"></div>
+								</div>
+							{% else %}
+								<div>
+									<a href="{% url 'dashboard' %}" class="button button-desc button-3d button-rounded button-teal center mt-5">Dashboard<span>Click here to go to your new dashboard!</span></a>
+								</div>
+							{% endif %}
 
 
 

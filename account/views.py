@@ -121,8 +121,13 @@ def site_mode(request):
         else:
             add_breed = True
 
+        # boltons
+        # default values
+        birth_notification = False
+
         return {'service': attached_service,
                 'attached_services': attached_services,
+                'birth_notification': attached_service.boltons.filter(bolton="1").exists(),
                 'add_pedigree': pedigrees,
                 'admins': admins,
                 'users': users,
@@ -636,28 +641,6 @@ def custom_field_edit(request):
         attached_service.custom_fields = json.dumps(custom_fields)
         attached_service.save()
 
-        # update the model
-        # if request.POST.get('location') == 'pedigree':
-        #     # make sure an empty "objects" var is created so that it's not edited localed
-        #     objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-        # elif request.POST.get('location') == 'breeder':
-        #     objects = Breeder.objects.filter(account=attached_service)
-        # elif request.POST.get('location') == 'breed':
-        #     objects = Breed.objects.filter(account=attached_service)
-        #
-        # for object in objects.all():
-        #     try:
-        #         object_custom_fields = json.loads(object.custom_fields)
-        #     except json.decoder.JSONDecodeError:
-        #         object_custom_fields = {}
-        #
-        #     object_custom_fields[field_key] = {'id': field_key,
-        #                                         'location': request.POST.get('location'),
-        #                                         'fieldName': request.POST.get('fieldName'),
-        #                                         'fieldType': request.POST.get('fieldType')}
-        #
-        #     object.custom_fields = json.dumps(object_custom_fields)
-        #     object.save()
         Thread(target=update_custom_fields, args=(request, attached_service)).start()
         return HttpResponse(json.dumps({'success': True}))
 
@@ -669,27 +652,6 @@ def custom_field_edit(request):
         attached_service.custom_fields = json.dumps(custom_fields)
         attached_service.save()
 
-        # update the model
-        # if request.POST.get('location') == 'pedigree':
-        #     objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-        # elif request.POST.get('location') == 'breeder':
-        #     objects = Breeder.objects.filter(account=attached_service)
-        # elif request.POST.get('location') == 'breed':
-        #     objects = Breed.objects.filter(account=attached_service)
-        #
-        # for object in objects.all():
-        #     try:
-        #         custom_fields = json.loads(object.custom_fields)
-        #     except json.decoder.JSONDecodeError:
-        #         custom_fields = {}
-        #
-        #     custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
-        #                                                 'location': request.POST.get('location'),
-        #                                                 'fieldName': request.POST.get('fieldName'),
-        #                                                 'fieldType': request.POST.get('fieldType')}
-        #
-        #     object.custom_fields = json.dumps(custom_fields)
-        #     object.save()
         Thread(target=update_custom_fields, args=(request, attached_service)).start()
         return HttpResponse(json.dumps({'success': True}))
 
@@ -698,24 +660,6 @@ def custom_field_edit(request):
         attached_service.custom_fields = json.dumps(custom_fields)
         attached_service.save()
 
-        # update model
-        # update the model
-        # if request.POST.get('location') == 'pedigree':
-        #     objects = Pedigree.objects.filter(account=attached_service, name='thisisfakename!£$%^&*()_+')
-        # elif request.POST.get('location') == 'breeder':
-        #     objects = Breeder.objects.filter(account=attached_service)
-        # elif request.POST.get('location') == 'breed':
-        #     objects = Breed.objects.filter(account=attached_service)
-        #
-        # for object in objects.all():
-        #     custom_fields_updated = {}
-        #     if object.custom_fields:
-        #         for key, val in json.loads(object.custom_fields).items():
-        #             if key in custom_fields:
-        #                 custom_fields_updated[key] = val
-        #
-        #     object.custom_fields = json.dumps(custom_fields_updated)
-        #     object.save()
         Thread(target=update_custom_fields, args=(request, attached_service)).start()
         return HttpResponse(json.dumps({'success': True}))
 
