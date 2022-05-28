@@ -158,7 +158,7 @@
                                 </thead>
                                 <tbody>
                                     {% for notification in birth_notifications.all reversed %}
-                                        <tr onclick="window.location='{% url 'bn_home' %}';" style="cursor: pointer;">
+                                        <tr onclick="window.location='{% url 'birth_notification' notification.id %}';" style="cursor: pointer;">
                                             <td>{{ notification.bn_number }}</td>
                                             <td>{{ notification.births.all.count }}</td>
                                             <td>{{ notification.births.all.count }}</td>

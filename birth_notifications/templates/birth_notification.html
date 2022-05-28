@@ -90,7 +90,19 @@
                                                         {{ birth.sex }}
                                                     </td>
                                                     <td>
-                                                        <a href="{% url 'birth_notification' bn.id %}"><i class="fad fa-search text-info pl-2"></i></a>
+                                                        <div class="checkbox checkbox-success checkbox-circle">
+                                                            <input id="chld-{{ birth.id }}" class="chld-approved" type="checkbox" {% if birth.approved %}checked{% endif %}>
+                                                            <label class="mb-0" for="chld-{{ birth.id }}"> Approved </label>
+                                                        </div>
+                                                        <script>
+                                                            $('#chld-{{ birth.id }}').change(function() {
+                                                                if(this.checked) {
+                                                                    $.get( "{% url 'child_approval' birth.id True %}" );
+                                                                } else {
+                                                                    $.get( "{% url 'child_approval' birth.id False %}" );
+                                                                }
+                                                            })
+                                                        </script>
                                                     </td>
                                                 </tr>
                                             {% endfor %}
@@ -115,5 +127,10 @@
         <!-- ============================================================== -->
         <!-- End PAge Content -->
         <!-- ============================================================== -->
+
+{% endblock %}
+
+{% block footer %}
+
 
 {% endblock %}

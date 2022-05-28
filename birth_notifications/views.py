@@ -126,3 +126,12 @@ def birth_notification_form(request):
 
     return render(request, 'birth_notification_form.html', {'bn_form': bn_form,
                                                             'bn_number': bn_number})
+
+@login_required(login_url="/account/login")
+def child_approval(request, id, approved):
+    if approved == "True":
+        app = True
+    else:
+        app = False
+    BnChild.objects.filter(id=id).update(approved=app)
+    return HttpResponse('')
