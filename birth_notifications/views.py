@@ -68,15 +68,14 @@ def birth_notification_form(request):
             ### mother ###
             try:
                 new_bn.mother = Pedigree.objects.get(account=attached_service,
-                                                      reg_no=bn_form['mother'].value().strip())
-                print('GOT IT!')
+                                                      reg_no=request.POST.get('motherx'))
             except:
                 print('Not a valid mother')
 
             ### father ###
             try:
                 new_bn.father = Pedigree.objects.get(account=attached_service,
-                                                      reg_no=bn_form['father'].value().strip())
+                                                      reg_no=request.POST.get('fatherx'))
             except:
                 pass
             new_bn.user = request.user
@@ -97,8 +96,7 @@ def birth_notification_form(request):
                 birth_line += 1
 
             return redirect('bn_home')
-        else:
-            print(bn_form.errors)
+
 
     else:
 
@@ -128,10 +126,54 @@ def birth_notification_form(request):
                                                             'bn_number': bn_number})
 
 @login_required(login_url="/account/login")
-def child_approval(request, id, approved):
-    if approved == "True":
-        app = True
-    else:
-        app = False
-    BnChild.objects.filter(id=id).update(approved=app)
-    return HttpResponse('')
+def edit_child(request, id):
+    if request.method == 'POST':
+        child = BnChild.objects.get(id=id)
+        child.tag_no = request.POST.get('tag_no')
+        child.status = request.POST.get('status')
+        child.sex = request.POST.get('sex')
+        child.save()
+    return redirect('birth_notification', child.births.all()[0].id)
+
+
+@login_required(login_url="/account/login")
+def delete_child(request, id):
+    if request.method == 'GET':
+        child = BnChild.objects.get(id=id)
+        id = child.births.all()[0].id
+        child.delete()
+    return redirect('birth_notification', id)
+
+
+@login_required(login_url="/account/login")
+def toggle_birth_notification(request, id):
+    if request.method == 'GET':
+        bn = BirthNotification.objects.get(id=id)
+        if bn.complete:
+            bn.complete = False
+        else:
+            bn.complete = True
+        bn.save()
+    return redirect('birth_notification', bn.id)
+
+
+@login_required(login_url="/account/login")
+def edit_birth_notification(request, id):
+    attached_service = get_main_account(request.user)
+    if request.method == 'POST':
+        bn = BirthNotification.objects.get(id=id)
+        bn.mother = Pedigree.objects.get(account=attached_service,
+                                         reg_no=request.POST.get('motherx'))
+        bn.father = Pedigree.objects.get(account=attached_service,
+                                         reg_no=request.POST.get('fatherx'))
+        bn.comments = request.POST.get('comments')
+        bn.save()
+    return redirect('birth_notification', bn.id)
+
+
+@login_required(login_url="/account/login")
+def delete_birth_notification(request, id):
+    if request.method == 'GET':
+        bn = BirthNotification.objects.get(id=id)
+        bn.delete()
+    return redirect('bn_home')
