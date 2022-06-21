@@ -35,6 +35,69 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">{{ bn.bn_number }} Details</h4>
+                                <button class="btn btn-danger float-right" data-toggle="modal" data-target="#deleteBn">Delete</button>
+                                <button class="btn btn-warning float-right mr-2" data-toggle="modal" data-target="#editBn">Edit</button>
+                                <a href="{% url 'toggle_birth_notification' bn.id %}"><button class="btn btn-info float-right mr-2">{% if bn.complete %}Unapprove{% else %}Approve{% endif %}</button></a>
+                                <!-- Warning Filled Modal -->
+                                <div id="editBn" class="modal fade" tabindex="-1" role="dialog"
+                                    aria-labelledby="fill-warning-modalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content modal-filled bg-warning">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title  text-white" id="fill-warning-modalLabel">Edit Birth Notification</h4>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-hidden="true">×</button>
+                                            </div>
+                                            <form method="POST" action="{% url 'edit_birth_notification' bn.id %}">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <div id="mothers-alive">
+                                                        <label class="text-white">{{ service.mother_title }}</label>
+                                                        <input id="id_mother" class="typeahead form-control mt-2" name='motherx' type="text" value="{{ bn.mother.reg_no }}" required>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <!-- hidden note which will show name and tag number of female if reg number has a match -->
+                                                        <ul class="list-icons d-none text-white" id="mother-info"></ul>
+                                                    </div>
+                                                    <div id="fathers-alive">
+                                                        <label class="text-white pt-2">{{ service.father_title }}</label>
+                                                        <input id="id_father" class="typeahead form-control mt-2" name='fatherx' type="text" value="{{ bn.father.reg_no }}" required>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <!-- hidden note which will show name and tag number of male if reg number has a match -->
+                                                        <ul class="list-icons d-none" id="father-info"></ul>
+                                                    </div>
+                                                    <label class="text-light pt-2">Comments</label>
+                                                    <textarea class="form-control" name="comments">{{ bn.comments }}</textarea>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light"
+                                                        data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-outline-light">Save
+                                                        changes</button>
+                                                </div>
+                                            </form>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal-dialog -->
+                                </div><!-- /.modal -->
+                                <!-- Danger Alert Modal -->
+                                <div id="deleteBn" class="modal fade" tabindex="-1" role="dialog"
+                                    aria-hidden="true">
+                                    <div class="modal-dialog modal-sm">
+                                        <div class="modal-content modal-filled bg-danger">
+                                            <div class="modal-body p-4">
+                                                <div class="text-center">
+                                                    <i class="dripicons-wrong h1"></i>
+                                                    <h4 class="mt-2 text-white">Delete this Birth Notification?</h4>
+                                                    <p class="mt-3 op-7 text-light">Are you sure you want to delete this Birth Notification?</p>
+                                                    <button type="button" class="btn btn-light"
+                                                        data-dismiss="modal">Close</button>
+                                                    <a href="{% url 'delete_birth_notification' bn.id %}"><button type="submit" class="btn btn-light my-2" >Delete</button></a>
+                                                </div>
+                                            </div>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal-dialog -->
+                                </div><!-- /.modal -->
                                 <div class="row">
                                     <div class="col-6">
                                         <dl class="row">
@@ -90,9 +153,66 @@
                                                         {{ birth.sex }}
                                                     </td>
                                                     <td>
-                                                        <a href="{% url 'birth_notification' bn.id %}"><i class="fad fa-search text-info pl-2"></i></a>
+                                                        <div class="btn-list">
+                                                            <button class="btn btn-warning" data-toggle="modal" data-target="#editChild{{ birth.id }}">Edit</button>
+                                                            <button class="btn btn-danger" data-toggle="modal" data-target="#deleteChild{{ birth.id }}">Delete</button>
+                                                        </div>
                                                     </td>
                                                 </tr>
+                                                <!-- Warning Filled Modal -->
+                                                <div id="editChild{{ birth.id }}" class="modal fade" tabindex="-1" role="dialog"
+                                                    aria-labelledby="fill-warning-modalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content modal-filled bg-warning">
+                                                            <div class="modal-header">
+                                                                <h4 class="modal-title  text-white" id="fill-warning-modalLabel">Edit birth {{ birth.tag_no }}</h4>
+                                                                <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-hidden="true">×</button>
+                                                            </div>
+                                                            <form method="POST" action="{% url 'edit_child' birth.id %}">
+                                                                {% csrf_token %}
+                                                                <div class="modal-body">
+                                                                    <label class="text-light">Tag Number</label>
+                                                                    <input type="text" class="form-control" name="tag_no" value="{{ birth.tag_no }}">
+                                                                    <label class="mt-2 text-light">Status</label>
+                                                                    <select class="form-control" name="status">
+                                                                        <option value="alive" {% if birth.status == 'alive' %}selected{% endif %}>Alive</option>
+                                                                        <option value="deceased" {% if birth.status == 'deceased' %}selected{% endif %}>Deceased</option>
+                                                                    </select>
+                                                                    <label class="mt-2 text-light">Sex</label>
+                                                                    <select class="form-control" name="sex">
+                                                                        <option value="male" {% if birth.sex == 'male' %}selected{% endif %}>Male</option>
+                                                                        <option value="female" {% if birth.sex == 'female' %}selected{% endif %}>Female</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-light"
+                                                                        data-dismiss="modal">Close</button>
+                                                                    <button type="submit" class="btn btn-outline-light">Save
+                                                                        changes</button>
+                                                                </div>
+                                                            </form>
+                                                        </div><!-- /.modal-content -->
+                                                    </div><!-- /.modal-dialog -->
+                                                </div><!-- /.modal -->
+                                                <!-- Danger Alert Modal -->
+                                                <div id="deleteChild{{ birth.id }}" class="modal fade" tabindex="-1" role="dialog"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog modal-sm">
+                                                        <div class="modal-content modal-filled bg-danger">
+                                                            <div class="modal-body p-4">
+                                                                <div class="text-center">
+                                                                    <i class="dripicons-wrong h1"></i>
+                                                                    <h4 class="mt-2 text-white">Delete {{ birth.tag_no }}?</h4>
+                                                                    <p class="mt-3 op-7 text-light">Are you sure you want to delete {{ birth.tag_no }}?</p>
+                                                                    <button type="button" class="btn btn-light"
+                                                                        data-dismiss="modal">Close</button>
+                                                                    <a href="{% url 'delete_child' birth.id %}"><button type="submit" class="btn btn-light my-2" >Delete</button></a>
+                                                                </div>
+                                                            </div>
+                                                        </div><!-- /.modal-content -->
+                                                    </div><!-- /.modal-dialog -->
+                                                </div><!-- /.modal -->
                                             {% endfor %}
                                         </tbody>
                                     </table>
@@ -115,5 +235,11 @@
         <!-- ============================================================== -->
         <!-- End PAge Content -->
         <!-- ============================================================== -->
+
+{% endblock %}
+
+{% block footer %}
+    <!-- code for the reg number field typeaheads -->
+    {% include 'ta_metrics.html' %}
 
 {% endblock %}

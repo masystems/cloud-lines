@@ -99,41 +99,56 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="card-title">Approvals</h4>
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-bordered" style="width:100%">
-                                        <thead>
-                                            <tr>
-                                                <th>User</th>
-                                                <th>Births</th>
-                                                <th>BN No.</th>
-                                                <th>Date Added</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for approval in approvals %}
+                                {% if approvals %}
+                                    <h4 class="card-title">Approvals</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered" style="width:100%">
+                                            <thead>
                                                 <tr>
-                                                    <td>
-                                                        {{ approval.user.get_full_name }}
-                                                    </td>
-                                                    <td>
-                                                        {{ approval.births.count }}
-                                                    </td>
-                                                    <td>
-                                                        {{ approval.bn_number }}
-                                                    </td>
-                                                    <td>
-                                                        {{ approval.date_added }}
-                                                    </td>
-                                                    <td>
-                                                        <a href="{% url 'birth_notification' approval.id %}"><i class="fad fa-search text-info pl-2"></i></a>
-                                                    </td>
+                                                    <th>User</th>
+                                                    <th>Births</th>
+                                                    <th>BN No.</th>
+                                                    <th>Date Added</th>
+                                                    <th>Action</th>
                                                 </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {% for approval in approvals reversed %}
+                                                    <tr>
+                                                        <td>
+                                                            {{ approval.user.get_full_name }}
+                                                        </td>
+                                                        <td>
+                                                            {{ approval.births.count }}
+                                                        </td>
+                                                        <td>
+                                                            {{ approval.bn_number }}
+                                                        </td>
+                                                        <td>
+                                                            {{ approval.date_added }}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{% url 'birth_notification' approval.id %}"><i class="fad fa-search text-info pl-2"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% endif %}
+                                <hr>
+                                <h3>Birth Notifications</h3>
+                                <table id="all_birth_notifications" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Births</th>
+                                            <th>BN No.</th>
+                                            <th>Date Added</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -158,7 +173,7 @@
                                 </thead>
                                 <tbody>
                                     {% for notification in birth_notifications.all reversed %}
-                                        <tr onclick="window.location='{% url 'bn_home' %}';" style="cursor: pointer;">
+                                        <tr onclick="window.location='{% url 'birth_notification' notification.id %}';" style="cursor: pointer;">
                                             <td>{{ notification.bn_number }}</td>
                                             <td>{{ notification.births.all.count }}</td>
                                             <td>{{ notification.births.all.count }}</td>
@@ -183,5 +198,53 @@
         <!-- ============================================================== -->
         <!-- End PAge Content -->
         <!-- ============================================================== -->
+
+{% endblock %}
+
+{% block footer %}
+
+    <script src="{% static 'assets/libs/datatables/media/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'dist/js/pages/datatable/custom-datatable.js' %}"></script>
+
+
+    <!-- start - This is for export functionality only -->
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
+    <script src="{% static 'dist/js/pages/datatable/datatable-advanced.init.js' %}"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#all_birth_notifications').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                orderCellsTop: true,
+                fixedHeader: true,
+                stateSave: true,
+                "ajax": {
+                    url: "{% url 'get_births_td' %}",
+                    type: "POST",
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: {'data': ''},
+                },
+                "columns": [
+                    { data: "user" },
+                    { data: "births" },
+                    { data: "bn no" },
+                    { data: "date added" },
+                    { data: "action" },
+                ],
+                "language": {
+                    "search": "Filter records:"
+                }
+            });
+        });
+    </script>
 
 {% endblock %}
