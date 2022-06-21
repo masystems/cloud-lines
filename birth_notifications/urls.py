@@ -1,5 +1,5 @@
 from django.urls import path
-
+from . import tabledata
 from . import views
 
 urlpatterns = [
@@ -11,5 +11,6 @@ urlpatterns = [
     path('edit_birth_notification/<int:id>', views.edit_birth_notification, name='edit_birth_notification'),
     path('delete_birth_notification/<int:id>', views.delete_birth_notification, name='delete_birth_notification'),
     path('toggle_birth_notification/<int:id>', views.toggle_birth_notification, name='toggle_birth_notification'),
+    path('get_births_td', tabledata.get_birth_notifications_td, name='get_births_td'),
 
 ]
