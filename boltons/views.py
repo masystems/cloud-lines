@@ -59,15 +59,19 @@ def change_bolton_state(request, bolton_id, req_state):
             if result['result'] == 'fail':
                 return HttpResponse(dumps(result))
 
+            if request.user.is_superuser:
+                plan = bolton['test_stripe_price_id']
+            else:
+                plan = bolton['stripe_price_id']
+            print(plan)
             subscription = stripe.Subscription.create(
                 items=[
                     {
-                        #"plan": bolton['stripe_price_id'],
-                        "plan": "price_1JuydWD6klOlOx6rKL7XSrO3",
+                        "plan": plan,
                     },
                 ],
                 customer=attached_service.user.stripe_id,
-                promotion_code="promo_1Jyid1D6klOlOx6rgDEv2DZr"
+                #promotion_code="promo_1Jyid1D6klOlOx6rgDEv2DZr"
             )
             if subscription['status'] != 'active':
                 result = {'result': 'fail',
