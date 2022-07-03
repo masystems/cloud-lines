@@ -3,12 +3,11 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
-from django.conf import settings
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
-from account.models import AttachedBolton
 from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm, BirthForm
 from pedigree.models import Pedigree
+from json import dumps
 import re
 
 
@@ -154,7 +153,7 @@ def toggle_birth_notification(request, id):
         else:
             bn.complete = True
         bn.save()
-    return redirect('birth_notification', bn.id)
+    return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 
 @login_required(login_url="/account/login")
@@ -166,6 +165,7 @@ def edit_birth_notification(request, id):
                                          reg_no=request.POST.get('motherx'))
         bn.father = Pedigree.objects.get(account=attached_service,
                                          reg_no=request.POST.get('fatherx'))
+        bn.bn_number = request.POST.get('bn_number')
         bn.comments = request.POST.get('comments')
         bn.save()
     return redirect('birth_notification', bn.id)
@@ -177,3 +177,31 @@ def delete_birth_notification(request, id):
         bn = BirthNotification.objects.get(id=id)
         bn.delete()
     return redirect('bn_home')
+
+
+@login_required(login_url="/account/login")
+def validate_bn(request, id):
+    # return
+    # true == in use
+    # false == not in use
+    bn = BirthNotification.objects.get(id=id)
+
+    new_bn = list(request.GET.keys())[0]
+
+    # if the bn number is its self, not in use
+    if bn.bn_number == list(request.GET.keys())[0]:
+        return HttpResponse(False)
+
+    # check if bn number is in use
+    try:
+        bn_check = BirthNotification.objects.get(bn_number=new_bn)
+    except BirthNotification.DoesNotExist:
+        # the bn number is not being used at all, not in use
+        return HttpResponse(False)
+
+    # if the bn check is the same as the main bn then it's not in use
+    if bn.id == bn_check.id:
+        return HttpResponse(False)
+
+    # a bn was found and it's the same as the main bn then it's in use!
+    return HttpResponse(True)
