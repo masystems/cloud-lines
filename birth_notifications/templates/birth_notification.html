@@ -40,11 +40,11 @@
                                 <a href="{% url 'toggle_birth_notification' bn.id %}"><button class="btn btn-success float-right mr-2">{% if bn.complete %}Unapprove{% else %}Approve{% endif %}</button></a>
                                 <!-- Warning Filled Modal -->
                                 <div id="editBn" class="modal fade" tabindex="-1" role="dialog"
-                                    aria-labelledby="fill-warning-modalLabel" aria-hidden="true">
+                                    aria-labelledby="fill-info-modalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
-                                        <div class="modal-content modal-filled bg-warning">
+                                        <div class="modal-content modal-filled bg-info">
                                             <div class="modal-header">
-                                                <h4 class="modal-title  text-white" id="fill-warning-modalLabel">Edit Birth Notification</h4>
+                                                <h4 class="modal-title  text-white" id="fill-info-modalLabel">Edit Birth Notification</h4>
                                                 <button type="button" class="close" data-dismiss="modal"
                                                     aria-hidden="true">×</button>
                                             </div>
@@ -63,6 +63,11 @@
                                                         <label class="text-white pt-2">{{ service.father_title }}</label>
                                                         <input id="id_father" class="typeahead form-control mt-2" name='fatherx' type="text" value="{{ bn.father.reg_no }}" required>
                                                     </div>
+                                                    <div>
+                                                        <label class="text-white pt-2">BN No.</label>
+                                                        <input id="bn_number_validate" class="form-control mt-2" name='bn_number' type="text" value="{{ bn.bn_number }}" required>
+                                                        <small id="bn_number_message"></small>
+                                                    </div>
                                                     <div class="col-md-5">
                                                         <!-- hidden note which will show name and tag number of male if reg number has a match -->
                                                         <ul class="list-icons d-none" id="father-info"></ul>
@@ -77,6 +82,23 @@
                                                         changes</button>
                                                 </div>
                                             </form>
+                                            <script>
+                                                $('#bn_number_validate').on('input',function(e){
+                                                    $.ajax({
+                                                        url: '{% url 'validate_bn' bn.id %}',
+                                                        type: 'get',
+                                                        dataType: 'text',
+                                                        data: $('#bn_number_validate').val(),
+                                                        success: function(data) {
+                                                        if (data == 'False') {
+                                                            $('#bn_number_message').html('');
+                                                            $('#bn_number_validate').css('borderColor', 'none')
+                                                        } else {
+                                                            $('#bn_number_message').html('BN is already in use!').css('color', 'red');
+                                                        }
+                                                    });
+                                                });
+                                            </script>
                                         </div><!-- /.modal-content -->
                                     </div><!-- /.modal-dialog -->
                                 </div><!-- /.modal -->
@@ -161,11 +183,11 @@
                                                 </tr>
                                                 <!-- Warning Filled Modal -->
                                                 <div id="editChild{{ birth.id }}" class="modal fade" tabindex="-1" role="dialog"
-                                                    aria-labelledby="fill-warning-modalLabel" aria-hidden="true">
+                                                    aria-labelledby="fill-info-modalLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
-                                                        <div class="modal-content modal-filled bg-warning">
+                                                        <div class="modal-content modal-filled bg-info">
                                                             <div class="modal-header">
-                                                                <h4 class="modal-title  text-white" id="fill-warning-modalLabel">Edit birth {{ birth.tag_no }}</h4>
+                                                                <h4 class="modal-title  text-white" id="fill-info-modalLabel">Edit birth {{ birth.tag_no }}</h4>
                                                                 <button type="button" class="close" data-dismiss="modal"
                                                                     aria-hidden="true">×</button>
                                                             </div>

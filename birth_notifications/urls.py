@@ -12,5 +12,6 @@ urlpatterns = [
     path('delete_birth_notification/<int:id>', views.delete_birth_notification, name='delete_birth_notification'),
     path('toggle_birth_notification/<int:id>', views.toggle_birth_notification, name='toggle_birth_notification'),
     path('get_births_td', tabledata.get_birth_notifications_td, name='get_births_td'),
+    path('validate_bn/<int:id>', views.validate_bn, name='validate_bn'),
 
 ]
