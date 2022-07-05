@@ -90,7 +90,7 @@ tinycss2==1.0.2
 toml==0.10.0
 tqdm==4.19.1
 troposphere==2.5.3
-ujson==1.35
+ujson==5.4.0
 Unidecode==1.1.1
 urllib3==1.26.5
 virtualenv==16.7.9
