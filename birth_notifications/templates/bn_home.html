@@ -192,11 +192,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for notification in birth_notifications.all reversed %}
-                                        <tr onclick="window.location='{% url 'birth_notification' notification.id %}';" style="cursor: pointer;">
-                                            <td>{{ notification.bn_number }}</td>
-                                            <td>{{ notification.births.all.count }}</td>
-                                            <td>{{ notification.births.all.count }}</td>
+                                    {% for birth in birth_notifications.all reversed %}
+                                        <tr>
+                                            <td>{{ birth.bn_number }}</td>
+                                            <td>{{ birth.births.all.count }}</td>
+                                            <td>{{ birth.births.all.count }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
