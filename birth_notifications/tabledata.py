@@ -37,8 +37,9 @@ def get_birth_notifications_td(request):
             row['user'] = birth.user.get_full_name()
             row['births'] = birth.births.all().count()
             row['bn no'] = birth.bn_number
-            row['date added'] = birth.date_added.isoformat()
-            row['action'] = birth.user.get_full_name()
+            row['date added'] = birth.date_added.date()
+            row['action'] = f"""<a href="/birth_notification/birth_notification/{birth.id}"><button class="btn btn-sm btn-outline-info mr-1">View</button></a></td>"""
+
 
 
             births.append(row)
