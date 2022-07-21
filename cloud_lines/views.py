@@ -439,7 +439,7 @@ def order_service(request):
                                                             increment=request.POST.get('checkout-form-payment-inc').lower(),
                                                             active=False)
 
-    return HttpResponse(json.dumps(attached_service))
+    return HttpResponse(json.dumps(attached_service.id))
 
 
 @login_required(login_url="/account/login")

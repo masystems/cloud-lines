@@ -45,3 +45,12 @@ class BirthNotification(models.Model):
     comments = models.TextField(max_length=1000, blank=True, null=True, verbose_name="Comments", help_text="Max 1000 characters")
 
     complete = models.BooleanField(default=False)
+
+
+class BnStripeAccount(models.Model):
+    account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True,
+                                verbose_name="BnN Stripe Account")
+    attached_bolton = models.ForeignKey(AttachedBolton, on_delete=models.SET_NULL, blank=True, null=True,
+                                        verbose_name="Attached Bolton")
+    stripe_acct_id = models.CharField(max_length=255, blank=True, unique=True)
+    account_name = models.CharField(max_length=255, blank=True, unique=True)
