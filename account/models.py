@@ -41,6 +41,9 @@ class AttachedBolton(models.Model):
     increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True, blank=True)
     active = models.BooleanField(default=False)
 
+    # used by BN package for storing their custom account id
+    stripe_acct_id = models.CharField(max_length=255, blank=True)
+
 
 class AttachedService(models.Model):
     user = models.ForeignKey(UserDetail, on_delete=models.CASCADE, related_name='attached_service', null=True, blank=True)

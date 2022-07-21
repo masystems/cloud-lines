@@ -3,12 +3,14 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
+from django.conf import settings
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
-from .models import BirthNotification, BnChild
+from .models import BirthNotification, BnChild, BnStripeAccount
 from .forms import BirthNotificationForm, BirthForm
 from pedigree.models import Pedigree
 from json import dumps
 import re
+import stripe
 
 
 # Create your views here.
@@ -205,3 +207,46 @@ def validate_bn(request, id):
 
     # a bn was found and it's the same as the main bn then it's in use!
     return HttpResponse(True)
+
+
+# @login_required(login_url='/accounts/login/')
+# def create_package_on_stripe(request):
+#     # get strip secret key
+#     # import stripe key
+#     if request.user.is_superuser:
+#         stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+#     else:
+#         stripe.api_key = settings.STRIPE_SECRET_KEY
+#
+#     attached_service = get_main_account(request.user)
+#     bn_package = BnStripeAccount.objects.get(account=attached_service, active=True)
+#
+#     if not bn_package.stripe_acct_id:
+#         # create initial account
+#         account = stripe.Account.create(
+#             type="express",
+#             email=f"{request.user.email}",
+#             capabilities={
+#                 "card_payments": {"requested": True},
+#                 "transfers": {"requested": True},
+#             },
+#             business_type='company',
+#             company={
+#                 'name': membership_package.organisation_name,
+#                 "directors_provided": True,
+#                 "executives_provided": True,
+#             },
+#             country="GB",
+#             default_currency="GBP",
+#         )
+#         bn_package.stripe_acct_id = account.id
+#
+#     if not membership_package.stripe_product_id:
+#         # create product
+#         product = stripe.Product.create(name=membership_package.organisation_name,
+#                                         stripe_account=membership_package.stripe_acct_id)
+#         membership_package.stripe_product_id = product.id
+#
+#     membership_package.save()
+#
+#     return get_account_link(membership_package)
