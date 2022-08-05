@@ -141,8 +141,12 @@
     });
 </script>
 
+{% endblock %}
+
+{% block footer %}
+
 <!-- save the file when selected -->
-<script src="{% static 'js/jquery.csv.js' %}"></script>
+<script src="{% static 'js/jquery.csv.min.js' %}"></script>
 <script>
     function showFile(input) {
         if ($('#uploadDatabase').val() != '') {
@@ -156,21 +160,21 @@
                 if (fileType != '.csv') {
                     $('#overlay-spinner').modal('hide')
                     errorMsg('File type must be CSV!')
-                    
+
                     // create the error message
                     errorHtml = '<h5 class="text-danger">The selected file must be a CSV file</h5>'
-                    
+
                     // display the error message
                     $('#errors').html(errorHtml)
                     $('#errors').removeClass('d-none')
-                    
+
                     // stop the import
                     return false
                 }
-                
+
                 // the content of the csv file
                 var csvContent = $.csv.toArrays(reader.result)
-                
+
                 // variable to store whether there were errors
                 var errors = false
 
@@ -184,11 +188,11 @@
 
                     // create the error message
                     errorHtml = '<h5 class="text-danger">The selected file must have at least one row as well as the header</h5>'
-                    
+
                     // display the error message
                     $('#errors').html(errorHtml)
                     $('#errors').removeClass('d-none')
-                    
+
                     // stop the import
                     return false
                 }
@@ -205,7 +209,7 @@
 
                 // get all rows,  using all fields
                 var allRows = csvContent.slice(1, csvContent.length)
-                
+
                 // post request to process the header of the uploaded file
                 $.ajax({
                     type: "POST",
@@ -257,7 +261,7 @@
                             fileSliceArray[index] = row.concat([rowCounter])
                             rowCounter += 1
                         }
-                        
+
                         // send slice to backend
                         $.ajax({
                             type: "POST",
@@ -272,7 +276,7 @@
                             success: function(result){
                             }
                         })
-                        
+
                         // increment end and start of slice
                         sliceStart = sliceEnd
                         sliceEnd += sliceMax
@@ -287,9 +291,5 @@
         }
     }
 </script>
-
-{% endblock %}
-
-{% block footer %}
 
 {% endblock %}
