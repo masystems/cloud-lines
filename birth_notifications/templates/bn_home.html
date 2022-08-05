@@ -176,6 +176,24 @@
             </div>
 
             <div class="col-md-4 col-lg-4 col-xlg-4">
+                {% if stripe_package_setup %}
+                    <div class="alert alert-success" role="alert">
+                        <strong>Accept payments?</strong> Please head to Stripe to set up your account details.
+                    </div>
+                {% endif %}
+                {% if stripe_package_setup %}
+                    <a href="{{ stripe_package_setup.url }}">
+                        <button type="button" class="btn btn-success mb-2" style="width: 100%">
+                            Setup Stripe Account
+                        </button>
+                    </a>
+                {% elif account_link %}
+                    <a href="{{ account_link.url }}">
+                        <button type="button" class="btn btn-warning mb-2" style="width: 100%">
+                            Action Required on Stripe
+                        </button>
+                    </a>
+                {% endif %}
                 <!-- Card -->
                 <div class="card">
                     <div class="card-body">
