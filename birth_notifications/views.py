@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
 from django.conf import settings
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
+from account.models import AttachedBolton
 from .models import BirthNotification, BnChild, BnStripeAccount
 from .forms import BirthNotificationForm, BirthForm
 from pedigree.models import Pedigree
@@ -35,6 +36,32 @@ class BnHome(BirthNotificationBase):
         context['total_living'] = BnChild.objects.filter(status="alive").count()
         context['total_deceased'] = BnChild.objects.filter(status="deceased").count()
         context['approvals'] = BirthNotification.objects.filter(complete=False)
+
+        if self.request.user.is_superuser:
+            stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+        else:
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        try:
+            context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
+        except BnStripeAccount.DoesNotExist:
+            context['account_link'] = create_package_on_stripe(self.request)
+            context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
+
+        context['stripe_package'] = stripe.Account.retrieve(context['bn_stripe_account'].stripe_acct_id)
+
+        if context['bn_stripe_account'].stripe_acct_id:
+            try:
+                context['edit_account'] = stripe.Account.create_login_link(context['bn_stripe_account'].stripe_acct_id)
+            except stripe.error.InvalidRequestError:
+                # stripe account created but not setup
+                context['stripe_package_setup'] = get_account_link(context['bn_stripe_account'])
+            if context['stripe_package'].requirements.errors:
+                context['account_link'] = get_account_link(context['bn_stripe_account'])
+        else:
+            # stripe account not setup
+            context['stripe_package_setup'] = create_package_on_stripe(self.request)
+
         return context
 
 
@@ -209,44 +236,58 @@ def validate_bn(request, id):
     return HttpResponse(True)
 
 
-# @login_required(login_url='/accounts/login/')
-# def create_package_on_stripe(request):
-#     # get strip secret key
-#     # import stripe key
-#     if request.user.is_superuser:
-#         stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-#     else:
-#         stripe.api_key = settings.STRIPE_SECRET_KEY
-#
-#     attached_service = get_main_account(request.user)
-#     bn_package = BnStripeAccount.objects.get(account=attached_service, active=True)
-#
-#     if not bn_package.stripe_acct_id:
-#         # create initial account
-#         account = stripe.Account.create(
-#             type="express",
-#             email=f"{request.user.email}",
-#             capabilities={
-#                 "card_payments": {"requested": True},
-#                 "transfers": {"requested": True},
-#             },
-#             business_type='company',
-#             company={
-#                 'name': membership_package.organisation_name,
-#                 "directors_provided": True,
-#                 "executives_provided": True,
-#             },
-#             country="GB",
-#             default_currency="GBP",
-#         )
-#         bn_package.stripe_acct_id = account.id
-#
-#     if not membership_package.stripe_product_id:
-#         # create product
-#         product = stripe.Product.create(name=membership_package.organisation_name,
-#                                         stripe_account=membership_package.stripe_acct_id)
-#         membership_package.stripe_product_id = product.id
-#
-#     membership_package.save()
-#
-#     return get_account_link(membership_package)
+def get_account_link(bn_package):
+    account_link = stripe.AccountLink.create(
+        account=bn_package.stripe_acct_id,
+        refresh_url=f'{settings.HTTP_PROTOCOL}://{settings.SITE_NAME}/birth_notification',
+        return_url=f'{settings.HTTP_PROTOCOL}://{settings.SITE_NAME}/birth_notification',
+        type='account_onboarding',
+    )
+    return account_link
+
+
+@login_required(login_url='/accounts/login/')
+def create_package_on_stripe(request):
+    # get strip secret key
+    # import stripe key
+    if request.user.is_superuser:
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+    else:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    attached_service = get_main_account(request.user)
+    attached_bolton = AttachedBolton.objects.get(bolton='1', active=True)
+    try:
+        bn_package = BnStripeAccount.objects.get(account=attached_service)
+    except BnStripeAccount.DoesNotExist:
+        bn_package = BnStripeAccount.objects.create(account=attached_service, attached_bolton=attached_bolton)
+
+    if not bn_package.stripe_acct_id:
+        # create initial account
+        account = stripe.Account.create(
+            type="express",
+            email=f"{request.user.email}",
+            capabilities={
+                "card_payments": {"requested": True},
+                "transfers": {"requested": True},
+            },
+            business_type='company',
+            company={
+                'name': 'test_name',
+                "directors_provided": True,
+                "executives_provided": True,
+            },
+            country="GB",
+            default_currency="GBP",
+        )
+        bn_package.stripe_acct_id = account.id
+
+    if not bn_package.stripe_product_id:
+        # create product
+        product = stripe.Product.create(name='test_name',
+                                        stripe_account=bn_package.stripe_acct_id)
+        bn_package.stripe_product_id = product.id
+
+    bn_package.save()
+
+    return get_account_link(bn_package)
