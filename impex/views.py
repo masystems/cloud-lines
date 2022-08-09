@@ -1207,7 +1207,7 @@ def import_breeder_data(request):
     phone_number2 = post_data['phone_number2'] or ''
     email = post_data['email'] or ''
     active = post_data['active'] or ''
-
+    print(loads(database_upload.header)['header'])
     # get index of each heading
     thousand = 1000
     if breeding_prefix:
@@ -1232,11 +1232,11 @@ def import_breeder_data(request):
     else:
         town = thousand
     if country:
-        country = loads(database_upload.header)['country'].index(town)
+        country = loads(database_upload.header)['header'].index(country)
     else:
         country = thousand
     if postcode:
-        postcode = loads(database_upload.header)['country'].index(town)
+        postcode = loads(database_upload.header)['header'].index(postcode)
     else:
         postcode = thousand
     if phone_number1:
