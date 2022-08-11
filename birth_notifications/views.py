@@ -23,6 +23,7 @@ class BirthNotificationBase(LoginRequiredMixin, TemplateView):
 
         context['attached_service'] = get_main_account(self.request.user)
         context['birth_notifications'] = BirthNotification.objects.filter(account=context['attached_service'])
+        context['latest'] = BirthNotification.objects.filter(account=context['attached_service'])[:10]
 
         return context
 
@@ -55,9 +56,9 @@ class BnHome(BirthNotificationBase):
                 context['edit_account'] = stripe.Account.create_login_link(context['bn_stripe_account'].stripe_acct_id)
             except stripe.error.InvalidRequestError:
                 # stripe account created but not setup
-                context['stripe_package_setup'] = get_account_link(context['bn_stripe_account'])
+                context['stripe_package_setup'] = get_account_link(context['bn_stripe_account'], context['attached_service'])
             if context['stripe_package'].requirements.errors:
-                context['account_link'] = get_account_link(context['bn_stripe_account'])
+                context['account_link'] = get_account_link(context['bn_stripe_account'], context['attached_service'])
         else:
             # stripe account not setup
             context['stripe_package_setup'] = create_package_on_stripe(self.request)
@@ -127,6 +128,10 @@ def birth_notification_form(request):
 
 
     else:
+        if request.user.is_superuser:
+            public_api_key = settings.STRIPE_TEST_PUBLIC_KEY
+        else:
+            public_api_key = settings.STRIPE_PUBLIC_KEY
 
         # get next available reg number
         try:
@@ -151,7 +156,8 @@ def birth_notification_form(request):
         bn_form = BirthNotificationForm({'bn_number': bn_number})
 
     return render(request, 'birth_notification_form.html', {'bn_form': bn_form,
-                                                            'bn_number': bn_number})
+                                                            'bn_number': bn_number,
+                                                            'public_api_key': public_api_key})
 
 @login_required(login_url="/account/login")
 def edit_child(request, id):
@@ -236,11 +242,15 @@ def validate_bn(request, id):
     return HttpResponse(True)
 
 
-def get_account_link(bn_package):
+def get_account_link(bn_package, attached_service):
+    if not attached_service.domain:
+        domain = "http://localhost:8000"
+    else:
+        domain = attached_service.domain
     account_link = stripe.AccountLink.create(
         account=bn_package.stripe_acct_id,
-        refresh_url=f'{settings.HTTP_PROTOCOL}://{settings.SITE_NAME}/birth_notification',
-        return_url=f'{settings.HTTP_PROTOCOL}://{settings.SITE_NAME}/birth_notification',
+        refresh_url=f'{domain}/birth_notification',
+        return_url=f'{domain}/birth_notification',
         type='account_onboarding',
     )
     return account_link
@@ -290,4 +300,4 @@ def create_package_on_stripe(request):
 
     bn_package.save()
 
-    return get_account_link(bn_package)
+    return get_account_link(bn_package, attached_service)
