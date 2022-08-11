@@ -24,9 +24,10 @@ class BnChild(models.Model):
     sex = models.CharField(max_length=10, choices=GENDERS, null=True, default='unknown',
                            help_text="Accepted formats: male, female", verbose_name="Sex")
 
-    #comments = models.TextField(max_length=1000, blank=True, null=True, verbose_name="Comments",
-    #                            help_text="Max 1000 characters")
+    comments = models.TextField(max_length=1000, blank=True, null=True, verbose_name="Comments",
+                               help_text="Max 1000 characters")
 
+    pedigree = models.ForeignKey(Pedigree, related_name='registered_ped', on_delete=models.SET_NULL, blank=True, null=True)
     approved = models.BooleanField(default=False)
 
 
