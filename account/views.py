@@ -95,7 +95,7 @@ def site_mode(request):
         else:
             pending_approvals = False
 
-        if attached_service.service.service_name != 'Organisation':
+        if attached_service.service.service_name not in ['Organisation', 'Large Society']:
             if Pedigree.objects.filter(account=attached_service).count() < attached_service.service.number_of_animals:
                 pedigrees = True
             else:
