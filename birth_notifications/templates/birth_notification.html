@@ -161,6 +161,7 @@
                                                 <th>Tag No</th>
                                                 <th>Status</th>
                                                 <th>Sex</th>
+                                                <th>Comments</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -175,6 +176,9 @@
                                                     </td>
                                                     <td>
                                                         {{ birth.sex }}
+                                                    </td>
+                                                    <td>
+                                                        {{ birth.comments }}
                                                     </td>
                                                     <td>
                                                         <div class="btn-list">
@@ -208,6 +212,8 @@
                                                                         <option value="male" {% if birth.sex == 'male' %}selected{% endif %}>Male</option>
                                                                         <option value="female" {% if birth.sex == 'female' %}selected{% endif %}>Female</option>
                                                                     </select>
+                                                                    <label class="mt-2 text-light">Comments</label>
+                                                                    <textarea class="form-control" name="comments" rows="4" cols="50">{{ birth.comments }}</textarea>
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-light"

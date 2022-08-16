@@ -166,6 +166,7 @@ def edit_child(request, id):
         child.tag_no = request.POST.get('tag_no')
         child.status = request.POST.get('status')
         child.sex = request.POST.get('sex')
+        child.comments = request.POST.get('comments')
         child.save()
     return redirect('birth_notification', child.births.all()[0].id)
 
