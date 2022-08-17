@@ -38,7 +38,7 @@ class BnHome(BirthNotificationBase):
         context['total_deceased'] = BnChild.objects.filter(status="deceased").count()
         context['approvals'] = BirthNotification.objects.filter(complete=False)
 
-        if self.request.user.is_superuser:
+        if self.request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
             stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
         else:
             stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -128,7 +128,7 @@ def birth_notification_form(request):
 
 
     else:
-        if request.user.is_superuser:
+        if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
             public_api_key = settings.STRIPE_TEST_PUBLIC_KEY
         else:
             public_api_key = settings.STRIPE_PUBLIC_KEY
@@ -261,7 +261,7 @@ def get_account_link(bn_package, attached_service):
 def create_package_on_stripe(request):
     # get strip secret key
     # import stripe key
-    if request.user.is_superuser:
+    if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
         stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
     else:
         stripe.api_key = settings.STRIPE_SECRET_KEY

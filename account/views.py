@@ -516,8 +516,13 @@ def logout(request):
 @login_required(login_url="/account/login")
 def profile(request):
     from django.conf import settings
-    stripe_pk = settings.STRIPE_PUBLIC_KEY
-    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
+        stripe_pk = settings.STRIPE_TEST_PUBLIC_KEY
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+    else:
+        stripe_pk = settings.STRIPE_PUBLIC_KEY
+        stripe.api_key = settings.STRIPE_SECRET_KEY
     context = {'public_api_key': stripe_pk, 'user_detail': UserDetail.objects.get(user=request.user)}
 
     main_account = get_main_account(request.user)
@@ -983,7 +988,10 @@ def cancel_sub(request):
         raise PermissionDenied()
     
     from django.conf import settings
-    stripe.api_key = settings.STRIPE_SECRET_KEY
+    if self.request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+    else:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
     attached_service = get_main_account(request.user)
     stripe.Subscription.delete(attached_service.subscription_id)
     attached_service.active = False
