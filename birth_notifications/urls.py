@@ -4,6 +4,8 @@ from . import views
 
 urlpatterns = [
     path('', views.BnHome.as_view(), name='bn_home'),
+    path('settings', views.Settings.as_view(), name='bn_settings'),
+    path('update_prices', views.update_prices, name='update_prices'),
     path('birth_notification_form', views.birth_notification_form, name='birth_notification_form'),
     path('birth_notification/<int:id>', views.BirthNotificationView.as_view(), name='birth_notification'),
     path('edit_child/<int:id>', views.edit_child, name='edit_child'),

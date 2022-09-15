@@ -3,17 +3,19 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 
+
 class BirthNotificationForm(forms.ModelForm):
     class Meta:
         model = BirthNotification
         fields = '__all__'
-        exclude = ('account', 'user', 'attached_bolton', 'births', 'complete')
+        exclude = ('account', 'user', 'attached_bolton', 'births', 'stripe_payment_token', 'stripe_payment_source', 'complete')
         help_texts = {
             # 'breed_name': _('e.g. Greyhound, Siamese, Shetland, etc'),
             # 'image': _('A great picture to depict the breed.'),
             # 'breed_description': _('What are the common attributes about this breed?')
         }
         widgets = {
+            'dob': forms.DateInput(format='%d/%m/%Y', attrs={'type':'date'}),
             'comments': forms.Textarea(attrs={'rows': 4, 'cols': 15, 'maxlength': 2000,}),
         }
 
