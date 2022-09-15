@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, HttpResponse
+from django.db import IntegrityError
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -10,6 +11,7 @@ from .models import BirthNotification, BnChild, BnStripeAccount
 from .forms import BirthNotificationForm, BirthForm
 from pedigree.models import Pedigree
 from json import dumps
+from urllib.parse import parse_qs
 import re
 import stripe
 
@@ -43,27 +45,72 @@ class BnHome(BirthNotificationBase):
         else:
             stripe.api_key = settings.STRIPE_SECRET_KEY
 
-        try:
-            context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
-        except BnStripeAccount.DoesNotExist:
-            context['account_link'] = create_package_on_stripe(self.request)
-            context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
-
-        context['stripe_package'] = stripe.Account.retrieve(context['bn_stripe_account'].stripe_acct_id)
-
-        if context['bn_stripe_account'].stripe_acct_id:
+        if self.request.user == context['attached_service'].user:
             try:
-                context['edit_account'] = stripe.Account.create_login_link(context['bn_stripe_account'].stripe_acct_id)
-            except stripe.error.InvalidRequestError:
-                # stripe account created but not setup
-                context['stripe_package_setup'] = get_account_link(context['bn_stripe_account'], context['attached_service'])
-            if context['stripe_package'].requirements.errors:
-                context['account_link'] = get_account_link(context['bn_stripe_account'], context['attached_service'])
-        else:
-            # stripe account not setup
-            context['stripe_package_setup'] = create_package_on_stripe(self.request)
+                context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
+            except BnStripeAccount.DoesNotExist:
+                context['account_link'] = create_package_on_stripe(self.request)
+                context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
+
+            context['stripe_package'] = stripe.Account.retrieve(context['bn_stripe_account'].stripe_acct_id)
+
+            if context['bn_stripe_account'].stripe_acct_id:
+                try:
+                    context['edit_account'] = stripe.Account.create_login_link(context['bn_stripe_account'].stripe_acct_id)
+                except stripe.error.InvalidRequestError:
+                    # stripe account created but not setup
+                    context['stripe_package_setup'] = get_account_link(context['bn_stripe_account'], context['attached_service'])
+                if context['stripe_package'].requirements.errors:
+                    context['account_link'] = get_account_link(context['bn_stripe_account'], context['attached_service'])
+            else:
+                # stripe account not setup
+                context['stripe_package_setup'] = create_package_on_stripe(self.request)
 
         return context
+
+
+class Settings(BirthNotificationBase):
+    template_name = 'bn_settings.html'
+
+    def get_context_data(self, **kwargs):
+        # check if user has permission
+        if self.request.method == 'GET':
+            if not has_permission(self.request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': False}):
+                return redirect_2_login(request)
+        elif self.request.method == 'POST':
+            if not has_permission(self.request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
+                raise PermissionDenied()
+        else:
+            raise PermissionDenied()
+
+        context = super().get_context_data(**kwargs)
+        context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
+        return context
+
+
+@login_required(login_url="/account/login")
+def update_prices(request):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+    
+    print(request.POST)
+    print(request.POST.get('bncost'))
+
+    attached_service = get_main_account(request.user)
+
+    bn_stripe_account = BnStripeAccount.objects.get(account=attached_service)
+    bn_stripe_account.bn_cost = float(request.POST.get('bncost')) * 100
+    bn_stripe_account.bn_child_cost = float(request.POST.get('bnccost')) * 100
+    bn_stripe_account.save()
+    
+    return redirect('bn_settings')
 
 
 class BirthNotificationView(BirthNotificationBase):
@@ -80,51 +127,99 @@ class BirthNotificationView(BirthNotificationBase):
 def birth_notification_form(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
 
     attached_service = get_main_account(request.user)
 
+    try:
+        bn_stripe_account = BnStripeAccount.objects.get(account=attached_service)
+    except BnStripeAccount.DoesNotExist:
+        bn_stripe_account = False
+
     if request.method == 'POST':
-        bn_form = BirthNotificationForm(request.POST or None)
-        if bn_form.is_valid():
-            new_bn = BirthNotification()
-            ### mother ###
-            try:
-                new_bn.mother = Pedigree.objects.get(account=attached_service,
-                                                      reg_no=request.POST.get('motherx'))
-            except:
-                print('Not a valid mother')
+        #bn_form = BirthNotificationForm(request.POST or None)
+        try:
+            bn_form = parse_qs(request.POST['form'])
+        except MultiValueDictKeyError:
+            bn_form = request.POST
 
-            ### father ###
-            try:
-                new_bn.father = Pedigree.objects.get(account=attached_service,
-                                                      reg_no=request.POST.get('fatherx'))
-            except:
-                pass
-            new_bn.user = request.user
-            new_bn.account = attached_service
-            new_bn.bn_number = bn_form['bn_number'].value().strip()
-            new_bn.comments = bn_form['comments'].value().strip()
+        new_bn = BirthNotification()
+        ### mother ###
+        try:
+            new_bn.mother = Pedigree.objects.get(account=attached_service,
+                                                  reg_no=bn_form['motherx'][0])
+        except:
+            pass
+
+        ### father ###
+        try:
+            new_bn.father = Pedigree.objects.get(account=attached_service,
+                                                  reg_no=bn_form['fatherx'][0])
+        except:
+            pass
+
+        new_bn.user = request.user
+        new_bn.account = attached_service
+        new_bn.bn_number = bn_form['bn_number'][0]
+        try:
+            new_bn.dob = bn_form['dob'][0]
+        except KeyError:
+            # no date added
+            pass
+        try:
+            new_bn.comments = bn_form['comments'][0]
+        except KeyError:
+            # no comment added
+            pass
+
+        # needs to be moved to after adding children
+        try:
             new_bn.save()
+        except IntegrityError:
+            result = {'result': 'fail',
+                      'feedback': f'BN Number: {bn_form["bn_number"][0]} already in use!'}
+            return HttpResponse(dumps(result))
 
-            # births
-            bn_child_form = dict(request.POST.lists())
-            birth_line = 0
-            for birth in bn_child_form['tag_no']:
-                child = BnChild.objects.create(tag_no=bn_child_form['tag_no'][birth_line],
-                                               status=bn_child_form['status'][birth_line],
-                                               sex=bn_child_form['sex'][birth_line])
-                new_bn.births.add(child)
-                new_bn.save()
-                birth_line += 1
+        # births and calc total
+        total_price = bn_stripe_account.bn_cost
+        birth_line = 0
+        for birth in bn_form['tag_no']:
+            child = BnChild.objects.create(tag_no=bn_form['tag_no'][birth_line],
+                                           status=bn_form['status'][birth_line],
+                                           sex=bn_form['sex'][birth_line])
+            new_bn.births.add(child)
+            new_bn.save()
+            total_price += bn_stripe_account.bn_child_cost
+            birth_line += 1
 
-            return redirect('bn_home')
+        bnstripeobject = BnStripeAccount.objects.get(account=attached_service)
+        # validate card to update card
+        result = validate_card(request, attached_service, bnstripeobject)
+        if result['result'] == 'fail':
+            return HttpResponse(dumps(result))
+
+        user_detail = request.user.user.all()[0]
+        payment_intent = stripe.PaymentIntent.create(
+            customer=user_detail.bn_stripe_id,
+            amount=total_price,
+            currency="gbp",
+            payment_method_types=["card"],
+            receipt_email=request.user.email,
+            stripe_account=bnstripeobject.stripe_acct_id
+        )
+        new_bn.stripe_payment_token = payment_intent['id']
+        new_bn.stripe_payment_source = result['feedback']['id']
+
+        new_bn.save()
+
+        result = {'result': 'success'}
+        return HttpResponse(dumps(result))
 
 
     else:
@@ -157,7 +252,8 @@ def birth_notification_form(request):
 
     return render(request, 'birth_notification_form.html', {'bn_form': bn_form,
                                                             'bn_number': bn_number,
-                                                            'public_api_key': public_api_key})
+                                                            'public_api_key': public_api_key,
+                                                            'bn_stripe_account': bn_stripe_account})
 
 @login_required(login_url="/account/login")
 def edit_child(request, id):
@@ -184,10 +280,23 @@ def delete_child(request, id):
 def toggle_birth_notification(request, id):
     if request.method == 'GET':
         bn = BirthNotification.objects.get(id=id)
-        if bn.complete:
-            bn.complete = False
+        attached_service = get_main_account(request.user)
+        bnstripeobject = BnStripeAccount.objects.get(account=attached_service)
+
+        if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
+            stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
         else:
-            bn.complete = True
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        # take payment
+        payment_confirm = stripe.PaymentIntent.confirm(
+            bn.stripe_payment_token,
+            payment_method=bn.stripe_payment_source,
+            stripe_account=bnstripeobject.stripe_acct_id
+        )
+        #receipt = stripe.Charge.list(customer=subscription.stripe_id, stripe_account=package.stripe_acct_id, limit=1)
+
+        bn.complete = True
         bn.save()
     return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
@@ -202,6 +311,7 @@ def edit_birth_notification(request, id):
         bn.father = Pedigree.objects.get(account=attached_service,
                                          reg_no=request.POST.get('fatherx'))
         bn.bn_number = request.POST.get('bn_number')
+        bn.dob = request.POST.get('bn_dob')
         bn.comments = request.POST.get('comments')
         bn.save()
     return redirect('birth_notification', bn.id)
@@ -302,3 +412,113 @@ def create_package_on_stripe(request):
     bn_package.save()
 
     return get_account_link(bn_package, attached_service)
+
+
+@login_required(login_url="/accounts/login")
+def validate_card(request, attached_service, bnstripeobject):
+    # get strip secret key
+    if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
+        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+    else:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    # validate main account created on stripe
+    if not bnstripeobject.stripe_acct_id:
+        return {'result': 'fail',
+                'feedback': "There has been a problem with this Stripe payment, you have not been charged, please try again. If this problem persists, email contact@masys.co.uk"}
+    else:
+        stripe_id = bnstripeobject.stripe_acct_id
+
+    user_detail = request.user.user.all()[0]
+
+    # create/ update stripe customer
+    if user_detail.bn_stripe_id != "":
+        try:
+            # stripe user already exists
+            stripe_customer = stripe.Customer.modify(
+                user_detail.bn_stripe_id,
+                name=user_detail.user.get_full_name(),
+                email=user_detail.user.email,
+                stripe_account=bnstripeobject.stripe_acct_id
+            )
+        except stripe.error.InvalidRequestError:
+            # we have a cus is but it doesn't exist in stripe
+            stripe_customer = stripe.Customer.create(
+                name=user_detail.user.get_full_name(),
+                email=user_detail.user.email,
+                stripe_account=bnstripeobject.stripe_acct_id
+            )
+            user_detail.bn_stripe_id = stripe_customer.id
+            user_detail.save()
+    else:
+        stripe_customer = stripe.Customer.create(
+            name=user_detail.user.get_full_name(),
+            email=user_detail.user.email,
+            stripe_account=bnstripeobject.stripe_acct_id
+        )
+        user_detail.bn_stripe_id = stripe_customer.id
+        user_detail.save()
+
+    try:
+        payment_method = stripe.Customer.create_source(
+            user_detail.bn_stripe_id,
+            source=request.POST.get('token[id]'),
+            stripe_account=bnstripeobject.stripe_acct_id
+        )
+        return {'result': 'success',
+                'feedback': payment_method}
+
+    except stripe.error.CardError as e:
+        # Since it's a decline, stripe.error.CardError will be caught
+        feedback = send_payment_error(e)
+        return {'result': 'fail',
+                'feedback': feedback}
+
+    except stripe.error.RateLimitError as e:
+        # Too many requests made to the API too quickly
+        feedback = send_payment_error(e)
+        return {'result': 'fail',
+                'feedback': feedback}
+
+    except stripe.error.InvalidRequestError as e:
+        # Invalid parameters were supplied to Stripe's API
+        feedback = send_payment_error(e)
+        return {'result': 'fail',
+                'feedback': feedback}
+
+    except stripe.error.AuthenticationError as e:
+        # Authentication with Stripe's API failed
+        # (maybe you changed API keys recently)
+        feedback = send_payment_error(e)
+        return {'result': 'fail',
+                'feedback': feedback}
+
+    except stripe.error.APIConnectionError as e:
+        # Network communication with Stripe failed
+        feedback = send_payment_error(e)
+        return {'result': 'fail',
+                'feedback': feedback}
+
+    except stripe.error.StripeError as e:
+        # Display a very generic error to the user, and maybe send
+        # yourself an email
+        feedback = send_payment_error(e)
+        return {'result': 'fail',
+                'feedback': feedback}
+
+    except Exception as e:
+        # Something else happened, completely unrelated to Stripe
+        feedback = send_payment_error(e)
+        return {'result': 'fail',
+                'feedback': feedback}
+
+
+def send_payment_error(error):
+    body = error.json_body
+    err = body.get('error', {})
+
+    feedback = "<strong>Status is:</strong> %s" % error.http_status
+    feedback += "<br><strong>Type is:</strong> %s" % err.get('type')
+    feedback += "<br><strong>Code is:</strong> %s" % err.get('code')
+    feedback += "<br><strong>Message is:</strong> <span class='text-danger'>%s</span>" % err.get('message')
+    return feedback

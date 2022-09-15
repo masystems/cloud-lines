@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% load static %}
+{% load custom_tags %}
 
 {% block header %}
 
@@ -99,7 +100,7 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <input type="text" class="form-control" name="tag_no">
+                                                        <input type="text" class="form-control" name="tag_no" required>
                                                     </td>
                                                     <td>
                                                         <select class="form-control" name="status">
@@ -119,31 +120,55 @@
                                             <button id="addRow" type="button" class="btn btn-outline-success">Add new row</button>
                                         </div>
                                     </div>
-<!--                                    <div class="col-lg-6 offset-lg-3">-->
-<!--                                        <form id="payment-form">-->
-<!--                                            <label>Card Holders Name:</label>-->
-<!--                                            <input id="cardholder-name" type="text" class="form-control" value="{{ user.get_full_name }}">-->
-<!--                                            &lt;!&ndash; placeholder for Elements &ndash;&gt;-->
-<!--                                            <div id="card-element"></div>-->
-<!--                                            &lt;!&ndash; Used to display Element errors. &ndash;&gt;-->
-<!--                                            <div id="card-errors" role="alert"></div>-->
-<!--                                            <div class="text-center" id="cardTypes">-->
-<!--                                                <img class="mt-2" src="{% static 'cloud-lines/images/cards/1.png' %}" alt="Card" style="max-height:50px">-->
-<!--                                                <img class="mt-2" src="{% static 'cloud-lines/images/cards/2.png' %}" alt="Card" style="max-height:50px">-->
-<!--                                                <img class="mt-2" src="{% static 'cloud-lines/images/cards/22.png' %}" alt="Card" style="max-height:50px">-->
-<!--                                            </div>-->
-<!--                                        </form>-->
-<!--                                    </div>-->
+                                    {% if bn_stripe_account.stripe_acct_id %}
+                                        <div class="col-12 offset-xl-3">
+                                            <hr/>
+                                            <p>
+                                            BN Price: £{{ bn_stripe_account.bn_cost|price }} | Child Price: £{{ bn_stripe_account.bn_child_cost|price }}
+                                            </p>
+                                            <p id="totalCost">
+                                            <strong>Total:</strong>
+                                            </p>
+                                            <br>
+    <!--                                        <form id="payment-form">-->
+                                            <label>Card Holders Name:</label>
+                                            <input id="cardholder-name" type="text" class="form-control" value="{{ user.get_full_name }}">
+                                            <!-- placeholder for Elements -->
+                                            <div id="card-element"></div>
+                                            <!-- Used to display Element errors. -->
+                                            <div id="card-errors" role="alert"></div>
+                                            <div class="text-center" id="cardTypes">
+                                                <img class="mt-2" src="{% static 'cloud-lines/images/cards/1.png' %}" alt="Card" style="max-height:40px">
+                                                <img class="mt-2" src="{% static 'cloud-lines/images/cards/2.png' %}" alt="Card" style="max-height:40px">
+                                                <img class="mt-2" src="{% static 'cloud-lines/images/cards/22.png' %}" alt="Card" style="max-height:40px">
+                                            </div>
+    <!--                                        </form>-->
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-success float-right" type="submit">Submit</button>
                     </form>
+                    <button id="formSubmit" class="btn btn-success float-right" type="submit"><div id="loading" class="spinner-grow text-white align-self-center loader-sm d-none"></div> Submit</button>
                     <script>
+                        window.onload = function() {
+                          updateTotal();
+                        };
+                        function updateTotal() {
+                            var bnCost = {{ bn_stripe_account.bn_cost }}
+                            var childCost = {{ bn_stripe_account.bn_child_cost }}
+                            var table = document.getElementById("birthTable");
+                            var rows = table.rows.length - 1;
+                            var childTotal = childCost * rows
+                            var total = bnCost + childTotal
+                            var totalDec = total / 100
+                            $('#totalCost').html("<strong>Total:</strong> £" + totalDec.toFixed(2))
+                        }
                         function DeleteRow(o) {
                          //no clue what to put here?
                          var p=o.parentNode.parentNode;
                              p.parentNode.removeChild(p);
+                             updateTotal()
                         }
 
                         function addRow(){
@@ -203,6 +228,7 @@
                             birthTr.appendChild(deleteTd);
 
                           birthTable.appendChild(birthTr);
+                          updateTotal()
                         }
                         document.getElementById('addRow').onclick=addRow;
                     </script>
@@ -230,6 +256,14 @@
 
     <script src="https://js.stripe.com/v3/"></script>
     <script>
+        $('#formSubmit').click( function () {
+            {% if bn_stripe_account.stripe_acct_id %}
+                // process card
+                generateCardToken();
+            {% else %}
+                $('#bnForm').submit()
+            {% endif %}
+        });
 
         // STRIPE STUFF
         var stripe = Stripe('{{ public_api_key }}');
@@ -241,7 +275,7 @@
             color: '#32325d',
             fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
             fontSmoothing: 'antialiased',
-            fontSize: '24px',
+            fontSize: '18px',
             '::placeholder': {
               color: '#aab7c4'
             }
@@ -263,52 +297,53 @@
           var displayError = document.getElementById('card-errors');
           if (event.error) {
             displayError.textContent = event.error.message;
-            $('#overlay-spinner').modal('hide');
           } else {
             displayError.textContent = '';
           }
         });
 
         // Create a token or display an error when the form is submitted.
-        function generateCardToken(old_price) {
+        var form = document.getElementById('payment-form');
+        var cardButton = document.getElementById('card-button');
+        function generateCardToken() {
+
             stripe.createToken(card).then(function(result) {
                 if (result.error) {
                     // Inform the customer that there was an error.
                     var errorElement = document.getElementById('card-errors');
-                    $('#overlay-spinner').modal('hide');
                     errorElement.textContent = result.error.message;
                 } else {
                     // Send the token to your server.
-                    stripeTokenHandler(result.token, old_price);
+                    stripeTokenHandler(result.token);
                 }
             });
         }
 
-        function stripeTokenHandler(token, old_price) {
-
+        function stripeTokenHandler(token) {
             // Submit the token
             $.ajax({
-                url: 'paymenturl',
+                url: '{% url 'birth_notification_form' %}',
                 type: 'post',
                 dataType: 'text',
                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                data: {
-                    'token': token,
-                    'old_price': old_price,
-                    },
+                data: {'form': $('#bnForm').serialize(),
+                       'token': token
+                       },
                 beforeSend: function() {
-                    $('#paymentSuccess').addClass('d-none');
-                    $('#paymentFail').addClass('d-none');
+                    $('#card-errors').html('');
+                    $('#loading').removeClass('d-none');
+                    $('#formSubmit').prop('disabled', true);
                 },
                 success: function(data) {
                     var result = JSON.parse(data);
                     if (result.result == 'fail') {
-                        $('#overlay-spinner').modal('hide');
+                        // hide loader
+                        $('#loading').addClass('d-none');
+                        $('#formSubmit').prop('disabled', false);
                         $('#card-errors').html(result.feedback);
+                        errorMsg(result.feedback)
                     } else {
-                        $('#existing-customer-details').addClass('d-none');
-                        $('#payment-form').addClass('d-none');
-                        $('#payment-buttons').addClass('d-none');
+                        // hide loader
                         loadSuccessPage(result);
                     }
                  },
@@ -324,12 +359,11 @@
         }
 
         function loadSuccessPage(result) {
-            $('#overlay-spinner').modal('hide');
+            $('#loading').addClass('d-none');
+            $('#formSubmit').prop('disabled', false);
 
-            //update layout
-            $('#result').removeClass('d-none');
-            $('#receipt').attr("href", result.receipt);
-            $('#goToMemberPageLink').attr("href", '/membership/member-profile/{{ member.pk }}');
+            //redirect to bn home
+            window.location.href = "{% url 'bn_home' %}";
         }
     </script>
 

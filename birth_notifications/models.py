@@ -41,9 +41,12 @@ class BirthNotification(models.Model):
     births = models.ManyToManyField(BnChild, related_name='births', blank=True)
 
     bn_number = models.CharField(max_length=255, blank=True, unique=True)
-
+    dob = models.DateField(blank=True, null=True, verbose_name="Date Of Birth(s)")
     date_added = models.DateTimeField(auto_now_add=True)
     comments = models.TextField(max_length=1000, blank=True, null=True, verbose_name="Comments", help_text="Max 1000 characters")
+
+    stripe_payment_token = models.CharField(max_length=255, blank=True)
+    stripe_payment_source = models.CharField(max_length=255, blank=True)
 
     complete = models.BooleanField(default=False)
 
@@ -56,3 +59,6 @@ class BnStripeAccount(models.Model):
     stripe_acct_id = models.CharField(max_length=255, blank=True, unique=True)
     stripe_product_id = models.CharField(max_length=255, blank=True, unique=True)
     account_name = models.CharField(max_length=255, blank=True, unique=True)
+    bn_cost = models.IntegerField(default=0, blank=True)
+    bn_child_cost = models.IntegerField(default=0, blank=True)
+    ped_cost = models.IntegerField(default=0, blank=True)
