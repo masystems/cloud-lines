@@ -1,5 +1,6 @@
 from django.shortcuts import HttpResponse
 from account.views import get_main_account, has_permission
+from django.db.models import Q
 from .models import BirthNotification
 from json import dumps
 from django.urls import reverse
@@ -11,21 +12,33 @@ def get_birth_notifications_td(request):
     end = int(request.POST.get('length', 20))
     search = request.POST.get('search[value]', "")
     sort_by = request.POST.get(f'columns[{request.POST.get("order[0][column]")}][data]')
+
     # desc or asc
     if request.POST.get('order[0][dir]') == 'asc':
         direction = ""
     else:
         direction = "-"
     # sort map
-    #sort_by_col = f"-reg_no"
+    if sort_by == 'bn no':
+        sort_by_col = f"{direction}bn_number"
+    elif sort_by == "date added":
+        sort_by_col = f"{direction}date_added"
+    else:
+        sort_by_col = f"{direction}user"
 
     births = []
     
     all_births = BirthNotification.objects.filter(
-        account=attached_service).distinct()[start:start + end]
-    
+        Q(user__first_name__icontains=search)|
+        Q(user__last_name__icontains=search)|
+        Q(bn_number__icontains=search)|
+        Q(date_added__icontains=search)).order_by(sort_by_col).distinct()[start:start + end]
+    #.order_by(sort_by_col)
     total_births = BirthNotification.objects.filter(
-                    account=attached_service).distinct().count()
+        Q(user__first_name__icontains=search) |
+        Q(user__last_name__icontains=search) |
+        Q(bn_number__icontains=search) |
+        Q(date_added__icontains=search)).order_by(sort_by_col).distinct().count()
 
     if all_births.count() > 0:
         for birth in all_births:
