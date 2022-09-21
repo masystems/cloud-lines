@@ -124,4 +124,4 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 20000
 
 BOLTON_API_URL = "https://cloud-lines.com/api/bolton/"
 
-TEST_STRIPE_DOMAINS = ['localhost:8000', 'oegs.cloud-lines.com', 'dev.cloud-lines.com', 'test.cloud-lines.com']
+TEST_STRIPE_DOMAINS = ['localhost:8000', 'dev.cloud-lines.com', 'test.cloud-lines.com']
