@@ -22,7 +22,7 @@ class UserDetail(models.Model):
     privacy_version = models.CharField(max_length=10, blank=True)
     data_protection_agreed = models.DateTimeField(null=True, blank=True)
     data_protection_version = models.CharField(max_length=10, blank=True)
-    bn_stripe_id = models.CharField(max_length=255, blank=False)
+    bn_stripe_id = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return str(self.user)
