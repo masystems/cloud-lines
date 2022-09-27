@@ -27,6 +27,8 @@ class BnChild(models.Model):
     comments = models.TextField(max_length=1000, blank=True, null=True, verbose_name="Comments",
                                help_text="Max 1000 characters")
 
+    for_sale = models.BooleanField(null=True, default=False)
+
     pedigree = models.ForeignKey(Pedigree, related_name='registered_ped', on_delete=models.SET_NULL, blank=True, null=True)
     approved = models.BooleanField(default=False)
 
