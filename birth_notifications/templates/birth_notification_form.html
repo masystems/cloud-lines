@@ -95,7 +95,8 @@
                                                 <tr>
                                                     <th>Tag No.</th>
                                                     <th>Status</th>
-                                                    <th>sex</th>
+                                                    <th>Sex</th>
+                                                    <th>For Sale</th>
                                                     <th></th>
                                                 </tr>
                                                 <tr>
@@ -112,6 +113,12 @@
                                                         <select class="form-control" name="sex">
                                                             <option value="male">Male</option>
                                                             <option value="female">Female</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-control" name="for_sale">
+                                                            <option value="False">No</option>
+                                                            <option value="True">Yes</option>
                                                         </select>
                                                     </td>
                                                     <td><button type="button" class="btn" onclick="DeleteRow(this)"><i class="fad fa-trash-alt fa-lg text-danger"></i></button></td>
@@ -194,8 +201,8 @@
                                 var deceasedOpt = document.createElement('option');
                                     deceasedOpt.value = "deceased";
                                     deceasedOpt.innerHTML = "Deceased";
-                                statusSelect.appendChild(aliveOpt);
-                                statusSelect.appendChild(deceasedOpt);
+                            statusSelect.appendChild(aliveOpt);
+                            statusSelect.appendChild(deceasedOpt);
                             statusSelect.setAttribute('class','form-control');
                             statusSelect.setAttribute('name','status');
                             statusTd.appendChild(statusSelect);
@@ -210,12 +217,28 @@
                                 var femaleOpt = document.createElement('option');
                                     femaleOpt.value = "female";
                                     femaleOpt.innerHTML = "Female";
-                                sexSelect.appendChild(maleOpt);
-                                sexSelect.appendChild(femaleOpt);
+                            sexSelect.appendChild(maleOpt);
+                            sexSelect.appendChild(femaleOpt);
                             sexSelect.setAttribute('class','form-control');
                             sexSelect.setAttribute('name','sex');
                             sexTd.appendChild(sexSelect);
                             birthTr.appendChild(sexTd);
+
+                            // for sale
+                            for_saleTd = document.createElement('td');
+                            for_saleSelect = document.createElement('select');
+                                var noOpt = document.createElement('option');
+                                    noOpt.value = "False";
+                                    noOpt.innerHTML = "No";
+                                var yesOpt = document.createElement('option');
+                                    yesOpt.value = "True";
+                                    yesOpt.innerHTML = "Yes";
+                            for_saleSelect.appendChild(noOpt);
+                            for_saleSelect.appendChild(yesOpt);
+                            for_saleSelect.setAttribute('class','form-control');
+                            for_saleSelect.setAttribute('name','for_sale');
+                            for_saleTd.appendChild(for_saleSelect);
+                            birthTr.appendChild(for_saleTd);
 
                             // delete row
                             deleteTd = document.createElement('td');

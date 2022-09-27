@@ -167,6 +167,7 @@
                                                 <th>Tag No</th>
                                                 <th>Status</th>
                                                 <th>Sex</th>
+                                                <th>For Sale</th>
                                                 <th>Comments</th>
                                                 <th>Action</th>
                                             </tr>
@@ -182,6 +183,9 @@
                                                     </td>
                                                     <td>
                                                         {{ birth.sex }}
+                                                    </td>
+                                                    <td>
+                                                        {% if birth.for_sale %}Yes{% else %}No{% endif %}
                                                     </td>
                                                     <td>
                                                         {{ birth.comments }}
@@ -217,6 +221,11 @@
                                                                     <select class="form-control" name="sex">
                                                                         <option value="male" {% if birth.sex == 'male' %}selected{% endif %}>Male</option>
                                                                         <option value="female" {% if birth.sex == 'female' %}selected{% endif %}>Female</option>
+                                                                    </select>
+                                                                    <label class="mt-2 text-light">For Sale</label>
+                                                                    <select class="form-control" name="for_sale">
+                                                                        <option value="False" {% if not birth.for_sale %}selected{% endif %}>No</option>
+                                                                        <option value="True" {% if birth.for_sale %}selected{% endif %}>Yes</option>
                                                                     </select>
                                                                     <label class="mt-2 text-light">Comments</label>
                                                                     <textarea class="form-control" name="comments" rows="4" cols="50">{{ birth.comments }}</textarea>

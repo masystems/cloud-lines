@@ -192,7 +192,8 @@ def birth_notification_form(request):
         for birth in bn_form['tag_no']:
             child = BnChild.objects.create(tag_no=bn_form['tag_no'][birth_line],
                                            status=bn_form['status'][birth_line],
-                                           sex=bn_form['sex'][birth_line])
+                                           sex=bn_form['sex'][birth_line],
+                                           for_sale=bn_form['for_sale'][birth_line])
             new_bn.births.add(child)
             new_bn.save()
             total_price += bn_stripe_account.bn_child_cost
@@ -262,6 +263,7 @@ def edit_child(request, id):
         child.tag_no = request.POST.get('tag_no')
         child.status = request.POST.get('status')
         child.sex = request.POST.get('sex')
+        child.for_sale = request.POST.get('for_sale')
         child.comments = request.POST.get('comments')
         child.save()
     return redirect('birth_notification', child.births.all()[0].id)
