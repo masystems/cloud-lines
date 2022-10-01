@@ -896,7 +896,6 @@
                     </div>
                     <div class="tab-pane" id="boltons" role="tabpanel">
                         <div class="card-body">
-                            {% if request.user.is_superuser %}
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead class="bg-info text-white">
@@ -984,9 +983,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                            {% else %}
-                                <h5>Coming soon!</h5>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
