@@ -25,7 +25,7 @@ class BirthNotificationBase(LoginRequiredMixin, TemplateView):
 
         context['attached_service'] = get_main_account(self.request.user)
         context['birth_notifications'] = BirthNotification.objects.filter(account=context['attached_service'])
-        context['latest'] = BirthNotification.objects.filter(account=context['attached_service'])[:10]
+        context['latest'] = context['birth_notifications'].filter(account=context['attached_service']).order_by('-id')[:10]
 
         return context
 
@@ -36,9 +36,9 @@ class BnHome(BirthNotificationBase):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['total_living'] = BnChild.objects.filter(status="alive").count()
-        context['total_deceased'] = BnChild.objects.filter(status="deceased").count()
-        context['approvals'] = BirthNotification.objects.filter(complete=False)
+        context['total_living'] = context['birth_notifications'].filter(births__status="alive").count()
+        context['total_deceased'] = context['birth_notifications'].filter(births__status="deceased").count()
+        context['approvals'] = BirthNotification.objects.filter(account=context['attached_service'], complete=False)
 
         if self.request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
             stripe.api_key = settings.STRIPE_TEST_SECRET_KEY

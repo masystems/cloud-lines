@@ -51,7 +51,7 @@ def change_bolton_state(request, bolton_id, req_state):
     # if activation request
     if req_state == "enable":
         # ensure bolton is not already active
-        if AttachedBolton.objects.filter(bolton=bolton['id'], active=True).exists():
+        if attached_service.boltons.filter(bolton=bolton['id'], active=True).exists():
             return redirect('settings')
         else:
             # validate the card
@@ -59,11 +59,11 @@ def change_bolton_state(request, bolton_id, req_state):
             if result['result'] == 'fail':
                 return HttpResponse(dumps(result))
 
-            if request.user.is_superuser:
+            if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
                 plan = bolton['test_stripe_price_id']
             else:
                 plan = bolton['stripe_price_id']
-            print(plan)
+
             subscription = stripe.Subscription.create(
                 items=[
                     {
@@ -87,10 +87,11 @@ def change_bolton_state(request, bolton_id, req_state):
                           # 'receipt': receipt.data[0].receipt_url
                           }
 
-                AttachedBolton.objects.create(bolton=bolton['id'],
-                                              stripe_sub_id=subscription.id,
-                                              increment="monthly",
-                                              active=True)
+                new_bolton = AttachedBolton.objects.create(bolton=bolton['id'],
+                                                           stripe_sub_id=subscription.id,
+                                                           increment="monthly",
+                                                           active=True)
+                attached_service.boltons.add(new_bolton)
 
                 # send confirmation email
                 body = f"""<p>This email confirms the successful creation of your new Cloud-Lines bolton.
@@ -103,9 +104,9 @@ def change_bolton_state(request, bolton_id, req_state):
                                 <p>Thank you for purchasing this boloton. Please contact us if you need anything - contact@masys.co.uk</p>
 
                                 """
-                send_mail(f"New Bolton Added: {bolton['name']}",
-                           request.user.get_full_name(), body,
-                           send_to=request.user.email)
+                # send_mail(f"New Bolton Added: {bolton['name']}",
+                #            request.user.get_full_name(), body,
+                #            send_to=request.user.email)
 
                 return HttpResponse(dumps(result))
 
