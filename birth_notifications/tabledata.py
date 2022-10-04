@@ -32,13 +32,15 @@ def get_birth_notifications_td(request):
         Q(user__first_name__icontains=search)|
         Q(user__last_name__icontains=search)|
         Q(bn_number__icontains=search)|
-        Q(date_added__icontains=search)).order_by(sort_by_col).distinct()[start:start + end]
+        Q(date_added__icontains=search),
+        account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
     #.order_by(sort_by_col)
     total_births = BirthNotification.objects.filter(
         Q(user__first_name__icontains=search) |
         Q(user__last_name__icontains=search) |
         Q(bn_number__icontains=search) |
-        Q(date_added__icontains=search)).order_by(sort_by_col).distinct().count()
+        Q(date_added__icontains=search),
+        account=attached_service).order_by(sort_by_col).distinct().count()
 
     if all_births.count() > 0:
         for birth in all_births:

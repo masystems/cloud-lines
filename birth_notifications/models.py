@@ -60,7 +60,7 @@ class BnStripeAccount(models.Model):
                                         verbose_name="Attached Bolton")
     stripe_acct_id = models.CharField(max_length=255, blank=True, unique=True)
     stripe_product_id = models.CharField(max_length=255, blank=True, unique=True)
-    account_name = models.CharField(max_length=255, blank=True, unique=True)
+    account_name = models.CharField(max_length=255, blank=True)
     bn_cost = models.IntegerField(default=0, blank=True)
     bn_child_cost = models.IntegerField(default=0, blank=True)
     ped_cost = models.IntegerField(default=0, blank=True)

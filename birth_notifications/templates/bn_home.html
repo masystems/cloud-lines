@@ -18,11 +18,13 @@
                 <li class="breadcrumb-item active">Birth Notifications</li>
             </ol>
         </div>
+        {% if not stripe_package_setup %}
         <div class="col-md-6 col-4 align-self-center">
             <a href="{% url 'bn_settings' %}">
                 <button class="btn btn-info float-right">Settings</button>
             </a>
         </div>
+        {% endif %}
     </div>
     <!-- ============================================================== -->
     <!-- End Bread crumb and right sidebar toggle -->

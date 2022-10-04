@@ -25,7 +25,7 @@ class BirthNotificationBase(LoginRequiredMixin, TemplateView):
 
         context['attached_service'] = get_main_account(self.request.user)
         context['birth_notifications'] = BirthNotification.objects.filter(account=context['attached_service'])
-        context['latest'] = BirthNotification.objects.filter(account=context['attached_service'])[:10]
+        context['latest'] = context['birth_notifications'].filter(account=context['attached_service']).order_by('-id')[:10]
 
         return context
 
@@ -36,16 +36,16 @@ class BnHome(BirthNotificationBase):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['total_living'] = BnChild.objects.filter(status="alive").count()
-        context['total_deceased'] = BnChild.objects.filter(status="deceased").count()
-        context['approvals'] = BirthNotification.objects.filter(complete=False)
+        context['total_living'] = context['birth_notifications'].filter(births__status="alive").count()
+        context['total_deceased'] = context['birth_notifications'].filter(births__status="deceased").count()
+        context['approvals'] = BirthNotification.objects.filter(account=context['attached_service'], complete=False)
 
         if self.request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
             stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
         else:
             stripe.api_key = settings.STRIPE_SECRET_KEY
 
-        if self.request.user == context['attached_service'].user:
+        if self.request.user == context['attached_service'].user.user:
             try:
                 context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
             except BnStripeAccount.DoesNotExist:
@@ -166,6 +166,7 @@ def birth_notification_form(request):
 
         new_bn.user = request.user
         new_bn.account = attached_service
+        # not currently validating against other bn numbers on same instance
         new_bn.bn_number = bn_form['bn_number'][0]
         try:
             new_bn.dob = bn_form['dob'][0]
@@ -332,7 +333,8 @@ def validate_bn(request, id):
     # return
     # true == in use
     # false == not in use
-    bn = BirthNotification.objects.get(id=id)
+    attached_service = get_main_account(request.user)
+    bn = BirthNotification.objects.get(account=attached_service, id=id)
 
     new_bn = list(request.GET.keys())[0]
 
@@ -342,7 +344,7 @@ def validate_bn(request, id):
 
     # check if bn number is in use
     try:
-        bn_check = BirthNotification.objects.get(bn_number=new_bn)
+        bn_check = BirthNotification.objects.get(account=attached_service, bn_number=new_bn)
     except BirthNotification.DoesNotExist:
         # the bn number is not being used at all, not in use
         return HttpResponse(False)
@@ -379,7 +381,7 @@ def create_package_on_stripe(request):
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
     attached_service = get_main_account(request.user)
-    attached_bolton = AttachedBolton.objects.get(bolton='1', active=True)
+    attached_bolton = attached_service.boltons.get(bolton='1', active=True)
     try:
         bn_package = BnStripeAccount.objects.get(account=attached_service)
     except BnStripeAccount.DoesNotExist:
@@ -396,7 +398,7 @@ def create_package_on_stripe(request):
             },
             business_type='company',
             company={
-                'name': 'test_name',
+                'name': request.META['HTTP_HOST'],
                 "directors_provided": True,
                 "executives_provided": True,
             },
