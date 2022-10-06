@@ -31,9 +31,8 @@ from django.utils.datastructures import MultiValueDictKeyError
 def search(request):
     attached_service = get_main_account(request.user)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
-    pedigrees = Pedigree.objects.filter(account=attached_service).exclude(state='unapproved').values('id', *columns)[:500]
-    return render(request, 'search.html', {'pedigrees': pedigrees,
-                                           'columns': columns,
+    #pedigrees = Pedigree.objects.filter(account=attached_service).exclude(state='unapproved').values('id', *columns)[:500]
+    return render(request, 'search.html', {'columns': columns,
                                            'column_data': column_data})
 
 

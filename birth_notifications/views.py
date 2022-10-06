@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
 from django.conf import settings
 from account.views import is_editor, get_main_account, has_permission, redirect_2_login
-from account.models import AttachedBolton
-from .models import BirthNotification, BnChild, BnStripeAccount
+from account.models import AttachedBolton, StripeAccount
+from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm, BirthForm
 from pedigree.models import Pedigree
 from json import dumps
@@ -47,10 +47,10 @@ class BnHome(BirthNotificationBase):
 
         if self.request.user == context['attached_service'].user.user:
             try:
-                context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
-            except BnStripeAccount.DoesNotExist:
+                context['bn_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
+            except StripeAccount.DoesNotExist:
                 context['account_link'] = create_package_on_stripe(self.request)
-                context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
+                context['bn_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
 
             context['stripe_package'] = stripe.Account.retrieve(context['bn_stripe_account'].stripe_acct_id)
 
@@ -84,7 +84,7 @@ class Settings(BirthNotificationBase):
             raise PermissionDenied()
 
         context = super().get_context_data(**kwargs)
-        context['bn_stripe_account'] = BnStripeAccount.objects.get(account=context['attached_service'])
+        context['bn_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
         return context
 
 
@@ -105,7 +105,7 @@ def update_prices(request):
 
     attached_service = get_main_account(request.user)
 
-    bn_stripe_account = BnStripeAccount.objects.get(account=attached_service)
+    bn_stripe_account = StripeAccount.objects.get(account=attached_service)
     bn_stripe_account.bn_cost = float(request.POST.get('bncost')) * 100
     bn_stripe_account.bn_child_cost = float(request.POST.get('bnccost')) * 100
     bn_stripe_account.save()
@@ -138,8 +138,8 @@ def birth_notification_form(request):
     attached_service = get_main_account(request.user)
 
     try:
-        bn_stripe_account = BnStripeAccount.objects.get(account=attached_service)
-    except BnStripeAccount.DoesNotExist:
+        bn_stripe_account = StripeAccount.objects.get(account=attached_service)
+    except StripeAccount.DoesNotExist:
         bn_stripe_account = False
 
     if request.method == 'POST':
@@ -200,7 +200,7 @@ def birth_notification_form(request):
             total_price += bn_stripe_account.bn_child_cost
             birth_line += 1
 
-        bnstripeobject = BnStripeAccount.objects.get(account=attached_service)
+        bnstripeobject = StripeAccount.objects.get(account=attached_service)
         # validate card to update card
         result = validate_card(request, attached_service, bnstripeobject)
         if result['result'] == 'fail':
@@ -284,7 +284,7 @@ def toggle_birth_notification(request, id):
     if request.method == 'GET':
         bn = BirthNotification.objects.get(id=id)
         attached_service = get_main_account(request.user)
-        bnstripeobject = BnStripeAccount.objects.get(account=attached_service)
+        bnstripeobject = StripeAccount.objects.get(account=attached_service)
 
         if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
             stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
@@ -383,9 +383,9 @@ def create_package_on_stripe(request):
     attached_service = get_main_account(request.user)
     attached_bolton = attached_service.boltons.get(bolton='1', active=True)
     try:
-        bn_package = BnStripeAccount.objects.get(account=attached_service)
-    except BnStripeAccount.DoesNotExist:
-        bn_package = BnStripeAccount.objects.create(account=attached_service, attached_bolton=attached_bolton)
+        bn_package = StripeAccount.objects.get(account=attached_service)
+    except StripeAccount.DoesNotExist:
+        bn_package = StripeAccount.objects.create(account=attached_service, attached_bolton=attached_bolton)
 
     if not bn_package.stripe_acct_id:
         # create initial account

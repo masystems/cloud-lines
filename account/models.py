@@ -83,3 +83,17 @@ class AttachedService(models.Model):
 
     def __str__(self):
         return "{}-{}".format(str(self.user), str(self.service))
+
+
+class StripeAccount(models.Model):
+    # created under BN in error, this is used for all payments
+    account = models.ForeignKey(AttachedService, on_delete=models.SET_NULL, blank=True, null=True,
+                                verbose_name="BnN Stripe Account")
+    attached_bolton = models.ForeignKey(AttachedBolton, on_delete=models.SET_NULL, blank=True, null=True,
+                                        verbose_name="Attached Bolton")
+    stripe_acct_id = models.CharField(max_length=255, blank=True, unique=True)
+    stripe_product_id = models.CharField(max_length=255, blank=True, unique=True)
+    account_name = models.CharField(max_length=255, blank=True)
+    bn_cost = models.IntegerField(default=0, blank=True)
+    bn_child_cost = models.IntegerField(default=0, blank=True)
+    ped_cost = models.IntegerField(default=0, blank=True)
