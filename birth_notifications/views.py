@@ -286,18 +286,20 @@ def toggle_birth_notification(request, id):
         attached_service = get_main_account(request.user)
         bnstripeobject = StripeAccount.objects.get(account=attached_service)
 
-        if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
-            stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-        else:
-            stripe.api_key = settings.STRIPE_SECRET_KEY
+        # validate if the BN needs charging
+        if bn.stripe_payment_source:
+            if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
+                stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+            else:
+                stripe.api_key = settings.STRIPE_SECRET_KEY
 
-        # take payment
-        payment_confirm = stripe.PaymentIntent.confirm(
-            bn.stripe_payment_token,
-            payment_method=bn.stripe_payment_source,
-            stripe_account=bnstripeobject.stripe_acct_id
-        )
-        #receipt = stripe.Charge.list(customer=subscription.stripe_id, stripe_account=package.stripe_acct_id, limit=1)
+            # take payment
+            payment_confirm = stripe.PaymentIntent.confirm(
+                bn.stripe_payment_token,
+                payment_method=bn.stripe_payment_source,
+                stripe_account=bnstripeobject.stripe_acct_id
+            )
+            #receipt = stripe.Charge.list(customer=subscription.stripe_id, stripe_account=package.stripe_acct_id, limit=1)
 
         bn.complete = True
         bn.save()
