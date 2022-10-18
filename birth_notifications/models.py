@@ -47,7 +47,8 @@ class BirthNotification(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     comments = models.TextField(max_length=1000, blank=True, null=True, verbose_name="Comments", help_text="Max 1000 characters")
 
+    # session id
     stripe_payment_token = models.CharField(max_length=255, blank=True)
-    stripe_payment_source = models.CharField(max_length=255, blank=True)
+    paid = models.BooleanField(default=False)
 
     complete = models.BooleanField(default=False)
