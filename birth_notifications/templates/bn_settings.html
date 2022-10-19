@@ -48,7 +48,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text"><i class="fad fa-pound-sign"></i></span>
                                                     </div>
-                                                    <input type="text" class="form-control" id="bncost" name="bncost" value="{{ bn_stripe_account.bn_cost|price }}">
+                                                    <input type="text" class="form-control" id="bncost" name="bncost" value="{{ bn_cost|price }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -59,7 +59,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text"><i class="fad fa-pound-sign"></i></span>
                                                     </div>
-                                                    <input type="text" class="form-control" id="bnccost" name="bnccost" value="{{ bn_stripe_account.bn_child_cost|price }}">
+                                                    <input type="text" class="form-control" id="bnccost" name="bnccost" value="{{ bn_child_cost|price }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -70,7 +70,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text"><i class="fad fa-pound-sign"></i></span>
                                                     </div>
-                                                    <input type="text" class="form-control" id="pedcost" name="pedcost" value="{{ bn_stripe_account.bn_child_cost|price }}" disabled>
+                                                    <input type="text" class="form-control" id="pedcost" name="pedcost" value="0" disabled>
                                                 </div>
                                                 <small class="text-danger">Coming Soon</small>
                                             </div>
@@ -96,9 +96,8 @@
                         <div class="d-flex no-block align-items-center">
                             <h4 class="card-title">BN Settings Overview</h4>
                         </div>
-                        <strong>BN Cost: £</strong> {{ bn_stripe_account.bn_cost|price }}<br>
-                        <strong>BN Child Cost: £</strong> {{ bn_stripe_account.bn_child_cost|price }}<br>
-<!--                        <strong>Pedigree Cost:</strong> {{ bn_stripe_account.ped_cost }}-->
+                        <strong>BN Cost: £</strong> {{ bn_cost|price }}<br>
+                        <strong>BN Child Cost: £</strong> {{ bn_child_cost|price }}
                     </div>
                 </div>
             </div>

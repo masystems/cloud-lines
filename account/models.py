@@ -34,12 +34,9 @@ class AttachedBolton(models.Model):
     2 == ???
     """
     bolton = models.CharField(max_length=10)
+    # session id
+    stripe_payment_token = models.CharField(max_length=255, blank=True)
     stripe_sub_id = models.CharField(max_length=255, blank=True)
-    INCREMENTS = (
-        ('monthly', 'Monthly'),
-        ('yearly', 'Yearly'),
-    )
-    increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True, blank=True)
     active = models.BooleanField(default=False)
 
     # used by BN package for storing their custom account id
@@ -92,8 +89,13 @@ class StripeAccount(models.Model):
     attached_bolton = models.ForeignKey(AttachedBolton, on_delete=models.SET_NULL, blank=True, null=True,
                                         verbose_name="Attached Bolton")
     stripe_acct_id = models.CharField(max_length=255, blank=True, unique=True)
-    stripe_product_id = models.CharField(max_length=255, blank=True, unique=True)
+
     account_name = models.CharField(max_length=255, blank=True)
-    bn_cost = models.IntegerField(default=0, blank=True)
-    bn_child_cost = models.IntegerField(default=0, blank=True)
-    ped_cost = models.IntegerField(default=0, blank=True)
+
+class BnStripe(StripeAccount):
+    # set to "Birth Notification"
+    bn_stripe_product_id = models.CharField(max_length=255, blank=True, unique=False)
+    # price of BN
+    bn_cost_id = models.CharField(max_length=255, blank=True, unique=False)
+    # Price of child
+    bn_child_cost_id = models.CharField(max_length=255, blank=True, unique=False)

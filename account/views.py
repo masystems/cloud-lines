@@ -252,6 +252,20 @@ def get_main_account(user):
     return attached_service
 
 
+def get_stripe_secret_key(request):
+    if request.META['HTTP_HOST'] in django_settings.TEST_STRIPE_DOMAINS:
+        return django_settings.STRIPE_TEST_SECRET_KEY
+    else:
+        return django_settings.STRIPE_SECRET_KEY
+
+
+def get_stripe_public_key(request):
+        if request.META['HTTP_HOST'] in django_settings.TEST_STRIPE_DOMAINS:
+            return django_settings.STRIPE_TEST_PUBLIC_KEY
+        else:
+            return django_settings.STRIPE_PUBLIC_KEY
+
+
 @login_required(login_url="/account/login")
 def user_edit(request):
     if request.method == 'GET':
@@ -557,7 +571,9 @@ def profile(request):
 
         # payment methods
         try:
-            context['cards'] = stripe.Customer.list_sources(main_account.user.stripe_id, object='card')
+            print(main_account.user.stripe_id)
+            context['cards'] = stripe.Customer.list_sources(main_account.user.stripe_id, object='card', limit=1)
+            print(context['cards'])
         except stripe.error.AuthenticationError:
             pass
 
@@ -598,6 +614,7 @@ def settings(request):
         boltons = requests.get(django_settings.BOLTON_API_URL).json()
         count = 0
         for bolton in boltons['results']:
+            print(attached_service.boltons.filter(bolton=bolton['id'], active=True).exists())
             if attached_service.boltons.filter(bolton=bolton['id'], active=True).exists():
                 boltons['results'][count]['active'] = True
             count += 1
@@ -892,78 +909,89 @@ def subdomain_check(request):
 
 
 @login_required(login_url="/account/login")
-@csrf_exempt
 def update_card(request):
     # permission check
     if request.method == 'GET':
-        return redirect_2_login(request)
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
+            raise PermissionDenied()
     elif request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             raise PermissionDenied()
     else:
         raise PermissionDenied()
+
+    stripe.api_key = get_stripe_secret_key(request)
     
     user_detail = UserDetail.objects.get(user=request.user)
 
-    # add payment token to user
-    try:
-        stripe.Customer.modify(
-            user_detail.stripe_id,
-            source=request.POST.get('id')
-        )
-    except stripe.error.CardError as e:
-        # Since it's a decline, stripe.error.CardError will be caught
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
+    session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        mode='setup',
+        customer=user_detail.stripe_id,
+        success_url=f"http://{request.META['HTTP_HOST']}/account/profile#billing",
+        cancel_url=f"http://{request.META['HTTP_HOST']}/account/profile#billing",
+    )
+    return redirect(session.url, code=303)
 
-    except stripe.error.RateLimitError as e:
-        # Too many requests made to the API too quickly
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.InvalidRequestError as e:
-        # Invalid parameters were supplied to Stripe's API
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.AuthenticationError as e:
-        # Authentication with Stripe's API failed
-        # (maybe you changed API keys recently)
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.APIConnectionError as e:
-        # Network communication with Stripe failed
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.StripeError as e:
-        # Display a very generic error to the user, and maybe send
-        # yourself an email
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except Exception as e:
-        # Something else happened, completely unrelated to Stripe
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    main_account = get_main_account(request.user)
-    return HttpResponse(stripe.Customer.list_sources(main_account.user.stripe_id, object='card'))
+    # # add payment token to user
+    # try:
+    #     stripe.Customer.modify(
+    #         user_detail.stripe_id,
+    #         source=request.POST.get('id')
+    #     )
+    # except stripe.error.CardError as e:
+    #     # Since it's a decline, stripe.error.CardError will be caught
+    #     feedback = send_payment_error(e)
+    #     result = {'result': 'fail',
+    #               'feedback': feedback}
+    #     return HttpResponse(json.dumps(result))
+    #
+    # except stripe.error.RateLimitError as e:
+    #     # Too many requests made to the API too quickly
+    #     feedback = send_payment_error(e)
+    #     result = {'result': 'fail',
+    #               'feedback': feedback}
+    #     return HttpResponse(json.dumps(result))
+    #
+    # except stripe.error.InvalidRequestError as e:
+    #     # Invalid parameters were supplied to Stripe's API
+    #     feedback = send_payment_error(e)
+    #     result = {'result': 'fail',
+    #               'feedback': feedback}
+    #     return HttpResponse(json.dumps(result))
+    #
+    # except stripe.error.AuthenticationError as e:
+    #     # Authentication with Stripe's API failed
+    #     # (maybe you changed API keys recently)
+    #     feedback = send_payment_error(e)
+    #     result = {'result': 'fail',
+    #               'feedback': feedback}
+    #     return HttpResponse(json.dumps(result))
+    #
+    # except stripe.error.APIConnectionError as e:
+    #     # Network communication with Stripe failed
+    #     feedback = send_payment_error(e)
+    #     result = {'result': 'fail',
+    #               'feedback': feedback}
+    #     return HttpResponse(json.dumps(result))
+    #
+    # except stripe.error.StripeError as e:
+    #     # Display a very generic error to the user, and maybe send
+    #     # yourself an email
+    #     feedback = send_payment_error(e)
+    #     result = {'result': 'fail',
+    #               'feedback': feedback}
+    #     return HttpResponse(json.dumps(result))
+    #
+    # except Exception as e:
+    #     # Something else happened, completely unrelated to Stripe
+    #     feedback = send_payment_error(e)
+    #     result = {'result': 'fail',
+    #               'feedback': feedback}
+    #     return HttpResponse(json.dumps(result))
+    #
+    # main_account = get_main_account(request.user)
+    # return HttpResponse(stripe.Customer.list_sources(main_account.user.stripe_id, object='card'))
 
 
 def send_payment_error(e):

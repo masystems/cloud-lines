@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserDetail, AttachedService, AttachedBolton, StripeAccount
+from .models import UserDetail, AttachedService, AttachedBolton, BnStripe
 
 
 class UserServicesInline(admin.StackedInline):
@@ -32,10 +32,10 @@ admin.site.register(AttachedService, AttachedServiceAdmin)
 
 
 class AttachedBoltonAdmin(admin.ModelAdmin):
-    list_display = ('bolton', 'stripe_sub_id', 'increment', 'active')
-    list_display_links = ['bolton', 'stripe_sub_id', 'increment', 'active']
-    search_fields = ('bolton', 'stripe_sub_id', 'increment', 'active')
-    list_filter = ('bolton', 'stripe_sub_id', 'increment', 'active')
+    list_display = ('bolton', 'active')
+    list_display_links = ['bolton', 'active']
+    search_fields = ('bolton', 'active')
+    list_filter = ('bolton', 'active')
     ordering = ['bolton']
     empty_value_display = '-empty-'
 
@@ -44,4 +44,4 @@ class AttachedBoltonAdmin(admin.ModelAdmin):
 
 admin.site.register(AttachedBolton, AttachedBoltonAdmin)
 
-admin.site.register(StripeAccount)
+admin.site.register(BnStripe)
