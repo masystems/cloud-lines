@@ -522,8 +522,8 @@ def validate_bn(request, id):
 def get_account_link(bn_package, attached_service):
     account_link = stripe.AccountLink.create(
         account=bn_package.stripe_acct_id,
-        refresh_url=f'{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification',
-        return_url=f'{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification',
+        refresh_url=f'{settings.HTTP_PROTOCOL}://{request.META["HTTP_HOST"]}/birth_notification',
+        return_url=f'{settings.HTTP_PROTOCOL}://{request.META["HTTP_HOST"]}/birth_notification',
         type='account_onboarding',
     )
     return account_link
