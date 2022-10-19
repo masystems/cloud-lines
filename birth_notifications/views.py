@@ -282,8 +282,8 @@ def birth_notification_form(request):
                 ],
                 mode='payment',
                 customer=customer.id,
-                success_url=f"http://{request.META['HTTP_HOST']}/birth_notification/birth_notification_paid/{new_bn.id}",
-                cancel_url=f"http://{request.META['HTTP_HOST']}/birth_notification",
+                success_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/birth_notification_paid/{new_bn.id}",
+                cancel_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification",
                 stripe_account=bn_stripe_account.stripe_acct_id,
             )
             new_bn.stripe_payment_token = session['id']

@@ -74,70 +74,12 @@ def change_bolton_state(request, bolton_id, req_state):
                 ],
                 mode='subscription',
                 customer=attached_service.user.stripe_id,
-                success_url=f"http://{request.META['HTTP_HOST']}/birth_notification/enable_bn/{new_bolton.id}",
-                cancel_url=f"http://{request.META['HTTP_HOST']}/account/settings",
+                success_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/enable_bn/{new_bolton.id}",
+                cancel_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/account/settings",
             )
             new_bolton.stripe_payment_token=session['id']
             new_bolton.save()
             return redirect(session.url, code=303)
-
-            #################################
-            # validate the card
-            # result = validate_card(request, attached_service)
-            # if result['result'] == 'fail':
-            #     return HttpResponse(dumps(result))
-            #
-            # if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
-            #     plan = bolton['test_stripe_price_id']
-            # else:
-            #     plan = bolton['stripe_price_id']
-            #
-            # subscription = stripe.Subscription.create(
-            #     items=[
-            #         {
-            #             "plan": plan,
-            #         },
-            #     ],
-            #     customer=attached_service.user.stripe_id,
-            #     #promotion_code="promo_1Jyid1D6klOlOx6rgDEv2DZr"
-            # )
-            # if subscription['status'] != 'active':
-            #     result = {'result': 'fail',
-            #               'feedback': f"<strong>Failure message:</strong> <span class='text-danger'>{subscription['status']}</span>"}
-            #     return HttpResponse(dumps(result))
-            # else:
-            #     # invoice = stripe.Invoice.list(subscription=subscription.id,
-            #     #                               limit=1)
-            #     # receipt = stripe.Charge.list(customer=membership_package.stripe_owner_id)
-            #
-            #     result = {'result': 'success',
-            #               # 'invoice': invoice.data[0].invoice_pdf,
-            #               # 'receipt': receipt.data[0].receipt_url
-            #               }
-            #
-            ####################################################
-            #     new_bolton = AttachedBolton.objects.create(bolton=bolton['id'],
-            #                                                stripe_sub_id=subscription.id,
-            #                                                increment="monthly",
-            #                                                active=True)
-            #     attached_service.boltons.add(new_bolton)
-            #
-            #     # send confirmation email
-            #     body = f"""<p>This email confirms the successful creation of your new Cloud-Lines bolton.
-            #
-            #                     <ul>
-            #                     <li>Bolton: {bolton['name']}</li>
-            #                     <li>Monthly Cost: £{bolton['price']}</li>
-            #                     </ul>
-            #
-            #                     <p>Thank you for purchasing this boloton. Please contact us if you need anything - contact@masys.co.uk</p>
-            #
-            #                     """
-                # send_mail(f"New Bolton Added: {bolton['name']}",
-                #            request.user.get_full_name(), body,
-                #            send_to=request.user.email)
-
-            # return HttpResponse(dumps(result))
 
     # if deactivation request
     elif req_state == "disable":
