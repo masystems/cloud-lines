@@ -61,9 +61,9 @@ class BnHome(BirthNotificationBase):
                     context['edit_account'] = stripe.Account.create_login_link(context['bn_stripe_account'].stripe_acct_id)
                 except stripe.error.InvalidRequestError:
                     # stripe account created but not setup
-                    context['stripe_package_setup'] = get_account_link(context['bn_stripe_account'], context['attached_service'])
+                    context['stripe_package_setup'] = get_account_link(self.request, context['bn_stripe_account'], context['attached_service'])
                 if context['stripe_package'].requirements.errors:
-                    context['account_link'] = get_account_link(context['bn_stripe_account'], context['attached_service'])
+                    context['account_link'] = get_account_link(self.request, context['bn_stripe_account'], context['attached_service'])
             else:
                 # stripe account not setup
                 context['stripe_package_setup'] = create_package_on_stripe(self.request)
@@ -519,7 +519,7 @@ def validate_bn(request, id):
     return HttpResponse(True)
 
 
-def get_account_link(bn_package, attached_service):
+def get_account_link(request, bn_package, attached_service):
     account_link = stripe.AccountLink.create(
         account=bn_package.stripe_acct_id,
         refresh_url=f'{settings.HTTP_PROTOCOL}://{request.META["HTTP_HOST"]}/birth_notification',
@@ -570,7 +570,7 @@ def create_package_on_stripe(request):
 
     bn_package.save()
 
-    return get_account_link(bn_package, attached_service)
+    return get_account_link(request, bn_package, attached_service)
 
 
 def validate_bn_number(request):
