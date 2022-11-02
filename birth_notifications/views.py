@@ -11,8 +11,9 @@ from account.views import is_editor,\
     has_permission,\
     redirect_2_login,\
     get_stripe_secret_key,\
-    get_stripe_public_key
-from account.models import AttachedBolton, BnStripe
+    get_stripe_public_key,\
+    get_stripe_connected_account_links
+from account.models import AttachedBolton, StripeAccount
 from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm
 from pedigree.models import Pedigree
@@ -48,25 +49,11 @@ class BnHome(BirthNotificationBase):
         stripe.api_key = get_stripe_secret_key(self.request)
 
         if self.request.user == context['attached_service'].user.user:
-            try:
-                context['bn_stripe_account'] = BnStripe.objects.get(account=context['attached_service'])
-            except BnStripe.DoesNotExist:
-                context['account_link'] = create_package_on_stripe(self.request)
-                context['bn_stripe_account'] = BnStripe.objects.get(account=context['attached_service'])
-
-            context['stripe_package'] = stripe.Account.retrieve(context['bn_stripe_account'].stripe_acct_id)
-
-            if context['bn_stripe_account'].stripe_acct_id:
-                try:
-                    context['edit_account'] = stripe.Account.create_login_link(context['bn_stripe_account'].stripe_acct_id)
-                except stripe.error.InvalidRequestError:
-                    # stripe account created but not setup
-                    context['stripe_package_setup'] = get_account_link(self.request, context['bn_stripe_account'], context['attached_service'])
-                if context['stripe_package'].requirements.errors:
-                    context['account_link'] = get_account_link(self.request, context['bn_stripe_account'], context['attached_service'])
-            else:
-                # stripe account not setup
-                context['stripe_package_setup'] = create_package_on_stripe(self.request)
+            context['stripe_account'], \
+            context['account_link'], \
+            context['stripe_package'], \
+            context['edit_account'], \
+            context['account_link_setup'] = get_stripe_connected_account_links(self.request, context['attached_service'])
 
         return context
 
@@ -89,7 +76,7 @@ class Settings(BirthNotificationBase):
 
         stripe.api_key = get_stripe_secret_key(self.request)
 
-        context['bn_stripe_account'] = BnStripe.objects.get(account=context['attached_service'])
+        context['bn_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
 
         # get bn price
         if context['bn_stripe_account'].bn_cost_id:
@@ -114,7 +101,7 @@ class Settings(BirthNotificationBase):
 def update_prices(request):
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
             return redirect_2_login(request)
     elif request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
@@ -126,7 +113,7 @@ def update_prices(request):
 
     attached_service = get_main_account(request.user)
 
-    bn_stripe_account = BnStripe.objects.get(account=attached_service)
+    bn_stripe_account = StripeAccount.objects.get(account=attached_service)
 
     bn_stripe_account.bn_cost_id = stripe.Price.create(
         nickname="BN Price",
@@ -173,8 +160,8 @@ def birth_notification_form(request):
     attached_service = get_main_account(request.user)
 
     try:
-        bn_stripe_account = BnStripe.objects.get(account=attached_service)
-    except BnStripe.DoesNotExist:
+        bn_stripe_account = StripeAccount.objects.get(account=attached_service)
+    except StripeAccount.DoesNotExist:
         bn_stripe_account = False
 
     stripe.api_key = get_stripe_secret_key(request)
@@ -464,10 +451,10 @@ def delete_birth_notification(request, id):
 
     if request.method == 'GET':
         attached_service = get_main_account(request.user)
-        bnstripeobject = BnStripe.objects.get(account=attached_service)
+        bnstripeobject = StripeAccount.objects.get(account=attached_service)
         bn = BirthNotification.objects.get(id=id)
 
-        if bnstripeobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
+        if StripeAccountobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
             stripe.api_key = get_stripe_secret_key(request)
             # submit refund
             session = stripe.checkout.Session.retrieve(
@@ -517,60 +504,6 @@ def validate_bn(request, id):
 
     # a bn was found and it's the same as the main bn then it's in use!
     return HttpResponse(True)
-
-
-def get_account_link(request, bn_package, attached_service):
-    account_link = stripe.AccountLink.create(
-        account=bn_package.stripe_acct_id,
-        refresh_url=f'{settings.HTTP_PROTOCOL}://{request.META["HTTP_HOST"]}/birth_notification',
-        return_url=f'{settings.HTTP_PROTOCOL}://{request.META["HTTP_HOST"]}/birth_notification',
-        type='account_onboarding',
-    )
-    return account_link
-
-
-@login_required(login_url='/accounts/login/')
-def create_package_on_stripe(request):
-    # get strip secret key
-    # import stripe key
-    public_api_key = get_stripe_secret_key(request)
-
-    attached_service = get_main_account(request.user)
-    attached_bolton = attached_service.boltons.get(bolton='1', active=True)
-    try:
-        bn_package = BnStripe.objects.get(account=attached_service)
-    except BnStripe.DoesNotExist:
-        bn_package = BnStripe.objects.create(account=attached_service, attached_bolton=attached_bolton)
-
-    if not bn_package.stripe_acct_id:
-        # create initial account
-        account = stripe.Account.create(
-            type="express",
-            email=f"{request.user.email}",
-            capabilities={
-                "card_payments": {"requested": True},
-                "transfers": {"requested": True},
-            },
-            business_type='company',
-            company={
-                'name': request.META['HTTP_HOST'],
-                "directors_provided": True,
-                "executives_provided": True,
-            },
-            country="GB",
-            default_currency="GBP",
-        )
-        bn_package.stripe_acct_id = account.id
-
-    if not bn_package.bn_stripe_product_id:
-        # create product
-        product = stripe.Product.create(name='Birth Notification',
-                                        stripe_account=bn_package.stripe_acct_id)
-        bn_package.bn_stripe_product_id = product.id
-
-    bn_package.save()
-
-    return get_account_link(request, bn_package, attached_service)
 
 
 def validate_bn_number(request):

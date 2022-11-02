@@ -18,12 +18,12 @@
                 <li class="breadcrumb-item active">Birth Notifications</li>
             </ol>
         </div>
-        {% if not stripe_package_setup %}
-        <div class="col-md-6 col-4 align-self-center">
-            <a href="{% url 'bn_settings' %}">
-                <button class="btn btn-info float-right">Settings</button>
-            </a>
-        </div>
+        {% if not account_link %}
+            <div class="col-md-6 col-4 align-self-center">
+                <a href="{% url 'bn_settings' %}">
+                    <button class="btn btn-info float-right"><i class="fad fa-cog"></i> Settings</button>
+                </a>
+            </div>
         {% endif %}
     </div>
     <!-- ============================================================== -->
@@ -39,14 +39,14 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-info">
-                            {% if stripe_package_setup %}
+                            {% if account_link_setup %}
                                 <a href="{% url 'birth_notification_form' %}">
                                     <div class="box text-center">
                                         <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
                                         <h6 class="text-white">Add New Birth</h6>
                                     </div>
                                 </a>
-                            {% elif not stripe_package_setup and bn_stripe_account.bn_cost_id or bn_stripe_account.bn_child_cost_id %}
+                            {% elif not account_link_setup and stripe_account.bn_cost_id or stripe_account.bn_child_cost_id %}
                                 <a href="{% url 'birth_notification_form' %}">
                                     <div class="box text-center">
                                         <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
@@ -198,13 +198,12 @@
             </div>
 
             <div class="col-md-4 col-lg-4 col-xlg-4">
-                {% if stripe_package_setup %}
+                {% if account_link_setup %}
                     <div class="alert alert-success" role="alert">
                         <strong>Accept payments?</strong> Please head to Stripe to set up your account details.
                     </div>
-                {% endif %}
-                {% if stripe_package_setup %}
-                    <a href="{{ stripe_package_setup.url }}">
+
+                    <a href="{{ account_link_setup.url }}">
                         <button type="button" class="btn btn-success mb-2" style="width: 100%">
                             Setup Stripe Account
                         </button>
@@ -212,7 +211,7 @@
                 {% elif account_link %}
                     <a href="{{ account_link.url }}">
                         <button type="button" class="btn btn-warning mb-2" style="width: 100%">
-                            Action Required on Stripe
+                            Go To Stripe Account
                         </button>
                     </a>
                 {% endif %}
