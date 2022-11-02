@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserDetail, AttachedService, AttachedBolton, BnStripe
+from .models import UserDetail, AttachedService, AttachedBolton, StripeAccount
 
 
 class UserServicesInline(admin.StackedInline):
@@ -44,4 +44,4 @@ class AttachedBoltonAdmin(admin.ModelAdmin):
 
 admin.site.register(AttachedBolton, AttachedBoltonAdmin)
 
-admin.site.register(BnStripe)
+admin.site.register(StripeAccount)

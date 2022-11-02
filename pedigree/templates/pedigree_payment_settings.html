@@ -13,10 +13,10 @@
     <!-- ============================================================== -->
     <div class="row page-titles">
         <div class="col-md-6 col-8 align-self-center">
-            <h3 class="text-themecolor m-b-0 m-t-0">Birth Notifications</h3>
+            <h3 class="text-themecolor m-b-0 m-t-0">Pedigree Payment Settings</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'bn_home' %}">Birth Notifications</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'pedigree_search' %}">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Poultry {% endif %} search</a></li>
                 <li class="breadcrumb-item active">Settings</li>
             </ol>
         </div>
@@ -35,10 +35,10 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">BN Settings</h4>
+                            <h4 class="card-title">Payment Settings</h4>
                             <hr>
-                            <p>Use the below fields to select how much to charge each user per item.</p>
-                            <form class="form-horizontal" action="{% url 'update_prices' %}" method="POST">
+                            <p>Use the below fields to select how much to charge each user per pedigree.</p>
+                            <form class="form-horizontal" action="{% url 'update_pedigree_prices' %}" method="POST">
                                 {% csrf_token %}
                                 <div class="card-body">
                                     <div class="form-group row">
@@ -48,7 +48,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><i class="fad fa-pound-sign"></i></span>
                                                 </div>
-                                                <input type="text" class="form-control" id="bncost" name="bncost" value="{{ bn_cost|price }}">
+                                                <input type="text" class="form-control" id="bncost" name="bncost" value="{{ bn_cost }}">
                                             </div>
                                         </div>
                                     </div>
@@ -59,20 +59,8 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><i class="fad fa-pound-sign"></i></span>
                                                 </div>
-                                                <input type="text" class="form-control" id="bnccost" name="bnccost" value="{{ bn_child_cost|price }}">
+                                                <input type="text" class="form-control" id="bnccost" name="bnccost" value="{{ bn_child_cost }}">
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="pedcost" class="col-sm-3 text-right control-label col-form-label">Adult pedigree cost</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="fad fa-pound-sign"></i></span>
-                                                </div>
-                                                <input type="text" class="form-control" id="pedcost" name="pedcost" value="0" disabled>
-                                            </div>
-                                            <small class="text-danger">Coming Soon</small>
                                         </div>
                                     </div>
                                 </div>
@@ -90,9 +78,10 @@
         </div>
     </div>
 
-
 {% endblock %}
 
 {% block footer %}
+
+
 
 {% endblock %}
