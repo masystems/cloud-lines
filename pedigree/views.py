@@ -39,16 +39,20 @@ def search(request):
     attached_service = get_main_account(request.user)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
 
-    stripe_account, \
-    account_link, \
-    stripe_package, \
-    edit_account,\
-    account_link_setup = get_stripe_connected_account_links(request, attached_service)
+    if attached_service.pedigree_charging:
+        stripe_account, \
+        account_link, \
+        stripe_package, \
+        edit_account,\
+        account_link_setup = get_stripe_connected_account_links(request, attached_service)
 
-    return render(request, 'search.html', {'columns': columns,
-                                           'column_data': column_data,
-                                           'stripe_account': stripe_account,
-                                           'account_link': account_link})
+        return render(request, 'search.html', {'columns': columns,
+                                               'column_data': column_data,
+                                               'stripe_account': stripe_account,
+                                               'account_link': account_link})
+    else:
+        return render(request, 'search.html', {'columns': columns,
+                                               'column_data': column_data})
 
 
 class PedigreeBase(LoginRequiredMixin, TemplateView):
@@ -115,83 +119,6 @@ class ShowPedigree(PedigreeBase):
         context = super().get_context_data(**kwargs)
         
         return context
-
-
-class PedigreePaymentSettings(LoginRequiredMixin, TemplateView):
-    template_name = 'pedigree_payment_settings.html'
-
-    def get_context_data(self, **kwargs):
-        # check if user has permission
-        if self.request.method == 'GET':
-            if not has_permission(self.request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': False}):
-                return redirect_2_login(request)
-        elif self.request.method == 'POST':
-            if not has_permission(self.request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
-                raise PermissionDenied()
-        else:
-            raise PermissionDenied()
-
-        context = super().get_context_data(**kwargs)
-
-        stripe.api_key = get_stripe_secret_key(self.request)
-
-        # context['bn_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
-
-        # get bn price
-        # if context['bn_stripe_account'].bn_cost_id:
-        #     context['bn_cost'] = stripe.Price.retrieve(
-        #         context['bn_stripe_account'].bn_cost_id,
-        #         stripe_account=context['bn_stripe_account'].stripe_acct_id
-        #     ).unit_amount
-        # else:
-        #     context['bn_cost'] = 0
-        # # get child price
-        # if context['bn_stripe_account'].bn_child_cost_id:
-        #     context['bn_child_cost'] = stripe.Price.retrieve(
-        #         context['bn_stripe_account'].bn_child_cost_id,
-        #         stripe_account=context['bn_stripe_account'].stripe_acct_id
-        #     ).unit_amount
-        # else:
-        #     context['bn_child_cost'] = 0
-        return context
-
-
-@login_required(login_url="/account/login")
-def update_pedigree_prices(request):
-    # check if user has permission
-    if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
-            return redirect_2_login(request)
-    elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
-            raise PermissionDenied()
-    else:
-        raise PermissionDenied()
-
-    stripe.api_key = get_stripe_secret_key(request)
-
-    # attached_service = get_main_account(request.user)
-    #
-    # bn_stripe_account = StripeAccount.objects.get(account=attached_service)
-    #
-    # bn_stripe_account.bn_cost_id = stripe.Price.create(
-    #     nickname="BN Price",
-    #     unit_amount=int(float(request.POST.get('bncost')) * 100),
-    #     currency="gbp",
-    #     product=bn_stripe_account.bn_stripe_product_id,
-    #     stripe_account=bn_stripe_account.stripe_acct_id
-    # ).id
-    #
-    # bn_stripe_account.bn_child_cost_id = stripe.Price.create(
-    #     nickname="BN Child Price",
-    #     unit_amount=int(float(request.POST.get('bnccost')) * 100),
-    #     currency="gbp",
-    #     product=bn_stripe_account.bn_stripe_product_id,
-    #     stripe_account=bn_stripe_account.stripe_acct_id
-    # ).id
-    # bn_stripe_account.save()
-
-    return redirect('bn_settings')
 
 
 def render_to_pdf(template_src, context_dict):

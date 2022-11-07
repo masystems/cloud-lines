@@ -1,6 +1,8 @@
 from django import template
 from django.template import Variable, VariableDoesNotExist
 
+from datetime import datetime
+
 register = template.Library()
 
 
@@ -33,3 +35,20 @@ def pedigree_column_data(pedigree, data):
     else:
         return value
 
+
+@register.filter
+def price(value):
+    if value != "0":
+        return "{:.2f}".format(float(value) / 100)
+    else:
+        return 0
+
+
+@register.filter
+def datefield(value):
+    return str(value)
+
+
+@register.filter
+def epochtodate(value):
+    return str(datetime.fromtimestamp(value).strftime("%m/%d/%Y, %H:%M:%S"))

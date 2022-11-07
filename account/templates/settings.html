@@ -52,7 +52,7 @@
                     <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#overview" role="tab">Overview</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#users" role="tab">Users</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#customisation" role="tab">Customisation</a> </li>
-                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#metrics" role="tab">Metrics</a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#features" role="tab">Features</a> </li>
                     <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#boltons" role="tab">Boltons</a> </li>
                 </ul>
                 <!-- Tab panes -->
@@ -877,17 +877,19 @@
                         </div>
                     </div>
                     <!-- metrics tab -->
-                    <div class="tab-pane" id="metrics" role="tabpanel">
+                    <div class="tab-pane" id="features" role="tabpanel">
                         <div class="card-body">
 
                             {% if editor %}
-                                <p class="text-left">You can enable/disable metrics using the switch below.</p>
-                                <div class="form-group">
-                                    <div class="mb-4">
+                                <p class="text-left">You can enable/disable features using the switchs below.</p>
+                                <div class="btn-list">
 
                                         <button class="btn {% if service.metrics %}btn-danger{% else%}btn-success{% endif %}"
                                                 id="metricsSwitch">{% if service.metrics %}Disable Metrics{% else%}Enable Metrics{% endif %}</button>
-                                    </div>
+
+                                        <button class="btn {% if service.pedigree_charging %}btn-danger{% else%}btn-success{% endif %}"
+                                                id="pedigreeChargingSwitch">{% if service.pedigree_charging %}Disable Pedigree Charging{% else%}Enable Pedigree Charging{% endif %}</button>
+
                                 </div>
                             {% else %}
                                 <p>You must be an editor to enable/disable metrics.</p>
@@ -988,6 +990,30 @@
                         $('#metricsSwitch').removeClass('btn-success');
                         $('#metricsSwitch').addClass('btn-danger');
                         $('#metricsSwitch').text('Disable Metrics');
+                        }
+                },
+                success: function (data) {
+                },
+                error: function (xhr, textStatus, error) {
+                },
+            });
+        });
+        $('#pedigreeChargingSwitch').click(function() {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'pedigree_charging_switch' %}",
+                dataType: "text",
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                data: '',
+                beforeSend: function() {
+                    if ($('#pedigreeChargingSwitch').hasClass('btn-danger')) {
+                        $('#pedigreeChargingSwitch').removeClass('btn-danger');
+                        $('#pedigreeChargingSwitch').addClass('btn-success');
+                        $('#pedigreeChargingSwitch').text('Enable Pedigree Charging');
+                        } else {
+                        $('#pedigreeChargingSwitch').removeClass('btn-success');
+                        $('#pedigreeChargingSwitch').addClass('btn-danger');
+                        $('#pedigreeChargingSwitch').text('Disable Pedigree Charging');
                         }
                 },
                 success: function (data) {
