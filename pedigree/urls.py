@@ -1,6 +1,7 @@
 from django.urls import path
 from . import tabledata
 from . import views
+from . import pedigree_charging
 
 urlpatterns = [
     path('search', views.search, name='pedigree_search'),
@@ -14,6 +15,6 @@ urlpatterns = [
     path('get-pedigrees', tabledata.get_pedigrees, name="get_pedigrees"),
     path('get_pedigree_details', views.get_pedigree_details, name="get_pedigree_details"),
     path('get-ta-pedigrees/<str:sex>/<str:state>/<str:avoid>', tabledata.get_ta_pedigrees, name="get_ta_pedigrees"),
-    path('pedigree_payment_settings', views.PedigreePaymentSettings.as_view(), name="pedigree_payment_settings"),
-    path('update_pedigree_prices', views.update_pedigree_prices, name="update_pedigree_prices"),
+    path('pedigree_payment_settings', pedigree_charging.PedigreePaymentSettings.as_view(), name="pedigree_payment_settings"),
+    path('pedigree_price_edit', pedigree_charging.pedigree_price_edit, name="pedigree_price_edit"),
 ]

@@ -61,6 +61,7 @@ class AttachedService(models.Model):
     coi_timeout = models.IntegerField(default=60)
     mean_kinship_timeout = models.IntegerField(default=60)
     metrics = models.BooleanField(default=False)
+    pedigree_charging = models.BooleanField(default=False)
 
     SITE_MODES = (
         ('mammal', 'Mammal'),
