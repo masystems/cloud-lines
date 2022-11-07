@@ -98,5 +98,4 @@ def pedigree_price_edit(request):
                     stripe_account=stripe_account.stripe_acct_id
                 )
 
-    return HttpResponse(json.dumps(
-        {'result': 'fail', 'errors': {'field_errors': [], 'non_field_errors': ['You do not have permission!']}}))
+    return HttpResponse(json.dumps({'result': 'success'}))
