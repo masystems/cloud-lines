@@ -87,7 +87,8 @@
                                                     <input type="hidden" id="priceID" name="id">
                                                     <input type="hidden" id="priceFormType" name="formType">
                                                 </form>
-                                                <div class="modal-footer">
+                                                <div class="modal-footer-bottom">
+                                                    <p id="priceError" class="text-danger mt-2"></p>
                                                     <button type="submit" id="priceFormBtn" class="btn btn-success">Save changes</button>
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                                                 </div>
@@ -151,13 +152,13 @@
                                             dataType: 'text',
                                             data: $('#PriceEditor').serialize(),
                                             success: function(data) {
-                                                console.log(data);
                                                 var result = JSON.parse(data);
-                                                if (result.success){
+                                                if (result.result == 'success'){
                                                     $('#priceverticalcenter').modal('toggle');
-                                                    window.location.href = window.location.href.split('#')[0] + "#customisation";
                                                     location.reload();
-                                                } else {
+                                                } else if (result.result == 'fail'){
+                                                    $('#priceError').html(result.error);
+                                                 } else {
                                                     console.log('something went wrong!');
                                                     location.reload()
                                                 }

@@ -83,13 +83,17 @@ def pedigree_price_edit(request):
     price = request.POST
 
     if price['formType'] == 'new':
-        price = stripe.Price.create(
-                    product=pedigree_product,
-                    unit_amount=int(float(price['fieldPrice'].replace('£','')) * 100),
-                    nickname=price['fieldType'],
-                    currency="gbp",
-                    stripe_account=stripe_account.stripe_acct_id
-                )
+        try:
+            price = stripe.Price.create(
+                        product=pedigree_product,
+                        unit_amount=int(float(price['fieldPrice'].replace('£','')) * 100),
+                        nickname=price['fieldType'],
+                        currency="gbp",
+                        stripe_account=stripe_account.stripe_acct_id
+                    )
+        except ValueError:
+            print('value error!')
+            return HttpResponse(json.dumps({'result': 'fail', 'error': 'Price must be a numerical value.'}))
     # Delete price
     elif price['formType'] == 'delete':
         price = stripe.Price.modify(
