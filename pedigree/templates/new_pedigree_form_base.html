@@ -183,8 +183,8 @@
                     {% csrf_token %}
                     <div class="form-body">
                         {% include 'new_pedigree_form.html' %}
-
                     </div>
+                    <hr>
                 </form>
                 <div class="form-actions">
                     <div class="row mt-2">
@@ -229,6 +229,8 @@
                 if (result.result == 'success') {
                     // redirect to breeders page
                     window.location.replace("/pedigree/" + result.ped_id);
+                } else if (result.result == 'payment_redirect') {
+                    window.location.replace(result.url);
                 } else {
                     // create html to display what fields were erroneous
                     var errorHtml = "";

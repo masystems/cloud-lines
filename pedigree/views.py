@@ -19,6 +19,7 @@ from breed.forms import BreedForm
 from breed_group.models import BreedGroup
 from .forms import PedigreeForm, ImagesForm
 from .functions import get_site_pedigree_column_headings
+from .pedigree_charging import pedigree_charging_session
 from django.db.models import Q
 import re
 import json
@@ -31,7 +32,6 @@ from account.views import is_editor,\
 from approvals.models import Approval
 import dateutil.parser
 from django.utils.datastructures import MultiValueDictKeyError
-import stripe
 
 
 @login_required(login_url="/account/login")
@@ -484,13 +484,14 @@ def new_pedigree_form(request):
             else:
                 new_pedigree.save()
 
+            # redirect for charging
+            if attached_service.pedigree_charging:
+                session_url = pedigree_charging_session(request, new_pedigree, pedigree_form['registration_charge'].value())
+                return HttpResponse(json.dumps({'result': 'payment_redirect', 'url': session_url}))
+            else:
+                new_pedigree.paid = True
+                new_pedigree.save()
 
-            # for key, file in request.FILES.items():
-            #     upload = PedigreeImage(account=attached_service, image=file, reg_no=new_pedigree)
-            #     upload.save()
-
-
-            new_pedigree.save()
             return HttpResponse(json.dumps({'result': 'success', 'ped_id': new_pedigree.id}))
         # form invalid
         else:
@@ -543,6 +544,12 @@ def new_pedigree_form(request):
             elif parent.sex == 'male':
                 father_reg = parent.reg_no
 
+    # pedigree charging
+    prices = None
+    if attached_service.pedigree_charging:
+        from .pedigree_charging import get_pedigree_prices
+        prices = get_pedigree_prices(request, attached_service)
+
     return render(request, 'new_pedigree_form_base.html', {'pedigree_form': pedigree_form,
                                                            'pedigrees': Pedigree.objects.filter(account=attached_service),
                                                            'breeders': Breeder.objects.filter(account=attached_service),
@@ -553,7 +560,8 @@ def new_pedigree_form(request):
                                                            'breed_form': BreedForm(),
                                                            'suggested_reg': suggested_reg,
                                                            'mother_reg': mother_reg,
-                                                           'father_reg': father_reg})
+                                                           'father_reg': father_reg,
+                                                           'prices': prices})
 
 
 @login_required(login_url="/account/login")
