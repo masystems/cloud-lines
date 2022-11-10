@@ -144,14 +144,14 @@ def declined(request):
 
         approval.delete()
 
-        # message = """{} has decline your change approval request for {} with the following message:
-        #
-        # {}
-        # """.format(request.user.get_full_name(), message_approval_id, request.POST.get('message'))
-        #
-        # send_mail('Cloud-Lines approval declined for {}'.format(message_approval_id), approval.user.get_full_name(), message,
-        #           send_to=approval.user.email,
-        #           send_from='contact@masys.co.uk',
-        #           reply_to=request.user.email)
+        message = """{} has decline your change approval request for {} with the following message:
+
+        {}
+        """.format(request.user.get_full_name(), message_approval_id, request.POST.get('message'))
+
+        send_mail('Cloud-Lines approval declined for {}'.format(message_approval_id), approval.user.get_full_name(), message,
+                  send_to=approval.user.email,
+                  send_from='contact@masys.co.uk',
+                  reply_to=request.user.email)
 
     return redirect('approvals')
