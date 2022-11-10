@@ -485,7 +485,7 @@ def new_pedigree_form(request):
                 new_pedigree.save()
 
             # redirect for charging
-            if attached_service.pedigree_charging:
+            if attached_service.pedigree_charging and request.user in attached_service.contributors.all():
                 session_url = pedigree_charging_session(request, new_pedigree, pedigree_form['registration_charge'].value())
                 return HttpResponse(json.dumps({'result': 'payment_redirect', 'url': session_url}))
             else:

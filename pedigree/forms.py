@@ -69,7 +69,7 @@ class PedigreeForm(forms.Form):
     sale_or_hire = forms.BooleanField(required=False)
     sale_or_hire.widget.attrs['class'] = 'form-control'
 
-    registration_charge = forms.CharField(required=True)
+    registration_charge = forms.CharField(required=False)
     registration_charge.widget.attrs['class'] = 'form-control'
 
 

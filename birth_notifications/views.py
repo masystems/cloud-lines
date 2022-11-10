@@ -55,6 +55,25 @@ class BnHome(BirthNotificationBase):
             context['edit_account'], \
             context['account_link_setup'] = get_stripe_connected_account_links(self.request, context['attached_service'])
 
+        # validate if user can add a BN
+        context['stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
+        # stripe set up & price set | True
+        if context['stripe_account'].stripe_acct_id and \
+            context['stripe_account'].bn_cost_id or \
+                context['stripe_account'].bn_child_cost_id:
+            context['add_bn'] = True
+        # stripe set up & no price set | False
+        elif context['stripe_account'].stripe_acct_id and not \
+                context['stripe_account'].bn_cost_id and not \
+                context['stripe_account'].bn_child_cost_id:
+            context['add_bn'] = False
+        # stripe not set up | True
+        elif not context['stripe_account'].stripe_acct_id:
+            context['add_bn'] = True
+        else:
+            # not really sure how you got here
+            context['add_bn'] = False
+
         return context
 
 
@@ -454,7 +473,7 @@ def delete_birth_notification(request, id):
         bnstripeobject = StripeAccount.objects.get(account=attached_service)
         bn = BirthNotification.objects.get(id=id)
 
-        if StripeAccountobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
+        if bnstripeobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
             stripe.api_key = get_stripe_secret_key(request)
             # submit refund
             session = stripe.checkout.Session.retrieve(
