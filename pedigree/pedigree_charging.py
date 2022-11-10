@@ -153,6 +153,8 @@ def pedigree_paid(request, id):
 def decline_pedigree(request, reg_no):
     stripe.api_key = get_stripe_secret_key(request)
     attached_service = get_main_account(request.user)
+    if not attached_service.pedigree_charging:
+        return
     stripe_account = StripeAccount.objects.get(account=attached_service)
     pedigree = Pedigree.objects.get(reg_no=reg_no)
 
