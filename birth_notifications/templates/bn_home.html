@@ -18,7 +18,7 @@
                 <li class="breadcrumb-item active">Birth Notifications</li>
             </ol>
         </div>
-        {% if not account_link %}
+        {% if not account_link and editor %}
             <div class="col-md-6 col-4 align-self-center">
                 <a href="{% url 'bn_settings' %}">
                     <button class="btn btn-info float-right"><i class="fad fa-cog"></i> Settings</button>
@@ -39,20 +39,12 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-info">
-                            {% if add_bn %}
-                                <a href="{% url 'birth_notification_form' %}">
-                                    <div class="box text-center">
-                                        <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
-                                        <h6 class="text-white">Add New Birth</h6>
-                                    </div>
-                                </a>
-                            {% else %}
+                            <a href="{% url 'birth_notification_form' %}">
                                 <div class="box text-center">
                                     <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
                                     <h6 class="text-white">Add New Birth</h6>
-                                    <small class="text-danger">Please add at least 1 price in the BN <a href="{% url 'bn_settings' %}" class="text-white">settings</a>.</small>
                                 </div>
-                            {% endif %}
+                            </a>
                         </div>
                     </div>
                     <!-- Column -->

@@ -19,6 +19,7 @@ from .models import UserDetail, AttachedService, AttachedBolton, StripeAccount
 from cloud_lines.models import Service, Page, Bolton
 from pedigree.models import Pedigree
 from pedigree.functions import get_pedigree_column_headings
+from birth_notifications.models import BnSettings
 from breed.models import Breed
 from breeder.models import Breeder
 from approvals.models import Approval
@@ -1095,7 +1096,7 @@ def get_data_protection_version():
 
 ## stripe connected account
 @login_required(login_url="/account/login")
-def get_stripe_connected_account_links(request, attached_service):
+def get_stripe_connected_account_links(request, attached_service, feature=None):
     """
     :param request:
     :param attached_service:
@@ -1111,7 +1112,10 @@ def get_stripe_connected_account_links(request, attached_service):
     # check to see if the account has a stripe connected account to take payments
     if request.user == attached_service.user.user:
         # get or create stripe account object
-        stripe_account, created = StripeAccount.objects.get_or_create(account=attached_service)
+        if feature == 'Birth Notifications':
+            stripe_account, created = BnSettings.objects.get_or_create(account=attached_service)
+        else:
+            stripe_account, created = StripeAccount.objects.get_or_create(account=attached_service)
         if created:
             # create stripe account and get setup url
             account_link = create_package_on_stripe(request, stripe_account)
