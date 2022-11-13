@@ -52,13 +52,3 @@ class BirthNotification(models.Model):
     paid = models.BooleanField(default=False)
 
     complete = models.BooleanField(default=False)
-
-
-class BnSettings(StripeAccount):
-    charging = models.BooleanField(default=False)
-    # set to "Birth Notification"
-    bn_stripe_product_id = models.CharField(max_length=255, blank=True, unique=False)
-    # price of BN
-    bn_cost_id = models.CharField(max_length=255, blank=True, unique=False)
-    # Price of child
-    bn_child_cost_id = models.CharField(max_length=255, blank=True, unique=False)

@@ -14,7 +14,7 @@ from account.views import is_editor,\
     get_stripe_public_key,\
     get_stripe_connected_account_links
 from account.models import AttachedBolton, StripeAccount
-from .models import BirthNotification, BnChild, BnSettings
+from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm
 from pedigree.models import Pedigree
 from json import dumps
@@ -30,7 +30,7 @@ class BirthNotificationBase(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context['attached_service'] = get_main_account(self.request.user)
-        context['stripe_account'] = BnSettings.objects.get(account=context['attached_service'])
+        #context['stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
         return context
 
 
@@ -53,7 +53,7 @@ class BnHome(BirthNotificationBase):
             context['account_link'], \
             context['stripe_package'], \
             context['edit_account'], \
-            context['account_link_setup'] = get_stripe_connected_account_links(self.request, context['attached_service'], 'Birth Notifications')
+            context['account_link_setup'] = get_stripe_connected_account_links(self.request, context['attached_service'])
 
         return context
 
@@ -76,7 +76,7 @@ class Settings(BirthNotificationBase):
 
         stripe.api_key = get_stripe_secret_key(self.request)
 
-        context['bn_stripe_account'] = BnSettings.objects.get(account=context['attached_service'])
+        context['bn_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
 
         # get bn price
         if context['bn_stripe_account'].bn_cost_id:
@@ -113,7 +113,7 @@ def update_prices(request):
 
     attached_service = get_main_account(request.user)
 
-    bn_stripe_account = BnSettings.objects.get(account=attached_service)
+    bn_stripe_account = StripeAccount.objects.get(account=attached_service)
 
     bn_stripe_account.bn_cost_id = stripe.Price.create(
         nickname="BN Price",
@@ -160,7 +160,7 @@ def birth_notification_form(request):
     attached_service = get_main_account(request.user)
 
     try:
-        bn_stripe_account = BnSettings.objects.get(account=attached_service)
+        bn_stripe_account = StripeAccount.objects.get(account=attached_service)
     except StripeAccount.DoesNotExist:
         bn_stripe_account = False
 
@@ -240,7 +240,7 @@ def birth_notification_form(request):
         new_bn.save()
 
         # process payment
-        if bn_stripe_account.charging:
+        if bn_stripe_account.bn_charging:
             user_detail = request.user.user.all()[0]
 
             # get or create customer
@@ -449,7 +449,7 @@ def delete_birth_notification(request, id):
 
     if request.method == 'GET':
         attached_service = get_main_account(request.user)
-        bnstripeobject = BnSettings.objects.get(account=attached_service)
+        bnstripeobject = StripeAccount.objects.get(account=attached_service)
         bn = BirthNotification.objects.get(id=id)
 
         if bnstripeobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
@@ -513,13 +513,13 @@ def validate_bn_number(request):
 @login_required(login_url="/account/login")
 def bn_charging_switch(request):
     attached_service = get_main_account(request.user)
-    bnstripeobject = BnSettings.objects.get(account=attached_service)
+    bnstripeobject = StripeAccount.objects.get(account=attached_service)
     # validate a price has been set
     if bnstripeobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
-        if not bnstripeobject.charging:
-            bnstripeobject.charging = True
+        if not bnstripeobject.bn_charging:
+            bnstripeobject.bn_charging = True
         else:
-            bnstripeobject.charging = False
+            bnstripeobject.bn_charging = False
         bnstripeobject.save()
         return JsonResponse({'result': 'success'})
     else:
