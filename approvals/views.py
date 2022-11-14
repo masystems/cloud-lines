@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from account.views import is_editor, get_main_account, send_mail, has_permission, redirect_2_login
 from .models import Approval
 from pedigree.models import Pedigree, PedigreeImage
+from pedigree.pedigree_charging import decline_pedigree
 from breed_group.models import BreedGroup
 from breeder.models import Breeder
 from breed.models import Breed
@@ -116,7 +117,10 @@ def declined(request):
     if request.method == 'POST':
         if approval.pedigree:
             message_approval_id = approval.pedigree.reg_no
+
             if approval.type == 'new':
+                # create refund
+                decline_pedigree(request, approval.pedigree.reg_no)
                 # delete new entry
                 approval.pedigree.delete()
             else:
@@ -136,10 +140,12 @@ def declined(request):
             else:
                 # mark edited items as approved but do not save yaml data from approval object
                 BreedGroup.objects.filter(id=approval.breed_group.id).update(state='approved')
+
+
         approval.delete()
 
         message = """{} has decline your change approval request for {} with the following message:
-        
+
         {}
         """.format(request.user.get_full_name(), message_approval_id, request.POST.get('message'))
 

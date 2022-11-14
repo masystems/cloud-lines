@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from pedigree.models import Pedigree
-from account.models import AttachedService, AttachedBolton
+from account.models import AttachedService, AttachedBolton, StripeAccount
 
 
 class BnChild(models.Model):

@@ -18,7 +18,7 @@
                 <li class="breadcrumb-item active">Birth Notifications</li>
             </ol>
         </div>
-        {% if not account_link %}
+        {% if not account_link and editor %}
             <div class="col-md-6 col-4 align-self-center">
                 <a href="{% url 'bn_settings' %}">
                     <button class="btn btn-info float-right"><i class="fad fa-cog"></i> Settings</button>
@@ -39,27 +39,12 @@
                 <div class="row">
                     <div class="col-md-6 col-lg-3 col-xlg-3">
                         <div class="card card-inverse card-info">
-                            {% if account_link_setup %}
-                                <a href="{% url 'birth_notification_form' %}">
-                                    <div class="box text-center">
-                                        <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
-                                        <h6 class="text-white">Add New Birth</h6>
-                                    </div>
-                                </a>
-                            {% elif not account_link_setup and stripe_account.bn_cost_id or stripe_account.bn_child_cost_id %}
-                                <a href="{% url 'birth_notification_form' %}">
-                                    <div class="box text-center">
-                                        <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
-                                        <h6 class="text-white">Add New Birth</h6>
-                                    </div>
-                                </a>
-                            {% else %}
+                            <a href="{% url 'birth_notification_form' %}">
                                 <div class="box text-center">
                                     <h1 class="font-light text-white"><i class="fad fa-plus"></i> </h1>
                                     <h6 class="text-white">Add New Birth</h6>
-                                    <small class="text-danger">Please add at least 1 price in the BN <a href="{% url 'bn_settings' %}" class="text-white">settings</a>.</small>
                                 </div>
-                            {% endif %}
+                            </a>
                         </div>
                     </div>
                     <!-- Column -->
@@ -131,7 +116,9 @@
                                                     <th>Births</th>
                                                     <th>BN No.</th>
                                                     <th>Date Added</th>
+                                                    {% if editor %}
                                                     <th>Action</th>
+                                                    {% endif %}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -149,12 +136,15 @@
                                                         <td>
                                                             {{ approval.date_added }}
                                                         </td>
+                                                        {% if editor %}
                                                         <td>
                                                             <a href="{% url 'approve_birth_notification' approval.id %}"><button class="btn btn-sm btn-success mr-1">Approve</button></a>
                                                             <a href="{% url 'birth_notification' approval.id %}"><button class="btn btn-sm btn-outline-info mr-1">View</button></a>
                                                             <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#{{ approval.id }}-deleteBn">Decline</button>
                                                         </td>
+                                                        {% endif %}
                                                     </tr>
+                                                    {% if editor %}
                                                     <!-- Danger Alert Modal -->
                                                     <div id="{{ approval.id }}-deleteBn" class="modal fade" tabindex="-1" role="dialog"
                                                         aria-hidden="true">
@@ -173,6 +163,7 @@
                                                             </div><!-- /.modal-content -->
                                                         </div><!-- /.modal-dialog -->
                                                     </div><!-- /.modal -->
+                                                    {% endif %}
                                                 {% endfor %}
                                             </tbody>
                                         </table>

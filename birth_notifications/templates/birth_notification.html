@@ -36,9 +36,11 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">{{ bn.bn_number }} Details</h4>
+                                {% if editor %}
                                 <button class="btn btn-danger float-right" data-toggle="modal" data-target="#deleteBn">Delete</button>
+                                {% endif %}
                                 <button class="btn btn-outline-info float-right mr-2" data-toggle="modal" data-target="#editBn">Edit</button>
-                                {% if not bn.complete %}
+                                {% if not bn.complete and editor %}
                                     <a href="{% url 'approve_birth_notification' bn.id %}"><button class="btn btn-success float-right mr-2">Approve</button></a>
                                 {% endif %}
                                 <!-- Warning Filled Modal -->

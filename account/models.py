@@ -93,6 +93,8 @@ class StripeAccount(models.Model):
 
     account_name = models.CharField(max_length=255, blank=True)
 
+    ## birth notifications
+    bn_charging = models.BooleanField(default=False)
     # set to "Birth Notification"
     bn_stripe_product_id = models.CharField(max_length=255, blank=True, unique=False)
     # price of BN

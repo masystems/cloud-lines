@@ -8,8 +8,6 @@ from account.models import AttachedBolton
 from urllib.parse import urljoin
 import requests
 import stripe
-from json.decoder import JSONDecodeError
-from json import dumps
 
 
 # Create your views here.
@@ -32,6 +30,7 @@ class Membership(MembershipBase):
         return context
 
 
+@login_required(login_url="/account/login")
 def change_bolton_state(request, bolton_id, req_state):
     # security checks
     # ensure user is superadmin or owner

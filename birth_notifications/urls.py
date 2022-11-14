@@ -18,5 +18,6 @@ urlpatterns = [
     path('approve_birth_notification/<int:id>', views.approve_birth_notification, name='approve_birth_notification'),
     path('get_births_td', tabledata.get_birth_notifications_td, name='get_births_td'),
     path('validate_bn/<int:id>', views.validate_bn, name='validate_bn'),
+    path('bn_charging_switch', views.bn_charging_switch, name='bn_charging_switch'),
 
 ]

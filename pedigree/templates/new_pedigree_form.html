@@ -1,5 +1,7 @@
 {% load static %}
 {% load widget_tweaks %}
+{% load custom_tags %}
+
 
 <h3 class="box-title">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Info</h3>
 {% if contributor %}
@@ -168,6 +170,21 @@
                                     <small>Make sure you add some custom fields in the 'Site Settings' section after this!</small>
                                 {% endif %}
                             {% endif %}
+                        {% elif field.label == 'Registration charge' %}
+                            {% if prices and contributor %}
+                                <select name="registration_charge" class="custom-select" id="prices" required>
+                                    {% for price in prices %}
+                                        <option value="{{ price.id }}">{{ price.nickname }} £{{ price.unit_amount|price }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small>Select the correct charge type for this pedigree</small>
+                            {% else %}
+                                <select name="registration_charge" class="custom-select" id="prices" disabled>
+                                    <option value="price_0000">No Charge</option>
+                                </select>
+                                <small>Field only used if charging is enabled, prices are created and user is a Contributor </small>
+                            {% endif %}
+
                         {% else %}
                             {{ field }}
                         {% endif %}
@@ -181,6 +198,7 @@
                 <div class="col-md-6 col-lg-0"></div><!-- blank space to right of field -->
                 </div><!-- end row for field -->
             {% endif %}
+
             </div>
         {% endif %}
     {% endfor %}

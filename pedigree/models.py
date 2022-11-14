@@ -62,6 +62,8 @@ class Pedigree(models.Model):
     date_added = models.DateTimeField(auto_now_add=True, verbose_name="Date Added")
     custom_fields = models.TextField(blank=True, verbose_name="Custom Fields")
     sale_or_hire = models.BooleanField(default=False, help_text="Is the pedigree for sale/hire, or not?", verbose_name="For Sale/Hire")
+    paid = models.BooleanField(default=False)
+    stripe_payment_token = models.CharField(max_length=255, blank=True, null=True)
 
     def parent_father_reg_no(self):
         if self.parent_father:

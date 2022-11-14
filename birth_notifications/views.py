@@ -30,7 +30,7 @@ class BirthNotificationBase(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context['attached_service'] = get_main_account(self.request.user)
-
+        #context['stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
         return context
 
 
@@ -240,7 +240,7 @@ def birth_notification_form(request):
         new_bn.save()
 
         # process payment
-        if bn_stripe_account.bn_cost_id or bn_stripe_account.bn_child_cost_id:
+        if bn_stripe_account.bn_charging:
             user_detail = request.user.user.all()[0]
 
             # get or create customer
@@ -404,8 +404,6 @@ def approve_birth_notification(request, id):
 
     if request.method == 'GET':
         bn = BirthNotification.objects.get(id=id)
-        attached_service = get_main_account(request.user)
-
         bn.complete = True
         bn.save()
     return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
@@ -454,7 +452,7 @@ def delete_birth_notification(request, id):
         bnstripeobject = StripeAccount.objects.get(account=attached_service)
         bn = BirthNotification.objects.get(id=id)
 
-        if StripeAccountobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
+        if bnstripeobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
             stripe.api_key = get_stripe_secret_key(request)
             # submit refund
             session = stripe.checkout.Session.retrieve(
@@ -506,7 +504,24 @@ def validate_bn(request, id):
     return HttpResponse(True)
 
 
+@login_required(login_url="/account/login")
 def validate_bn_number(request):
     if request.POST:
-        print(request.POST.get('bn_number'))
-    return JsonResponse({'result': BirthNotification.objects.filter(bn_number=request.POST.get('bn_number')).exists()})
+        return JsonResponse({'result': BirthNotification.objects.filter(bn_number=request.POST.get('bn_number')).exists()})
+
+
+@login_required(login_url="/account/login")
+def bn_charging_switch(request):
+    attached_service = get_main_account(request.user)
+    bnstripeobject = StripeAccount.objects.get(account=attached_service)
+    # validate a price has been set
+    if bnstripeobject.bn_cost_id or bnstripeobject.bn_child_cost_id:
+        if not bnstripeobject.bn_charging:
+            bnstripeobject.bn_charging = True
+        else:
+            bnstripeobject.bn_charging = False
+        bnstripeobject.save()
+        return JsonResponse({'result': 'success'})
+    else:
+        return JsonResponse({'result': 'fail',
+                             'error': 'At least one price must be set!'})
