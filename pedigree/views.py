@@ -19,7 +19,8 @@ from breed.forms import BreedForm
 from breed_group.models import BreedGroup
 from .forms import PedigreeForm, ImagesForm
 from .functions import get_site_pedigree_column_headings
-from .pedigree_charging import pedigree_charging_session
+from .pedigree_charging import pedigree_charging_session,\
+    get_pedigree_payment_session
 from django.db.models import Q
 import re
 import json
@@ -89,6 +90,10 @@ class PedigreeBase(LoginRequiredMixin, TemplateView):
 
         context = generate_hirearchy(context)
 
+        # stripe payment state
+        if context['lvl1'].stripe_payment_token and context['attached_service'].pedigree_charging:
+            context['payment_session'] = get_pedigree_payment_session(self.request, context['lvl1'])
+
         return context
 
 
@@ -96,27 +101,28 @@ class ShowPedigree(PedigreeBase):
     template_name = 'pedigree.html'
 
     def dispatch(self, request, *args, **kwargs):
-        # check permission
-        # get breeder_users of pedigree
-        breeder_users = []
-        if super().get_context_data(**kwargs)['lvl1'].breeder:
-            if super().get_context_data(**kwargs)['lvl1'].breeder.user:
-                breeder_users.append(super().get_context_data(**kwargs)['lvl1'].breeder.user)
-        if super().get_context_data(**kwargs)['lvl1'].current_owner:
-            if super().get_context_data(**kwargs)['lvl1'].current_owner.user:
-                breeder_users.append(super().get_context_data(**kwargs)['lvl1'].current_owner.user)
-        if self.request.method == 'GET':
-            if not has_permission(self.request, {'read_only': 'breeder', 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
-                                        pedigrees=[super().get_context_data(**kwargs)['lvl1']],
-                                        breeder_users=breeder_users):
-                return redirect_2_login(self.request)
-        else:
-            raise PermissionDenied()
-        
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # check permission
+        # get breeder_users of pedigree
+        breeder_users = []
+        pedigree = context['lvl1']
+        if pedigree.breeder:
+            if pedigree.breeder.user:
+                breeder_users.append(pedigree.breeder.user)
+        if pedigree.current_owner:
+            if pedigree.current_owner.user:
+                breeder_users.append(pedigree.current_owner.user)
+        if self.request.method == 'GET':
+            if not has_permission(self.request,
+                                  {'read_only': 'breeder', 'contrib': True, 'admin': True, 'breed_admin': 'breed'},
+                                  pedigrees=[pedigree],
+                                  breeder_users=breeder_users):
+                return redirect_2_login(self.request)
+        else:
+            raise PermissionDenied()
         
         return context
 

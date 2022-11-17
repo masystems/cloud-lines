@@ -64,6 +64,9 @@
                                 <th data-type="text">Edited By</th>
                                 <th data-type="text">Section</th>
                                 <th data-type="text">Change Type</th>
+                                {% if service.pedigree_charging %}
+                                    <th data-type="text">Paid</th>
+                                {% endif %}
                                 <th id="status" data-sorted="true" data-direction="DESC">Status</th>
                                 <th data-sortable="false"></th>
                             </tr>
@@ -90,6 +93,11 @@
 
                                 <td>{{ approval.type|title }}</td>
 
+                                {% if service.pedigree_charging and approval.pedigree %}
+                                    <td>{{ approval.pedigree.paid }}</td>
+                                {% else %}
+                                    <td>N/A</td>
+                                {% endif %}
                                 <td><strong class="text-info">Pending</strong></td>
 
                                 <td>

@@ -63,6 +63,11 @@ vertical-align: middle;
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
             </div>
         {% endif %}
+        {% if payment_session.payment_status == 'unpaid' %}
+        <div class="alert alert-danger alert-rounded"> <i class="ti-alert"></i> Payment not complete for this {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}. <a href="{{ payment_session.url }}">Pay Now</a>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+            </div>
+        {% endif %}
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">{{ lvl1.name }}</h4>
