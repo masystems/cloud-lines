@@ -175,3 +175,16 @@ def decline_pedigree(request, reg_no):
             charge=payment_intent['charges']['data'][0]['id'],
             stripe_account=stripe_account.stripe_acct_id
         )
+
+
+def get_pedigree_payment_session(request, pedigree):
+    stripe.api_key = get_stripe_secret_key(request)
+    attached_service = get_main_account(request.user)
+    if not attached_service.pedigree_charging:
+        return
+    stripe_account = StripeAccount.objects.get(account=attached_service)
+    session = stripe.checkout.Session.retrieve(
+        pedigree.stripe_payment_token,
+        stripe_account=stripe_account.stripe_acct_id
+    )
+    return session
