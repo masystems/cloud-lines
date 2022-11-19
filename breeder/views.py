@@ -50,6 +50,28 @@ def breeder(request, breeder_id):
 @login_required(login_url="/account/login")
 def breeders(request):
     attached_service = get_main_account(request.user)
+    # checker permissions and redirect if needed
+    if request.user in attached_service.contributors.all():
+        # check if they're a breed admin
+        try:
+            breeder = Breeder.objects.get(account=attached_service, user=request.user)
+            # redirect to their breeder page
+            return redirect('breeder', breeder.id)
+        except breeder.DoesNotExist:
+            # user not a breed admin
+            pass
+        except:
+            pass
+    elif request.user in attached_service.read_only_users.all():
+        try:
+            breeder = Breeder.objects.get(account=attached_service, user=request.user)
+            # redirect to their breeder page
+            return redirect('breeder', breeder.id)
+        except breeder.DoesNotExist:
+            # user not a breed admin
+            pass
+        except:
+            pass
     return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
 
 

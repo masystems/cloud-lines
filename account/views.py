@@ -176,7 +176,7 @@ def has_permission(request, permissions, pedigrees=[], breeder_users=[]):
     try:
         account = get_main_account(request.user)
 
-        # go through each user type and allow access accoringly
+        # go through each user type and allow access accordingly
         if request.user == account.user.user:
             has_permission = True
         elif request.user in account.admin_users.all():
@@ -185,7 +185,7 @@ def has_permission(request, permissions, pedigrees=[], breeder_users=[]):
         # if user is a breed admin
         elif Breed.objects.filter(account=account, breed_admins__in=[request.user]).exists():
 
-            # if its a straight yes or no
+            # if it's a straight yes or no
             if permissions['breed_admin'] in (True, False):
                 if permissions['breed_admin']:
                     # if breed admins are always allowed, grant permission
@@ -571,9 +571,9 @@ def profile(request):
 
         # payment methods
         try:
-            print(main_account.user.stripe_id)
+            #print(main_account.user.stripe_id)
             context['cards'] = stripe.Customer.list_sources(main_account.user.stripe_id, object='card', limit=1)
-            print(context['cards'])
+            #print(context['cards'])
         except stripe.error.AuthenticationError:
             pass
 
@@ -614,7 +614,7 @@ def settings(request):
         boltons = requests.get(django_settings.BOLTON_API_URL).json()
         count = 0
         for bolton in boltons['results']:
-            print(attached_service.boltons.filter(bolton=bolton['id'], active=True).exists())
+            #print(attached_service.boltons.filter(bolton=bolton['id'], active=True).exists())
             if attached_service.boltons.filter(bolton=bolton['id'], active=True).exists():
                 boltons['results'][count]['active'] = True
             count += 1
