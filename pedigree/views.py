@@ -558,7 +558,6 @@ def new_pedigree_form(request):
 
     return render(request, 'new_pedigree_form_base.html', {'pedigree_form': pedigree_form,
                                                            'pedigrees': Pedigree.objects.filter(account=attached_service),
-                                                           'breeders': Breeder.objects.filter(account=attached_service),
                                                            'breeds': Breed.objects.filter(account=attached_service),
                                                            'breed_groups': BreedGroup.objects.filter(account=attached_service),
                                                            'custom_fields': custom_fields,
