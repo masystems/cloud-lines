@@ -1,18 +1,18 @@
 <!-- living females and males for metrics page -->
 <script>
     // use the data to set up typeahead
-    $('#breeders-free .typeahead').typeahead(
+    $('#breeders .typeahead').typeahead(
         {
             hint: false,
             highlight: true,
             minLength: 1,
         },
         {
-            name: 'freeBreeders',
+            name: 'Breeders',
             // the text entered in the field after typeahead selected
             displayKey: 'display',
             source: function (query, sync, async) {
-                return $.getJSON("{% url 'get_ta_breeders' 'free' %}", { query: query }, function (data) {
+                return $.getJSON("{% url 'get_ta_breeders' search_type %}", { query: query }, function (data) {
                     data = data.map(function(item) {
                         item.display = item.fields.breeding_prefix;
                         return item;
@@ -36,12 +36,13 @@
     );
 
     // Ajax call to get and display name if a full breeder is in any of the fields
-    $('#breeding_prefix').bind('keyup change click typeahead:select', function() {
+    $('#breeding_prefix,#id_breeder,#id_current_owner').bind('keyup change click typeahead:select', function() {
         // get the element that has triggered this function
         var input_element = $(this)
+
         // get the corresponding info element and parent type
         var info_element = $('#breeder-info')
-        var breeder_type = 'free'
+        var breeder_type = '{{ search_type }}'
         
         $.ajax({
             url: "{% url 'get_breeder_details' %}",
@@ -51,7 +52,6 @@
             data: {'id': input_element.val(), 'breeder_type': breeder_type},
             success: function(data) {
                 result = JSON.parse(data)
-
                 if (result.result == 'success') {
                     // don't display names if no text in field
                     if (input_element.val() != '') {
