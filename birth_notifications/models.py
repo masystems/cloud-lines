@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from pedigree.models import Pedigree
+from breeder.models import Breeder
 from account.models import AttachedService, AttachedBolton, StripeAccount
 
 
@@ -46,6 +47,7 @@ class BirthNotification(models.Model):
     dob = models.DateField(blank=True, null=True, verbose_name="Date Of Birth(s)")
     date_added = models.DateTimeField(auto_now_add=True)
     comments = models.TextField(max_length=1000, blank=True, null=True, verbose_name="Comments", help_text="Max 1000 characters")
+    breeder = models.ForeignKey(Breeder, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Breeder")
 
     # session id
     stripe_payment_token = models.CharField(max_length=255, blank=True)
