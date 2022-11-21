@@ -16,6 +16,7 @@ from account.views import is_editor,\
 from account.models import AttachedBolton, StripeAccount
 from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm
+from breeder.models import Breeder
 from pedigree.models import Pedigree
 from json import dumps
 import re
@@ -216,6 +217,13 @@ def birth_notification_form(request):
             new_bn.comments = bn_form['comments']
         except KeyError:
             # no comment added
+            pass
+
+        try:
+            new_bn.breeder = Breeder.objects.get(breeding_prefix=bn_form['breeder'])
+        except Breeder.DoesNotExist:
+            pass
+        except KeyError:
             pass
 
         # needs to be moved to after adding children
@@ -422,6 +430,7 @@ def edit_birth_notification(request, id):
         raise PermissionDenied()
 
     attached_service = get_main_account(request.user)
+    print(request.POST.get('bn_breeder'))
     if request.method == 'POST':
         bn = BirthNotification.objects.get(id=id)
         bn.mother = Pedigree.objects.get(account=attached_service,
@@ -431,6 +440,13 @@ def edit_birth_notification(request, id):
         bn.bn_number = request.POST.get('bn_number')
         bn.dob = request.POST.get('bn_dob')
         bn.comments = request.POST.get('comments')
+        try:
+            bn.breeder = Breeder.objects.get(breeding_prefix=request.POST.get('bn_breeder'))
+        except Breeder.DoesNotExist:
+            pass
+        except KeyError:
+            bn.breeder = None
+
         bn.save()
     return redirect('birth_notification', bn.id)
 

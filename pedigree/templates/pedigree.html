@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load widget_tweaks %}
+{% load custom_tags %}
 {% block content %}
 <style>
 td:nth-child(1) {
@@ -723,7 +724,7 @@ vertical-align: middle;
                         <div class="bg-light-warning"><i class="far fa-object-ungroup"></i></div> Member of <span class="font-weight-normal">{% for group in groups %}{{ group.group_name }}, {% endfor %}</span></li>
                     {% endif %}
                     <li>
-                        <div class="bg-light-warning"><i class="far fa-chart-bar"></i></div> COI <span class="font-weight-normal">{{ lvl1.coi }}</span></li>
+                        <div class="bg-light-warning"><i class="far fa-chart-bar"></i></div> COI <span class="font-weight-normal">{{ lvl1.coi|percent }}</span></li>
                     <li>
                         <div class="bg-light-warning"><i class="far fa-chart-bar"></i></div> Mean Kinship <span class="font-weight-normal">{{ lvl1.mean_kinship }}</span></li>
                     <li>

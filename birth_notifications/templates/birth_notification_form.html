@@ -79,6 +79,11 @@
                                         {% for error in field.errors %}
                                           <span class="help-block">{{ error }}</span>
                                         {% endfor %}
+                                    {% elif field.label == 'Breeder' %}
+                                        <div id="breeders">
+                                            <label class="col-sm-6 col-form-label">{{ field.label }}</label>
+                                            <input id="id_breeder" class="typeahead form-control" name='{{ field.name }}' type="text" placeholder="{{ field.label|title }}">
+                                        </div>
                                     {% else %}
                                         <label class="col-sm-6 col-form-label">{{ field.label }}</label>
                                         {{ field|attr:"class:form-control" }}
@@ -305,5 +310,7 @@
             $('#bnForm').submit()
         });
     </script>
+
+    {% include 'ta_breeder.html' with search_type='all' %}
 
 {% endblock %}
