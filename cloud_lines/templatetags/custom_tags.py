@@ -52,3 +52,8 @@ def datefield(value):
 @register.filter
 def epochtodate(value):
     return str(datetime.fromtimestamp(value).strftime("%m/%d/%Y, %H:%M:%S"))
+
+
+@register.filter
+def percent(value):
+    return f"{float(value*100)}%"
