@@ -56,4 +56,4 @@ def epochtodate(value):
 
 @register.filter
 def percent(value):
-    return f"{float(value*100)}%"
+    return f"{float(value)*100}%"
