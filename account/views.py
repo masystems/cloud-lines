@@ -15,7 +15,8 @@ from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings as django_settings
 from rest_framework.authtoken.models import Token
-from .models import UserDetail, AttachedService, AttachedBolton, StripeAccount
+from .models import UserDetail, AttachedService, StripeAccount
+from memberships.models import Membership
 from cloud_lines.models import Service, Page, Bolton
 from pedigree.models import Pedigree
 from pedigree.functions import get_pedigree_column_headings
@@ -621,12 +622,26 @@ def settings(request):
     except:
         boltons = []
 
+    # memberships
+    # validate active membership bolton exists
+    if attached_service.boltons.filter(bolton='2', active=True).exists():
+        try:
+            # get the membership objects
+            membership, created = Membership.objects.get_or_create(account=attached_service)
+            # get or create a token
+            membership.get_or_create_token()
+        except Membership.DoesNotExist:
+            membership = None
+    else:
+        membership = None
+
     return render(request, 'settings.html', {'custom_fields': custom_fields,
                                              'pedigree_headings': get_pedigree_column_headings(),
                                              'active_pedigree_columns': active_pedigree_columns,
                                              'breeds': breeds,
                                              'breed_admins': breed_admins,
-                                             'boltons': boltons})
+                                             'boltons': boltons,
+                                             'membership': membership})
 
 
 @user_passes_test(is_editor, "/account/login")
@@ -955,77 +970,6 @@ def update_card(request):
         cancel_url=f"http://{request.META['HTTP_HOST']}/account/profile#billing",
     )
     return redirect(session.url, code=303)
-
-    # # add payment token to user
-    # try:
-    #     stripe.Customer.modify(
-    #         user_detail.stripe_id,
-    #         source=request.POST.get('id')
-    #     )
-    # except stripe.error.CardError as e:
-    #     # Since it's a decline, stripe.error.CardError will be caught
-    #     feedback = send_payment_error(e)
-    #     result = {'result': 'fail',
-    #               'feedback': feedback}
-    #     return HttpResponse(json.dumps(result))
-    #
-    # except stripe.error.RateLimitError as e:
-    #     # Too many requests made to the API too quickly
-    #     feedback = send_payment_error(e)
-    #     result = {'result': 'fail',
-    #               'feedback': feedback}
-    #     return HttpResponse(json.dumps(result))
-    #
-    # except stripe.error.InvalidRequestError as e:
-    #     # Invalid parameters were supplied to Stripe's API
-    #     feedback = send_payment_error(e)
-    #     result = {'result': 'fail',
-    #               'feedback': feedback}
-    #     return HttpResponse(json.dumps(result))
-    #
-    # except stripe.error.AuthenticationError as e:
-    #     # Authentication with Stripe's API failed
-    #     # (maybe you changed API keys recently)
-    #     feedback = send_payment_error(e)
-    #     result = {'result': 'fail',
-    #               'feedback': feedback}
-    #     return HttpResponse(json.dumps(result))
-    #
-    # except stripe.error.APIConnectionError as e:
-    #     # Network communication with Stripe failed
-    #     feedback = send_payment_error(e)
-    #     result = {'result': 'fail',
-    #               'feedback': feedback}
-    #     return HttpResponse(json.dumps(result))
-    #
-    # except stripe.error.StripeError as e:
-    #     # Display a very generic error to the user, and maybe send
-    #     # yourself an email
-    #     feedback = send_payment_error(e)
-    #     result = {'result': 'fail',
-    #               'feedback': feedback}
-    #     return HttpResponse(json.dumps(result))
-    #
-    # except Exception as e:
-    #     # Something else happened, completely unrelated to Stripe
-    #     feedback = send_payment_error(e)
-    #     result = {'result': 'fail',
-    #               'feedback': feedback}
-    #     return HttpResponse(json.dumps(result))
-    #
-    # main_account = get_main_account(request.user)
-    # return HttpResponse(stripe.Customer.list_sources(main_account.user.stripe_id, object='card'))
-
-
-def send_payment_error(e):
-    body = e.json_body
-    err = body.get('error', {})
-
-    feedback = "Status is: %s" % e.http_status
-    feedback += "<br>Type is: %s" % err.get('type')
-    feedback += "<br>Code is: %s" % err.get('code')
-    feedback += "<br>Message is: %s" % err.get('message')
-    return feedback
 
 
 @login_required(login_url="/account/login")

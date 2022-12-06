@@ -89,5 +89,4 @@ def change_bolton_state(request, bolton_id, req_state):
 
         # cancel subscription in strip
         stripe.Subscription.delete(attached_bolton.stripe_sub_id)
-    # disable bolton
     return redirect('settings')

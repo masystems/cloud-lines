@@ -31,7 +31,7 @@ class UserDetail(models.Model):
 class AttachedBolton(models.Model):
     """
     1 == birth notifications
-    2 == ???
+    2 == memberships
     """
     bolton = models.CharField(max_length=10)
     # session id
@@ -41,6 +41,14 @@ class AttachedBolton(models.Model):
 
     # used by BN package for storing their custom account id
     stripe_acct_id = models.CharField(max_length=255, blank=True)
+
+    def bolton_name(self):
+        bolton_dict = {'1': 'Birth Notification',
+                       '2': 'Memberships'}
+        return bolton_dict[self.bolton]
+
+    def __str__(self):
+        return f'{self.boltons.all()[0].organisation_or_society_name} - {self.bolton_name()}'
 
 
 class AttachedService(models.Model):
@@ -80,7 +88,7 @@ class AttachedService(models.Model):
     install_available = models.BooleanField(default=False)
 
     def __str__(self):
-        return "{}-{}".format(str(self.user), str(self.service))
+        return f"{self.user.user.get_full_name()}-{self.service.service_name}-{self.organisation_or_society_name}"
 
 
 class StripeAccount(models.Model):
