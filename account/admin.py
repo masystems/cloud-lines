@@ -23,17 +23,17 @@ admin.site.register(UserDetail, UserDetailAdmin)
 
 
 class AttachedServiceAdmin(admin.ModelAdmin):
-    list_display = ('user', 'service')
-    list_display_links = ['user', 'service']
-    search_fields = ('user', 'service')
-    list_filter = ('user', 'service')
+    list_display = ('organisation_or_society_name', 'user', 'service', 'domain', 'site_mode', 'active')
+    list_display_links = ['organisation_or_society_name', 'user', 'service', 'domain', 'site_mode', 'active']
+    search_fields = ('organisation_or_society_name', 'user', 'service', 'domain', 'site_mode', 'active')
+    list_filter = ('organisation_or_society_name', 'user', 'service', 'domain', 'site_mode', 'active')
 
 admin.site.register(AttachedService, AttachedServiceAdmin)
 
 
 class AttachedBoltonAdmin(admin.ModelAdmin):
-    list_display = ('bolton', 'active')
-    list_display_links = ['bolton', 'active']
+    list_display = ('bolton_name', 'active')
+    list_display_links = ['bolton_name', 'active']
     search_fields = ('bolton', 'active')
     list_filter = ('bolton', 'active')
     ordering = ['bolton']

@@ -87,6 +87,17 @@
                     <!--second tab-->
                     <div class="tab-pane" id="users" role="tabpanel">
                         <div class="card-body">
+                            {% if membership %}
+                            <div class="alert alert-warning alert-rounded"> <i class="ti-alert"></i> Membership token: <span id="membershipToken">{{ membership.token }}</span> <a href="#" id="copyToken"><i class="fad fa-copy"></i></a>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+                                </div>
+                                <script>
+                                    $("#copyToken").click(function() {
+                                        navigator.clipboard.writeText($('#membershipToken').text())
+                                        infoMsg("Token copied!")
+                                    });
+                                </script>
+                            {% endif %}
                             <table id="userTable" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
