@@ -44,6 +44,13 @@ class ApiAttachedServiceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ApiUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'username', 'first_name', 'last_name')
+
+
+
 class ApiPedigreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pedigree

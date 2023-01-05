@@ -1,9 +1,11 @@
+from django.core.exceptions import PermissionDenied
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication, SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import ApiLargeTierQueueSerializer, \
     ApiReportQueueSerializer, \
     ApiAttachedServiceSerializer, \
+    ApiUserSerializer, \
     ApiPedigreeSerializer, \
     ApiPedigreeImageSerializer,\
     ApiBreederSerializer, \
@@ -25,11 +27,14 @@ from breed_group.models import BreedGroup
 from cloud_lines.models import Service, Faq, Bolton
 from account.models import UserDetail, AttachedService
 from metrics.models import KinshipQueue, DataValidatorQueue, StudAdvisorQueue
+from memberships.models import Membership
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import permission_classes
 from account.views import get_main_account
 from django.db.models import Q
+from django.contrib.auth.models import User
+
 
 
 @permission_classes((AllowAny, ))
@@ -70,6 +75,29 @@ class AttachedServiceViews(viewsets.ModelViewSet):
                                               Q(contributors=user, active=True) |
                                               Q(read_only_users=user, active=True) |
                                               Q(user=user_detail, active=True)).distinct().distinct()
+
+
+@permission_classes((AllowAny, ))
+class UserViews(viewsets.ModelViewSet):
+    #authentication_classes = (BasicAuthentication,)
+    serializer_class = ApiUserSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        try:
+            membership = Membership.objects.get(token=self.request.GET.get('token'))
+        except Membership.DoesNotExist:
+            raise PermissionDenied()
+
+        #attached_service = membership.account
+        from itertools import chain
+        if self.request.GET.get('email') == membership.account.user.user.email:
+            return User.objects.filter(email=self.request.GET.get('email'))
+        querysets = [membership.account.admin_users.filter(email=self.request.GET.get('email')),
+                     membership.account.contributors.filter(email=self.request.GET.get('email')),
+                     membership.account.read_only_users.filter(email=self.request.GET.get('email'))]
+        return list(chain(*querysets))
 
 
 class PedigreeViews(viewsets.ModelViewSet):
@@ -120,9 +148,12 @@ class BreederViews(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        main_account = get_main_account(user)
-        return Breeder.objects.filter(account=main_account)
+        if self.request.GET.get('email'):
+            return Breeder.objects.filter(user__email=self.request.GET.get('email'))
+        else:
+            user = self.request.user
+            main_account = get_main_account(user)
+            return Breeder.objects.filter(account=main_account)
 
 
 class BreedViews(viewsets.ModelViewSet):
