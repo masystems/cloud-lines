@@ -6,6 +6,7 @@ from .serializers import ApiLargeTierQueueSerializer, \
     ApiReportQueueSerializer, \
     ApiAttachedServiceSerializer, \
     ApiUserSerializer, \
+    ApiUserDetailSerializer, \
     ApiPedigreeSerializer, \
     ApiPedigreeImageSerializer,\
     ApiBreederSerializer, \
@@ -98,6 +99,20 @@ class UserViews(viewsets.ModelViewSet):
                      membership.account.contributors.filter(email=self.request.GET.get('email')),
                      membership.account.read_only_users.filter(email=self.request.GET.get('email'))]
         return list(chain(*querysets))
+
+
+@permission_classes((AllowAny, ))
+class UserDetailViews(viewsets.ModelViewSet):
+    #authentication_classes = (BasicAuthentication,)
+    serializer_class = ApiUserDetailSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        try:
+            membership = Membership.objects.get(token=self.request.GET.get('token'))
+        except Membership.DoesNotExist:
+            raise PermissionDenied()
 
 
 class PedigreeViews(viewsets.ModelViewSet):

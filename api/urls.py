@@ -18,6 +18,7 @@ router.register('data_validation', views.DataValidatorViews, basename='data_vali
 router.register('stud_advisor', views.StudAdvisorViews, basename='stud_advisor')
 router.register('attached-service', views.AttachedServiceViews, basename='AttachedService')
 router.register('user', views.UserViews, basename='User')
+router.register('user-detail', views.UserDetailViews, basename='UserDetail')
 #router.register('authenticate', views.Authenticate)
 
 urlpatterns = [
