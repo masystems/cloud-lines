@@ -6,7 +6,7 @@ from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
 from cloud_lines.models import Service, Faq, Bolton
-from account.models import AttachedService
+from account.models import AttachedService, UserDetail
 from metrics.models import KinshipQueue, DataValidatorQueue, StudAdvisorQueue
 from django.contrib.auth.models import User
 
@@ -47,8 +47,13 @@ class ApiAttachedServiceSerializer(serializers.ModelSerializer):
 class ApiUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'username', 'first_name', 'last_name')
+        fields = ('id', 'email', 'username', 'first_name', 'last_name')
 
+
+class ApiUserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDetail
+        fields = ('id', 'user', 'current_service')
 
 
 class ApiPedigreeSerializer(serializers.ModelSerializer):
