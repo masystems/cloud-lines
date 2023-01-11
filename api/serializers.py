@@ -43,6 +43,9 @@ class ApiAttachedServiceSerializer(serializers.ModelSerializer):
         model = AttachedService
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        instance.read_only_users.add(validated_data.get('read_only_users', instance.read_only_users)[0])
+        return instance
 
 class ApiUserSerializer(serializers.ModelSerializer):
     class Meta:
