@@ -1,12 +1,11 @@
 from django.core.exceptions import PermissionDenied
+from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication, SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import ApiLargeTierQueueSerializer, \
     ApiReportQueueSerializer, \
     ApiAttachedServiceSerializer, \
-    ApiUserSerializer, \
-    ApiUserDetailSerializer, \
     ApiPedigreeSerializer, \
     ApiPedigreeImageSerializer,\
     ApiBreederSerializer, \
@@ -78,41 +77,49 @@ class AttachedServiceViews(viewsets.ModelViewSet):
                                               Q(user=user_detail, active=True)).distinct().distinct()
 
 
-@permission_classes((AllowAny, ))
-class UserViews(viewsets.ModelViewSet):
-    #authentication_classes = (BasicAuthentication,)
-    serializer_class = ApiUserSerializer
-    filter_backends = [SearchFilter]
-    permission_classes = [AllowAny]
 
-    def get_queryset(self):
+@api_view(['POST',])
+@permission_classes((AllowAny, ))
+def membership_add_edit_user(request):
+    if request.method == 'POST':
         try:
-            membership = Membership.objects.get(token=self.request.GET.get('token'))
+            membership = Membership.objects.get(token=request.data['token'])
         except Membership.DoesNotExist:
             raise PermissionDenied()
 
-        #attached_service = membership.account
-        from itertools import chain
-        if self.request.GET.get('email') == membership.account.user.user.email:
-            return User.objects.filter(email=self.request.GET.get('email'))
-        querysets = [membership.account.admin_users.filter(email=self.request.GET.get('email')),
-                     membership.account.contributors.filter(email=self.request.GET.get('email')),
-                     membership.account.read_only_users.filter(email=self.request.GET.get('email'))]
-        return list(chain(*querysets))
+        # create user
+        user, created = User.objects.get_or_create(email=request.data['email'])
+        user.username = request.data['username']
+        user.first_name = request.data['first_name']
+        user.last_name = request.data['last_name']
+        user.save()
 
+        # create user detail
+        if created:
+            user_detail = UserDetail.objects.create(user=user)
+        else:
+            user_detail = UserDetail.objects.get(user=user)
+        user_detail.phone = request.data['phone']
+        user_detail.current_service = membership.account
+        user_detail.save()
 
-@permission_classes((AllowAny, ))
-class UserDetailViews(viewsets.ModelViewSet):
-    #authentication_classes = (BasicAuthentication,)
-    serializer_class = ApiUserDetailSerializer
-    filter_backends = [SearchFilter]
-    permission_classes = [AllowAny]
+        # add user to attached service
+        if request.data['permission_level'] == 'read_only_users':
+            membership.account.read_only_users.add(user)
+        elif request.data['permission_level'] == 'contributors':
+            membership.account.contributors.add(user)
+        elif request.data['permission_level'] == 'admin_users':
+            membership.account.admin_users.add(user)
+        else:
+            return Response({
+                'error': True,
+                'detail': 'Incorrect permission or no permission level not given'
+            })
 
-    def get_queryset(self):
-        try:
-            membership = Membership.objects.get(token=self.request.GET.get('token'))
-        except Membership.DoesNotExist:
-            raise PermissionDenied()
+        return Response({
+            'error': False,
+            'detail': f'User created: {user.email}'
+        })
 
 
 class PedigreeViews(viewsets.ModelViewSet):
