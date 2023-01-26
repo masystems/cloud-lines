@@ -171,7 +171,7 @@
                                 {% endif %}
                             {% endif %}
                         {% elif field.label == 'Registration charge' %}
-                            {% if prices %}
+                            {% if prices and contributor %}
                                 <select name="registration_charge" class="custom-select" id="prices" required>
                                     {% for price in prices %}
                                         <option value="{{ price.id }}">{{ price.nickname }} £{{ price.unit_amount|price }}</option>
