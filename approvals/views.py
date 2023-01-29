@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from account.views import is_editor, get_main_account, send_mail, has_permission, redirect_2_login
 from .models import Approval
 from pedigree.models import Pedigree, PedigreeImage
-from pedigree.pedigree_charging import decline_pedigree
+from pedigree.pedigree_charging import decline_pedigree, get_pedigree_payment_session
 from breed_group.models import BreedGroup
 from breeder.models import Breeder
 from breed.models import Breed
@@ -29,7 +29,7 @@ def approvals(request):
     else:
         approvals = Approval.objects.filter(account=attached_service)
     data = []
-
+    charging_data = {}
     for approval in approvals:
         if approval.pedigree:
             for obj in serializers.deserialize("yaml", approval.data):
@@ -38,6 +38,8 @@ def approvals(request):
                 else:
                     obj.object.custom_fields_expanded = "{}"
                 data.append(obj.object)
+            # get charging info for failed payments
+            charging_data[approval.id] = get_pedigree_payment_session(request, approval.pedigree).amount_total
         elif approval.breed_group:
             # convert the data to a dict
             data_dict = load(approval.data)[0]
@@ -57,7 +59,8 @@ def approvals(request):
             data_dict['fields']['group_members'] = pedigrees
             data.append(data_dict)
     return render(request, 'approvals.html', {'approvals': approvals,
-                                              'data': data})
+                                              'data': data,
+                                              'charging_data': charging_data})
 
 
 @login_required(login_url="/account/login")

@@ -2,6 +2,7 @@
 {% load widget_tweaks %}
 {% load static %}
 {% block content %}
+{% load custom_tags %}
 
     <!-- ============================================================== -->
     <!-- Bread crumb and right sidebar toggle -->
@@ -66,6 +67,7 @@
                                 <th data-type="text">Change Type</th>
                                 {% if service.pedigree_charging %}
                                     <th data-type="text">Paid</th>
+                                    <th data-type="text">Charge</th>
                                 {% endif %}
                                 <th id="status" data-sorted="true" data-direction="DESC">Status</th>
                                 <th data-sortable="false"></th>
@@ -94,7 +96,16 @@
                                 <td>{{ approval.type|title }}</td>
 
                                 {% if service.pedigree_charging and approval.pedigree %}
-                                    <td>{{ approval.pedigree.paid }}</td>
+                                    {% if approval.pedigree.paid %}
+                                        <td>Paid</td>
+                                    {% else %}
+                                        <td class="text-danger"><strong>Failed</strong></td>
+                                    {% endif %}
+                                    {% for app, charge in charging_data.items %}
+                                        {% if app == approval.id %}
+                                            <td>£{{ charge|price }}</td>
+                                        {% endif %}
+                                    {% endfor %}
                                 {% else %}
                                     <td>N/A</td>
                                 {% endif %}
