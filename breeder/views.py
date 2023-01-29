@@ -59,9 +59,9 @@ def breeders(request):
             return redirect('breeder', breeder.id)
         except breeder.DoesNotExist:
             # user not a breed admin
-            pass
+            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
         except:
-            pass
+            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
     elif request.user in attached_service.read_only_users.all():
         try:
             breeder = Breeder.objects.get(account=attached_service, user=request.user)
@@ -69,9 +69,9 @@ def breeders(request):
             return redirect('breeder', breeder.id)
         except breeder.DoesNotExist:
             # user not a breed admin
-            pass
+            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
         except:
-            pass
+            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
     return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
 
 

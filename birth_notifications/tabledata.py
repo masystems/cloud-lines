@@ -29,15 +29,13 @@ def get_birth_notifications_td(request):
     births = []
     
     all_births = BirthNotification.objects.filter(
-        Q(user__first_name__icontains=search)|
-        Q(user__last_name__icontains=search)|
+        Q(breeder__breeding_prefix__icontains=search)|
         Q(bn_number__icontains=search)|
         Q(date_added__icontains=search),
         account=attached_service).order_by(sort_by_col).distinct()[start:start + end]
     #.order_by(sort_by_col)
     total_births = BirthNotification.objects.filter(
-        Q(user__first_name__icontains=search) |
-        Q(user__last_name__icontains=search) |
+        Q(breeder__breeding_prefix__icontains=search) |
         Q(bn_number__icontains=search) |
         Q(date_added__icontains=search),
         account=attached_service).order_by(sort_by_col).distinct().count()
@@ -49,10 +47,13 @@ def get_birth_notifications_td(request):
             disabled = ''
 
             row = {}
-            row['user'] = birth.user.get_full_name()
+            try:
+                row['breeder'] = birth.breeder.breeding_prefix
+            except AttributeError:
+                row['breeder'] = ""
             row['births'] = birth.births.all().count()
             row['bn no'] = birth.bn_number
-            row['date added'] = birth.date_added.date()
+            row['date added'] = birth.date_added.date().strftime("%d %b %Y")
             row['action'] = f"""<a href="/birth_notification/birth_notification/{birth.id}"><button class="btn btn-sm btn-outline-info mr-1">View</button></a></td>"""
 
 

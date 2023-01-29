@@ -22,30 +22,8 @@
 <!-- Row -->
     <div class="row">
         <!-- Column -->
-        <div class="col-md-12 col-lg-4 col-xlg-3">
-            <div class="card">
-                <div class="card-body">
-                    <center class="mt-4"> <i class="fad fa-user-circle fa-4x"></i>
-                        <h4 class="card-title mt-2">{{ request.user.get_full_name }}</h4>
-                        <h6 class="card-subtitle">{% if editor %}Editor{% else %}User{% endif %}</h6>
-                    </center>
-                </div>
-                <div>
-                    <hr> </div>
-                <div class="card-body">
-                    <small class="text-muted p-t-30 db">Service</small>
-                    <h6>{{ service.service.service_name }}</h6>
-                    <small class="text-muted p-t-30 db">Animal</small>
-                    <h6>{{ service.animal_type|title }}</h6>
-                    <small class="text-muted p-t-30 db">Site Mode</small>
-                    <h6>{{ service.site_mode|title }}</h6>
-
-                </div>
-            </div>
-        </div>
         <!-- Column -->
-        <!-- Column -->
-        <div class="col-md-12 col-lg-8 col-xlg-9">
+        <div class="col-12">
             <div class="card">
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs profile-tab" role="tablist">
@@ -87,6 +65,7 @@
                     <!--second tab-->
                     <div class="tab-pane" id="users" role="tabpanel">
                         <div class="card-body">
+
                             {% if membership %}
                             <div class="alert alert-warning alert-rounded"> <i class="ti-alert"></i> Membership token: <span id="membershipToken">{{ membership.token }}</span> <a href="#" id="copyToken"><i class="fad fa-copy"></i></a>
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
@@ -97,6 +76,10 @@
                                         infoMsg("Token copied!")
                                     });
                                 </script>
+                            {% endif %}
+                            {% if editor %}
+                                <a type="hidden" id="openUserModal" data-toggle="modal" data-target="#verticalcenter"></a>
+                                <button class="btn btn-success mb-2" id="createNew">Create New User</button>
                             {% endif %}
                             <table id="userTable" class="table table-bordered table-striped">
                                 <thead>
