@@ -233,8 +233,16 @@ def get_pedigrees(request):
             else:
                 disabled = 'disabled'
 
+            # pedigree approval icon
+            # try:
+            #     if pedigree.approval_set.all()[0]:
+            #        warning = '<i class="fad fa-exclamation-triangle"></i>'
+            #     else:
+            #         warning = ''
+            # except IndexError:
+            #     warning = ''
             row = {}
-            row['action'] = f"""<a {href}><button class='btn btn-info' {disabled}>View</button></a>"""
+            row['action'] = f"""<a {href}><button class='btn btn-info' {disabled}>View </button></a>"""
             for col in columns:
                 for data in column_data:
                     if col == column_data[data]['db_id']:
