@@ -13,7 +13,7 @@ class PedigreeForm(forms.Form):
 
     tag_no = forms.CharField(label='Tag Number', required=False)
     tag_no.widget.attrs['class'] = 'form-control'
-    tag_no.widget.attrs['placeholder'] = 'T012345'
+    #tag_no.widget.attrs['placeholder'] = 'T012345'
 
     name = forms.CharField(label='Name', required=False)
     name.widget.attrs['class'] = 'form-control'
