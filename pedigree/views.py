@@ -524,7 +524,7 @@ def new_pedigree_form(request):
 
     # get next available reg number
     try:
-        latest_added = Pedigree.objects.filter(account=attached_service).latest('-reg_no')
+        latest_added = Pedigree.objects.filter(account=attached_service).latest('id')
         latest_reg = latest_added.reg_no
         reg_ints_re = re.search("[0-9]+", latest_reg)
         suggested_reg = latest_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1).zfill(len(reg_ints_re.group(0))))
