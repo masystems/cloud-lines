@@ -96,16 +96,26 @@
                                 <td>{{ approval.type|title }}</td>
 
                                 {% if service.pedigree_charging and approval.pedigree %}
-                                    {% if approval.pedigree.paid %}
-                                        <td>Paid</td>
-                                    {% else %}
-                                        <td class="text-danger"><strong>Failed</strong></td>
-                                    {% endif %}
-                                    {% for app, charge in charging_data.items %}
-                                        {% if app == approval.id %}
-                                            <td>£{{ charge|price }}</td>
+                                    <td>
+                                        {% if approva.pedigree.stripe_payment_token %}
+                                            {% if approval.pedigree.paid %}
+                                                Paid
+                                            {% else %}
+                                                <strong class="text-danger">Failed</strong>
+                                            {% endif %}
                                         {% endif %}
-                                    {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% if approva.pedigree.stripe_payment_token %}
+                                            {% for app, charge in charging_data.items %}
+                                                {% if app == approval.id %}
+                                                    £{{ charge|price }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            No Charge
+                                        {% endif %}
+                                    </td>
                                 {% else %}
                                     <td>N/A</td>
                                 {% endif %}
