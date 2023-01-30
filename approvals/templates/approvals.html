@@ -97,7 +97,7 @@
 
                                 {% if service.pedigree_charging and approval.pedigree %}
                                     <td>
-                                        {% if approva.pedigree.stripe_payment_token %}
+                                        {% if approval.pedigree.stripe_payment_token %}
                                             {% if approval.pedigree.paid %}
                                                 Paid
                                             {% else %}
@@ -106,7 +106,7 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if approva.pedigree.stripe_payment_token %}
+                                        {% if approval.pedigree.stripe_payment_token %}
                                             {% for app, charge in charging_data.items %}
                                                 {% if app == approval.id %}
                                                     £{{ charge|price }}
