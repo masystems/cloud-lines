@@ -24,10 +24,8 @@ def approvals(request):
         raise PermissionDenied()
     
     attached_service = get_main_account(request.user)
-    if attached_service.pedigree_charging:
-        approvals = Approval.objects.filter(account=attached_service, pedigree__paid=False)
-    else:
-        approvals = Approval.objects.filter(account=attached_service)
+
+    approvals = Approval.objects.filter(account=attached_service)
     data = []
     charging_data = {}
     for approval in approvals:
