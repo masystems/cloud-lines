@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_tags %}
 
 {% block header %}
     <link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.css' %}" rel="stylesheet">
@@ -225,11 +226,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for birth in latest.all reversed %}
+                                    {% for bn in latest.all reversed %}
                                         <tr>
-                                            <td>{{ birth.bn_number }}</td>
-                                            <td>{{ birth.births.all.count }}</td>
-                                            <td>{{ birth.births.all.count }}</td>
+                                            <td>{{ bn.bn_number }}</td>
+                                            <td>{{ bn|get_living_births }}</td>
+                                            <td>{{ bn|get_deceased_births }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
