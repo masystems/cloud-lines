@@ -17,6 +17,8 @@
                         item.display = item.fields.breeding_prefix;
                         return item;
                     })
+                    // Store a reference to the data source array
+                    breedersTypeahead = data;
                     async(data);
                 });
             },

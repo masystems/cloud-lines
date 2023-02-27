@@ -134,33 +134,42 @@ def new_breeder_form(request):
         custom_fields = {}
 
     if request.method == 'POST':
+        pre_checks = True
         if breeder_form.is_valid():
-            new_breeder = Breeder()
-            new_breeder.breeding_prefix = breeder_form['breeding_prefix'].value().replace("'", "").replace("/", "")
-            new_breeder.contact_name = breeder_form['contact_name'].value()
-            new_breeder.address_line_1 = breeder_form['address_line_1'].value()
-            new_breeder.address_line_2 = breeder_form['address_line_2'].value()
-            new_breeder.town = breeder_form['town'].value()
-            new_breeder.country = breeder_form['country'].value()
-            new_breeder.postcode = breeder_form['postcode'].value()
-            new_breeder.phone_number1 = breeder_form['phone_number1'].value()
-            new_breeder.phone_number2 = breeder_form['phone_number2'].value()
-            new_breeder.email = breeder_form['email'].value()
-            new_breeder.active = breeder_form['active'].value()
-            new_breeder.account = attached_service
+            if Breeder.objects.filter(account=attached_service, breeding_prefix=breeder_form['breeding_prefix'].value().replace("'", "").replace("/", "")).exists():
+                breeder_form.add_error('breeding_prefix', 'Breeding prefix already exists')
+                pre_checks = False
+            if pre_checks:
+                new_breeder = Breeder()
+                new_breeder.breeding_prefix = breeder_form['breeding_prefix'].value().replace("'", "").replace("/", "")
+                new_breeder.contact_name = breeder_form['contact_name'].value()
+                new_breeder.address_line_1 = breeder_form['address_line_1'].value()
+                new_breeder.address_line_2 = breeder_form['address_line_2'].value()
+                new_breeder.town = breeder_form['town'].value()
+                new_breeder.country = breeder_form['country'].value()
+                new_breeder.postcode = breeder_form['postcode'].value()
+                new_breeder.phone_number1 = breeder_form['phone_number1'].value()
+                new_breeder.phone_number2 = breeder_form['phone_number2'].value()
+                new_breeder.email = breeder_form['email'].value()
+                new_breeder.active = breeder_form['active'].value()
+                new_breeder.account = attached_service
 
-            try:
-                custom_fields = json.loads(attached_service.custom_fields)
+                try:
+                    custom_fields = json.loads(attached_service.custom_fields)
 
-                for id, field in custom_fields.items():
-                    custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
-            except json.decoder.JSONDecodeError:
-                pass
+                    for id, field in custom_fields.items():
+                        custom_fields[id]['field_value'] = request.POST.get(custom_fields[id]['fieldName'])
+                except json.decoder.JSONDecodeError:
+                    pass
 
-            new_breeder.custom_fields = json.dumps(custom_fields)
-            new_breeder.save()
+                new_breeder.custom_fields = json.dumps(custom_fields)
+                new_breeder.save()
 
-            return redirect('breeder', new_breeder.id)
+                return redirect('breeder', new_breeder.id)
+            else:
+                # failed pre checks
+                return render(request, 'new_breeder_form_base.html', {'breeder_form': breeder_form,
+                                                                      'custom_fields': custom_fields})
         else:
             return render(request, 'new_breeder_form_base.html', {'breeder_form': breeder_form,
                                                                   'custom_fields': custom_fields})
