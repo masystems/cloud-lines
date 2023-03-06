@@ -18,11 +18,10 @@ from breeder.forms import BreederForm
 from breed.forms import BreedForm
 from breed_group.models import BreedGroup
 from .forms import PedigreeForm, ImagesForm
-from .functions import get_site_pedigree_column_headings
+from .functions import get_site_pedigree_column_headings, get_next_reg
 from .pedigree_charging import pedigree_charging_session,\
     get_pedigree_payment_session
 from django.db.models import Q
-import re
 import json
 from account.views import is_editor,\
     get_main_account,\
@@ -522,22 +521,7 @@ def new_pedigree_form(request):
     else:
         pedigree_form = PedigreeForm()
 
-    # get next available reg number
-    try:
-        latest_added = Pedigree.objects.filter(account=attached_service).latest('id')
-        latest_reg = latest_added.reg_no
-        reg_ints_re = re.search("[0-9]+", latest_reg)
-        suggested_reg = latest_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1).zfill(len(reg_ints_re.group(0))))
-    except Pedigree.DoesNotExist:
-        suggested_reg = 'REG123456'
-    except AttributeError:
-        suggested_reg = 'REG123456'
-
-    # if reg taken, increment until not taken
-    if suggested_reg == 'REG123456':
-        while Pedigree.objects.filter(account=attached_service, reg_no=suggested_reg).exists():
-            reg_ints_re = re.search("[0-9]+", suggested_reg)
-            suggested_reg = suggested_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1).zfill(len(reg_ints_re.group(0))))
+    suggested_reg = get_next_reg(attached_service)
 
     mother_reg = ''
     father_reg= ''
@@ -634,10 +618,10 @@ def edit_pedigree_form(request, id):
             if Pedigree.objects.filter(reg_no=pedigree_form['reg_no'].value().strip()).exists():
                 pedigree_form.add_error('reg_no', 'Selected reg number already exists.')
                 pre_checks = False
-        if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
+        if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['breeder'].value().strip()).exists() and pedigree_form['breeder'].value() not in ['Breeder', '', 'None', None]:
             pedigree_form.add_error('breeder', 'Selected breeder does not exist.')
             pre_checks = False
-        if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value()).exists() and pedigree_form['current_owner'].value() not in ['Current Owner', '', 'None', None]:
+        if not Breeder.objects.filter(account=attached_service, breeding_prefix=pedigree_form['current_owner'].value().strip()).exists() and pedigree_form['current_owner'].value() not in ['Current Owner', '', 'None', None]:
             pedigree_form.add_error('current_owner', 'Selected owner does not exist.')
             pre_checks = False
         try:

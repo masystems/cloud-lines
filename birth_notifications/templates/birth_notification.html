@@ -187,10 +187,10 @@
                                                         {{ birth.tag_no }}
                                                     </td>
                                                     <td>
-                                                        {{ birth.status }}
+                                                        {{ birth.status|title }}
                                                     </td>
                                                     <td>
-                                                        {{ birth.sex }}
+                                                        {{ birth.sex|title }}
                                                     </td>
                                                     <td>
                                                         {% if birth.for_sale %}Yes{% else %}No{% endif %}
@@ -202,6 +202,27 @@
                                                         <div class="btn-list">
                                                             <button class="btn btn-outline-info" data-toggle="modal" data-target="#editChild{{ birth.id }}">Edit</button>
                                                             <button class="btn btn-danger" data-toggle="modal" data-target="#deleteChild{{ birth.id }}">Delete</button>
+                                                            {% if not birth.pedigree %}
+                                                                {% if can_register or contributor or editor %}
+                                                                    {% if birth.status == 'alive' and bn.complete and prices %}
+                                                                        <div class="btn-group">
+                                                                            <button type="button" class="btn btn-info dropdown-toggle"
+                                                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                                Register Pedigree
+                                                                            </button>
+                                                                            <div class="dropdown-menu">
+                                                                                {% for price in prices %}
+                                                                                    <a class="dropdown-item" href="{% url 'register_pedigree' birth.id price.id %}">{{ price.nickname }} £{{ price.unit_amount|price }}</a>
+                                                                                {% endfor %}
+                                                                            </div>
+                                                                        </div>
+                                                                    {% elif birth.status == 'alive' and bn.complete and not prices %}
+                                                                        <a href="{% url 'register_pedigree' birth.id 0 %}"><button class="btn btn-info">Register Pedigree</button></a>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% else %}
+                                                                <a href="{% url 'pedigree' birth.pedigree.id %}"><button class="btn btn-success">View Pedigree</button></a>
+                                                            {% endif %}
                                                         </div>
                                                     </td>
                                                 </tr>

@@ -1,3 +1,5 @@
+import re
+
 from .models import Pedigree
 
 
@@ -121,3 +123,23 @@ def get_site_pedigree_column_headings(atatched_service):
     for column in site_columns:
         columns.append(pedigree_mapping[column]['db_id'])
     return columns, pedigree_mapping
+
+
+def get_next_reg(attached_service):
+    # get next available reg number
+    try:
+        latest_added = Pedigree.objects.filter(account=attached_service).latest('id')
+        latest_reg = latest_added.reg_no
+        reg_ints_re = re.search("[0-9]+", latest_reg)
+        suggested_reg = latest_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1).zfill(len(reg_ints_re.group(0))))
+    except Pedigree.DoesNotExist:
+        suggested_reg = 'REG123456'
+    except AttributeError:
+        suggested_reg = 'REG123456'
+
+    # if reg taken, increment until not taken
+    if suggested_reg == 'REG123456':
+        while Pedigree.objects.filter(account=attached_service, reg_no=suggested_reg).exists():
+            reg_ints_re = re.search("[0-9]+", suggested_reg)
+            suggested_reg = suggested_reg.replace(str(reg_ints_re.group(0)), str(int(reg_ints_re.group(0))+1).zfill(len(reg_ints_re.group(0))))
+    return suggested_reg
