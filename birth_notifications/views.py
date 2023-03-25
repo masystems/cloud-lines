@@ -16,8 +16,12 @@ from account.views import is_editor,\
 from account.models import AttachedBolton, StripeAccount
 from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm
+from .charging import *
 from breeder.models import Breeder
 from pedigree.models import Pedigree
+from pedigree.pedigree_charging import get_pedigree_prices
+from pedigree.views import create_approval
+from pedigree.functions import get_next_reg
 from json import dumps
 import re
 import stripe
@@ -31,7 +35,13 @@ class BirthNotificationBase(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context['attached_service'] = get_main_account(self.request.user)
-        #context['stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
+        if self.request.user == context['attached_service'].user.user:
+            context['stripe_account'], \
+            context['account_link'], \
+            context['stripe_package'], \
+            context['edit_account'], \
+            context['account_link_setup'] = get_stripe_connected_account_links(self.request,
+                                                                               context['attached_service'])
         return context
 
 
@@ -47,15 +57,6 @@ class BnHome(BirthNotificationBase):
         context['total_deceased'] = context['birth_notifications'].filter(births__status="deceased", paid=True).count()
         context['approvals'] = BirthNotification.objects.filter(account=context['attached_service'], paid=True , complete=False)
 
-        stripe.api_key = get_stripe_secret_key(self.request)
-
-        if self.request.user == context['attached_service'].user.user:
-            context['stripe_account'], \
-            context['account_link'], \
-            context['stripe_package'], \
-            context['edit_account'], \
-            context['account_link_setup'] = get_stripe_connected_account_links(self.request, context['attached_service'])
-
         return context
 
 
@@ -66,7 +67,7 @@ class Settings(BirthNotificationBase):
         # check if user has permission
         if self.request.method == 'GET':
             if not has_permission(self.request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': False}):
-                return redirect_2_login(request)
+                return redirect_2_login(self.request)
         elif self.request.method == 'POST':
             if not has_permission(self.request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
                 raise PermissionDenied()
@@ -78,6 +79,7 @@ class Settings(BirthNotificationBase):
         stripe.api_key = get_stripe_secret_key(self.request)
 
         context['bn_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
+        context['stripe_account'] = stripe.Account.retrieve(context['bn_stripe_account'].stripe_acct_id)
 
         # get bn price
         if context['bn_stripe_account'].bn_cost_id:
@@ -143,6 +145,16 @@ class BirthNotificationView(BirthNotificationBase):
         context = super().get_context_data(**kwargs)
 
         context['bn'] = BirthNotification.objects.get(id=self.kwargs['id'])
+
+        # validate user can register pedigrees
+        if self.request.user in context['bn'].mother.breed.breed_admins.all():
+            # must also be a contrib or editor
+            context['can_register'] = True
+        else:
+            context['can_register'] = False
+
+        if context['attached_service'].pedigree_charging:
+            context['prices'] = get_pedigree_prices(self.request, context['attached_service'])
         return context
 
 
@@ -396,6 +408,72 @@ def delete_child(request, id):
         id = child.births.all()[0].id
         child.delete()
     return redirect('birth_notification', id)
+
+
+@login_required(login_url="/account/login")
+def register_pedigree(request, id, price):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+
+    attached_service = get_main_account(request.user)
+
+    child = BnChild.objects.get(id=id)
+
+    new_pedigree = Pedigree.objects.create(account=attached_service,
+                                           reg_no=get_next_reg(attached_service),
+                                           tag_no=child.tag_no,
+                                           status=child.status,
+                                           sex=child.sex,
+                                           parent_mother=child.births.all()[0].mother,
+                                           parent_father=child.births.all()[0].father,
+                                           breed=child.births.all()[0].mother.breed,
+                                           sale_or_hire=child.for_sale,
+                                           description=child.comments)
+
+    # redirect for charging
+    if attached_service.pedigree_charging:
+        session_url = bn_charging_session(request, new_pedigree, child, price)
+        return redirect(session_url, code=303)
+    else:
+        new_pedigree.paid = True
+        new_pedigree.save()
+        child.pedigree = new_pedigree
+        child.save()
+
+        if request.user in attached_service.contributors.all():
+            create_approval(request, new_pedigree, attached_service, state='unapproved', type='new')
+
+    return redirect('birth_notification', child.births.all()[0].id)
+
+
+@login_required(login_url="/account/login")
+def register_pedigree_success(request, child_id, pedigree_id):
+    # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+
+    attached_service = get_main_account(request.user)
+    child = BnChild.objects.get(id=child_id)
+    pedigree = Pedigree.objects.get(id=pedigree_id)
+    child.pedigree = pedigree
+    child.save()
+
+    if request.user in attached_service.contributors.all():
+        create_approval(request, pedigree, attached_service, state='unapproved', type='new')
+    return redirect('pedigree', pedigree_id)
 
 
 @login_required(login_url="/account/login")

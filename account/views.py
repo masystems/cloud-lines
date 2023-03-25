@@ -1069,6 +1069,7 @@ def get_stripe_connected_account_links(request, attached_service):
             except stripe.error.InvalidRequestError:
                 # stripe account created but not setup
                 account_link_setup = get_account_link(request, stripe_account)
+
             if stripe_package.requirements.errors:
                 # error exist on account, get link to fix
                 account_link = get_account_link(request, stripe_account)
