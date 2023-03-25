@@ -905,6 +905,8 @@ def add_existing_parent(request, pedigree_id):
 def create_approval(request, pedigree, attached_service, state, type):
     if state == 'edited':
         Pedigree.objects.filter(id=pedigree.id).update(state=state)
+    elif state == 'unapproved':
+        Pedigree.objects.filter(id=pedigree.id).update(state=state)
 
     try:
         pedigree.dob = dateutil.parser.parse(pedigree.dob)
