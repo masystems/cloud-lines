@@ -702,7 +702,7 @@
                                         $('#cfFieldName').val(currentRow.find("td:eq(2)").text());
                                         $('#cfFieldType').val(currentRow.find("td:eq(3)").text());
                                         // in cert check box
-                                        if (currentRow.find("td:eq(4)").text() == "on") {
+                                        if (currentRow.find("td:eq(4)").html().includes("fa-check-square")) {
                                             $('#cfIncCert').prop('checked', true)
                                         } else {
                                             $('#cfIncCert').prop('checked', false)
