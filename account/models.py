@@ -48,7 +48,7 @@ class AttachedBolton(models.Model):
         return bolton_dict[self.bolton]
 
     def __str__(self):
-        return f'{self.boltons.all()[0].organisation_or_society_name} - {self.bolton_name()}'
+        return self.bolton_name()
 
 
 class AttachedService(models.Model):
