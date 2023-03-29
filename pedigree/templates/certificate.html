@@ -97,7 +97,6 @@
                                 <li><strong>Owner:</strong> {{ lvl1.current_owner.breeding_prefix }}</li>
                                 <li><strong>Owner Name:</strong> {{ lvl1.current_owner.contact_name }}</li>
                                 <li><strong>Owner Address:</strong> {{ lvl1.current_owner.address_line_1 }} {{ lvl1.current_owner.address_line_2 }} {{ lvl1.current_owner.town }} {{ lvl1.current_owner.country }} {{ lvl1.current_owner.postcode }}</li>
-
                             </ul>
                             {% if lvl1.images.first %}
                                 <img src="{% for image in lvl1.images.all %}
@@ -130,6 +129,54 @@
                                 {% endif %}
                                 {% if lvl1.note %}
                                     <li><strong>Note:</strong> {{ lvl1.note }}</li>
+                                {% endif %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style-type:none;">
+                                <!--if account custom fields exist-->
+                                {% if acc_custom_fields %}
+                                    <!--loop over account custom fields-->
+                                    {% for field_key, field_vals in acc_custom_fields.items %}
+                                        <!--validate field item is set to on-->
+                                        {% if field_vals.incCert == 'on' %}
+                                            <!--loop over pedigree custom fields-->
+                                            {% for ped_field_key, ped_field_vals in ped_custom_fields.items %}
+                                                <!--validate pedigree field is same as account-->
+                                                {% if ped_field_key == field_key %}
+                                                    <li><strong>{{ ped_field_vals.fieldName }}</strong> {{ ped_field_vals.field_value }}</li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <!--loop over account custom fields-->
+                                    {% for field_key, field_vals in acc_custom_fields.items %}
+                                        <!--validate field item is set to on-->
+                                        {% if field_vals.incCert == 'on' %}
+                                            <!--loop over breeder custom fields-->
+                                            {% for breeder_field_key, breeder_field_vals in breeder_custom_fields.items %}
+                                                <!--validate breeder field is same as account-->
+                                                {% if breeder_field_key == field_key %}
+                                                    <li><strong>{{ breeder_field_vals.fieldName }}</strong> {{ breeder_field_vals.field_value }}</li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <!--loop over account custom fields-->
+                                    {% for field_key, field_vals in acc_custom_fields.items %}
+                                        <!--validate field item is set to on-->
+                                        {% if field_vals.incCert == 'on' %}
+                                            <!--loop over breed custom fields-->
+                                            {% for breed_field_key, breed_field_vals in breed_custom_fields.items %}
+                                                <!--validate breed field is same as account-->
+                                                {% if breed_field_key == field_key %}
+                                                    <li><strong>{{ breed_field_vals.fieldName }}</strong> {{ breed_field_vals.field_value }}</li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
                                 {% endif %}
                             </ul>
                         </td>
