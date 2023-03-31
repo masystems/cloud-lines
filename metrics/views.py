@@ -650,7 +650,7 @@ def poprep_export(request):
 
     writer = csv.writer(response, delimiter="|")
 
-    for pedigree in Pedigree.objects.filter(account=attached_service, breed=breed).exclude(Q(state='unapproved') | Q(status='unknown') | Q(sex='unknown')).values('reg_no', 'parent_father__reg_no', 'parent_mother__reg_no', 'dob', 'sex'):
+    for pedigree in Pedigree.objects.filter(account=attached_service, breed=breed).exclude(Q(state='unapproved') | Q(status='unknown') | Q(sex='unknown') | Q(sex='castrated')).values('reg_no', 'parent_father__reg_no', 'parent_mother__reg_no', 'dob', 'sex'):
         if pedigree['sex'] == "male":
             sex = "M"
         elif pedigree['sex'] == "female":
