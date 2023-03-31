@@ -163,6 +163,28 @@ class GeneratePDF(View):
         context = {}
         context['attached_service'] = get_main_account(request.user)
         context['lvl1'] = Pedigree.objects.exclude(state='unapproved').get(account=context['attached_service'], id=self.kwargs['pedigree_id'])
+
+        # get account custom fields
+        try:
+            context['acc_custom_fields'] = json.loads(context['attached_service'].custom_fields)
+        except json.decoder.JSONDecodeError:
+            context['acc_custom_fields'] = {}
+        # get pedigree custom fields
+        try:
+            context['ped_custom_fields'] = json.loads(context['lvl1'].custom_fields)
+        except json.decoder.JSONDecodeError:
+            context['ped_custom_fields'] = {}
+        # get breeder custom fields
+        try:
+            context['breeder_custom_fields'] = json.loads(context['lvl1'].breeder.custom_fields)
+        except json.decoder.JSONDecodeError:
+            context['breeder_custom_fields'] = {}
+        # get breed custom fields
+        try:
+            context['breed_custom_fields'] = json.loads(context['lvl1'].breed.custom_fields)
+        except json.decoder.JSONDecodeError:
+            context['breed_custom_fields'] = {}
+
         context = generate_hirearchy(context)
 
         if kwargs['type'] == 'cert':

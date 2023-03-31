@@ -674,7 +674,8 @@ def custom_field_edit(request):
         custom_fields[field_key] = {'id': field_key,
                                     'location': request.POST.get('location'),
                                     'fieldName': request.POST.get('fieldName'),
-                                    'fieldType': request.POST.get('fieldType')}
+                                    'fieldType': request.POST.get('fieldType'),
+                                    'incCert': request.POST.get('incCert')}
         attached_service.custom_fields = json.dumps(custom_fields)
         attached_service.save()
 
@@ -683,9 +684,10 @@ def custom_field_edit(request):
 
     elif request.POST.get('formType') == 'edit':
         custom_fields[request.POST.get('id')] = {'id': request.POST.get('id'),
-                                                    'location': request.POST.get('location'),
-                                                    'fieldName': request.POST.get('fieldName'),
-                                                    'fieldType': request.POST.get('fieldType')}
+                                                 'location': request.POST.get('location'),
+                                                 'fieldName': request.POST.get('fieldName'),
+                                                 'fieldType': request.POST.get('fieldType'),
+                                                 'incCert': request.POST.get('incCert')}
         attached_service.custom_fields = json.dumps(custom_fields)
         attached_service.save()
 
