@@ -139,7 +139,7 @@
                                     <!--loop over account custom fields-->
                                     {% for field_key, field_vals in acc_custom_fields.items %}
                                         <!--validate field item is set to on-->
-                                        {% if field_vals.incCert == 'on' %}
+                                        {% if field_vals.incCert == 'on' and field_vals.location == 'pedigree' %}
                                             <!--loop over pedigree custom fields-->
                                             {% for ped_field_key, ped_field_vals in ped_custom_fields.items %}
                                                 <!--validate pedigree field is same as account-->
@@ -153,7 +153,7 @@
                                     <!--loop over account custom fields-->
                                     {% for field_key, field_vals in acc_custom_fields.items %}
                                         <!--validate field item is set to on-->
-                                        {% if field_vals.incCert == 'on' %}
+                                        {% if field_vals.incCert == 'on' and field_vals.location == 'breeder' %}
                                             <!--loop over breeder custom fields-->
                                             {% for breeder_field_key, breeder_field_vals in breeder_custom_fields.items %}
                                                 <!--validate breeder field is same as account-->
@@ -167,7 +167,7 @@
                                     <!--loop over account custom fields-->
                                     {% for field_key, field_vals in acc_custom_fields.items %}
                                         <!--validate field item is set to on-->
-                                        {% if field_vals.incCert == 'on' %}
+                                        {% if field_vals.incCert == 'on' and field_vals.location == 'breed' %}
                                             <!--loop over breed custom fields-->
                                             {% for breed_field_key, breed_field_vals in breed_custom_fields.items %}
                                                 <!--validate breed field is same as account-->
