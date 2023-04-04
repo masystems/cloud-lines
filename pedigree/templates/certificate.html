@@ -144,7 +144,7 @@
                                             {% for ped_field_key, ped_field_vals in ped_custom_fields.items %}
                                                 <!--validate pedigree field is same as account-->
                                                 {% if ped_field_key == field_key %}
-                                                    <li><strong>{{ ped_field_vals.fieldName }}</strong> {{ ped_field_vals.field_value }}</li>
+                                                    <li><strong>{{ ped_field_vals.fieldName }}:</strong> {{ ped_field_vals.field_value }}</li>
                                                 {% endif %}
                                             {% endfor %}
                                         {% endif %}
@@ -158,7 +158,7 @@
                                             {% for breeder_field_key, breeder_field_vals in breeder_custom_fields.items %}
                                                 <!--validate breeder field is same as account-->
                                                 {% if breeder_field_key == field_key %}
-                                                    <li><strong>{{ breeder_field_vals.fieldName }}</strong> {{ breeder_field_vals.field_value }}</li>
+                                                    <li><strong>{{ breeder_field_vals.fieldName }}:</strong> {{ breeder_field_vals.field_value }}</li>
                                                 {% endif %}
                                             {% endfor %}
                                         {% endif %}
