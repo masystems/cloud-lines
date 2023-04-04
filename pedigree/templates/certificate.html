@@ -172,7 +172,7 @@
                                             {% for breed_field_key, breed_field_vals in breed_custom_fields.items %}
                                                 <!--validate breed field is same as account-->
                                                 {% if breed_field_key == field_key %}
-                                                    <li><strong>{{ breed_field_vals.fieldName }}</strong> {{ breed_field_vals.field_value }}</li>
+                                                    <li><strong>{{ breed_field_vals.fieldName }}:</strong> {{ breed_field_vals.field_value }}</li>
                                                 {% endif %}
                                             {% endfor %}
                                         {% endif %}
