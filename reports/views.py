@@ -142,3 +142,38 @@ def all(request, type):
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/all/', headers=headers, data=data)
 
     return redirect('reports')
+
+
+def fangr(request):
+     # check if user has permission
+    if request.method == 'GET':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+
+    attached_service = get_main_account(request.user)
+
+    queue_item = ReportQueue.objects.create(account=attached_service,
+                                            user=request.user,
+                                            file_name="",
+                                            file_type="xls",
+                                            complete=False)
+
+    token_res = requests.post(url=f'{settings.ORCH_URL}/api-token-auth/',
+                              data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
+    ## create header
+    headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
+    ## get pedigrees
+    if attached_service.domain:
+        domain = attached_service.domain
+    else:
+        domain = "https://cloud-lines.com"
+
+    token, created = Token.objects.get_or_create(user=request.user)
+
+    data = '{"queue_id": %d, "domain": "%s", "token": "%s"}' % (queue_item.id, domain, token)
+
+    post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/fangr/', headers=headers, data=data)
+
+    return redirect('reports')
