@@ -136,7 +136,7 @@ def render_to_pdf(template_src, context_dict):
     return None
 
 
-class GeneratePDF(View):
+class GenerateCert(View):
     def dispatch(self, request, *args, **kwargs):
         # check permission
         if self.request.method == 'GET':
@@ -201,6 +201,7 @@ class GeneratePDF(View):
                 pedigree=context['lvl1'].reg_no,
             )
             pdf = render_to_pdf('cert-zootechnical.html', context)
+            
         if pdf:
             response = HttpResponse(pdf, content_type='application/pdf')
             filename = "%s.pdf" % pdf_filename
