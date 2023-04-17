@@ -2,14 +2,14 @@ from django.core.management.base import BaseCommand
 from pedigree.views import generate_hirearchy
 from pedigree.models import Pedigree
 from account.models import AttachedService
-from datetime import datetime
 
 class Command(BaseCommand):
     help = "Calculate the FAnGR report"
 
     def add_arguments(self, parser):
         # Add any command line arguments if required
-        parser.add_argument('-as', '--attached_service', type=int, help='attached_service')
+        parser.add_argument('-as', '--attached_service', type=int, help='Attached Service')
+        parser.add_argument('-y', '--year', type=str, help='Year to run report on')
 
         #context['attached_service']
         pass
@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
         context = {}
         context['attached_service'] = AttachedService.objects.get(id=options.get('attached_service', None))
-        current_year = datetime.now().year
+        current_year = options.get('year', None)
 
         for pedigree in Pedigree.objects.filter(account=context['attached_service']):
             capture_parent_breeder_count = False
