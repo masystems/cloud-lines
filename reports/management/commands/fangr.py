@@ -35,11 +35,11 @@ class Command(BaseCommand):
                     break
             # FULL pedigree, can add to calculations
             try:
-                context['lvl1'].dob.year
+                context['lvl1'].date_of_registration.year
             except AttributeError:
                 # dob field empty
                 continue
-            if context['lvl1'].dob.year == current_year:
+            if str(context['lvl1'].date_of_registration.year) == str(current_year):
                 # Q1
                 if context['lvl1'].sex == 'female':
                     number_of_females_this_year += 1
