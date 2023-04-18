@@ -28,13 +28,18 @@ class Command(BaseCommand):
         context['attached_service'] = AttachedService.objects.get(id=options.get('attached_service', None))
         current_year = options.get('year', None)
 
-        for pedigree in Pedigree.objects.filter(account=context['attached_service']):
+        for pedigree in Pedigree.objects.filter(account=context['attached_service'], id=51744):
             capture_parent_breeder_count = False
+            break_outer_loop = False
             context['lvl1'] = pedigree
+            print(generate_hirearchy(context))
             for key, value in generate_hirearchy(context).items():
-                if not value:
+                if value in ['', None]:
                     # not a FULL pedigree
+                    break_outer_loop = True
                     break
+            if break_outer_loop:
+                break
             # FULL pedigree, can add to calculations
             try:
                 context['lvl1'].date_of_registration.year
@@ -46,18 +51,18 @@ class Command(BaseCommand):
                 if context['lvl1'].sex == 'female':
                     number_of_females_this_year += 1
                     capture_parent_breeder_count = True
+                    female_reg_numbers.append(context['lvl1'].reg_no)
                 # Q1
                 elif context['lvl1'].sex == 'male':
                     number_of_males_this_year += 1
                     capture_parent_breeder_count = True
+                    male_reg_numbers.append(context['lvl1'].reg_no)
 
                 if capture_parent_breeder_count:
                     if context['lvl1'].parent_mother not in total_females:
                         total_females.append(context['lvl1'].parent_mother)
-                        female_reg_numbers.append(context['lvl1'].reg_no)
                     if context['lvl1'].parent_father not in total_males:
                         total_males.append(context['lvl1'].parent_father)
-                        male_reg_numbers.append(context['lvl1'].reg_no)
                     if context['lvl1'].breeder not in total_breeders:
                         total_breeders.append(context['lvl1'].breeder)
 
