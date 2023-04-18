@@ -28,7 +28,7 @@ class Command(BaseCommand):
         context['attached_service'] = AttachedService.objects.get(id=options.get('attached_service', None))
         current_year = options.get('year', None)
 
-        for pedigree in Pedigree.objects.filter(account=context['attached_service'], id=51744):
+        for pedigree in Pedigree.objects.filter(account=context['attached_service']):
             capture_parent_breeder_count = False
             break_outer_loop = False
             context['lvl1'] = pedigree
