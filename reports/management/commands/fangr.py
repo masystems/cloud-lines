@@ -26,7 +26,7 @@ class Command(BaseCommand):
         context['attached_service'] = AttachedService.objects.get(id=options.get('attached_service', None))
         current_year = options.get('year', None)
 
-        for pedigree in Pedigree.objects.filter(account=context['attached_service']):
+        for pedigree in Pedigree.objects.filter(account=context['attached_service'], id=51744):
             capture_parent_breeder_count = False
             context['lvl1'] = pedigree
             for key, value in generate_hirearchy(context).items():
@@ -35,11 +35,11 @@ class Command(BaseCommand):
                     break
             # FULL pedigree, can add to calculations
             try:
-                context['lvl1'].dob.year
+                context['lvl1'].date_of_registration.year
             except AttributeError:
                 # dob field empty
                 continue
-            if context['lvl1'].dob.year == current_year:
+            if str(context['lvl1'].date_of_registration.year) == str(current_year):
                 # Q1
                 if context['lvl1'].sex == 'female':
                     number_of_females_this_year += 1
