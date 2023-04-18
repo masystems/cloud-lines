@@ -32,14 +32,13 @@ class Command(BaseCommand):
             capture_parent_breeder_count = False
             break_outer_loop = False
             context['lvl1'] = pedigree
-            print(generate_hirearchy(context))
             for key, value in generate_hirearchy(context).items():
                 if value in ['', None]:
                     # not a FULL pedigree
                     break_outer_loop = True
                     break
             if break_outer_loop:
-                break
+                continue
             # FULL pedigree, can add to calculations
             try:
                 context['lvl1'].date_of_registration.year
