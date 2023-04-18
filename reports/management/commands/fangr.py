@@ -19,7 +19,9 @@ class Command(BaseCommand):
         number_of_females_this_year = 0
         number_of_males_this_year = 0
         total_females = []
+        female_reg_numbers = []
         total_males = []
+        male_reg_numbers = []
         total_breeders = []
 
         context = {}
@@ -43,7 +45,7 @@ class Command(BaseCommand):
                 # Q1
                 if context['lvl1'].sex == 'female':
                     number_of_females_this_year += 1
-                    capture_parent_count = True
+                    capture_parent_breeder_count = True
                 # Q1
                 elif context['lvl1'].sex == 'male':
                     number_of_males_this_year += 1
@@ -52,8 +54,10 @@ class Command(BaseCommand):
                 if capture_parent_breeder_count:
                     if context['lvl1'].parent_mother not in total_females:
                         total_females.append(context['lvl1'].parent_mother)
+                        female_reg_numbers.append(context['lvl1'].reg_no)
                     if context['lvl1'].parent_father not in total_males:
                         total_males.append(context['lvl1'].parent_father)
+                        male_reg_numbers.append(context['lvl1'].reg_no)
                     if context['lvl1'].breeder not in total_breeders:
                         total_breeders.append(context['lvl1'].breeder)
 
@@ -61,6 +65,8 @@ class Command(BaseCommand):
         output = {"females_this_year": number_of_females_this_year,
                   "males_this_year": number_of_males_this_year,
                   "total_females": len(total_females),
+                  "female_reg_numbers": female_reg_numbers,
                   "total_males": len(total_males),
+                  "male_reg_numbers": male_reg_numbers,
                   "total_breeders": len(total_breeders)}
         self.stdout.write(self.style.SUCCESS(output))
