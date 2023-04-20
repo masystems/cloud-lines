@@ -172,7 +172,7 @@ def fangr(request):
 
     token, created = Token.objects.get_or_create(user=request.user)
 
-    data = '{"queue_id": %d, "domain": "%s", "token": "%s"}' % (queue_item.id, domain, token)
+    data = '{"queue_id": %d, "domain": "%s", "account": %d, "token": "%s"}' % (queue_item.id, domain, attached_service.id, token)
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/fangr/', headers=headers, data=data)
 
