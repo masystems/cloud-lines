@@ -10,6 +10,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         # Add any command line arguments if required
         parser.add_argument('-as', '--attached_service', type=int, help='Attached Service')
+        parser.add_argument('-b', '--breed', type=int, help='Breed ID')
         parser.add_argument('-y', '--year', type=str, help='Year to run report on')
 
         #context['attached_service']
@@ -27,9 +28,10 @@ class Command(BaseCommand):
 
         context = {}
         context['attached_service'] = AttachedService.objects.get(id=options.get('attached_service', None))
+        breed_id = options.get('breed', None)
         current_year = options.get('year', None)
 
-        for pedigree in Pedigree.objects.filter(account=context['attached_service']):
+        for pedigree in Pedigree.objects.filter(account=context['attached_service'], breed=breed_id):
             capture_parent_breeder_count = False
             break_outer_loop = False
             context['lvl1'] = pedigree
