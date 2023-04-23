@@ -146,7 +146,7 @@ def all(request, type):
 
 def fangr(request):
      # check if user has permission
-    if request.method == 'GET':
+    if request.method == 'POST':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     else:
@@ -172,7 +172,7 @@ def fangr(request):
 
     token, created = Token.objects.get_or_create(user=request.user)
 
-    data = '{"queue_id": %d, "domain": "%s", "account": %d, "token": "%s"}' % (queue_item.id, domain, attached_service.id, token)
+    data = '{"queue_id": %d, "domain": "%s", "account": %d, "year": "%s", "token": "%s"}' % (queue_item.id, domain, attached_service.id, request.POST.get('year'), token)
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/fangr/', headers=headers, data=data)
 
