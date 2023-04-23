@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from pedigree.views import generate_hirearchy
 from pedigree.models import Pedigree
 from account.models import AttachedService
+import json
 
 class Command(BaseCommand):
     help = "Calculate the FAnGR report"
@@ -73,4 +74,4 @@ class Command(BaseCommand):
                   "total_males": len(total_males),
                   "male_reg_numbers": male_reg_numbers,
                   "total_breeders": len(total_breeders)}
-        self.stdout.write(self.style.SUCCESS(output))
+        self.stdout.write(self.style.SUCCESS(json.dumps(output)))
