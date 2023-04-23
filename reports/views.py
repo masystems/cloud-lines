@@ -26,7 +26,8 @@ def reports(request):
     else:
         raise PermissionDenied()
     attached_service = get_main_account(request.user)
-    return render(request, 'reports.html', {'queue_items': ReportQueue.objects.filter(account=attached_service)})
+    return render(request, 'reports.html', {'queue_items': ReportQueue.objects.filter(account=attached_service),
+                                            'breeds': Breed.objects.filter(account=attached_service)})
 
 
 @login_required(login_url="/account/login")
@@ -172,7 +173,12 @@ def fangr(request):
 
     token, created = Token.objects.get_or_create(user=request.user)
 
-    data = '{"queue_id": %d, "domain": "%s", "account": %d, "year": "%s", "token": "%s"}' % (queue_item.id, domain, attached_service.id, request.POST.get('year'), token)
+    data = '{"queue_id": %d, "domain": "%s", "account": %d, "year": "%s", "breed": "%d", "token": "%s"}' % (queue_item.id,
+                                                                                                            domain,
+                                                                                                            attached_service.id,
+                                                                                                            request.POST.get('year'),
+                                                                                                            Breed.objects.filter(breed_name__iexact=request.POST.get('breed')).first().id,
+                                                                                                            token)
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/fangr/', headers=headers, data=data)
 

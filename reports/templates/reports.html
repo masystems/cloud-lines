@@ -68,6 +68,15 @@
                                     <div class="invalid-feedback">
                                     Please enter a valid year between 1900 and 2099.
                                     </div>
+                                    <label for="yearInput">Breed: {{add_breed}}</label>
+                                    {% if add_breed %}
+                                        <div id="breeds">
+                                            <input id="id_breed" class="typeahead form-control" name='breed' type="text" placeholder="{{ breeds.all.first }}">
+                                        </div>
+                                    {% else %}
+                                            <input id="hid_breed" class="typeahead form-control" name='breed' type="hidden" value="{{ breeds.all.first }}">
+                                            <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
