@@ -26,7 +26,7 @@ def reports(request):
     else:
         raise PermissionDenied()
     attached_service = get_main_account(request.user)
-    return render(request, 'reports.html', {'queue_items': ReportQueue.objects.filter(account=attached_service),
+    return render(request, 'reports.html', {'queue_items': ReportQueue.objects.filter(account=attached_service).order_by('id'),
                                             'breeds': Breed.objects.filter(account=attached_service)})
 
 
