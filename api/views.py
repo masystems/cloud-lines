@@ -179,6 +179,7 @@ class BreederViews(viewsets.ModelViewSet):
 
 
 class BreedViews(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
     serializer_class = ApiBreedSerializer
     filter_backends = [SearchFilter]
     permission_classes = [IsAuthenticated]
