@@ -173,11 +173,12 @@ def fangr(request):
 
     token, created = Token.objects.get_or_create(user=request.user)
 
-    data = '{"queue_id": %d, "domain": "%s", "account": %d, "year": "%s", "breed": "%d", "token": "%s"}' % (queue_item.id,
+    data = '{"queue_id": %d, "domain": "%s", "account": %d, "year": "%s", "breed": "%d", "email": "%s", "token": "%s"}' % (queue_item.id,
                                                                                                             domain,
                                                                                                             attached_service.id,
                                                                                                             request.POST.get('year'),
                                                                                                             Breed.objects.filter(breed_name__iexact=request.POST.get('breed')).first().id,
+                                                                                                            request.user.email,
                                                                                                             token)
 
     post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/fangr/', headers=headers, data=data)
