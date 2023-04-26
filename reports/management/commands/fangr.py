@@ -52,28 +52,28 @@ class Command(BaseCommand):
                 # Q1
                 if context['lvl1'].sex == 'female':
                     number_of_females_this_year += 1
-                    capture_parent_breeder_count = True
+                    #capture_parent_breeder_count = True
                     female_reg_numbers.append(context['lvl1'].reg_no)
                 # Q1
                 elif context['lvl1'].sex == 'male':
                     number_of_males_this_year += 1
-                    capture_parent_breeder_count = True
+                    #capture_parent_breeder_count = True
                     male_reg_numbers.append(context['lvl1'].reg_no)
 
-                if capture_parent_breeder_count:
-                    if context['lvl1'].parent_mother not in total_females:
-                        total_females.append(context['lvl1'].parent_mother)
-                    if context['lvl1'].parent_father not in total_males:
-                        total_males.append(context['lvl1'].parent_father)
-                    if context['lvl1'].breeder not in total_breeders:
-                        total_breeders.append(context['lvl1'].breeder)
+                # if capture_parent_breeder_count:
+                #     if context['lvl1'].parent_mother not in total_females:
+                #         total_females.append(context['lvl1'].parent_mother)
+                #     if context['lvl1'].parent_father not in total_males:
+                #         total_males.append(context['lvl1'].parent_father)
+                #     if context['lvl1'].breeder not in total_breeders:
+                #         total_breeders.append(context['lvl1'].breeder)
 
         # create json stdout
         output = {"females_this_year": number_of_females_this_year,
                   "males_this_year": number_of_males_this_year,
                   "total_females": len(total_females),
-                  "female_reg_numbers": female_reg_numbers,
+                  #"female_reg_numbers": female_reg_numbers,
                   "total_males": len(total_males),
-                  "male_reg_numbers": male_reg_numbers,
+                  #"male_reg_numbers": male_reg_numbers,
                   "total_breeders": len(total_breeders)}
         self.stdout.write(self.style.SUCCESS(json.dumps(output)))
