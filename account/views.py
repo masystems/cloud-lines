@@ -562,8 +562,9 @@ def profile(request):
                 date = time.strftime('%d-%m-%Y', time.localtime(charge.created))
                 charge['created'] = date
                 # get invoice pdf
-                invoice = stripe.Invoice.retrieve(charge['invoice'])
-                charge['invoice'] = invoice.invoice_pdf
+                if charge['invoice']:
+                    invoice = stripe.Invoice.retrieve(charge['invoice'])
+                    charge['invoice'] = invoice.invoice_pdf
 
             context['charges'] = charges
         except stripe.error.AuthenticationError:
