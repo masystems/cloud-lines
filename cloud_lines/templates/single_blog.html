@@ -1,6 +1,7 @@
 {% extends 'home_base.html' %}
 {% load static %}
 {% load widget_tweaks %}
+{% load custom_tags %}
 {% block content %}
 
 <style>
@@ -32,7 +33,7 @@
 		<ol class="breadcrumb">
 			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
 			<li class="breadcrumb-item" aria-current="page"><a href="{% url 'blog' %}">Blog</a></li>
-			<li class="breadcrumb-item active" aria-current="page">{{ article.title }}</li>
+			<li class="breadcrumb-item active" aria-current="page">{{ article.title|truncatechars:10 }}</li>
 		</ol>
 	</div>
 </section>
