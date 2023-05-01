@@ -1,6 +1,8 @@
 from django.core.exceptions import PermissionDenied
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.viewsets import GenericViewSet
 from rest_framework.authentication import BasicAuthentication, TokenAuthentication, SessionAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from .serializers import ApiLargeTierQueueSerializer, \
@@ -17,6 +19,8 @@ from .serializers import ApiLargeTierQueueSerializer, \
     ApiDataValidationSerializer, \
     ApiServiceSerializer, \
     ApiStudAdvisorSerializer, \
+    ApiBirthNotificationSerializer, \
+    ApiBnChildSerializer, \
     ApiAuthentication
 from cloud_lines.models import LargeTierQueue
 from reports.models import ReportQueue
@@ -24,6 +28,7 @@ from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
+from birth_notifications.models import BirthNotification, BnChild
 from cloud_lines.models import Service, Faq, Bolton
 from account.models import UserDetail, AttachedService
 from metrics.models import KinshipQueue, DataValidatorQueue, StudAdvisorQueue
@@ -253,6 +258,31 @@ class StudAdvisorViews(viewsets.ModelViewSet):
         user = self.request.user
         main_account = get_main_account(user)
         return StudAdvisorQueue.objects.all()
+
+
+class BirthNotificationViews(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
+    serializer_class = ApiBirthNotificationSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        main_account = get_main_account(user)
+        return BirthNotification.objects.all()
+
+
+class BnChildViews(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    authentication_classes = (TokenAuthentication, BasicAuthentication, SessionAuthentication)
+    serializer_class = ApiBnChildSerializer
+    filter_backends = [SearchFilter]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        main_account = get_main_account(user)
+        return BnChild.objects.all()
+
 
 ########## Auth ###########
 from rest_framework.authtoken.views import ObtainAuthToken

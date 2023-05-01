@@ -5,6 +5,7 @@ from pedigree.models import Pedigree, PedigreeImage
 from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
+from birth_notifications.models import BirthNotification, BnChild
 from cloud_lines.models import Service, Faq, Bolton
 from account.models import AttachedService
 from metrics.models import KinshipQueue, DataValidatorQueue, StudAdvisorQueue
@@ -173,4 +174,15 @@ class ApiDataValidationSerializer(serializers.ModelSerializer):
 class ApiStudAdvisorSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudAdvisorQueue
+        fields = '__all__'
+
+
+class ApiBirthNotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BirthNotification
+        fields = '__all__'
+
+class ApiBnChildSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BnChild
         fields = '__all__'
