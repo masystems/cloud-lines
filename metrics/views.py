@@ -438,14 +438,17 @@ def stud_advisor(request):
     attached_service = get_main_account(request.user)
     epoch = int(time())
 
-    reg_no = request.POST['reg_no']
+    try:
+        reg_no = request.POST['mreg_no']
+    except KeyError:
+        reg_no = request.POST['freg_no']
 
     try:
         pedigree = Pedigree.objects.get(account=attached_service, reg_no=reg_no)
     except Pedigree.DoesNotExist:
         response = {
             'status': 'fail',
-            'msg': f"pedigree ({request.POST['reg_no']}) does not exist",
+            'msg': f"pedigree ({reg_no}) does not exist",
             'item_id': ''
         }
         return HttpResponse(dumps(response))
