@@ -417,35 +417,35 @@ def mean_kinship(request):
         #     Pedigree.objects.filter(account=attached_service, id=pedigree.strip('X')).update(mean_kinship=value['1'])
 
 
-def stud_advisor_mother_details(request, mother):
+def stud_advisor_pedigree_details(request, pedigree):
     attached_service = get_main_account(request.user)
-    cois = Pedigree.objects.filter(account=attached_service, breed=mother.breed, status='alive').values('coi')
+    cois = Pedigree.objects.filter(account=attached_service, breed=pedigree.breed, status='alive').values('coi')
     total = 0
     for coi in cois.all():
         total += coi['coi']
-    breed_mean_coi = total / Pedigree.objects.filter(account=attached_service, breed=mother.breed, status__icontains='alive').count()
+    breed_mean_coi = total / Pedigree.objects.filter(account=attached_service, breed=pedigree.breed, status__icontains='alive').count()
 
-    mother_details = {'reg_no': mother.reg_no,
-                      'name': mother.name,
-                      'mk': str(mother.mean_kinship),
-                      'breed': mother.breed.breed_name,
-                      'threshold': str(mother.breed.mk_threshold),
+    pedigree_details = {'reg_no': pedigree.reg_no,
+                      'name': pedigree.name,
+                      'mk': str(pedigree.mean_kinship),
+                      'breed': pedigree.breed.breed_name,
+                      'threshold': str(pedigree.breed.mk_threshold),
                       'breed_mean_coi': str(breed_mean_coi)}
-    return mother_details
+    return pedigree_details
 
 
 def stud_advisor(request):
     attached_service = get_main_account(request.user)
     epoch = int(time())
 
-    mother = request.POST['mother']
-    
+    reg_no = request.POST['reg_no']
+
     try:
-        mother = Pedigree.objects.get(account=attached_service, reg_no=mother)
+        pedigree = Pedigree.objects.get(account=attached_service, reg_no=reg_no)
     except Pedigree.DoesNotExist:
         response = {
             'status': 'fail',
-            'msg': f"Mother ({request.POST['mother']}) does not exist",
+            'msg': f"pedigree ({request.POST['reg_no']}) does not exist",
             'item_id': ''
         }
         return HttpResponse(dumps(response))
@@ -457,9 +457,9 @@ def stud_advisor(request):
     elif request.method == 'POST':
         # get breeder users
         breeder_users = []
-        if mother.current_owner:
-            if mother.current_owner.user:
-                breeder_users.append(mother.current_owner.user)
+        if pedigree.current_owner:
+            if pedigree.current_owner.user:
+                breeder_users.append(pedigree.current_owner.user)
         if not has_permission(request, {'read_only': 'breeder', 'contrib': 'breeder', 'admin': True, 'breed_admin': True}, 
                                         breeder_users=breeder_users):
             response = {'status': 'fail',
@@ -470,11 +470,11 @@ def stud_advisor(request):
     else:
         raise PermissionDenied()
 
-    # check that mother is a living female
-    if mother.sex.lower() != 'female' or mother.status.lower() != 'alive':
+    # check that pedigree is a living female
+    if pedigree.sex.lower() != 'female' or pedigree.status.lower() != 'alive':
         response = {
             'status': 'fail',
-            'msg': f"Mother ({request.POST['mother']}) is not a living female!",
+            'msg': f"pedigree ({request.POST['reg_no']}) is not a living female!",
             'item_id': ''
         }
         return HttpResponse(dumps(response))
@@ -484,17 +484,17 @@ def stud_advisor(request):
         breeds_editable.remove('')
     # if user is a breed admin
     if len(breeds_editable) > 0:
-        # check that the breed of the mother is editable
-        if request.user not in mother.breed.breed_admins.all():
+        # check that the breed of the pedigree is editable
+        if request.user not in pedigree.breed.breed_admins.all():
             response = {
                 'status': 'fail',
-                'msg': f"The breed of mother ({request.POST['mother']}) is not a breed you are an editor for!",
+                'msg': f"The breed of pedigree ({request.POST['reg_no']}) is not a breed you are an editor for!",
                 'item_id': ''
             }
             return HttpResponse(dumps(response))
 
     pedigrees = Pedigree.objects.filter(account=attached_service,
-                                        breed=mother.breed).values('id',
+                                        breed=pedigree.breed).values('id',
                                                                    'parent_father__id',
                                                                    'parent_mother__id',
                                                                    'sex',
@@ -519,18 +519,18 @@ def stud_advisor(request):
 
     token, created = Token.objects.get_or_create(user=request.user)
 
-    mother_details = stud_advisor_mother_details(request, mother)
+    pedigree_details = stud_advisor_pedigree_details(request, pedigree)
 
-    sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=mother, file=file_name,
-                                         mk_threshold=mother.breed.mk_threshold)
+    sa = StudAdvisorQueue.objects.create(account=attached_service, user=request.user, mother=pedigree, file=file_name,
+                                         mk_threshold=pedigree.breed.mk_threshold)
 
     data = {'data_path': remote_output,
             'file_name': file_name,
             'domain': attached_service.domain,
-            'mother_id': mother.id,
-            'mother_mk': mother.mean_kinship,
-            'mother_breed_mean_coi': mother_details['breed_mean_coi'],
-            'mother_breed_mk_threshold': mother.breed.mk_threshold,
+            'pedigree_id': pedigree.id,
+            'pedigree_mk': pedigree.mean_kinship,
+            'pedigree_breed_mean_coi': pedigree_details['breed_mean_coi'],
+            'pedigree_breed_mk_threshold': pedigree.breed.mk_threshold,
             'token': str(token),
             'queue_id': sa.id}
 
@@ -570,18 +570,18 @@ def stud_advisor_results(request, id):
     else:
         raise PermissionDenied()
 
-    mother_details = stud_advisor_mother_details(request, sa_queue_item.mother)
-    #mother_details = eval(mother_details.content.decode())
+    pedigree_details = stud_advisor_pedigree_details(request, sa_queue_item.mother)
+    #pedigree_details = eval(pedigree_details.content.decode())
     mk_threshold = sa_queue_item.mk_threshold
 
     with urllib.request.urlopen(f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/metrics/results-{sa_queue_item.file}") as results_file:
         results_raw = loads(results_file.read().decode())
 
-    #studs_data = calculate_sa_thresholds(studs_raw, attached_service, sa_queue_item.mother, mother_details)
+    #studs_data = calculate_sa_thresholds(studs_raw, attached_service, sa_queue_item.mother, pedigree_details)
 
     return render(request, 'sa_results.html', {'results_raw': results_raw,
                                                'sa_queue_item': sa_queue_item,
-                                               'mother_details': mother_details,
+                                               'pedigree_details': pedigree_details,
                                                'mk_threshold': mk_threshold})
 
 

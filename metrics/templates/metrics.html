@@ -90,29 +90,50 @@
 
                     <h4 class="card-title">Stud Advisor</h4>
                     <p id="studIntroText">Select a {{ service.mother_title }} to determine who will be the best matches for mating.</p>
-                    <div id="pdfArea">
-                        <form id="saForm" class="pb-4">
+
+                    <form id="saMForm" class="pb-4">
+                        <div class="form-row align-items-center">
+                            <div class="col-md-5">
+                                <div id="mothers-alive">
+                                    <input id="sa_mother" class="typeahead form-control mt-2" name='reg_no' type="text" placeholder="{{ service.mother_title }}" form_type="metrics">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button id="saFBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <!-- hidden note which will show name and tag number of female if reg number has a match -->
+                                <ul class="list-icons d-none" id="sa-m-info"></ul>
+                            </div>
+                        </div>
+                        <!-- hidden input which tells the backend whether user is a breed admin -->
+                        <input type="hidden" name="breeds-editable" value="{{ breeds_editable }}">
+                    </form>
+                    {% if editor %}
+                        <form id="saFForm" class="pb-4">
                             <div class="form-row align-items-center">
                                 <div class="col-md-5">
-                                    <div id="mothers-alive">
-                                        <input id="sa_mother" class="typeahead form-control mt-2" name='mother' type="text" placeholder="{{ service.mother_title }}" form_type="metrics">
+                                    <div id="fathers-alive">
+                                        <input id="sa_father" class="typeahead form-control mt-2" name='reg_no' type="text" placeholder="{{ service.father_title }}" form_type="metrics">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <button id="saBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
+                                    <button id="saMBtn" class="btn btn-info mt-2" name='Submit' type="button">Run Advisor</button>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-md-5">
                                     <!-- hidden note which will show name and tag number of female if reg number has a match -->
-                                    <ul class="list-icons d-none" id="sa-info"></ul>
+                                    <ul class="list-icons d-none" id="sa-f-info"></ul>
                                 </div>
                             </div>
                             <!-- hidden input which tells the backend whether user is a breed admin -->
                             <input type="hidden" name="breeds-editable" value="{{ breeds_editable }}">
                         </form>
                         <p id="saMsg" class="mt-2 text-center"></p>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -463,15 +484,15 @@
         });
     });
 
-    $('#saBtn').click( function() {
+    $('#saMBtn').click( function() {
         $.ajax({
             url: "{% url 'stud_advisor' %}",
             type: 'post',
             headers: {'X-CSRFToken': '{{ csrf_token }}'},
             dataType: 'text',
-            data: $('#saForm').serialize(),
+            data: $('#saMForm').serialize(),
             beforeSend: function() {
-                $('#saMsg').html($('#sa_mother').val() + ' added to results queue below!');
+                $('#saMMsg').html($('#sa_mother').val() + ' added to results queue below!');
                 var dt = new Date();
                 // month array
                 var month = new Array();
@@ -536,7 +557,89 @@
                             else {
                                 $(row).remove()
                                 errorMsg(result.msg)
-                                $('#saMsg').html('<div class="text-danger"><strong>' + result.msg + '</strong></div>');
+                                $('#saMMsg').html('<div class="text-danger"><strong>' + result.msg + '</strong></div>');
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    $('#saFBtn').click( function() {
+        $.ajax({
+            url: "{% url 'stud_advisor' %}",
+            type: 'post',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            dataType: 'text',
+            data: $('#saFForm').serialize(),
+            beforeSend: function() {
+                $('#saFMsg').html($('#sa_mother').val() + ' added to results queue below!');
+                var dt = new Date();
+                // month array
+                var month = new Array();
+                month[0] = "Jan";
+                month[1] = "Feb";
+                month[2] = "Mar";
+                month[3] = "Apr";
+                month[4] = "May";
+                month[5] = "Jun";
+                month[6] = "Jul";
+                month[7] = "Aug";
+                month[8] = "Sep";
+                month[9] = "Oct";
+                month[10] = "Nov";
+                month[11] = "Dec";
+                // am pm
+                var hours = dt.getHours();
+                var ampm = hours >= 12 ? ' p.m.' : ' a.m.';
+                // convert hours to 12 hour time equivalent
+                if (hours == 0) {
+                    hours = 12
+                }
+                else if (hours > 12) {
+                    hours -= 12
+                }
+                // create time string
+                var datetime = dt.getDate() + " "
+                + (month[dt.getMonth()])  + " "
+                + dt.getFullYear() + ", "
+                + hours + ":"
+                + dt.getMinutes() + ampm;
+
+                // set time string with seconds
+                datetimesecs = datetime + dt.getSeconds();
+
+                $('#resultsTable > tbody:last-child').prepend('<tr class="results-row" complete="False" dts="' + datetimesecs + '"><td class="full-name">{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td class="complete"><i class="fas fa-cog fa-spin text-info"></i></td><td class="results"><button class="btn btn-info" disabled>View</button></td></tr>');
+
+            },
+            success: function(data, global) {
+                result = JSON.parse(data);
+                // if timeout, the queue item has been created
+                if (result.hasOwnProperty('item_id')) {
+                    // iterate through the rows, starting from the first
+                    $('.results-row').each( function (i, row) {
+                        // if creator is request.user, and there isn't an id, and dts matches datetimeseconds (this is the row)
+                        if ( ($(row).find('td[class*="full-name"]').html() == '{{ request.user.get_full_name }}')
+                                        && ($(row).attr('id') == undefined)
+                                        && ($(row).attr('dts') == datetimesecs) ) {
+
+                            // if result was successful, change the row to indicate completion
+                            if (result.status != 'fail') {
+                                // remove full name class
+                                $(row).find('td[class*="full-name"]').removeClass('full-name');
+                                // remove datetimeseconds (dts) class
+                                $(row).removeAttr('dts');
+
+                                // set id for the new row, and break out of the loop
+                                $(row).attr('id', result.item_id);
+                                return false;
+                            }
+                            // if result fails, remove the row, and display the error
+                            else {
+                                $(row).remove()
+                                errorMsg(result.msg)
+                                $('#saFMsg').html('<div class="text-danger"><strong>' + result.msg + '</strong></div>');
                             }
                         }
                     });

@@ -76,7 +76,7 @@
     });
 
     // Ajax call to get and display name if a full living male/female is in any of the fields
-    $('#id_mother, #id_father, #sa_mother').bind('keyup change click typeahead:select', function() {
+    $('#id_mother, #id_father, #sa_mother, #sa_father').bind('keyup change click typeahead:select', function() {
         // there is no single pedigree we are editing, as this is metrics page
         var ped_reg = ''
         // get the element that has triggered this function
@@ -93,8 +93,12 @@
             parent_type = 'father'
         }
         else if (input_element.attr('id') == 'sa_mother') {
-            info_element = $('#sa-info')
+            info_element = $('#sa-m-info')
             parent_type = 'mother'
+        }
+        else if (input_element.attr('id') == 'sa_father') {
+            info_element = $('#sa-f-info')
+            parent_type = 'father'
         }
         
         $.ajax({
