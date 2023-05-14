@@ -437,8 +437,8 @@ def stud_advisor_pedigree_details(request, pedigree):
 def stud_advisor(request):
     attached_service = get_main_account(request.user)
     epoch = int(time())
-
     try:
+        print(request.POST)
         reg_no = request.POST['mreg_no']
     except KeyError:
         reg_no = request.POST['freg_no']
@@ -474,13 +474,13 @@ def stud_advisor(request):
         raise PermissionDenied()
 
     # check that pedigree is a living female
-    if pedigree.sex.lower() != 'female' or pedigree.status.lower() != 'alive':
-        response = {
-            'status': 'fail',
-            'msg': f"pedigree ({request.POST['reg_no']}) is not a living female!",
-            'item_id': ''
-        }
-        return HttpResponse(dumps(response))
+    # if pedigree.sex.lower() != 'female' or pedigree.status.lower() != 'alive':
+    #     response = {
+    #         'status': 'fail',
+    #         'msg': f"pedigree ({reg_no}) is not a living female!",
+    #         'item_id': ''
+    #     }
+    #     return HttpResponse(dumps(response))
 
     breeds_editable = request.POST.get('breeds-editable').replace('[', '').replace(']', '').replace("&#39;", '').replace("'", '').replace(', ', ',').split(',')
     if '' in breeds_editable:
@@ -491,7 +491,7 @@ def stud_advisor(request):
         if request.user not in pedigree.breed.breed_admins.all():
             response = {
                 'status': 'fail',
-                'msg': f"The breed of pedigree ({request.POST['reg_no']}) is not a breed you are an editor for!",
+                'msg': f"The breed of pedigree ({reg_no}) is not a breed you are an editor for!",
                 'item_id': ''
             }
             return HttpResponse(dumps(response))
