@@ -492,7 +492,7 @@
             dataType: 'text',
             data: $('#saMForm').serialize(),
             beforeSend: function() {
-                $('#saMMsg').html($('#sa_mother').val() + ' added to results queue below!');
+                $('#saMMsg').html($('#sa_father').val() + ' added to results queue below!');
                 var dt = new Date();
                 // month array
                 var month = new Array();
@@ -528,7 +528,7 @@
                 // set time string with seconds
                 datetimesecs = datetime + dt.getSeconds();
 
-                $('#resultsTable > tbody:last-child').prepend('<tr class="results-row" complete="False" dts="' + datetimesecs + '"><td class="full-name">{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_mother').val() + '</td><td>' + datetime + '</td><td class="complete"><i class="fas fa-cog fa-spin text-info"></i></td><td class="results"><button class="btn btn-info" disabled>View</button></td></tr>');
+                $('#resultsTable > tbody:last-child').prepend('<tr class="results-row" complete="False" dts="' + datetimesecs + '"><td class="full-name">{{ request.user.get_full_name }}</td><td>Stud Advisor: ' + $('#sa_father').val() + '</td><td>' + datetime + '</td><td class="complete"><i class="fas fa-cog fa-spin text-info"></i></td><td class="results"><button class="btn btn-info" disabled>View</button></td></tr>');
 
             },
             success: function(data, global) {
