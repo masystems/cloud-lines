@@ -25,5 +25,5 @@ urlpatterns = [
     path('subdomain_check', views.subdomain_check, name='subdomain_check'),
     path('cancel_sub', views.cancel_sub, name='cancel_sub'),
     path('get-ta-users', tabledata.get_ta_users, name="get_ta_users"),
-    path('get_user_details', views.get_user_details, name='get_user_details')
+    path('get_user_details', views.get_user_details, name='get_user_details'),
 ]

@@ -1101,8 +1101,6 @@ def create_package_on_stripe(request, stripe_account):
                 "directors_provided": True,
                 "executives_provided": True,
             },
-            country="GB",
-            default_currency="GBP",
         )
         stripe_account.stripe_acct_id = account.id
 
@@ -1128,3 +1126,4 @@ def get_account_link(request, stripe_account):
         type='account_onboarding',
     )
     return account_link
+

@@ -147,14 +147,15 @@ class BirthNotificationView(BirthNotificationBase):
         context['bn'] = BirthNotification.objects.get(id=self.kwargs['id'])
 
         # validate user can register pedigrees
-        if self.request.user in context['bn'].mother.breed.breed_admins.all():
-            # must also be a contrib or editor
-            context['can_register'] = True
-        else:
-            context['can_register'] = False
+        if context['bn'].mother and context['bn'].mother.breed:
+            if self.request.user in context['bn'].mother.breed.breed_admins.all():
+                # must also be a contrib or editor
+                context['can_register'] = True
+            else:
+                context['can_register'] = False
 
-        if context['attached_service'].pedigree_charging:
-            context['prices'] = get_pedigree_prices(self.request, context['attached_service'])
+            if context['attached_service'].pedigree_charging:
+                context['prices'] = get_pedigree_prices(self.request, context['attached_service'])
         return context
 
 
