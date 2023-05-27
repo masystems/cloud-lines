@@ -14,6 +14,7 @@ from account.views import is_editor,\
     get_stripe_public_key,\
     get_stripe_connected_account_links
 from account.models import AttachedBolton, StripeAccount
+from account.currencies import get_currencies
 from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm
 from .charging import *
@@ -78,6 +79,8 @@ class Settings(BirthNotificationBase):
 
         stripe.api_key = get_stripe_secret_key(self.request)
 
+        context['currencies'] = get_currencies()
+
         context['bn_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
         context['stripe_account'] = stripe.Account.retrieve(context['bn_stripe_account'].stripe_acct_id)
 
@@ -118,10 +121,12 @@ def update_prices(request):
 
     bn_stripe_account = StripeAccount.objects.get(account=attached_service)
 
+    bn_stripe_account.currency = request.POST.get('currency')
+
     bn_stripe_account.bn_cost_id = stripe.Price.create(
         nickname="BN Price",
         unit_amount=int(float(request.POST.get('bncost')) * 100),
-        currency="gbp",
+        currency=request.POST.get('currency'),
         product=bn_stripe_account.bn_stripe_product_id,
         stripe_account=bn_stripe_account.stripe_acct_id
     ).id
@@ -129,7 +134,7 @@ def update_prices(request):
     bn_stripe_account.bn_child_cost_id = stripe.Price.create(
         nickname="BN Child Price",
         unit_amount=int(float(request.POST.get('bnccost')) * 100),
-        currency="gbp",
+        currency=request.POST.get('currency'),
         product=bn_stripe_account.bn_stripe_product_id,
         stripe_account=bn_stripe_account.stripe_acct_id
     ).id
@@ -185,7 +190,7 @@ def birth_notification_form(request):
         bn_cost = stripe.Price.retrieve(
             bn_stripe_account.bn_cost_id,
             stripe_account=bn_stripe_account.stripe_acct_id
-        ).unit_amount
+        )
     else:
         bn_cost = 0
     # get child price
@@ -193,7 +198,7 @@ def birth_notification_form(request):
         bn_child_cost = stripe.Price.retrieve(
             bn_stripe_account.bn_child_cost_id,
             stripe_account=bn_stripe_account.stripe_acct_id
-        ).unit_amount
+        )
     else:
         bn_child_cost = 0
 
