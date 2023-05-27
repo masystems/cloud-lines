@@ -174,7 +174,7 @@
                             {% if prices and contributor %}
                                 <select name="registration_charge" class="custom-select" id="prices" required>
                                     {% for price in prices %}
-                                        <option value="{{ price.id }}">{{ price.nickname }} £{{ price.unit_amount|price }}</option>
+                                        <option value="{{ price.id }}">{{ price.nickname }} {{ price.unit_amount|price }} {{ price.currency|upper }}</option>
                                     {% endfor %}
                                 </select>
                                 <small>Select the correct charge type for this pedigree</small>

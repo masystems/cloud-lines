@@ -143,10 +143,10 @@
                     <div class="col-12">
                         <hr/>
                         <p>
-                        BN Price: £{{ bn_cost|price }} | Child Price: £{{ bn_child_cost|price }}
+                        BN Price: {{ bn_cost.unit_amount|price }} {{ bn_cost.currency|upper }} | Child Price: {{ bn_child_cost.unit_amount|price }} {{ bn_child_cost.currency|upper }}
                         </p>
                         <p id="totalCost">
-                        <strong>Total:</strong>
+                        <strong>Total:</strong> {{ bn_stripe_account.currency }}
                         </p>
                     </div>
                     <button id="formSubmit" class="btn btn-success float-right" type="submit">Submit</button>
@@ -189,14 +189,14 @@
                           updateTotal();
                         };
                         function updateTotal() {
-                            var bnCost = {{ bn_cost }}
-                            var childCost = {{ bn_child_cost }}
+                            var bnCost = {{ bn_cost.unit_amount }}
+                            var childCost = {{ bn_child_cost.unit_amount }}
                             var table = document.getElementById("birthTable");
                             var rows = table.rows.length - 1;
                             var childTotal = childCost * rows
                             var total = bnCost + childTotal
                             var totalDec = total / 100
-                            $('#totalCost').html("<strong>Total:</strong> £" + totalDec.toFixed(2))
+                            $('#totalCost').html("<strong>Total:</strong> " + totalDec.toFixed(2) + " {{ bn_stripe_account.currency }}")
                         }
                         function DeleteRow(o) {
                          //no clue what to put here?

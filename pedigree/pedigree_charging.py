@@ -5,6 +5,7 @@ from django.views.generic.base import TemplateView
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 from .models import Pedigree
+from account.currencies import get_currencies
 from account.models import StripeAccount, UserDetail
 from account.views import is_editor,\
     get_main_account,\
@@ -33,6 +34,7 @@ class PedigreePaymentSettings(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['attached_service'] = get_main_account(self.request.user)
         context['prices'] = get_pedigree_prices(self.request, context['attached_service'])
+        context['currencies'] = get_currencies()
         return context
 
 
@@ -91,7 +93,7 @@ def pedigree_price_edit(request):
                         product=pedigree_product,
                         unit_amount=int(float(price['fieldPrice'].replace('£','')) * 100),
                         nickname=price['fieldType'],
-                        currency="gbp",
+                        currency=price['currency'],
                         stripe_account=stripe_account.stripe_acct_id
                     )
         except ValueError:

@@ -42,25 +42,25 @@
                                 {% csrf_token %}
                                 <div class="card-body">
                                     <div class="form-group row">
+                                        <label for="bncost" class="col-sm-3 text-right control-label col-form-label">Currency</label>
+                                        <div class="col-sm-9">
+                                            <select class="form-control" name="currency" id="currencySelect">
+                                                {% for iso, country in currencies.items %}
+                                                    <option {% if iso == bn_stripe_account.currency %}selected{% endif %} value="{{ iso }}">{{ iso }}: {{ country }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
                                         <label for="bncost" class="col-sm-3 text-right control-label col-form-label">Birth notification cost</label>
                                         <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="fad fa-pound-sign"></i></span>
-                                                </div>
-                                                <input type="text" class="form-control" id="bncost" name="bncost" value="{{ bn_cost|price }}">
-                                            </div>
+                                            <input type="text" class="form-control" id="bncost" name="bncost" value="{{ bn_cost|price }}">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="bnccost" class="col-sm-3 text-right control-label col-form-label">Birth notification child cost</label>
                                         <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="fad fa-pound-sign"></i></span>
-                                                </div>
-                                                <input type="text" class="form-control" id="bnccost" name="bnccost" value="{{ bn_child_cost|price }}">
-                                            </div>
+                                            <input type="text" class="form-control" id="bnccost" name="bnccost" value="{{ bn_child_cost|price }}">
                                         </div>
                                     </div>
                                 </div>

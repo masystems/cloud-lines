@@ -101,6 +101,8 @@ class StripeAccount(models.Model):
 
     account_name = models.CharField(max_length=255, blank=True)
 
+    currency = models.CharField(max_length=255, default="GBP", blank=True)
+
     ## birth notifications
     bn_charging = models.BooleanField(default=False)
     # set to "Birth Notification"
