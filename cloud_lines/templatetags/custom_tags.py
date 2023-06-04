@@ -39,7 +39,10 @@ def pedigree_column_data(pedigree, data):
 @register.filter
 def price(value):
     if value != "0":
-        return "{:.2f}".format(float(value) / 100)
+        try:
+            return "{:.2f}".format(float(value) / 100)
+        except ValueError:
+            return 0
     else:
         return 0
 
