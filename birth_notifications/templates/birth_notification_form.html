@@ -56,7 +56,7 @@
                             {% for field in bn_form.visible_fields %}
                                 <div class="col-md-6 pt-2">
                                     {% if field.label == 'Mother' %}
-                                        <div id="mothers-alive">
+                                        <div id="mothers-all">
                                             <label class="col-sm-6 col-form-label">{{ field.label }}</label>
                                             <input id="id_mother" class="typeahead form-control mt-2" name='motherx' type="text" placeholder="{{ service.mother_title }}" required>
                                         </div>
@@ -68,7 +68,7 @@
                                           <span class="help-block">{{ error }}</span>
                                         {% endfor %}
                                     {% elif field.label == 'Father' %}
-                                        <div id="fathers-alive">
+                                        <div id="fathers-all">
                                             <label class="col-sm-6 col-form-label">{{ field.label }}</label>
                                             <input id="id_father" class="typeahead form-control mt-2" name='fatherx' type="text" placeholder="{{ service.father_title }}" required>
                                         </div>
@@ -302,7 +302,7 @@
 
 {% block footer %}
     <!-- code for the reg number field typeaheads -->
-    {% include 'ta_metrics.html' %}
+    {% include 'ta_pedigrees_by_sex.html' %}
 
     <script src="https://js.stripe.com/v3/"></script>
     <script>
