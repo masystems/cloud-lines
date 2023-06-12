@@ -189,8 +189,8 @@
                           updateTotal();
                         };
                         function updateTotal() {
-                            var bnCost = {{ bn_cost.unit_amount }}
-                            var childCost = {{ bn_child_cost.unit_amount }}
+                            var bnCost = {{ bn_cost.unit_amount|price }}
+                            var childCost = {{ bn_child_cost.unit_amount|price }}
                             var table = document.getElementById("birthTable");
                             var rows = table.rows.length - 1;
                             var childTotal = childCost * rows
