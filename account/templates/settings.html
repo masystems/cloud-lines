@@ -78,8 +78,7 @@
                                 </script>
                             {% endif %}
                             {% if editor %}
-                                <a type="hidden" id="openUserModal" data-toggle="modal" data-target="#verticalcenter"></a>
-                                <button class="btn btn-success mb-2" id="createNew">Create New User</button>
+                                <button type="button" data-toggle="modal" data-target="#verticalcenter" class="btn btn-success mb-2">Create New User</button>
                             {% endif %}
                             <table id="userTable" class="table table-bordered table-striped">
                                 <thead>
@@ -141,8 +140,7 @@
                                 </tbody>
                             </table>
                             {% if editor %}
-                                <a type="hidden" id="openUserModal" data-toggle="modal" data-target="#verticalcenter"></a>
-                                <button class="btn btn-success" id="createNew">Create New User</button>
+                                <button type="button" data-toggle="modal" data-target="#verticalcenter" class="btn btn-success mb-2">Create New User</button>
 
                                 <div id="verticalcenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="vcenter" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
@@ -328,7 +326,7 @@
                                     // edit form type
                                     $('#formType').val('edit');
                                     // open modal
-                                    $('#openUserModal').click();
+                                    $('#verticalcenter').modal('show');
 
                                 });
 
