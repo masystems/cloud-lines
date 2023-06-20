@@ -5,6 +5,7 @@ Babel==2.9.1
 boto3==1.18.53
 boto3-stubs==1.18.53
 botocore==1.21.53
+botocore-stubs==1.27.35
 CacheControl==0.12.6
 cairocffi==1.2.0
 CairoSVG==2.5.2
@@ -89,7 +90,8 @@ text-unidecode==1.3
 tinycss2==1.0.2
 toml==0.10.0
 tqdm==4.19.1
-troposphere==2.5.3
+troposphere==3.1.1
+typing_extensions==4.1.1
 ujson==1.35
 Unidecode==1.1.1
 urllib3==1.26.5
@@ -100,6 +102,6 @@ Werkzeug==0.16.1
 wsgi-request-logger==0.4.6
 xhtml2pdf==0.2.4
 xlwt==1.3.0
-zappa==0.53.0
+zappa==0.54.2
 zappa-django-utils==0.4.0
 zipp==3.1.0
