@@ -88,7 +88,7 @@ class AttachedService(models.Model):
     install_available = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.user.user.get_full_name()}-{self.service.service_name}-{self.organisation_or_society_name}"
+        return f"{self.service.service_name}-{self.organisation_or_society_name}"
 
 
 class StripeAccount(models.Model):
