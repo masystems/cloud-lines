@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class BirthNotifcationsConfig(AppConfig):
-    name = 'birth_notifcations'
+class BirthNotificationsConfig(AppConfig):
+    name = 'birth_notifications'

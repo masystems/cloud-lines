@@ -14,7 +14,7 @@ class BnChild(models.Model):
         ('died_pre_reg', 'Died Pre Reg'),
     )
 
-    status = models.CharField(max_length=10, choices=STATUSES, null=True, default='unknown',
+    status = models.CharField(max_length=12, choices=STATUSES, null=True, default='unknown',
                               help_text="Accepted formats: dead, alive, unknown", verbose_name="Status")
 
     GENDERS = (
