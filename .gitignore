@@ -5,6 +5,7 @@
 __pycache__/
 cloudlines/local_settings.py
 cloudlines/static
+cloud_lines/large-tier/log.txt
 media
 db.sqlite3
 /static
