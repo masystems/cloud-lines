@@ -618,7 +618,7 @@ def edit_pedigree_form(request, id):
         try:
             # get custom fields template
             custom_fields = json.loads(attached_service.custom_fields)
-            Pedigree.objects.filter(id=pedigree.id).update(custom_fields=custom_fields)
+            Pedigree.objects.filter(id=pedigree.id).update(custom_fields=json.dumps(custom_fields))
         except json.decoder.JSONDecodeError:
             custom_fields = {}
     except ObjectDoesNotExist:
