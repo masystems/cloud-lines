@@ -313,7 +313,7 @@ def birth_notification_form(request):
 
         # get next available reg number
         try:
-            latest_added = BirthNotification.objects.filter(account=attached_service).latest('bn_number')
+            latest_added = BirthNotification.objects.filter(account=attached_service).last()
             latest_reg = latest_added.bn_number
             reg_ints_re = re.search("[0-9]+", latest_reg)
             bn_number = latest_reg.replace(str(reg_ints_re.group(0)),
