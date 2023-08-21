@@ -10,7 +10,7 @@ from pedigree.pedigree_charging import decline_pedigree, get_pedigree_payment_se
 from breed_group.models import BreedGroup
 from breeder.models import Breeder
 from breed.models import Breed
-from yaml import load
+from yaml import safe_load, SafeLoader
 from json import loads
 
 
@@ -41,7 +41,7 @@ def approvals(request):
                 charging_data[approval.id] = get_pedigree_payment_session(request, approval.pedigree).amount_total
         elif approval.breed_group:
             # convert the data to a dict
-            data_dict = load(approval.data)[0]
+            data_dict = safe_load(approval.data, Loader=SafeLoader)[0]
             # get the breeder
             try:
                 breeder = Breeder.objects.get(id=data_dict['fields']['breeder'])
@@ -78,7 +78,7 @@ def approve(request, id):
         obj.object.save()
 
     if approval.pedigree:
-        data_dict = load(approval.data)[0]
+        data_dict = safe_load(approval.data, Loader=SafeLoader)[0]
         try:
             approval.pedigree.parent_mother = Pedigree.objects.get(id=str(data_dict['fields']['parent_mother']))
         except ValueError:
@@ -95,7 +95,7 @@ def approve(request, id):
             image.save()
 
     elif approval.breed_group:
-        data_dict = load(approval.data)[0]
+        data_dict = safe_load(approval.data, Loader=SafeLoader)[0]
         approval.breed_group.group_members.clear()
         for pedigree in data_dict['fields']['group_members']:
             approval.breed_group.group_members.add(Pedigree.objects.get(id=pedigree))
