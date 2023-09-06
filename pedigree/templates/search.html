@@ -50,8 +50,8 @@
                         <button class="btn btn-info float-right mr-2"><i class="fad fa-cog"></i> Settings</button>
                     </a>
                 {% endif %}
-                {% if account_link %}
-                    <a href="{% url 'account_link' %}">
+                {% if edit_account %}
+                    <a href="{% url 'edit_account' %}">
                         <button class="btn btn-warning float-right mr-2"><i class="fad fa-cog"></i> Stripe Setup</button>
                     </a>
                 {% endif %}
