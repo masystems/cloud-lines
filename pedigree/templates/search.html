@@ -50,6 +50,11 @@
                         <button class="btn btn-info float-right mr-2"><i class="fad fa-cog"></i> Settings</button>
                     </a>
                 {% endif %}
+                {% if account_link %}
+                    <a href="{% url 'account_link' %}">
+                        <button class="btn btn-warning float-right mr-2"><i class="fad fa-cog"></i> Stripe Setup</button>
+                    </a>
+                {% endif %}
                 {% if account_link_setup %}
                     <a href="{{ account_link_setup.url }}">
                         <button type="button" class="btn btn-success float-right mr-2">
