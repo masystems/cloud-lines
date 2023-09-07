@@ -50,7 +50,8 @@ def search(request):
                                                'column_data': column_data,
                                                'stripe_account': stripe_account,
                                                'account_link': account_link,
-                                               'edit_account': edit_account})
+                                               'edit_account': edit_account,
+                                               'account_link_setup': account_link_setup})
     else:
         return render(request, 'search.html', {'columns': columns,
                                                'column_data': column_data})
