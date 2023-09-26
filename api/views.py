@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseForbidden
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
@@ -135,25 +136,37 @@ class PedigreeViews(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.GET.get('account'):
-            main_account = AttachedService.objects.get(id=self.request.GET.get('account'))
-            if self.request.user.is_superuser or \
-                    self.request.user == main_account.user.user or \
-                    self.request.user in main_account.admin_users.all():
-                pass
-            else:
-                return False
-        else:
-            user = self.request.user
-            main_account = get_main_account(user)
+        current_owner = self.request.GET.get('current_owner')
+        from_date = self.request.GET.get('from_date')
+        to_date = self.request.GET.get('to_date')
+        account_id = self.request.GET.get('account')
 
-        if self.request.GET.get('from_date') and self.request.GET.get('to_date'):
-            return Pedigree.objects.filter(account=main_account,
-                                           date_of_registration__range=[self.request.GET.get('from_date'),
-                                                                        self.request.GET.get('to_date')],
-                                           status='alive')
+        if account_id:
+            try:
+                main_account = AttachedService.objects.get(id=account_id)
+            except AttachedService.DoesNotExist:
+                return Pedigree.objects.none()
+
+            if not (self.request.user.is_superuser or 
+                    self.request.user == main_account.user.user or 
+                    self.request.user in main_account.admin_users.all()):
+                return HttpResponseForbidden("You don't have permission to access these resources.")
+
         else:
-            return Pedigree.objects.filter(account=main_account)
+            main_account = get_main_account(self.request.user)
+
+        queryset = Pedigree.objects.filter(account=main_account)
+
+        if from_date and to_date:
+            queryset = queryset.filter(date_of_registration__range=[from_date, to_date])
+
+        if current_owner is not None:
+            queryset = queryset.filter(current_owner=current_owner)
+
+        queryset = queryset.filter(status='alive')
+
+        return queryset
+
 
 
 class PedigreeImageViews(viewsets.ModelViewSet):
