@@ -49,29 +49,20 @@ def breeder(request, breeder_id):
 
 @login_required(login_url="/account/login")
 def breeders(request):
+    def get_breeder_and_redirect():
+        try:
+            breeder = Breeder.objects.get(account=attached_service, user=request.user)
+            return redirect('breeder', breeder.id)
+        except Breeder.DoesNotExist:
+            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
+        except:
+            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
+
     attached_service = get_main_account(request.user)
-    # checker permissions and redirect if needed
-    if request.user in attached_service.contributors.all():
-        # check if they're a breed admin
-        try:
-            breeder = Breeder.objects.get(account=attached_service, user=request.user)
-            # redirect to their breeder page
-            return redirect('breeder', breeder.id)
-        except breeder.DoesNotExist:
-            # user not a breed admin
-            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
-        except:
-            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
-    elif request.user in attached_service.read_only_users.all():
-        try:
-            breeder = Breeder.objects.get(account=attached_service, user=request.user)
-            # redirect to their breeder page
-            return redirect('breeder', breeder.id)
-        except breeder.DoesNotExist:
-            # user not a breed admin
-            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
-        except:
-            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
+
+    if request.user in attached_service.contributors.all() or request.user in attached_service.read_only_users.all():
+        return get_breeder_and_redirect()
+
     return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
 
 
