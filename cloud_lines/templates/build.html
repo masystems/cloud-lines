@@ -1,0 +1,116 @@
+
+{% extends 'home_base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- STRIPE-->
+
+<style>
+    .slider-element {
+    top: -100px;
+    bottom: -100px;
+    height: 100px !important;
+    margin-bottom: -100px;
+	}
+</style>
+
+<section id="slider" class="slider-element">
+	<div class="cloud-wrap">
+		<div class="c1"><div class="cloud"></div></div>
+		<div class="c2"><div class="cloud"></div></div>
+		<div class="c3"><div class="cloud"></div></div>
+		<div class="c4"><div class="cloud"></div></div>
+		<div class="c5"><div class="cloud"></div></div>
+	</div>
+</section><!-- #slider end -->
+
+<!-- Page Title
+============================================= -->
+<section id="page-title">
+
+	<div class="container clearfix">
+		<h1>Build Status</h1>
+		<span>Follow the build progress</span>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Order</li>
+		</ol>
+	</div>
+
+</section><!-- #page-title end -->
+<!-- Content
+============================================= -->
+<section id="content">
+
+	<div class="content-wrap">
+
+		<div class="container clearfix">
+			<div class="title-block mt-3 text-left">
+				<h2 id="buildStatusMsg">Loading</h2>
+			</div>
+			<div id="buildURL" class="mt-1 d-none">
+				<h3><a href="{{ queue_item.subdomain }}">{{ queue_item.subdomain }}</a></h3>
+			</div>
+			<div id="buildMessage" class="mt-1 d-none">
+				<p><code>Please allow 24 hours (normally only 20 minutes) for your bespoke address to start working.</code></p>
+			</div>
+			
+			<div id="buildProgressDiv" class="progress active mt-2 d-none">
+				<div id="buildProgress" class="progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; height:20px; background-color:#1ABC9C !important" role="progressbar"></div>
+			</div>
+
+			<div class="clear"></div>
+
+			<div class="divider divider-center"><i class="icon-cloud"></i></div>
+		</div>
+
+	<script>
+		function updateBuildStatus(buildId) {
+			// activate loading bar
+			$('#buildProgressDiv').removeClass('d-none');
+			setTimeout(function () {
+				$.ajax({
+					url: '{% url 'get_build_status' %}',
+					type: 'post',
+					dataType: 'text',
+					headers: {'X-CSRFToken': '{{ csrf_token }}'},
+					data: {'build_id': buildId},
+					beforeSend: function() {
+					},
+					success: function(data) {
+						try {
+							var result = JSON.parse(data);
+						}
+						catch(err) {
+							// not started yet
+							var result = '';
+						}
+
+						if (result.status != ''){
+							if (result.status == 'complete'){
+								$('#buildMessage').removeClass('d-none');
+								$('#buildURL').removeClass('d-none');
+								$('#buildStatusMsg').html('<span>Status:</span> ' + result.status);
+								$('#buildProgress').css('width', result.percent + "%");
+								return;
+							}
+							$('#buildStatusMsg').html('<span>Status:</span> ' + result.status);
+							$('#buildProgress').css('width', result.percent + "%");
+						} else {
+							$('#buildStatusMsg').html('<span>Status: </span> Waiting to start...');
+						}
+
+						updateBuildStatus(buildId);
+					},
+					error: function(){
+						updateBuildStatus(buildId);
+					}
+				});
+			}, 3000)
+		};
+$(document).ready(function() {
+    var buildId = "{{ queue_item.id }}";
+    updateBuildStatus(buildId);
+});
+	</script>
+{% endblock %}

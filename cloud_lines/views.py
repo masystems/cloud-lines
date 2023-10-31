@@ -1,11 +1,14 @@
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect
+from django.http import JsonResponse, Http404
+from django.shortcuts import render, redirect, HttpResponse, HttpResponseRedirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.datastructures import MultiValueDictKeyError
+from django.contrib.auth.models import User
+from django.conf import settings as django_settings
 from .models import Service, Page, Gallery, Faq, Testimonial, LargeTierQueue, Blog
 from .forms import ContactForm, BlogForm
 from account.models import UserDetail, AttachedService
-from account.views import get_main_account, send_mail, has_permission, redirect_2_login
+from account.views import get_main_account, send_mail, has_permission, redirect_2_login, get_stripe_secret_key
 from account.graphs import get_graphs
 from django.conf import settings
 import json
@@ -231,7 +234,6 @@ def services(request):
 
 def blog(request):
     if request.POST:
-        print(request.POST)
         if request.POST['articleID'] == '0':
             # new article
             new_blog = Blog.objects.create(title=request.POST['title'],
@@ -348,27 +350,9 @@ def gdpr(request):
     return render(request, 'std_page.html', {'content': Page.objects.get(title='gdpr'),
                                              'services': Service.objects.all()})
 
-@login_required(login_url="/account/login")
-def order(request, service=None):
-    # check if user has permission
-    if request.method == 'GET':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
-            return redirect_2_login(request)
-    else:
-        raise PermissionDenied()
-    
+
+def order(request, service=1):
     context = {}
-    # import stripe key
-    if request.user.is_superuser:
-        context['public_api_key'] = settings.STRIPE_TEST_PUBLIC_KEY
-        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-    else:
-        context['public_api_key'] = settings.STRIPE_PUBLIC_KEY
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-
-    # get user detail object
-    context['user_detail'] = UserDetail.objects.get(user=request.user)
-
     if 'id' in request.GET:
         # get service the user wants to upgrade to
         context['requested_service'] = Service.objects.get(id=request.GET['id'])
@@ -392,268 +376,161 @@ def order(request, service=None):
     return render(request, 'order.html', context)
 
 
-@login_required(login_url="/account/login")
-def order_service(request):
-    if request.method == 'GET':
-        return redirect_2_login(request)
-    elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
-            raise PermissionDenied()
-    else:
-        raise PermissionDenied()
-
-    # import stripe key
-    if request.user.is_superuser:
-        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-    else:
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-
-    user_detail = UserDetail.objects.get(user=request.user)
-    service = Service.objects.get(price_per_month=request.POST.get('checkout-form-service'))
-
-    if request.POST.get('checkout-form-sub-domain'):
-        domain = 'https://{}.cloud-lines.com'.format(request.POST.get('checkout-form-sub-domain'))
-    else:
-        domain = ''
-
-    # if upgade
-    if request.POST.get('checkout-form-upgrade'):
-        try:
-            attached_service = AttachedService.objects.filter(user=user_detail,
-                                                              id=request.POST.get('checkout-form-upgrade')).update(animal_type=request.POST.get('checkout-form-animal-type'),
-                                                                                                                   site_mode=request.POST.get('checkout-form-site-mode'),
-                                                                                                                   install_available=False,
-                                                                                                                   service=service,
-                                                                                                                   increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                                                                                   active=False)
-        except AttachedService.DoesNotExist:
-            pass
-    else:
-        # create new attached service details object
-        attached_service = AttachedService.objects.create(user=user_detail,
-                                                            animal_type=request.POST.get('checkout-form-animal-type'),
-                                                            site_mode=request.POST.get('checkout-form-site-mode'),
-                                                            domain=domain,
-                                                            install_available=False,
-                                                            service=service,
-                                                            increment=request.POST.get('checkout-form-payment-inc').lower(),
-                                                            active=False)
-
-    return HttpResponse(json.dumps(attached_service.id))
-
-
-@login_required(login_url="/account/login")
-def order_billing(request):
-    # permission check
-    if request.method == 'GET':
-        return redirect_2_login(request)
-    elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
-            raise PermissionDenied()
-    else:
-        raise PermissionDenied()
-    
-    if request.user.is_superuser:
-        stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-    else:
-        stripe.api_key = settings.STRIPE_SECRET_KEY
-
-    user_detail = UserDetail.objects.get(user=request.user)
-
-    if not user_detail.stripe_id:
-        # create stripe user
-        if request.user.is_superuser:
-            stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-        else:
-            stripe.api_key = settings.STRIPE_SECRET_KEY
-        customer = stripe.Customer.create(
-            name=request.POST.get('checkout-form-billing-name'),
-            email=request.POST.get('checkout-form-billing-email'),
-
-            phone=request.POST.get('checkout-form-billing-phone'),
-            address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
-        )
-        customer_id = customer['id']
-        # update user datail
-        UserDetail.objects.filter(user=request.user).update(stripe_id=customer_id)
-    else:
-        stripe.Customer.modify(
-            user_detail.stripe_id,
-            name=request.POST.get('checkout-form-billing-name'),
-            email=request.POST.get('checkout-form-billing-email'),
-
-            phone=request.POST.get('checkout-form-billing-phone'),
-            address={'postal_code': request.POST.get('checkout-form-billing-post-code')}
-        )
-
-    return HttpResponse('done')
-
-
-@login_required(login_url="/account/login")
 def order_subscribe(request):
-    # permission check
-    if request.method == 'GET':
-        return redirect_2_login(request)
-    elif request.method == 'POST':
-        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': False, 'breed_admin': False}):
-            raise PermissionDenied()
-    else:
-        raise PermissionDenied()
-    
-    user_detail = UserDetail.objects.get(user=request.user)
-    attached_service = AttachedService.objects.get(id=request.POST.get('attached_service_id'), user=user_detail, active=False)
-    large_tier = ['Small Society', 'Large Society', 'Organisation']
-
-    # add payment token to user
-    try:
-        stripe.Customer.modify(
-            user_detail.stripe_id,
-            source=request.POST.get('token[id]')
-        )
-    except stripe.error.CardError as e:
-        # Since it's a decline, stripe.error.CardError will be caught
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.RateLimitError as e:
-        # Too many requests made to the API too quickly
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.InvalidRequestError as e:
-        # Invalid parameters were supplied to Stripe's API
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.AuthenticationError as e:
-        # Authentication with Stripe's API failed
-        # (maybe you changed API keys recently)
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.APIConnectionError as e:
-        # Network communication with Stripe failed
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except stripe.error.StripeError as e:
-        # Display a very generic error to the user, and maybe send
-        # yourself an email
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-    except Exception as e:
-        # Something else happened, completely unrelated to Stripe
-        feedback = send_payment_error(e)
-        result = {'result': 'fail',
-                  'feedback': feedback}
-        return HttpResponse(json.dumps(result))
-
-
-    # update the users attached service to be active
-    attached_service.active = True
-
-    if request.user.is_superuser:
-        if attached_service.increment == 'yearly':
-            plan = attached_service.service.yearly_test_id
+    if request.method == 'POST':
+        stripe.api_key = get_stripe_secret_key(request)
+        data = json.loads(request.body.decode('utf-8'))
+        service = Service.objects.get(price_per_month=data['checkout-form-service'])
+        if data['checkout-form-sub-domain']:
+            domain = 'https://{}.cloud-lines.com'.format(data['checkout-form-sub-domain'])
         else:
-            plan = attached_service.service.monthly_test_id
-    else:
-        if attached_service.increment == 'yearly':
-            plan = attached_service.service.yearly_id
+            domain = ''
+        
+        # get or create user
+        user, created = User.objects.get_or_create(email=data['checkout-form-owner-email'],
+                                                   defaults={
+                                                       'username': data['checkout-form-owner-email'],
+                                                       'first_name': data['checkout-form-owner-first-name'],
+                                                       'last_name': data['checkout-form-owner-second-name']})
+        # get or create userdetail
+        user_detail, created = UserDetail.objects.get_or_create(user=user,
+                                                                defaults={'phone': data['checkout-form-owner-phone']})
+        # get or create attached service
+        # when it's getting an existing service it's an upgrade situation
+        attached_service, created = AttachedService.objects.get_or_create(user=user_detail, domain=domain,
+                                                                            defaults={
+                                                                                'animal_type': data['checkout-form-animal-type'],
+                                                                                'site_mode': data['checkout-form-site-mode'],
+                                                                                'domain': domain,
+                                                                                'install_available': False,
+                                                                                'service': service,
+                                                                                'increment': data['checkout-form-payment-inc'].lower(),
+                                                                                'active': False})
+        user_detail.current_service = attached_service
+        user_detail.save()
+        
+        # stripe bit
+        if not user_detail.stripe_id:
+            # create stripe user
+            if request.user.is_superuser:
+                stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+            else:
+                stripe.api_key = settings.STRIPE_SECRET_KEY
+            customer = stripe.Customer.create(
+                name=f"{data['checkout-form-owner-first-name']} {data['checkout-form-owner-second-name']}",
+                email=data['checkout-form-owner-email'],
+                phone=data['checkout-form-owner-phone'],
+                address={'postal_code': data['checkout-form-owner-post-code']}
+            )
+            customer_id = customer['id']
+            # update user datail
+            user_detail.update(stripe_id=customer_id)
         else:
-            plan = attached_service.service.monthly_id
-
-    # update existing subscription if it exists
-    if attached_service.subscription_id:
-        subscription = stripe.Subscription.retrieve(attached_service.subscription_id)
-        stripe.Subscription.modify(
-            attached_service.subscription_id,
-            cancel_at_period_end=False,
-            items=[{
-                'id': subscription['items']['data'][0].id,
-                'plan': plan,
-            }]
+            customer = stripe.Customer.modify(
+                user_detail.stripe_id,
+                name=f"{data['checkout-form-owner-first-name']} {data['checkout-form-owner-second-name']}",
+                email=data['checkout-form-owner-email'],
+                phone=data['checkout-form-owner-phone'],
+                address={'postal_code': data['checkout-form-owner-post-code']}
+            )
+        
+        # get price ID
+        if request.META['HTTP_HOST'] in django_settings.TEST_STRIPE_DOMAINS:
+            if data['checkout-form-payment-inc'].lower() == 'yearly':
+                price = service.yearly_test_id
+            else:
+                price = service.monthly_test_id
+        else:
+            if data['checkout-form-payment-inc'].lower() == 'yearly':
+                price = service.yearly_id
+            else:
+                price = service.monthly_id
+        
+        # create session
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    "price": price,
+                    "quantity": 1,
+                },
+            ],
+            mode='subscription',
+            customer=customer.id,
+            success_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/order/success/{attached_service.id}",
+            cancel_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/",
         )
-
-    # subscribe user to the selected plan
-    subscription = stripe.Subscription.create(
-        customer=user_detail.stripe_id,
-        items=[
-            {
-                "plan": plan,
-            },
-        ]
-    )
-
-    if subscription:
-        attached_service.subscription_id = subscription['id']
+        attached_service.stripe_payment_token = session['id']
         attached_service.save()
-    else:
-        return HttpResponse(json.dumps({'Error': 'Something went wrong, please contact us.'}))
+        return JsonResponse({'success': True, 'url': session.url})
 
-    invoice = stripe.Invoice.list(customer=user_detail.stripe_id, subscription=subscription.id, limit=1)
-    receipt = stripe.Charge.list(customer=user_detail.stripe_id)
+    return JsonResponse({'success': False})
 
-    result = {'result': 'success',
-              'invoice': invoice.data[0].invoice_pdf,
-              'receipt': receipt.data[0].receipt_url}
 
-    # send confirmation email
-    if attached_service.service.service_name in large_tier:
-        body = """
-            Congratulations on purchasing a new Cloudlines {} service!
-            Your new service is building now. We will send you another email once it's built and ready to access.
-            
-            Remember you can always use the in built feature to import any existing data but if you would prefer you can
-            <a href="https://cloud-lines.com/contact">Contact us</a> and we'd be happy to help.
-            
-        """.format(attached_service.service.service_name, )
-    else:
-        body = """
-            Congratulations on purchasing a new Cloudlines {} service!
-            To access your new service click <a href="https://cloud-lines.com/dashboard"> HERE</a>. You should
-            find everything you need to get started there but do let is know if you have any questions.
-        """.format(attached_service.service.service_name,)
+def order_success(request, attached_service_id):
+    stripe.api_key = get_stripe_secret_key(request)
+    large_tier = ['Small Society', 'Large Society', 'Organisation']
+    # get the attached service object
+    attached_service = AttachedService.objects.get(id=attached_service_id)
+
     try:
-        send_mail('New subscription!', request.user, body, send_to=request.user.email)
-        send_mail('New subscription!', request.user, body, reply_to=request.user.email)
-    except Exception as err:
-        print(err)
+        session = stripe.checkout.Session.retrieve(
+            attached_service.stripe_payment_token, 
+        )
+    except stripe.error.StripeError as e:
+        # Handle error
+        return JsonResponse({'error': str(e)}, status=400)
 
-    # set new default attached service
-    UserDetail.objects.filter(user=request.user).update(current_service=attached_service)
+    if session.payment_status == 'paid':
+        # Session was successful
+        # update the users attached service to be active
+        attached_service.active = True
+        attached_service.save()
 
-    # delete dead attached services
-    AttachedService.objects.filter(user=user_detail, active=False).delete()
+        # send confirmation email
+        if attached_service.service.service_name in large_tier:
+            body = """
+                Congratulations on purchasing a new Cloudlines {} service!
+                Your new service is building now. We will send you another email once it's built and ready to access.
+                
+                Remember you can always use the in built feature to import any existing data but if you would prefer you can
+                <a href="https://cloud-lines.com/contact">Contact us</a> and we'd be happy to help.
+                
+            """.format(attached_service.service.service_name, )
+        else:
+            body = """
+                Congratulations on purchasing a new Cloudlines {} service!
+                To access your new service click <a href="https://cloud-lines.com/dashboard"> HERE</a>. You should
+                find everything you need to get started there but do let is know if you have any questions.
+            """.format(attached_service.service.service_name)
+        try:
+            send_mail('New subscription!', request.user, body, send_to=attached_service.user.user.email)
+            send_mail('New subscription!', request.user, body, reply_to=attached_service.user.user.email)
+        except Exception as err:
+            print(err)
+        
+        # start build
+        if attached_service.service.service_name in large_tier:
+            queue_item = LargeTierQueue.objects.create(subdomain=attached_service.domain, user=attached_service.user.user, user_detail=attached_service.user, attached_service=attached_service)
 
-    if attached_service.service.service_name in large_tier:
-        queue_item = LargeTierQueue.objects.create(subdomain=request.POST.get('subdomain'), user=request.user, user_detail=user_detail, attached_service=attached_service)
-        result['tier'] = 'large'
-        result['build_id'] = queue_item.id
+            token_res = requests.post(url=f'{settings.ORCH_URL}/api-token-auth/',
+                                      data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
+            ## create header
+            headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
+            ## get pedigrees
+            data = '{"queue_id": %d}' % queue_item.id
 
-        token_res = requests.post(url=f'{settings.ORCH_URL}/api-token-auth/',
-                                  data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
-        ## create header
-        headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
-        ## get pedigrees
-        data = '{"queue_id": %d}' % queue_item.id
+            post_res = requests.post(url=f'{settings.ORCH_URL}/api/tasks/new_large_tier/', headers=headers, data=data)
+            return redirect('build', queue_item.id)
+        else:
+            return redirect('dashboard')
+    else:
+        raise Http404("Payment not successful.")  # replace with your actual error handling
 
-        post_res = requests.post(url=f'{settings.ORCH_URL}/api/tasks/new_large_tier/', headers=headers, data=data)
 
-    return HttpResponse(json.dumps(result))
+def build(request, build_id):
+    queue_item = LargeTierQueue.objects.get(id=build_id)
+    return render(request, 'build.html', {'queue_item': queue_item})
 
 
 def send_payment_error(e):
@@ -694,14 +571,15 @@ def know_more(request):
 def get_build_status(request):
     if request.method == 'POST':
         queue_id = request.POST.get('build_id')
-        queue_item = LargeTierQueue.objects.get(id=queue_id)
-        if queue_item.build_state == 'complete':
-            status = {'status': 'complete'}
-        else:
-            status = {'status': queue_item.build_status}
+        queue_item = get_object_or_404(LargeTierQueue, id=queue_id)
+        
+        status = 'complete' if queue_item.build_state == 'complete' else queue_item.build_status
 
-        status['percent'] = queue_item.percentage_complete
-        return HttpResponse(json.dumps(status))
+        response_data = {
+            'status': status,
+            'percent': queue_item.percentage_complete
+        }
+        return JsonResponse(response_data)
 
 
 def robots(request):

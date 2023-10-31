@@ -17,9 +17,8 @@ urlpatterns = [
     path('delete_blog/<int:id>', views.delete_blog, name='delete_blog'),
     path('privacy-policy/', views.privacy_policy, name='privacy'),
     path('know_more/', views.know_more, name='know_more'),
-    path('order/service', views.order_service, name='order_service'),
-    path('order/billing', views.order_billing, name='order_billing'),
     path('order/subscribe', views.order_subscribe, name='order_subscribe'),
+    path('order/success/<int:attached_service_id>/', views.order_success, name='order_success'),
     path('pedigree/', include('pedigree.urls')),
     path('breeders/', include('breeder.urls')),
     path('breeds/', include('breed.urls')),
@@ -37,6 +36,7 @@ urlpatterns = [
     path('birth_notification/', include('birth_notifications.urls')),
     path('reports/', include('reports.urls')),
     path('primary_account/<str:service>', views.activate_primary_account, name='primary_account'),
+    path('build/<int:build_id>', views.build, name='build'),
     path('get_build_status', views.get_build_status, name='get_build_status'),
     path('gdpr/', views.gdpr, name='gdpr'),
     path('robots.txt', views.robots)

@@ -84,6 +84,7 @@ class AttachedService(models.Model):
     increment = models.CharField(max_length=10, choices=INCREMENTS, default=None, null=True, blank=True)
     active = models.BooleanField(default=False)
     subscription_id = models.CharField(max_length=250, blank=True)
+    stripe_payment_token = models.CharField(max_length=250, blank=True)
 
     install_available = models.BooleanField(default=False)
 
