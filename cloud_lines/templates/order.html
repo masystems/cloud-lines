@@ -4,41 +4,13 @@
 
 {% block content %}
 <!-- STRIPE-->
-<script src="https://js.stripe.com/v3/"></script>
+
 <style>
     .slider-element {
     top: -100px;
     bottom: -100px;
     height: 100px !important;
     margin-bottom: -100px;
-	}
-
-	.StripeElement {
-	  box-sizing: border-box;
-
-	  height: 40px;
-
-	  padding: 10px 12px;
-
-	  border: 1px solid transparent;
-	  border-radius: 4px;
-	  background-color: white;
-
-	  box-shadow: 0 1px 3px 0 #e6ebf1;
-	  -webkit-transition: box-shadow 150ms ease;
-	  transition: box-shadow 150ms ease;
-	}
-
-	.StripeElement--focus {
-	  box-shadow: 0 1px 3px 0 #cfd7df;
-	}
-
-	.StripeElement--invalid {
-	  border-color: #fa755a;
-	}
-
-	.StripeElement--webkit-autofill {
-	  background-color: #fefde5 !important;
 	}
 
 </style>
@@ -74,937 +46,693 @@
 	<div class="content-wrap">
 
 		<div class="container clearfix">
-			<div class="title-block">
-				<h4>Click <a href="{% url 'dashboard' %}"><span>here</span></a> to go to your free instance!</h4>
-				<span>The below form is for ordering a new service, but the free version is ready for you to use now!</span>
-			</div>
 			<hr>
 
-			<div id="processTabs">
-				<ul class="process-steps bottommargin clearfix">
-					<li>
-						<a href="#ptab1" class="i-circled i-bordered i-alt divcenter" style="pointer-events: none">1</a>
-						<h5>Select Service</h5>
-					</li>
-					<li>
-						<a href="#ptab2" class="i-circled i-bordered i-alt divcenter" style="pointer-events: none">2</a>
-						<h5>Enter Billing Info</h5>
-					</li>
-					<li>
-						<a href="#ptab3" class="i-circled i-bordered i-alt divcenter" style="pointer-events: none">3</a>
-						<h5>Complete Payment</h5>
-					</li>
-					<li>
-						<a href="#ptab4" class="i-circled i-bordered i-alt divcenter" style="pointer-events: none">4</a>
-						<h5>Order Complete</h5>
-					</li>
-				</ul>
-				<div>
-
-					<div id="ptab1">
-
-						<p>Please select your desired service type, payment increment and give us a couple of details about your animals.</p>
-						<form id="serviceForm" name="serviceForm" class="nobottommargin" method="POST">
-							<div class="row form-billing">
-								<input type="hidden" name="checkout-form-upgrade" id="checkout-form-upgrade" value="{{ attached_service_upgrade }}">
-								<div class="col-6 form-group">
-									<label>Service:</label>
-									<select class="form-control required" name="checkout-form-service" id="checkout-form-service" required>
-										<option value="None">------</option>
-										{% for service in services %}
-											{% if service.service_name != 'Free' %}
-												<option value="{{ service.price_per_month }}" name="{{ service.service_name }}" {% if requested_service.id == service.id %}selected{% endif %}>{{ service.service_name }}</option>
-											{% endif %}
-										{% endfor %}
-									</select>
-
+			<style>
+				div[data-acc-content] { display: none;  }
+				div[data-acc-step]:not(.open) { background: #f2f2f2;  }
+				div[data-acc-step]:not(.open) h5 { color: #777;  }
+				div[data-acc-step]:not(.open) .badge-primary { background: #ccc;  }
+			  </style>
+			  
+			  <div class="accordion" id="accordionForm">
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="serviceHeading">
+						<button class="accordion-button" type="button" data-bs-target="#serviceSection">
+							Service Info
+						</button>
+					</h2>
+					<div id="serviceSection" class="accordion-collapse collapse show" aria-labelledby="serviceHeading">
+						<div class="accordion-body">
+							<form id="serviceForm" name="serviceForm">
+								<div class="row form-owner">
+									<input type="hidden" name="checkout-form-upgrade" id="checkout-form-upgrade" value="{{ attached_service_upgrade }}">
+									<div class="col-6 form-group">
+										<label>Service:</label>
+										<select class="form-control required" name="checkout-form-service" id="checkout-form-service" required>
+											<option value="None">------</option>
+											{% for service in services %}
+												{% if service.service_name != 'Free' %}
+													<option value="{{ service.price_per_month }}" name="{{ service.service_name }}" {% if requested_service.id == service.id %}selected{% endif %}>{{ service.service_name }}</option>
+												{% endif %}
+											{% endfor %}
+										</select>
+									</div>
+									<div class="col-6 form-group">
+										<label>Payment Increment:</label>
+										<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc" required>
+											<option value="None">------</option>
+											<option value="Monthly" {% if upgrade and service.increment == 'monthly' %}selected{% endif %}>Monthly</option>
+											<option value="Yearly" {% if upgrade and service.increment == 'yearly' %}selected{% endif %}>Yearly</option>
+										</select>
+									</div>
 								</div>
-								<div class="col-6 form-group">
-									<label>Payment Increment:</label>
-									<select class="form-control required" name="checkout-form-payment-inc" id="checkout-form-payment-inc" required>
-										<option value="None">------</option>
-										<option value="Monthly" {% if upgrade and service.increment == 'monthly' %}selected{% endif %}>Monthly</option>
-										<option value="Yearly" {% if upgrade and service.increment == 'yearly' %}selected{% endif %}>Yearly</option>
-									</select>
+
+								<div class="row form-owner ">
+									<div id="subDomainDiv" class="col-6 form-group d-none">
+										<label>Domain Prefix:</label>
+	
+										<input type="text" class="form-control required" name="checkout-form-sub-domain" id="checkout-form-sub-domain" placeholder="e.g. rbst">
+	
+										<span><code>https://<i id="subDomain">rbst</i>.cloud-lines.com</code> <i id="subdomain_message"></i></span>
+									</div>
 								</div>
-							</div>
 
-
-							<div class="row form-billing ">
-								<div id="subDomainDiv" class="col-6 form-group d-none">
-									<label>Domain Prefix:</label>
-
-									<input type="text" class="form-control required" name="checkout-form-sub-domain" id="checkout-form-sub-domain" {% if service.domain %}value="{{ service.domain }}" readonly {% endif %} placeholder="e.g. rbst">
-
-									<span><code>https://<i id="subDomain">rbst</i>.cloud-lines.com</code> <i id="subdomain_message"></i></span>
+								<div class="row form-owner">
+									<div class="col-6 form-group">
+										<label>Animal Type (optional, plural):</label>
+										<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}" {% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
+										</select>
+	
+									</div>
+									<div class="col-6 form-group">
+										<label>Animal Category (optional):</label>
+										<select class="form-control required" name="checkout-form-site-mode" id="checkout-form-site-mode" required>
+											<option value="None">------</option>
+											<option value="mammal" {% if upgrade and service.site_mode == 'mammal' %}selected{% endif %}>Mammal</option>
+											<option value="poultry" {% if upgrade and service.site_mode == 'poultry' %}selected{% endif %}>Poultry</option>
+										</select>
+									</div>
 								</div>
-							</div>
 
-							<div class="row form-billing">
-								<div class="col-6 form-group">
-									<label>Animal Type (optional, plural):</label>
-									<input type="text" name="checkout-form-animal-type" id="checkout-form-animal-type" class="form-control required" {% if upgrade and service.service.service_name != 'Free' %}value="{{ service.animal_type }}" {% else %}placeholder="Cats, Dogs, Goats, Chickens"{% endif %}" required>
-									</select>
-
+								<div class="table pt-2">
+									<table class="table table-striped">
+										<thead>
+											<tr>
+												<th>Service</th>
+												<th>Increment</th>
+												<th>Total</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td id="service">None selected</td>
+												<td id="increment">None selected</td>
+												<td id="total">£0.00</td>
+											</tr>
+										</tbody>
+									</table>
 								</div>
-								<div class="col-6 form-group">
-									<label>Animal Category (optional):</label>
-									<select class="form-control required" name="checkout-form-site-mode" id="checkout-form-site-mode" required>
-										<option value="None">------</option>
-										<option value="mammal" {% if upgrade and service.site_mode == 'mammal' %}selected{% endif %}>Mammal</option>
-										<option value="poultry" {% if upgrade and service.site_mode == 'poultry' %}selected{% endif %}>Poultry</option>
-									</select>
-								</div>
-							</div>
+								<script>
+									$(document).ready(function() {
+										const LARGE_TIER = ['20.00', '40.00', '60.00'];
+										const FADE_OUT_TIME = 100;
+										const FADE_IN_TIME = 2000;
 
-							<div class="table pt-2">
-								<table class="table table-striped">
-									<thead>
-										<tr>
-											<th>Service</th>
-											<th>Increment</th>
-											<th>Total</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td id="service">None selected</td>
-											<td id="increment">None selected</td>
-											<td id="total">£0.00</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-							<script>
-								$(document).ready(function(){
-
-									updateTables()
-
-									$("#checkout-form-service").add('#checkout-form-payment-inc').change(function(){
-										var largeTier = ['20.00', '40.00', '60.00']
-										if (largeTier.includes($("#checkout-form-service").val())) {
-											$('#subDomainDiv').removeClass('d-none');
-											$("#checkout-form-sub-domain").prop('required',true);
-										} else {
-											$('#subDomainDiv').addClass('d-none');
-											$("#checkout-form-sub-domain").prop('required',false);
+										function updateTableRow(selector, text) {
+											$(selector).fadeOut(FADE_OUT_TIME, function() {
+											$(this).text(text).fadeIn(FADE_IN_TIME);
+											});
 										}
-										updateTables()
 
-								  	});
-									$('#checkout-form-service').trigger('change');
+										function toggleSubDomain(value) {
+											const subDomainDiv = $('#subDomainDiv');
+											const subDomainInput = $("#checkout-form-sub-domain");
 
-									$('#checkout-form-sub-domain').keyup( function() {
-										var subdomain = document.getElementById("checkout-form-sub-domain").value;
-										$.ajax({
+											if (LARGE_TIER.includes(value)) {
+											subDomainDiv.removeClass('d-none');
+											subDomainInput.prop('required', true);
+											} else {
+											subDomainDiv.addClass('d-none');
+											subDomainInput.prop('required', false);
+											}
+										}
+
+										function updateTables() {
+											const service = $("#checkout-form-service option:selected");
+											const serviceCost = parseFloat(service.val());
+											const serviceName = service.text();
+											const increment = $("#checkout-form-payment-inc").val();
+											const multiplier = (increment === 'Yearly') ? 12 : 1;
+
+											const totalCost = serviceCost * multiplier;
+
+											updateTableRow("#service", serviceName);
+											updateTableRow("#increment", increment);
+											updateTableRow("#total", `£${totalCost.toFixed(2)}p/${increment[0].toLowerCase()}`);
+											updateTableRow("#service2", serviceName);
+											updateTableRow("#increment2", increment);
+											updateTableRow("#total2", `£${totalCost.toFixed(2)}p/${increment[0].toLowerCase()}`);
+										}
+
+										$("#checkout-form-service, #checkout-form-payment-inc").change(function() {
+											const serviceVal = $("#checkout-form-service").val();
+											toggleSubDomain(serviceVal);
+											updateTables();
+										});
+
+										$('#checkout-form-service').trigger('change');
+
+										$('#checkout-form-sub-domain').keyup(function() {
+											const subdomain = $(this).val();
+											$.ajax({
 											url: '{% url 'subdomain_check' %}',
 											type: 'post',
 											dataType: 'text',
-											data: $('#checkout-form-sub-domain').serialize(),
+											data: $(this).serialize(),
 											beforeSend: function() {
 												$('#subDomain').text(subdomain);
 											},
 											success: function(data) {
-											if (data == 'False') {
-												$('#subdomain_message').html('');
-												} else {
-												$('#subdomain_message').html('<i class="icon-warning-sign"></i> Domain prefix already in use!').css('color', 'red');
-												}
-											 },
-											error: function(jqXHR, textStatus, errorThrown){
-												console.log('jqXHR:');
-												console.log(jqXHR);
-												console.log('textStatus:');
-												console.log(textStatus);
-												console.log('errorThrown:');
-												console.log(errorThrown);
+												const message = (data === 'False') ? '' : '<i class="icon-warning-sign"></i> Domain prefix already in use!';
+												$('#subdomain_message').html(message).css('color', 'red');
+											},
+											error: function(jqXHR, textStatus, errorThrown) {
+												console.error(`Error: ${textStatus} - ${errorThrown}`);
 											}
+											});
 										});
+
+										updateTables();
 									});
-
-								  	function updateTables() {
-								  		var service = document.getElementById("checkout-form-service");
-										var service_cost = service.options[service.selectedIndex].value;
-										var service_name = service.options[service.selectedIndex].text;
-										var increment = document.getElementById("checkout-form-payment-inc").value;
-										var fadeout = 100;
-										var fadein = 2000;
-								  	if (increment == 'Monthly'){
-
-										$("#service").fadeOut(fadeout, function() {
-											$("#service").text(service_name).fadeIn(fadein)
-										});
-
-										$("#increment").fadeOut(fadeout, function() {
-											$("#increment").text(increment).fadeIn(fadein)
-										});
-
-										$("#total").fadeOut(fadeout, function() {
-											$("#total").text('£' + service_cost + 'p/m').fadeIn(fadein)
-										});
-
-										$("#service2").fadeOut(fadeout, function() {
-											$("#service2").text(service_name).fadeIn(fadein)
-										});
-
-										$("#increment2").fadeOut(fadeout, function() {
-											$("#increment2").text(increment).fadeIn(fadein)
-										});
-
-										$("#total2").fadeOut(fadeout, function() {
-											$("#total2").text('£' + service_cost + 'p/m').fadeIn(fadein)
-										});
-
-									} else if (increment == 'Yearly') {
-
-										$("#service").fadeOut(fadeout, function() {
-											$("#service").text(service_name).fadeIn(fadein)
-										});
-
-										$("#increment").fadeOut(fadeout, function() {
-											$("#increment").text(increment).fadeIn(fadein)
-										});
-
-										$("#total").fadeOut(fadeout, function() {
-											$("#total").text('£' + service_cost*12 + 'p/y').fadeIn(fadein)
-										});
-
-										$("#service2").fadeOut(fadeout, function() {
-											$("#service2").text(service_name).fadeIn(fadein)
-										});
-
-										$("#increment2").fadeOut(fadeout, function() {
-											$("#increment2").text(increment).fadeIn(fadein)
-										});
-
-										$("#total2").fadeOut(fadeout, function() {
-											$("#total2").text('£' + service_cost*12 + 'p/y').fadeIn(fadein)
-										});
-
-
-									} else {
-									};
-								  }
-								});
-
-
-							</script>
-
-							<div id='serviceErrors' class="style-msg errormsg">
-
-							</div>
-
-							<a href="#" id="selectService" class="button button-3d nomargin fright tab-linker">Enter Billing Info &rArr;</a>
-							<button id="selectServiceButton" type="button" style="display: none;" class="tab-linker" rel="2"></button>
-						</form>
-						<script>
-							$('#selectService').click( function() {
-								// string to display errors
-								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Correct the following field(s) and try submitting again:<ul class="ml-4">'
-								// bool to know whether to submit form
-								var errors = false
-								
-								// add each error to the error message
-								if ($('#checkout-form-service').val() == 'None') {
-									errorsHtml += '<li>Service - this field is required</li>'
-									errors = true
-								}
-								if ($('#checkout-form-payment-inc').val() == 'None') {
-									errorsHtml += '<li>Payment Increment - this field is required</li>'
-									errors = true
-								}
-								if (['20.00', '40.00', '60.00'].includes($('#checkout-form-service').val())) {
-									if ($('#checkout-form-sub-domain').val() == '') {
-										errorsHtml += '<li>Domain Prefix - this field is required with the selected service</li>'
-										errors = true
-									}
-									// validate subdomain if it was given
-									else {
-										// check that the total number of characters is not over the limit
-										if ($('#checkout-form-sub-domain').val().length > 238) {
-											errorsHtml += '<li>Domain Prefix - this has a maximum length of 238 characters</li>'
-											errors = true
-										}
-										// check there aren't any labels over the limit
-										$('#checkout-form-sub-domain').val().split('.').forEach(label => {
-											if (label.length > 63) {
-												errorsHtml += '<li>Domain Prefix - each label (separated by a full stop) has a maximum length of 63 characters</li>'
-												errors = true
-											}
-										})
-									}
-								}
-								
-								errorsHtml += '</ul></div>'
-								
-								// display errors if there were any
-								if (errors) {
-									$('#serviceErrors').html(errorsHtml);
-								}
-								// allow form to be submitted if there weren'y any errors
-								else {
-									$('#serviceErrors').html('')
-									$.ajax({
-										url: "{% url 'order_service' %}",
-										type: 'post',
-										dataType: 'text',
-										headers: {'X-CSRFToken': '{{ csrf_token }}'},
-										data: $('#serviceForm').serialize(),
-										beforeSend: function() {
-											$('#serviceErrors').html('');
-										},
-										success: function(data) {
-											$('#attached_service_id').val(data)
-											$('#selectServiceButton').click();
-										},
-										error: function(jqXHR, textStatus, errorThrown){
-											if (jqXHR.status == 403) {
-												location.reload()
-											}
-											else {
-												$('#serviceErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Change your options and try submitting again.</div>');
-											}
-											console.log('jqXHR:');
-											console.log(jqXHR.responseText);
-											console.log('textStatus:');
-											console.log(textStatus);
-											console.log('errorThrown:');
-											console.log(errorThrown);
-										}
-									});
-								}
-							});
-						</script>
-					</div>
-					<div id="ptab2">
-						<p>Please enter your billing information.</p>
-						<div class="d-flex flex-column align-items-center justify-content-center ">
-							<div id="billingSpinner" class="spinner-border text-info d-none" style="width: 6rem; height: 6rem;" role="status"></div>
-							<div id="billingSpinnerText" class="row d-none">
-								<p><strong>Processing Payment</strong></p>
-							</div>
-						</div>
-						<form id="billingForm" name="billingForm" class="nobottommargin" method="POST">
-							<div class="col-lg-12">
-								<div class="row form-billing">
-									<div class="col-6 form-group">
-										<label>Name(required):</label>
-										<input type="text" name="checkout-form-billing-name" id="checkout-form-billing-name" class="form-control required" value="{{ user.first_name }} {{ user.last_name }}">
-									</div>
-									<div class="col-6 form-group">
-										<label>Email(required):</label>
-										<input type="email" name="checkout-form-billing-email" id="checkout-form-billing-email" class="form-control required" value="{{ user.email }}">
-									</div>
-									<div class="col-6 form-group">
-										<label>Phone:</label><br>
-										<input type="text" name="checkout-form-billing-phone" id="checkout-form-billing-phone" class="form-control required" value="{{ user_detail.phone }}">
-									</div>
-									<div class="col-6 form-group">
-										<label>Country:</label>
-										<select class="form-control required" name="checkout-form-billing-country" id="checkout-form-billing-country">
-											<option value="AX">&#197;land Islands</option>
-											<option value="AF">Afghanistan</option>
-											<option value="AL">Albania</option>
-											<option value="DZ">Algeria</option>
-											<option value="AD">Andorra</option>
-											<option value="AO">Angola</option>
-											<option value="AI">Anguilla</option>
-											<option value="AQ">Antarctica</option>
-											<option value="AG">Antigua and Barbuda</option>
-											<option value="AR">Argentina</option>
-											<option value="AM">Armenia</option>
-											<option value="AW">Aruba</option>
-											<option value="AU">Australia</option>
-											<option value="AT">Austria</option>
-											<option value="AZ">Azerbaijan</option>
-											<option value="BS">Bahamas</option>
-											<option value="BH">Bahrain</option>
-											<option value="BD">Bangladesh</option>
-											<option value="BB">Barbados</option>
-											<option value="BY">Belarus</option>
-											<option value="PW">Belau</option>
-											<option value="BE">Belgium</option>
-											<option value="BZ">Belize</option>
-											<option value="BJ">Benin</option>
-											<option value="BM">Bermuda</option>
-											<option value="BT">Bhutan</option>
-											<option value="BO">Bolivia</option>
-											<option value="BQ">Bonaire, Saint Eustatius and Saba</option>
-											<option value="BA">Bosnia and Herzegovina</option>
-											<option value="BW">Botswana</option>
-											<option value="BV">Bouvet Island</option>
-											<option value="BR">Brazil</option>
-											<option value="IO">British Indian Ocean Territory</option>
-											<option value="VG">British Virgin Islands</option>
-											<option value="BN">Brunei</option>
-											<option value="BG">Bulgaria</option>
-											<option value="BF">Burkina Faso</option>
-											<option value="BI">Burundi</option>
-											<option value="KH">Cambodia</option>
-											<option value="CM">Cameroon</option>
-											<option value="CA">Canada</option>
-											<option value="CV">Cape Verde</option>
-											<option value="KY">Cayman Islands</option>
-											<option value="CF">Central African Republic</option>
-											<option value="TD">Chad</option>
-											<option value="CL">Chile</option>
-											<option value="CN">China</option>
-											<option value="CX">Christmas Island</option>
-											<option value="CC">Cocos (Keeling) Islands</option>
-											<option value="CO">Colombia</option>
-											<option value="KM">Comoros</option>
-											<option value="CG">Congo (Brazzaville)</option>
-											<option value="CD">Congo (Kinshasa)</option>
-											<option value="CK">Cook Islands</option>
-											<option value="CR">Costa Rica</option>
-											<option value="HR">Croatia</option>
-											<option value="CU">Cuba</option>
-											<option value="CW">Cura&Ccedil;ao</option>
-											<option value="CY">Cyprus</option>
-											<option value="CZ">Czech Republic</option>
-											<option value="DK">Denmark</option>
-											<option value="DJ">Djibouti</option>
-											<option value="DM">Dominica</option>
-											<option value="DO">Dominican Republic</option>
-											<option value="EC">Ecuador</option>
-											<option value="EG">Egypt</option>
-											<option value="SV">El Salvador</option>
-											<option value="GQ">Equatorial Guinea</option>
-											<option value="ER">Eritrea</option>
-											<option value="EE">Estonia</option>
-											<option value="ET">Ethiopia</option>
-											<option value="FK">Falkland Islands</option>
-											<option value="FO">Faroe Islands</option>
-											<option value="FJ">Fiji</option>
-											<option value="FI">Finland</option>
-											<option value="FR">France</option>
-											<option value="GF">French Guiana</option>
-											<option value="PF">French Polynesia</option>
-											<option value="TF">French Southern Territories</option>
-											<option value="GA">Gabon</option>
-											<option value="GM">Gambia</option>
-											<option value="GE">Georgia</option>
-											<option value="DE">Germany</option>
-											<option value="GH">Ghana</option>
-											<option value="GI">Gibraltar</option>
-											<option value="GR">Greece</option>
-											<option value="GL">Greenland</option>
-											<option value="GD">Grenada</option>
-											<option value="GP">Guadeloupe</option>
-											<option value="GT">Guatemala</option>
-											<option value="GG">Guernsey</option>
-											<option value="GN">Guinea</option>
-											<option value="GW">Guinea-Bissau</option>
-											<option value="GY">Guyana</option>
-											<option value="HT">Haiti</option>
-											<option value="HM">Heard Island and McDonald Islands</option>
-											<option value="HN">Honduras</option>
-											<option value="HK">Hong Kong</option>
-											<option value="HU">Hungary</option>
-											<option value="IS">Iceland</option>
-											<option value="IN">India</option>
-											<option value="ID">Indonesia</option>
-											<option value="IR">Iran</option>
-											<option value="IQ">Iraq</option>
-											<option value="IM">Isle of Man</option>
-											<option value="IL">Israel</option>
-											<option value="IT">Italy</option>
-											<option value="CI">Ivory Coast</option>
-											<option value="JM">Jamaica</option>
-											<option value="JP">Japan</option>
-											<option value="JE">Jersey</option>
-											<option value="JO">Jordan</option>
-											<option value="KZ">Kazakhstan</option>
-											<option value="KE">Kenya</option>
-											<option value="KI">Kiribati</option>
-											<option value="KW">Kuwait</option>
-											<option value="KG">Kyrgyzstan</option>
-											<option value="LA">Laos</option>
-											<option value="LV">Latvia</option>
-											<option value="LB">Lebanon</option>
-											<option value="LS">Lesotho</option>
-											<option value="LR">Liberia</option>
-											<option value="LY">Libya</option>
-											<option value="LI">Liechtenstein</option>
-											<option value="LT">Lithuania</option>
-											<option value="LU">Luxembourg</option>
-											<option value="MO">Macao S.A.R., China</option>
-											<option value="MK">Macedonia</option>
-											<option value="MG">Madagascar</option>
-											<option value="MW">Malawi</option>
-											<option value="MY">Malaysia</option>
-											<option value="MV">Maldives</option>
-											<option value="ML">Mali</option>
-											<option value="MT">Malta</option>
-											<option value="MH">Marshall Islands</option>
-											<option value="MQ">Martinique</option>
-											<option value="MR">Mauritania</option>
-											<option value="MU">Mauritius</option>
-											<option value="YT">Mayotte</option>
-											<option value="MX">Mexico</option>
-											<option value="FM">Micronesia</option>
-											<option value="MD">Moldova</option>
-											<option value="MC">Monaco</option>
-											<option value="MN">Mongolia</option>
-											<option value="ME">Montenegro</option>
-											<option value="MS">Montserrat</option>
-											<option value="MA">Morocco</option>
-											<option value="MZ">Mozambique</option>
-											<option value="MM">Myanmar</option>
-											<option value="NA">Namibia</option>
-											<option value="NR">Nauru</option>
-											<option value="NP">Nepal</option>
-											<option value="NL">Netherlands</option>
-											<option value="AN">Netherlands Antilles</option>
-											<option value="NC">New Caledonia</option>
-											<option value="NZ">New Zealand</option>
-											<option value="NI">Nicaragua</option>
-											<option value="NE">Niger</option>
-											<option value="NG">Nigeria</option>
-											<option value="NU">Niue</option>
-											<option value="NF">Norfolk Island</option>
-											<option value="KP">North Korea</option>
-											<option value="NO">Norway</option>
-											<option value="OM">Oman</option>
-											<option value="PK">Pakistan</option>
-											<option value="PS">Palestinian Territory</option>
-											<option value="PA">Panama</option>
-											<option value="PG">Papua New Guinea</option>
-											<option value="PY">Paraguay</option>
-											<option value="PE">Peru</option>
-											<option value="PH">Philippines</option>
-											<option value="PN">Pitcairn</option>
-											<option value="PL">Poland</option>
-											<option value="PT">Portugal</option>
-											<option value="QA">Qatar</option>
-											<option value="IE">Republic of Ireland</option>
-											<option value="RE">Reunion</option>
-											<option value="RO">Romania</option>
-											<option value="RU">Russia</option>
-											<option value="RW">Rwanda</option>
-											<option value="ST">S&atilde;o Tom&eacute; and Pr&iacute;ncipe</option>
-											<option value="BL">Saint Barth&eacute;lemy</option>
-											<option value="SH">Saint Helena</option>
-											<option value="KN">Saint Kitts and Nevis</option>
-											<option value="LC">Saint Lucia</option>
-											<option value="SX">Saint Martin (Dutch part)</option>
-											<option value="MF">Saint Martin (French part)</option>
-											<option value="PM">Saint Pierre and Miquelon</option>
-											<option value="VC">Saint Vincent and the Grenadines</option>
-											<option value="SM">San Marino</option>
-											<option value="SA">Saudi Arabia</option>
-											<option value="SN">Senegal</option>
-											<option value="RS">Serbia</option>
-											<option value="SC">Seychelles</option>
-											<option value="SL">Sierra Leone</option>
-											<option value="SG">Singapore</option>
-											<option value="SK">Slovakia</option>
-											<option value="SI">Slovenia</option>
-											<option value="SB">Solomon Islands</option>
-											<option value="SO">Somalia</option>
-											<option value="ZA">South Africa</option>
-											<option value="GS">South Georgia/Sandwich Islands</option>
-											<option value="KR">South Korea</option>
-											<option value="SS">South Sudan</option>
-											<option value="ES">Spain</option>
-											<option value="LK">Sri Lanka</option>
-											<option value="SD">Sudan</option>
-											<option value="SR">Suriname</option>
-											<option value="SJ">Svalbard and Jan Mayen</option>
-											<option value="SZ">Swaziland</option>
-											<option value="SE">Sweden</option>
-											<option value="CH">Switzerland</option>
-											<option value="SY">Syria</option>
-											<option value="TW">Taiwan</option>
-											<option value="TJ">Tajikistan</option>
-											<option value="TZ">Tanzania</option>
-											<option value="TH">Thailand</option>
-											<option value="TL">Timor-Leste</option>
-											<option value="TG">Togo</option>
-											<option value="TK">Tokelau</option>
-											<option value="TO">Tonga</option>
-											<option value="TT">Trinidad and Tobago</option>
-											<option value="TN">Tunisia</option>
-											<option value="TR">Turkey</option>
-											<option value="TM">Turkmenistan</option>
-											<option value="TC">Turks and Caicos Islands</option>
-											<option value="TV">Tuvalu</option>
-											<option value="UG">Uganda</option>
-											<option value="UA">Ukraine</option>
-											<option value="AE">United Arab Emirates</option>
-											<option value="GB" selected='selected'>United Kingdom (UK)</option>
-											<option value="US">United States (US)</option>
-											<option value="UY">Uruguay</option>
-											<option value="UZ">Uzbekistan</option>
-											<option value="VU">Vanuatu</option>
-											<option value="VA">Vatican</option>
-											<option value="VE">Venezuela</option>
-											<option value="VN">Vietnam</option>
-											<option value="WF">Wallis and Futuna</option>
-											<option value="EH">Western Sahara</option>
-											<option value="WS">Western Samoa</option>
-											<option value="YE">Yemen</option>
-											<option value="ZM">Zambia</option>
-											<option value="ZW">Zimbabwe</option>
-										</select>
-									</div>
-									<div class="col-6 form-group">
-										<label>Post Code:</label>
-										<input type="text" name="checkout-form-billing-post-code" id="checkout-form-billing-post-code" class="form-control required" value="{{ customer.address.postal_code }}">
-									</div>
+								</script>
+	
+								<div id='serviceErrors' class="style-msg errormsg">
+	
 								</div>
-							</div>
-						</form>
-
-
-						<div id='billingErrors' class="style-msg errormsg">
-
-							</div>
-						<div class="line"></div>
-						<a href="#" class="button button-3d nomargin tab-linker" rel="1">Previous</a>
-						<a href="#" id="selectBilling" class="button button-3d nomargin fright" >Complete Payment</a>
-						<button id="selectBillingButton" type="button" style="display: none;" class="tab-linker" rel="3"></button>
-
-						<script>
-							$('#selectBilling').click( function() {
-								// string to display errors
-								var errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Fill out the following field(s) and try submitting again:<ul class="ml-4">'
-								// bool to know whether to submit form
-								var errors = false
-								
-								// add each error to the error message
-								if ($('#checkout-form-billing-name').val() == '') {
-									errorsHtml += '<li>Name</li>'
-									errors = true
-								}
-								if ($('#checkout-form-billing-email').val() == '') {
-									errorsHtml += '<li>Email</li>'
-									errors = true
-								}
-								if ($('#checkout-form-billing-phone').val() == '') {
-									errorsHtml += '<li>Phone</li>'
-									errors = true
-								}
-								if ($('#checkout-form-billing-post-code').val() == '') {
-									errorsHtml += '<li>Post Code</li>'
-									errors = true
-								}
-								
-								errorsHtml += '</ul></div>'
-								
-								// display errors if there were any
-								if (errors) {
-									$('#billingErrors').html(errorsHtml);
-								}
-								// allow form to be submitted if there weren'y any errors
-								else {
-									$('#billingErrors').html('');
-									$.ajax({
-										url: "{% url 'order_billing' %}",
-										type: 'post',
-										dataType: 'text',
-										headers: {'X-CSRFToken': '{{ csrf_token }}'},
-										data: $('#billingForm').serialize(),
-										beforeSend: function() {
-											$('#billingSpinner').removeClass('d-none');
-											$('#billingSpinnerText').removeClass('d-none');
-											$('#billingForm').addClass('d-none');
-										},
-										success: function(data) {
-											$('#billingErrors').html('');
-											$('#selectBillingButton').click();
-											$('#billingSpinner').addClass('d-none');
-											$('#billingSpinnerText').addClass('d-none');
-											$('#billingForm').removeClass('d-none');
-										},
-										error: function(jqXHR, textStatus, errorThrown){
-											if (jqXHR.status == 403) {
-												location.reload()
-											}
-											else {
-												$('#billingLoader').addClass('d-none');
-												$('#billingForm').removeClass('d-none');
-												$('#billingErrors').html('<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Check your information and try submitting again.</div>');
-											}
-											console.log('jqXHR:');
-											console.log(jqXHR);
-											console.log('textStatus:');
-											console.log(textStatus);
-											console.log('errorThrown:');
-											console.log(errorThrown);
-										}
-									});
-								}
-							});
-						</script>
-					</div>
-					<div id="ptab3">
-						{% if user.is_superuser %}
-							<p>Card: 4000 0582 6000 0005</p>
-						{% endif %}
-						<div class="table pt-2">
-							<table class="table table-striped">
-								<thead>
-									<tr>
-										<th>Service</th>
-										<th>Increment</th>
-										<th>Total</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td id="service2">None selected</td>
-										<td id="increment2">None selected</td>
-										<td id="total2">£0.00</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<div class="line"></div>
-						<div class="col-lg-6 offset-lg-3">
-							<form id="payment-form">
-								<label>Card Holders Name:</label>
-								<input id="cardholder-name" type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}">
-								<!-- placeholder for Elements -->
-								<div id="card-element"></div>
-								<!-- Used to display Element errors. -->
-								<div id="card-errors" role="alert"></div>
-								<input type="hidden" id="attached_service_id" value="">
 							</form>
-							<div class="text-center">
-								<img class="mt-2" src="{% static 'cloud-lines/images/cards/1.png' %}" alt="Card" style="max-height:50px">
-								<img class="mt-2" src="{% static 'cloud-lines/images/cards/2.png' %}" alt="Card" style="max-height:50px">
-								<img class="mt-2" src="{% static 'cloud-lines/images/cards/22.png' %}" alt="Card" style="max-height:50px">
-							</div>
+							<button type="button" class="btn btn-primary forward-btn float-right" id="selectService" data-target="#ownerSection" data-validation="validateServicesAccordion">Owner</button>
 						</div>
-
-
-
-
-						<div class="line"></div>
-						<a href="#" class="button button-3d nomargin tab-linker" rel="2">Previous</a>
-						<a href="#" id="card-button" class="button button-3d nomargin fright" rel="4">Complete {% if upgrade %}Upgrade{% else %}Order{% endif %}</a>
-						<button id="selectCardButton" type="button" style="display: none;" class="tab-linker" rel="4"></button>
-
-						<script>
-							var stripe = Stripe('{{ public_api_key }}');
-							var elements = stripe.elements();
-
-							// Custom styling can be passed to options when creating an Element.
-							var style = {
-							  base: {
-								color: '#32325d',
-								fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-								fontSmoothing: 'antialiased',
-								fontSize: '16px',
-								'::placeholder': {
-								  color: '#aab7c4'
-								}
-							  },
-							  invalid: {
-								color: '#fa755a',
-								iconColor: '#fa755a'
-							  }
-							};
-
-							// Create an instance of the card Element.
-							var card = elements.create('card', {style: style});
-
-							// Add an instance of the card Element into the `card-element` <div>.
-							card.mount('#card-element');
-
-
-							card.addEventListener('change', function(event) {
-							  var displayError = document.getElementById('card-errors');
-							  if (event.error) {
-								displayError.textContent = event.error.message;
-							  } else {
-								displayError.textContent = '';
-							  }
-							});
-
-							// Create a token or display an error when the form is submitted.
-							var form = document.getElementById('payment-form');
-							var cardButton = document.getElementById('card-button');
-							cardButton.addEventListener('click', function(event) {
-							  	event.preventDefault();
-
-							  	stripe.createToken(card).then(function(result) {
-									if (result.error) {
-									  	// Inform the customer that there was an error.
-								  		var errorElement = document.getElementById('card-errors');
-								  		errorElement.textContent = result.error.message;
-									} else {
-										// switch to next step
-										$('#selectCardButton').click();
-
-								  		// Send the token to your server.
-								  		stripeTokenHandler(result.token);
-									}
-							  	});
-							});
-
-							function stripeTokenHandler(token) {
-
-							  	// Submit the token
-							  	$.ajax({
-									url: '{% url 'order_subscribe' %}',
-									type: 'post',
-									dataType: 'text',
-									headers: {'X-CSRFToken': '{{ csrf_token }}'},
-									data: {
-										'token': token,
-										'attached_service_id': $('#attached_service_id').val(),
-										'subdomain': $('#checkout-form-sub-domain').val(),
-										},
-									beforeSend: function() {
-										$('#spinner').removeClass("d-none");
-										$('#spinnerText').removeClass("d-none");
-										$('#paymentSuccess').addClass('d-none');
-										$('#paymentFail').addClass('d-none');
-									},
-									success: function(data) {
-										var result = JSON.parse(data);
-										$('#spinner').addClass('d-none');
-										$('#spinnerText').addClass('d-none');
-										if (result.result == 'fail') {
-											$('#paymentFail').removeClass('d-none');
-											$('#failedMessage').html(result.feedback);
-										} else {
-											$('#invoice').attr("href", result.invoice);
-											$('#receipt').attr("href", result.receipt);
-											$('#paymentSuccess').removeClass('d-none');
-											if (result.tier == 'large') {
-												$('#dashboardButton').addClass('d-none');
-												$('#buildStatus').removeClass('d-none');
-												updateBuildStatus(result.build_id);
-											} else {
-
-											}
-
-										}
-									 },
-									error: function(jqXHR, textStatus, errorThrown){
-										if (jqXHR.status == 403) {
-											location.reload()
-										}
-										console.log('jqXHR:');
-										console.log(jqXHR);
-										console.log('textStatus:');
-										console.log(textStatus);
-										console.log('errorThrown:');
-										console.log(errorThrown);
-									}
-								});
-
-								function updateBuildStatus(buildId) {
-								    // activate loading bar
-									$('#buildProgressDiv').removeClass('d-none');
-									setTimeout(function () {
-										$.ajax({
-											url: '{% url 'get_build_status' %}',
-											type: 'post',
-											dataType: 'text',
-											headers: {'X-CSRFToken': '{{ csrf_token }}'},
-											data: {'build_id': buildId},
-											beforeSend: function() {
-											},
-											success: function(data) {
-												try {
-													var result = JSON.parse(data);
-												}
-												catch(err) {
-												  // not started yet
-												  var result = '';
-												}
-
-												if (result.status != ''){
-													$('#buildStatusInitial').addClass('d-none');
-
-													if (result.status == 'complete'){
-														$('#buildMessage').removeClass('d-none');
-														$('#buildStatusNote').text('Your new Cloud-Lines instance will soon be ready to use. Please keep an eye on your email inbox, you should receive your activation email within 24 hours (usually much sooner).');
-													} else {
-														$('#buildStatusMsg').html('<span>Status:</span> ' + result.status);
-														$('#buildProgress').css('width', result.percent + "%");
-													}
-												} else {
-													$('#buildStatusMsg').html('<span>Status: </span> Waiting to start...');
-												}
-
-												updateBuildStatus(buildId);
-											},
-											error: function(){
-												updateBuildStatus(buildId);
-											}
-										});
-									}, 3000)
-								};
-							}
-						</script>
 					</div>
-					<div id="ptab4" align="center">
-						<div class="d-flex flex-column align-items-center justify-content-center ">
-							<div id="spinner" class="spinner-border text-info d-none" style="width: 6rem; height: 6rem;" role="status"></div>
-							<div id="spinnerText" class="row d-none">
-								<p><strong>Processing Payment</strong></p>
-							</div>
-						</div>
-						<div id="paymentSuccess" class="mt-2 d-none" >
-							<h2>Thank You.</h2>
-							<strong>Your order has been processed.</strong>
-
-							{% if not upgrade %}
-								<div class="title-block mt-3 text-left">
-									<h2 id="buildStatusMsg"></h2>
-									<span id="buildStatusNote">Note: You Cloud-Lines dashboard is now ready to use! Use the links below to get started.</span>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="ownerHeading">
+						<button class="accordion-button collapsed" type="button" data-bs-target="#ownerSection">
+							Owner Info
+						</button>
+					</h2>
+					<div id="ownerSection" class="accordion-collapse collapse" aria-labelledby="ownerHeading">
+						<div class="accordion-body">
+							<p>Please enter the account owner information.</p>
+							<form id="ownerForm" name="ownerForm">
+								<div class="col-lg-12">
+									<div class="row form-owner">
+										<div class="col-6 form-group">
+											<label>First Name:</label>
+											<input type="text" name="checkout-form-owner-first-name" id="checkout-form-owner-first-name" class="form-control required" value="{{ user.first_name }}" required>
+										</div>
+										<div class="col-6 form-group">
+											<label>Second Name:</label>
+											<input type="text" name="checkout-form-owner-second-name" id="checkout-form-owner-second-name" class="form-control required" value="{{ user.last_name }}" required>
+										</div>
+										<div class="col-6 form-group">
+											<label>Email:</label>
+											<input type="email" name="checkout-form-owner-email" id="checkout-form-owner-email" class="form-control required" value="{{ user.email }}" required>
+										</div>
+										<div class="col-6 form-group">
+											<label>Phone:</label><br>
+											<input type="text" name="checkout-form-owner-phone" id="checkout-form-owner-phone" class="form-control required" value="{{ user_detail.phone }}" required>
+										</div>
+										<div class="col-6 form-group">
+											<label>Country:</label>
+											<select class="form-control required" name="checkout-form-owner-country" id="checkout-form-owner-country">
+												<option value="AX">&#197;land Islands</option>
+												<option value="AF">Afghanistan</option>
+												<option value="AL">Albania</option>
+												<option value="DZ">Algeria</option>
+												<option value="AD">Andorra</option>
+												<option value="AO">Angola</option>
+												<option value="AI">Anguilla</option>
+												<option value="AQ">Antarctica</option>
+												<option value="AG">Antigua and Barbuda</option>
+												<option value="AR">Argentina</option>
+												<option value="AM">Armenia</option>
+												<option value="AW">Aruba</option>
+												<option value="AU">Australia</option>
+												<option value="AT">Austria</option>
+												<option value="AZ">Azerbaijan</option>
+												<option value="BS">Bahamas</option>
+												<option value="BH">Bahrain</option>
+												<option value="BD">Bangladesh</option>
+												<option value="BB">Barbados</option>
+												<option value="BY">Belarus</option>
+												<option value="PW">Belau</option>
+												<option value="BE">Belgium</option>
+												<option value="BZ">Belize</option>
+												<option value="BJ">Benin</option>
+												<option value="BM">Bermuda</option>
+												<option value="BT">Bhutan</option>
+												<option value="BO">Bolivia</option>
+												<option value="BQ">Bonaire, Saint Eustatius and Saba</option>
+												<option value="BA">Bosnia and Herzegovina</option>
+												<option value="BW">Botswana</option>
+												<option value="BV">Bouvet Island</option>
+												<option value="BR">Brazil</option>
+												<option value="IO">British Indian Ocean Territory</option>
+												<option value="VG">British Virgin Islands</option>
+												<option value="BN">Brunei</option>
+												<option value="BG">Bulgaria</option>
+												<option value="BF">Burkina Faso</option>
+												<option value="BI">Burundi</option>
+												<option value="KH">Cambodia</option>
+												<option value="CM">Cameroon</option>
+												<option value="CA">Canada</option>
+												<option value="CV">Cape Verde</option>
+												<option value="KY">Cayman Islands</option>
+												<option value="CF">Central African Republic</option>
+												<option value="TD">Chad</option>
+												<option value="CL">Chile</option>
+												<option value="CN">China</option>
+												<option value="CX">Christmas Island</option>
+												<option value="CC">Cocos (Keeling) Islands</option>
+												<option value="CO">Colombia</option>
+												<option value="KM">Comoros</option>
+												<option value="CG">Congo (Brazzaville)</option>
+												<option value="CD">Congo (Kinshasa)</option>
+												<option value="CK">Cook Islands</option>
+												<option value="CR">Costa Rica</option>
+												<option value="HR">Croatia</option>
+												<option value="CU">Cuba</option>
+												<option value="CW">Cura&Ccedil;ao</option>
+												<option value="CY">Cyprus</option>
+												<option value="CZ">Czech Republic</option>
+												<option value="DK">Denmark</option>
+												<option value="DJ">Djibouti</option>
+												<option value="DM">Dominica</option>
+												<option value="DO">Dominican Republic</option>
+												<option value="EC">Ecuador</option>
+												<option value="EG">Egypt</option>
+												<option value="SV">El Salvador</option>
+												<option value="GQ">Equatorial Guinea</option>
+												<option value="ER">Eritrea</option>
+												<option value="EE">Estonia</option>
+												<option value="ET">Ethiopia</option>
+												<option value="FK">Falkland Islands</option>
+												<option value="FO">Faroe Islands</option>
+												<option value="FJ">Fiji</option>
+												<option value="FI">Finland</option>
+												<option value="FR">France</option>
+												<option value="GF">French Guiana</option>
+												<option value="PF">French Polynesia</option>
+												<option value="TF">French Southern Territories</option>
+												<option value="GA">Gabon</option>
+												<option value="GM">Gambia</option>
+												<option value="GE">Georgia</option>
+												<option value="DE">Germany</option>
+												<option value="GH">Ghana</option>
+												<option value="GI">Gibraltar</option>
+												<option value="GR">Greece</option>
+												<option value="GL">Greenland</option>
+												<option value="GD">Grenada</option>
+												<option value="GP">Guadeloupe</option>
+												<option value="GT">Guatemala</option>
+												<option value="GG">Guernsey</option>
+												<option value="GN">Guinea</option>
+												<option value="GW">Guinea-Bissau</option>
+												<option value="GY">Guyana</option>
+												<option value="HT">Haiti</option>
+												<option value="HM">Heard Island and McDonald Islands</option>
+												<option value="HN">Honduras</option>
+												<option value="HK">Hong Kong</option>
+												<option value="HU">Hungary</option>
+												<option value="IS">Iceland</option>
+												<option value="IN">India</option>
+												<option value="ID">Indonesia</option>
+												<option value="IR">Iran</option>
+												<option value="IQ">Iraq</option>
+												<option value="IM">Isle of Man</option>
+												<option value="IL">Israel</option>
+												<option value="IT">Italy</option>
+												<option value="CI">Ivory Coast</option>
+												<option value="JM">Jamaica</option>
+												<option value="JP">Japan</option>
+												<option value="JE">Jersey</option>
+												<option value="JO">Jordan</option>
+												<option value="KZ">Kazakhstan</option>
+												<option value="KE">Kenya</option>
+												<option value="KI">Kiribati</option>
+												<option value="KW">Kuwait</option>
+												<option value="KG">Kyrgyzstan</option>
+												<option value="LA">Laos</option>
+												<option value="LV">Latvia</option>
+												<option value="LB">Lebanon</option>
+												<option value="LS">Lesotho</option>
+												<option value="LR">Liberia</option>
+												<option value="LY">Libya</option>
+												<option value="LI">Liechtenstein</option>
+												<option value="LT">Lithuania</option>
+												<option value="LU">Luxembourg</option>
+												<option value="MO">Macao S.A.R., China</option>
+												<option value="MK">Macedonia</option>
+												<option value="MG">Madagascar</option>
+												<option value="MW">Malawi</option>
+												<option value="MY">Malaysia</option>
+												<option value="MV">Maldives</option>
+												<option value="ML">Mali</option>
+												<option value="MT">Malta</option>
+												<option value="MH">Marshall Islands</option>
+												<option value="MQ">Martinique</option>
+												<option value="MR">Mauritania</option>
+												<option value="MU">Mauritius</option>
+												<option value="YT">Mayotte</option>
+												<option value="MX">Mexico</option>
+												<option value="FM">Micronesia</option>
+												<option value="MD">Moldova</option>
+												<option value="MC">Monaco</option>
+												<option value="MN">Mongolia</option>
+												<option value="ME">Montenegro</option>
+												<option value="MS">Montserrat</option>
+												<option value="MA">Morocco</option>
+												<option value="MZ">Mozambique</option>
+												<option value="MM">Myanmar</option>
+												<option value="NA">Namibia</option>
+												<option value="NR">Nauru</option>
+												<option value="NP">Nepal</option>
+												<option value="NL">Netherlands</option>
+												<option value="AN">Netherlands Antilles</option>
+												<option value="NC">New Caledonia</option>
+												<option value="NZ">New Zealand</option>
+												<option value="NI">Nicaragua</option>
+												<option value="NE">Niger</option>
+												<option value="NG">Nigeria</option>
+												<option value="NU">Niue</option>
+												<option value="NF">Norfolk Island</option>
+												<option value="KP">North Korea</option>
+												<option value="NO">Norway</option>
+												<option value="OM">Oman</option>
+												<option value="PK">Pakistan</option>
+												<option value="PS">Palestinian Territory</option>
+												<option value="PA">Panama</option>
+												<option value="PG">Papua New Guinea</option>
+												<option value="PY">Paraguay</option>
+												<option value="PE">Peru</option>
+												<option value="PH">Philippines</option>
+												<option value="PN">Pitcairn</option>
+												<option value="PL">Poland</option>
+												<option value="PT">Portugal</option>
+												<option value="QA">Qatar</option>
+												<option value="IE">Republic of Ireland</option>
+												<option value="RE">Reunion</option>
+												<option value="RO">Romania</option>
+												<option value="RU">Russia</option>
+												<option value="RW">Rwanda</option>
+												<option value="ST">S&atilde;o Tom&eacute; and Pr&iacute;ncipe</option>
+												<option value="BL">Saint Barth&eacute;lemy</option>
+												<option value="SH">Saint Helena</option>
+												<option value="KN">Saint Kitts and Nevis</option>
+												<option value="LC">Saint Lucia</option>
+												<option value="SX">Saint Martin (Dutch part)</option>
+												<option value="MF">Saint Martin (French part)</option>
+												<option value="PM">Saint Pierre and Miquelon</option>
+												<option value="VC">Saint Vincent and the Grenadines</option>
+												<option value="SM">San Marino</option>
+												<option value="SA">Saudi Arabia</option>
+												<option value="SN">Senegal</option>
+												<option value="RS">Serbia</option>
+												<option value="SC">Seychelles</option>
+												<option value="SL">Sierra Leone</option>
+												<option value="SG">Singapore</option>
+												<option value="SK">Slovakia</option>
+												<option value="SI">Slovenia</option>
+												<option value="SB">Solomon Islands</option>
+												<option value="SO">Somalia</option>
+												<option value="ZA">South Africa</option>
+												<option value="GS">South Georgia/Sandwich Islands</option>
+												<option value="KR">South Korea</option>
+												<option value="SS">South Sudan</option>
+												<option value="ES">Spain</option>
+												<option value="LK">Sri Lanka</option>
+												<option value="SD">Sudan</option>
+												<option value="SR">Suriname</option>
+												<option value="SJ">Svalbard and Jan Mayen</option>
+												<option value="SZ">Swaziland</option>
+												<option value="SE">Sweden</option>
+												<option value="CH">Switzerland</option>
+												<option value="SY">Syria</option>
+												<option value="TW">Taiwan</option>
+												<option value="TJ">Tajikistan</option>
+												<option value="TZ">Tanzania</option>
+												<option value="TH">Thailand</option>
+												<option value="TL">Timor-Leste</option>
+												<option value="TG">Togo</option>
+												<option value="TK">Tokelau</option>
+												<option value="TO">Tonga</option>
+												<option value="TT">Trinidad and Tobago</option>
+												<option value="TN">Tunisia</option>
+												<option value="TR">Turkey</option>
+												<option value="TM">Turkmenistan</option>
+												<option value="TC">Turks and Caicos Islands</option>
+												<option value="TV">Tuvalu</option>
+												<option value="UG">Uganda</option>
+												<option value="UA">Ukraine</option>
+												<option value="AE">United Arab Emirates</option>
+												<option value="GB" selected='selected'>United Kingdom (UK)</option>
+												<option value="US">United States (US)</option>
+												<option value="UY">Uruguay</option>
+												<option value="UZ">Uzbekistan</option>
+												<option value="VU">Vanuatu</option>
+												<option value="VA">Vatican</option>
+												<option value="VE">Venezuela</option>
+												<option value="VN">Vietnam</option>
+												<option value="WF">Wallis and Futuna</option>
+												<option value="EH">Western Sahara</option>
+												<option value="WS">Western Samoa</option>
+												<option value="YE">Yemen</option>
+												<option value="ZM">Zambia</option>
+												<option value="ZW">Zimbabwe</option>
+												
+											</select>
+										</div>
+										<div class="col-6 form-group">
+											<label>Post Code:</label>
+											<input type="text" name="checkout-form-owner-post-code" id="checkout-form-owner-post-code" class="form-control required" value="{{ customer.address.postal_code }}">
+										</div>
+									</div>
 								</div>
-								<div id="buildMessage" class="mt-1 d-none">
-									<p><code>Please allow 24 hours (normally only 20 minutes) for your bespoke address to start working.</code></p>
-								</div>
-								<div id="buildProgressDiv" class="progress active mt-2 d-none">
-									<div id="buildProgress" class="progress-bar progress-bar-striped progress-bar-animated" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%; height:20px; background-color:#1ABC9C !important" role="progressbar"></div>
-								</div>
-							{% else %}
-								<div>
-									<a href="{% url 'dashboard' %}" class="button button-desc button-3d button-rounded button-teal center mt-5">Dashboard<span>Click here to go to your new dashboard!</span></a>
-								</div>
-							{% endif %}
-
-
-
-							<div id="dashboardButton">
-								<a href="{% url 'dashboard' %}" class="button button-desc button-3d button-rounded button-teal center mt-5">Dashboard<span>Click here to go to your new dashboard!</span></a>
-							</div>
-							<a href="#" id="invoice" target="_blank" class="button button-border button-border-thin button-aqua"><i class="icon-file-invoice"></i>Invoice <i class="icon-external-link"></i></a>
-							<a href="#" id="receipt" target="_blank" class="button button-border button-border-thin button-aqua"><i class="icon-receipt"></i>Receipt <i class="icon-external-link"></i></a>
-						</div>
-						<div id="paymentFail" class="alert alert-danger mt-2 d-none">
-							<h4>Oh No!</h4>
-							<div id="failedMessage">
-
-							</div>
+							</form>
+							<div id='ownerErrors' class="style-msg errormsg"></div>
+							<button type="button" class="btn btn-secondary back-btn" data-target="#serviceSection">Back</button>
+							<button type="button" class="btn btn-primary forward-btn" data-target="#paymentSection" id="submitBtn">Submit</button>
+						
 						</div>
 					</div>
 				</div>
 			</div>
+
+			<script>
+				const clearErrors = (elementId) => {
+					document.querySelector(elementId).innerHTML = '';
+				};
+
+				const validateServicesAccordion = () => {
+  					clearErrors('#serviceErrors');
+					let errors = false;
+					const REQUIRED_SERVICES = ['20.00', '40.00', '60.00'];
+					let errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Correct the following field(s) and try submitting again:<ul class="ml-4">';
+
+					function checkRequiredField(id, errorMessage) {
+						if ($(id).val() === 'None') {
+						errorsHtml += `<li>${errorMessage} - this field is required</li>`;
+						errors = true;
+						}
+					}
+
+					function checkSubDomain() {
+						const subDomain = $('#checkout-form-sub-domain').val();
+						if (subDomain === '') {
+						errorsHtml += '<li>Domain Prefix - this field is required with the selected service</li>';
+						errors = true;
+						} else {
+						if (subDomain.length > 238) {
+							errorsHtml += '<li>Domain Prefix - this has a maximum length of 238 characters</li>';
+							errors = true;
+						}
+						subDomain.split('.').forEach(label => {
+							if (label.length > 63) {
+							errorsHtml += '<li>Domain Prefix - each label (separated by a full stop) has a maximum length of 63 characters</li>';
+							errors = true;
+							}
+						});
+						}
+					}
+
+					checkRequiredField('#checkout-form-service', 'Service');
+					checkRequiredField('#checkout-form-payment-inc', 'Payment Increment');
+
+					if (REQUIRED_SERVICES.includes($('#checkout-form-service').val())) {
+						checkSubDomain();
+					}
+
+					errorsHtml += '</ul></div>';
+
+					if (errors) {
+						$('#serviceErrors').html(errorsHtml);
+					}
+					return !errors;  // Returns true if no errors
+				}
+				window.validateServicesAccordion = validateServicesAccordion;
+
+				const validateOwnerAccordion = () => {
+  					clearErrors('#ownerErrors');
+					let errors = false;
+					let errorsHtml = '<div class="sb-msg"><i class="icon-remove"></i><strong>Oh snap!</strong> Correct the following field(s) and try submitting again:<ul class="ml-4">';
+
+						function checkRequiredField(id, errorMessage, isNameField = false) {
+							const fieldValue = $(id).val().trim(); // Trim the value
+
+							if (fieldValue === '' || fieldValue === 'None') {
+								errorsHtml += `<li>${errorMessage} - this field is required</li>`;
+								errors = true;
+							} else if (isNameField && fieldValue.length < 1) {
+								errorsHtml += `<li>${errorMessage} - must contain at least one character</li>`;
+								errors = true;
+							}
+						}
+
+
+					function checkEmailField(id, errorMessage) {
+						const emailVal = $(id).val();
+						const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+						if (!emailPattern.test(emailVal)) {
+						errorsHtml += `<li>${errorMessage} - enter a valid email</li>`;
+						errors = true;
+						}
+					}
+
+					checkRequiredField('#checkout-form-owner-first-name', 'Name');
+					checkRequiredField('#checkout-form-owner-second-name', 'Name');
+					checkEmailField('#checkout-form-owner-email', 'Email');
+					checkRequiredField('#checkout-form-owner-phone', 'Phone');
+					checkRequiredField('#checkout-form-owner-country', 'Country');
+					checkRequiredField('#checkout-form-owner-post-code', 'Post Code');
+
+					errorsHtml += '</ul></div>';
+
+					if (errors) {
+						$('#ownerErrors').html(errorsHtml);
+					}
+
+					return !errors;  // Returns true if no errors
+				}
+				window.validateOwnerAccordion = validateOwnerAccordion;
+
+				// forward and back button handling
+				document.addEventListener("DOMContentLoaded", function() {
+					const forwardBtns = document.querySelectorAll('.forward-btn');
+					const backBtns = document.querySelectorAll('.back-btn');
+
+					const toggleAccordion = (targetId) => {
+						// Close all open accordion items and unhighlight headers
+						document.querySelectorAll('.accordion-collapse.show').forEach((element) => {
+							element.classList.remove('show');
+							element.previousElementSibling.querySelector('.accordion-button').classList.add('collapsed');
+						});
+
+						// Open the target accordion item and highlight header
+						const targetElement = document.querySelector(targetId);
+						if (targetElement) {
+							targetElement.classList.add('show');
+							targetElement.previousElementSibling.querySelector('.accordion-button').classList.remove('collapsed');
+						}
+					};
+
+					forwardBtns.forEach((btn) => {
+						btn.addEventListener('click', function() {
+							const validationFunctionName = this.getAttribute('data-validation');
+							
+							// Initialize to false, assume there are errors unless proven otherwise
+							let formIsValid = false;  
+
+							if (typeof window[validationFunctionName] === 'function') {
+							formIsValid = window[validationFunctionName]();
+							} else {
+							console.log('No validation function exists');
+							}
+
+							if (formIsValid) {
+							const targetId = this.getAttribute('data-target');
+							toggleAccordion(targetId);
+							}
+						});
+					});
+
+					backBtns.forEach((btn) => {
+						btn.addEventListener('click', function() {
+							const targetId = this.getAttribute('data-target');
+							toggleAccordion(targetId);
+						});
+					});
+
+					function getCookie(name) {
+						let cookieValue = null;
+						if (document.cookie && document.cookie !== '') {
+							const cookies = document.cookie.split(';');
+							for (let i = 0; i < cookies.length; i++) {
+							const cookie = cookies[i].trim();
+							if (cookie.substring(0, name.length + 1) === (name + '=')) {
+								cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+								break;
+							}
+							}
+						}
+						return cookieValue;
+					}
+
+
+					// submit form
+					const submitBtn = document.getElementById('submitBtn');
+
+					submitBtn.addEventListener('click', function() {
+						const ownerFormIsValid = validateOwnerAccordion();
+						const servicesFormIsValid = validateServicesAccordion();
+						
+						const allFormsValid = ownerFormIsValid && servicesFormIsValid;
+						
+						if (!allFormsValid) {
+							console.log('errors in the form');
+							return;
+						}
+
+						// Prepare data
+						const serviceForm = new FormData(document.querySelector('#serviceForm'));
+						const ownerForm = new FormData(document.querySelector('#ownerForm'));
+
+						const mergedData = {};
+						
+						for (let [key, value] of serviceForm.entries()) { mergedData[key] = value; }
+						for (let [key, value] of ownerForm.entries()) { mergedData[key] = value; }
+
+						// Fetch the CSRF token
+						const csrfToken = getCookie('csrftoken');
+
+						// Send data to Django backend via AJAX
+						fetch("{% url 'order_subscribe' %}", {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': getCookie('csrftoken') // make sure you have a getCookie function
+							},
+							body: JSON.stringify(mergedData),
+						})
+						.then(response => {
+							if (!response.ok) {
+								return response.text().then(text => {
+									throw new Error(`Server returned ${response.status}: ${text}`);
+								});
+							}
+							return response.json();
+						})
+						.then(data => {
+							if (data.success) {
+								window.location.href = data.url;  // Redirecting to Stripe
+							} else {
+								alert('Failed to submit. Please try again.');
+							}
+						})
+						.catch(error => {
+							alert(`Something went wrong: ${error.message}`);
+						});
+					});
+
+				});
+			</script>
 
 			<div class="clear"></div>
 
 			<div class="divider divider-center"><i class="icon-cloud"></i></div>
 		</div>
 
-
-
-	<script>
-		$(function() {
-			$( "#processTabs" ).tabs({ show: { effect: "fade", duration: 400 } });
-			$( ".tab-linker" ).click(function() {
-				$( "#processTabs" ).tabs("option", "active", $(this).attr('rel') - 1);
-				return false;
-			});
-		});
-	</script>
 	<script>
 		var url_string = window.location.href;
 		var url = new URL(url_string);

@@ -44,7 +44,7 @@
                 {% include 'upgrade_modal.html' with type='pedigrees' %}
                 <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
             {% endif %}
-            {% if service.pedigree_charging %}
+            {% if editor and service.pedigree_charging %}
                 {% if not account_link %}
                     <a href="{% url 'pedigree_payment_settings' %}">
                         <button class="btn btn-info float-right mr-2"><i class="fad fa-cog"></i> Settings</button>
@@ -55,7 +55,7 @@
                         <button class="btn btn-warning float-right mr-2"><i class="fad fa-cog"></i> Stripe</button>
                     </a>
                 {% endif %}
-                {% if account_link_setup %}
+                {% if editor and account_link_setup %}
                     <a href="{{ account_link_setup.url }}">
                         <button type="button" class="btn btn-success float-right mr-2">
                             Setup Stripe Account
