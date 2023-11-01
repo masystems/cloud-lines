@@ -424,7 +424,7 @@ def order_subscribe(request):
             )
             customer_id = customer['id']
             # update user datail
-            user_detail.update(stripe_id=customer_id)
+            UserDetail.objects.filter(id=user_detail.id).update(stripe_id=customer_id)
         else:
             customer = stripe.Customer.modify(
                 user_detail.stripe_id,
