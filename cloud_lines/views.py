@@ -408,7 +408,7 @@ def order_subscribe(request):
                                                                                 'active': False})
         user_detail.current_service = attached_service
         user_detail.save()
-        
+
         # stripe bit
         if not user_detail.stripe_id:
             # create stripe user
@@ -475,7 +475,7 @@ def order_success(request, attached_service_id):
 
     try:
         session = stripe.checkout.Session.retrieve(
-            attached_service.stripe_payment_token, 
+            attached_service.stripe_payment_token,
         )
     except stripe.error.StripeError as e:
         # Handle error
@@ -484,6 +484,7 @@ def order_success(request, attached_service_id):
     if session.payment_status == 'paid':
         # Session was successful
         # update the users attached service to be active
+        attached_service.subscription_id = session.get("subscription", None)
         attached_service.active = True
         attached_service.save()
 
@@ -492,10 +493,10 @@ def order_success(request, attached_service_id):
             body = """
                 Congratulations on purchasing a new Cloudlines {} service!
                 Your new service is building now. We will send you another email once it's built and ready to access.
-                
+
                 Remember you can always use the in built feature to import any existing data but if you would prefer you can
                 <a href="https://cloud-lines.com/contact">Contact us</a> and we'd be happy to help.
-                
+
             """.format(attached_service.service.service_name, )
         else:
             body = """
@@ -508,7 +509,7 @@ def order_success(request, attached_service_id):
             send_mail('New subscription!', request.user, body, reply_to=attached_service.user.user.email)
         except Exception as err:
             print(err)
-        
+
         # start build
         if attached_service.service.service_name in large_tier:
             queue_item = LargeTierQueue.objects.create(subdomain=attached_service.domain, user=attached_service.user.user, user_detail=attached_service.user, attached_service=attached_service)
