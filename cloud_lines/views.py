@@ -20,6 +20,7 @@ from breed.models import Breed
 from breeder.models import Breeder
 from breed_group.models import BreedGroup
 from django.db.models import Q
+from urllib.parse import urlparse
 from re import match
 import requests
 
@@ -385,7 +386,7 @@ def order_subscribe(request):
             domain = 'https://{}.cloud-lines.com'.format(data['checkout-form-sub-domain'])
         else:
             domain = ''
-        
+
         # get or create user
         user, created = User.objects.get_or_create(email=data['checkout-form-owner-email'],
                                                    defaults={
@@ -512,7 +513,10 @@ def order_success(request, attached_service_id):
 
         # start build
         if attached_service.service.service_name in large_tier:
-            queue_item = LargeTierQueue.objects.create(subdomain=attached_service.domain, user=attached_service.user.user, user_detail=attached_service.user, attached_service=attached_service)
+            parsed_uri = urlparse(attached_service.domain)
+            domain_parts = parsed_uri.netloc.split('.')
+            sub_domain = domain_parts[0] if len(domain_parts) > 2 else None
+            queue_item = LargeTierQueue.objects.create(subdomain=sub_domain, user=attached_service.user.user, user_detail=attached_service.user, attached_service=attached_service)
 
             token_res = requests.post(url=f'{settings.ORCH_URL}/api-token-auth/',
                                       data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
