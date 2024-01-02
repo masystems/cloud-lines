@@ -17,5 +17,7 @@ urlpatterns = [
     path('get-ta-pedigrees/<str:sex>/<str:state>/<str:avoid>', tabledata.get_ta_pedigrees, name="get_ta_pedigrees"),
     path('pedigree_payment_settings', pedigree_charging.PedigreePaymentSettings.as_view(), name="pedigree_payment_settings"),
     path('pedigree_price_edit', pedigree_charging.pedigree_price_edit, name="pedigree_price_edit"),
-    path('pedigree_paid/<int:id>', pedigree_charging.pedigree_paid, name="pedigree_paid"),
+    path('pedigree_checkout/<int:id>/<str:price>', views.pedigree_checkout, name="pedigree_checkout"),
+    path('pedigree_checkout_session/<int:id>/<str:price>', pedigree_charging.pedigree_charging_session, name="pedigree_charging_session"),
+    path('pedigree_paid', pedigree_charging.pedigree_paid, name="pedigree_paid"),
 ]

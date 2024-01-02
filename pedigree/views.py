@@ -23,11 +23,12 @@ from .pedigree_charging import pedigree_charging_session,\
     get_pedigree_payment_session
 from django.db.models import Q
 import json
+from account.models import StripeAccount
 from account.views import is_editor,\
     get_main_account,\
     has_permission,\
     redirect_2_login,\
-    get_stripe_secret_key,\
+    get_stripe_public_key,\
     get_stripe_connected_account_links
 from approvals.models import Approval
 import dateutil.parser
@@ -516,7 +517,9 @@ def new_pedigree_form(request):
 
             # redirect for charging
             if attached_service.pedigree_charging and request.user in attached_service.contributors.all():
-                session_url = pedigree_charging_session(request, new_pedigree, pedigree_form['registration_charge'].value())
+                #session_url = pedigree_charging_session(request, new_pedigree, pedigree_form['registration_charge'].value())
+                session_url = f'/pedigree/pedigree_checkout/{new_pedigree.id}/{pedigree_form["registration_charge"].value()}'
+                
                 return HttpResponse(json.dumps({'result': 'payment_redirect', 'url': session_url}))
             else:
                 new_pedigree.paid = True
@@ -926,6 +929,17 @@ def add_existing_parent(request, pedigree_id):
         pedigree.save()
 
     return HttpResponse(json.dumps({'success': True}))
+
+
+@login_required(login_url="/account/login")
+def pedigree_checkout(request, id, price):
+    # id = pedigree DB ID
+    pedigree = Pedigree.objects.get(id=id)
+    stripe_account = StripeAccount.objects.get(account=pedigree.account)
+    return render(request, 'pedigree_checkout.html', {'pedigree': pedigree,
+                                                      'price': price,
+                                                      'stripe_pk': get_stripe_public_key(request),
+                                                      'connect_account_id': stripe_account.stripe_acct_id})
 
 
 def create_approval(request, pedigree, attached_service, state, type):
