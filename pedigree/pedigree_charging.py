@@ -1,4 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
@@ -110,11 +112,13 @@ def pedigree_price_edit(request):
     return HttpResponse(json.dumps({'result': 'success'}))
 
 
-def pedigree_charging_session(request, pedigree, price):
+@csrf_exempt
+def pedigree_charging_session(request, id, price):
     stripe.api_key = get_stripe_secret_key(request)
     attached_service = get_main_account(request.user)
     stripe_account = StripeAccount.objects.get(account=attached_service)
     user_detail = UserDetail.objects.get(user=request.user)
+    pedigree = Pedigree.objects.get(id=id)
 
     # get or create customer
     if not user_detail.bn_stripe_id:
@@ -129,6 +133,7 @@ def pedigree_charging_session(request, pedigree, price):
 
     # create session
     session = stripe.checkout.Session.create(
+        ui_mode='embedded',
         payment_method_types=['card'],
         line_items=[
             {
@@ -136,20 +141,27 @@ def pedigree_charging_session(request, pedigree, price):
                 "quantity": 1,
             },
         ],
+        metadata={'Pedigree ID': pedigree.id,
+                  'Registration Number': pedigree.reg_no},
         mode='payment',
         customer=customer.id,
-        success_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/pedigree/pedigree_paid/{pedigree.id}",
-        cancel_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/pedigree/search",
+        return_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/pedigree/pedigree_paid" + f"?id={pedigree.id}&" + "session_id={CHECKOUT_SESSION_ID}",
         stripe_account=stripe_account.stripe_acct_id,
     )
-    pedigree.stripe_payment_token = session['id']
-    pedigree.save()
-    return session.url
+
+    return JsonResponse({'clientSecret': session.client_secret})
 
 
-def pedigree_paid(request, id):
-    Pedigree.objects.filter(id=id).update(paid=True)
-    return redirect('pedigree', id)
+def pedigree_paid(request):
+    stripe.api_key = get_stripe_secret_key(request)
+    attached_service = get_main_account(request.user)
+    stripe_account = StripeAccount.objects.get(account=attached_service)
+    session = stripe.checkout.Session.retrieve(request.GET.get('session_id', ''),
+                                               stripe_account=stripe_account.stripe_acct_id)
+    if session.payment_status == 'paid':
+        Pedigree.objects.filter(id=request.GET.get('id', '')).update(paid=True, 
+                                                                     stripe_payment_token=request.GET.get('session_id', ''))
+    return redirect('pedigree', request.GET.get('id', ''))
 
 
 def decline_pedigree(request, reg_no):

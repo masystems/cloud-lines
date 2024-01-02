@@ -65,6 +65,7 @@
                                 <th data-type="text">Edited By</th>
                                 <th data-type="text">Section</th>
                                 <th data-type="text">Change Type</th>
+                                <th data-type="text">Date/Time</th>
                                 {% if service.pedigree_charging %}
                                     <th data-type="text">Paid</th>
                                     <th data-type="text">Charge</th>
@@ -95,18 +96,18 @@
 
                                 <td>{{ approval.type|title }}</td>
 
+                                <td>{{ approval.date_created }}</td>
+
                                 {% if service.pedigree_charging and approval.pedigree %}
                                     <td>
-                                        {% if approval.pedigree.stripe_payment_token %}
-                                            {% if approval.pedigree.paid %}
-                                                Paid
-                                            {% else %}
-                                                <strong class="text-danger">Failed</strong>
-                                            {% endif %}
+                                        {% if approval.pedigree.paid %}
+                                            Paid
+                                        {% else %}
+                                            <strong class="text-danger">Failed</strong>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if approval.pedigree.stripe_payment_token %}
+                                        {% if service.pedigree_charging %}
                                             {% for app, charge in charging_data.items %}
                                                 {% if app == approval.id %}
                                                     £{{ charge|price }}
