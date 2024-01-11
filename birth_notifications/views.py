@@ -279,29 +279,9 @@ def birth_notification_form(request):
             else:
                 customer = stripe.Customer.retrieve(user_detail.bn_stripe_id,
                                                     stripe_account=bn_stripe_account.stripe_acct_id)
+            # redirect to bn payment page
+            return redirect('bn_checkout', new_bn.id, bn_stripe_account.bn_cost_id, bn_stripe_account.bn_child_cost_id, birth_line)
 
-            # create session
-            session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=[
-                    {
-                        "price": bn_stripe_account.bn_cost_id,
-                        "quantity": 1,
-                    },
-                    {
-                        "price": bn_stripe_account.bn_child_cost_id,
-                        "quantity": birth_line,
-                    },
-                ],
-                mode='payment',
-                customer=customer.id,
-                success_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/birth_notification_paid/{new_bn.id}",
-                cancel_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification",
-                stripe_account=bn_stripe_account.stripe_acct_id,
-            )
-            new_bn.stripe_payment_token = session['id']
-            new_bn.save()
-            return redirect(session.url, code=303)
         else:
             # payment required, set paid to true to ensure visibility
             new_bn.paid = True
@@ -339,6 +319,19 @@ def birth_notification_form(request):
                                                             'bn_stripe_account': bn_stripe_account,
                                                             'bn_cost': bn_cost,
                                                             'bn_child_cost': bn_child_cost})
+
+
+@login_required(login_url="/account/login")
+def bn_checkout(request, id, bn_cost_id, bn_child_cost_id, no_of_child):
+    attached_service = get_main_account(request.user)
+    stripe_account = StripeAccount.objects.get(account=attached_service)
+    return render(request, 'bn_checkout.html', {'bn_id': id,
+                                                'bn_cost_id': bn_cost_id,
+                                                'bn_child_cost_id': bn_child_cost_id,
+                                                'no_of_child': no_of_child,
+                                                'stripe_pk': get_stripe_public_key(request),
+                                                'connect_account_id': stripe_account.stripe_acct_id})
+
 
 @login_required(login_url="/account/login")
 def birth_notification_paid(request, id):
