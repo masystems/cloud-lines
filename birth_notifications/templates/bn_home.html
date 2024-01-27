@@ -193,18 +193,15 @@
             </div>
 
             <div class="col-md-4 col-lg-4 col-xlg-4">
-                {% if account_link_setup %}
+                {% if editor and service.pedigree_charging and not local_stripe_account.stripe_acct_id %}
                     <div class="alert alert-success" role="alert">
                         <strong>Accept payments?</strong> Please head to Stripe to set up your account details.
+                        {% include 'setup_stripe_account.html' %}
                     </div>
 
-                    <a href="{{ account_link_setup.url }}">
-                        <button type="button" class="btn btn-success mb-2" style="width: 100%">
-                            Setup Stripe Account
-                        </button>
-                    </a>
-                {% elif account_link %}
-                    <a href="{{ account_link.url }}">
+                    
+                {% elif editor and edit_account %}
+                    <a href="{{ edit_account.url }}">
                         <button type="button" class="btn btn-warning mb-2" style="width: 100%">
                             Go To Stripe Account
                         </button>

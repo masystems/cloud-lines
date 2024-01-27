@@ -11,10 +11,11 @@ from account.views import is_editor,\
     has_permission,\
     redirect_2_login,\
     get_stripe_secret_key,\
-    get_stripe_public_key,\
-    get_stripe_connected_account_links
+    get_stripe_public_key
+
 from account.models import AttachedBolton, StripeAccount
-from account.currencies import get_currencies
+from account.currencies import get_currencies, get_countries
+from account.stripe_charging import StripeAccountManager
 from .models import BirthNotification, BnChild
 from .forms import BirthNotificationForm
 from .charging import *
@@ -36,13 +37,22 @@ class BirthNotificationBase(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context['attached_service'] = get_main_account(self.request.user)
-        if self.request.user == context['attached_service'].user.user:
-            context['stripe_account'], \
-            context['account_link'], \
-            context['stripe_package'], \
-            context['edit_account'], \
-            context['account_link_setup'] = get_stripe_connected_account_links(self.request,
-                                                                               context['attached_service'])
+        if context['attached_service'].pedigree_charging and is_editor(self.request.user):
+            stripe_manager = StripeAccountManager(self.request, context['attached_service'])
+            try:
+                context['local_stripe_account'] = StripeAccount.objects.get(account=context['attached_service'])
+            except StripeAccount.DoesNotExist:
+                context['local_stripe_account'] = None
+            context['edit_account'] = stripe_manager.get_account_edit_link()  # Edit existing stripe account
+            context['countries'] = list(get_countries().values())
+        
+        # if self.request.user == context['attached_service'].user.user:
+        #     context['stripe_account'], \
+        #     context['account_link'], \
+        #     context['stripe_package'], \
+        #     context['edit_account'], \
+        #     context['account_link_setup'] = get_stripe_connected_account_links(self.request,
+        #                                                                        context['attached_service'])
         return context
 
 
