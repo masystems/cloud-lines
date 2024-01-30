@@ -23,6 +23,7 @@
                         <div class="form-group">
                             <label for="country">Country</label>
                             <input type="text" class="form-control typeahead" id="country" name="country" required>
+                            <small>Start typing your country</small>
                         </div>
                         <!-- Business Type Select -->
                         <div class="form-group">
@@ -74,7 +75,7 @@
     $('.typeahead').typeahead({
         hint: true,
         highlight: true,
-        minLength: 1
+        minLength: 0
     },
     {
         name: 'country',
