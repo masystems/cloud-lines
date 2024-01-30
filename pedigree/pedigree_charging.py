@@ -13,8 +13,7 @@ from account.views import is_editor,\
     get_main_account,\
     has_permission,\
     redirect_2_login,\
-    get_stripe_secret_key,\
-    get_stripe_connected_account_links
+    get_stripe_secret_key
 
 import json
 import stripe

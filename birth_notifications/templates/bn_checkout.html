@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block header %}
+  <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+<!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+      <div class="col-md-6 col-8 align-self-center">
+          <h3 class="text-themecolor m-b-0 m-t-0">New Birth Notification Payment</h3>
+          <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+              <li class="breadcrumb-item active">Payment</li>
+          </ol>
+      </div>
+  </div>
+  <!-- ============================================================== -->
+  <!-- End Bread crumb and right sidebar toggle -->
+  <!-- ============================================================== -->
+
+    <!-- Display a payment form -->
+    <div id="checkout">
+      <!-- Checkout will insert the payment form here -->
+    </div>
+{% endblock %}
+{% block footer %}
+  <script>
+    // This is your test publishable API key.
+    const stripe = Stripe('{{ stripe_pk }}', {
+      stripeAccount: '{{ connect_account_id }}',
+    });
+
+    initialize();
+
+    // Create a Checkout Session as soon as the page loads
+    async function initialize() {
+    const response = await fetch("{% url 'bn_checkout_session' bn_id bn_cost_id bn_child_cost_id no_of_child %}", {
+        method: "POST",
+    });
+
+    const { clientSecret } = await response.json();
+
+    const checkout = await stripe.initEmbeddedCheckout({
+        clientSecret,
+    });
+
+    // Mount Checkout
+    checkout.mount('#checkout');
+    }
+  </script>
+{% endblock %}

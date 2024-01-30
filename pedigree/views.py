@@ -23,13 +23,14 @@ from .pedigree_charging import pedigree_charging_session,\
     get_pedigree_payment_session
 from django.db.models import Q
 import json
+from account.currencies import get_countries
 from account.models import StripeAccount
 from account.views import is_editor,\
     get_main_account,\
     has_permission,\
     redirect_2_login,\
-    get_stripe_public_key,\
-    get_stripe_connected_account_links
+    get_stripe_public_key
+from account.stripe_charging import StripeAccountManager
 from approvals.models import Approval
 import dateutil.parser
 from django.utils.datastructures import MultiValueDictKeyError
@@ -40,19 +41,19 @@ def search(request):
     attached_service = get_main_account(request.user)
     columns, column_data = get_site_pedigree_column_headings(attached_service)
 
-    if attached_service.pedigree_charging:
-        stripe_account, \
-        account_link, \
-        stripe_package, \
-        edit_account,\
-        account_link_setup = get_stripe_connected_account_links(request, attached_service)
+    if attached_service.pedigree_charging and is_editor(request.user):
+        stripe_manager = StripeAccountManager(request, attached_service)
+        try:
+            local_stripe_account = StripeAccount.objects.get(account=attached_service)
+        except StripeAccount.DoesNotExist:
+            local_stripe_account = None
+        edit_account = stripe_manager.get_account_edit_link()  # Edit existing stripe account
 
         return render(request, 'search.html', {'columns': columns,
                                                'column_data': column_data,
-                                               'stripe_account': stripe_account,
-                                               'account_link': account_link,
+                                               'local_stripe_account': local_stripe_account,
                                                'edit_account': edit_account,
-                                               'account_link_setup': account_link_setup})
+                                               'countries': list(get_countries().values())})
     else:
         return render(request, 'search.html', {'columns': columns,
                                                'column_data': column_data})

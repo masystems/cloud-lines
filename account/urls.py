@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import stripe_charging
 from pedigree import tabledata
 
 urlpatterns = [
@@ -26,4 +27,5 @@ urlpatterns = [
     path('cancel_sub', views.cancel_sub, name='cancel_sub'),
     path('get-ta-users', tabledata.get_ta_users, name="get_ta_users"),
     path('get_user_details', views.get_user_details, name='get_user_details'),
+    path('setup_connect_account', stripe_charging.setup_connect_account, name='setup_connect_account'),
 ]
