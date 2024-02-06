@@ -98,7 +98,7 @@
 
                                 <td>{{ approval.date_created }}</td>
 
-                                {% if service.pedigree_charging and approval.pedigree %}
+                                {% if service.pedigree_charging and approval.pedigree and approval.type == 'new' %}
                                     <td>
                                         {% if approval.pedigree.paid %}
                                             Paid
@@ -118,6 +118,7 @@
                                         {% endif %}
                                     </td>
                                 {% else %}
+                                    <td>N/A</td>
                                     <td>N/A</td>
                                 {% endif %}
                                 <td><strong class="text-info">Pending</strong></td>
