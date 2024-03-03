@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block header %}
+  <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block content %}
+<!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles">
+      <div class="col-md-6 col-8 align-self-center">
+          <h3 class="text-themecolor m-b-0 m-t-0">Bolton Form</h3>
+          <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+              <li class="breadcrumb-item active">Payment</li>
+          </ol>
+      </div>
+  </div>
+  <!-- ============================================================== -->
+  <!-- End Bread crumb and right sidebar toggle -->
+  <!-- ============================================================== -->
+
+    <!-- Display a payment form -->
+    <div id="checkout">
+      <!-- Checkout will insert the payment form here -->
+    </div>
+{% endblock %}
+{% block footer %}
+  <script>
+    // This is your test publishable API key.
+    const stripe = Stripe('{{ stripe_pk }}');
+
+    initialize();
+
+    // Create a Checkout Session as soon as the page loads
+    async function initialize() {
+    const response = await fetch("{% url 'bolton_charging_session' bolton_id price %}", {
+        method: "POST",
+    });
+
+    const { clientSecret } = await response.json();
+
+    const checkout = await stripe.initEmbeddedCheckout({
+        clientSecret,
+    });
+
+    // Mount Checkout
+    checkout.mount('#checkout');
+    }
+  </script>
+{% endblock %}

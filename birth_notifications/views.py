@@ -25,6 +25,8 @@ from pedigree.pedigree_charging import get_pedigree_prices
 from pedigree.views import create_approval
 from pedigree.functions import get_next_reg
 from json import dumps
+from urllib.parse import urljoin
+import requests
 import re
 import stripe
 
@@ -359,22 +361,24 @@ def enable_bn(request, id):
     new_bolton.save()
     attached_service.boltons.add(new_bolton)
 
-    # send confirmation email
-    #     body = f"""<p>This email confirms the successful creation of your new Cloud-Lines bolton.
-    #
-    #                     <ul>
-    #                     <li>Bolton: {bolton['name']}</li>
-    #                     <li>Monthly Cost: £{bolton['price']}</li>
-    #                     </ul>
-    #
-    #                     <p>Thank you for purchasing this boloton. Please contact us if you need anything - contact@masys.co.uk</p>
-    #
-    #                     """
+    # bolton = requests.get(urljoin(settings.BOLTON_API_URL, str(id))).json()
+
+    # # send confirmation email
+    # body = f"""<p>This email confirms the successful creation of your new Cloud-Lines bolton.
+
+    #                 <ul>
+    #                 <li>Bolton: {bolton['name']}</li>
+    #                 <li>Monthly Cost: £{bolton['price']}</li>
+    #                 </ul>
+
+    #                 <p>Thank you for purchasing this boloton. Please contact us if you need anything - contact@masys.co.uk</p>
+
+    #                 """
     # send_mail(f"New Bolton Added: {bolton['name']}",
     #            request.user.get_full_name(), body,
     #            send_to=request.user.email)
 
-    return redirect('settings')
+    return redirect('bn_home')
 
 
 @login_required(login_url="/account/login")

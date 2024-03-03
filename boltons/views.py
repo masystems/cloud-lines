@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
 from django.conf import settings
-from account.views import is_editor, get_main_account, send_mail, get_stripe_secret_key
-from account.models import AttachedBolton
+from account.views import is_editor, get_main_account, get_stripe_secret_key, get_stripe_public_key
+from account.models import AttachedBolton, UserDetail
 from urllib.parse import urljoin
 import requests
 import stripe
@@ -53,32 +55,12 @@ def change_bolton_state(request, bolton_id, req_state):
         if attached_service.boltons.filter(bolton=bolton['id'], active=True).exists():
             return redirect('settings')
         else:
-            stripe.api_key = get_stripe_secret_key(request)
+            #  redirect to bolton charding
             if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
                 price = bolton['test_stripe_price_id']
             else:
                 price = bolton['stripe_price_id']
-
-            new_bolton = AttachedBolton.objects.create(bolton=bolton['id'],
-                                          active=False)
-
-            # create session
-            session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=[
-                    {
-                        "price": price,
-                        "quantity": 1
-                    }
-                ],
-                mode='subscription',
-                customer=attached_service.user.stripe_id,
-                success_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/enable_bn/{new_bolton.id}",
-                cancel_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/account/settings",
-            )
-            new_bolton.stripe_payment_token=session['id']
-            new_bolton.save()
-            return redirect(session.url, code=303)
+            return redirect('bolton_checkout', bolton['id'], price)
 
     # if deactivation request
     elif req_state == "disable":
@@ -90,3 +72,47 @@ def change_bolton_state(request, bolton_id, req_state):
         # cancel subscription in strip
         stripe.Subscription.delete(attached_bolton.stripe_sub_id)
     return redirect('settings')
+
+
+@login_required(login_url="/account/login")
+def bolton_checkout(request, bolton_id, price):
+    # id = pedigree DB ID
+    return render(request, 'bolton_checkout.html', {'price': price,
+                                                    'bolton_id': bolton_id,
+                                                    'stripe_pk': get_stripe_public_key(request)})
+
+
+@csrf_exempt
+def bolton_charging_session(request, bolton_id, price):
+    stripe.api_key = get_stripe_secret_key(request)
+    attached_service = get_main_account(request.user)
+    user_detail = UserDetail.objects.get(user=request.user)
+
+    # get customer
+    customer = stripe.Customer.retrieve(user_detail.stripe_id)
+
+    new_bolton = AttachedBolton.objects.create(bolton=bolton_id, active=False)
+
+    bolton = requests.get(urljoin(settings.BOLTON_API_URL, str(bolton_id))).json()
+
+    return_urls = {1: 'birth_notification',
+                   2: 'memberships'}
+
+    # create session
+    session = stripe.checkout.Session.create(
+        ui_mode='embedded',
+        payment_method_types=['card'],
+        line_items=[
+            {
+                "price": price,
+                "quantity": 1
+            }
+        ],
+        mode='subscription',
+        customer=attached_service.user.stripe_id,
+        return_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/{return_urls[bolton['id']]}/enable_bn/{new_bolton.id}",
+    )
+    new_bolton.stripe_payment_token=session['id']
+    new_bolton.save()
+
+    return JsonResponse({'clientSecret': session.client_secret})

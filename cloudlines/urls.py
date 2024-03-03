@@ -34,6 +34,7 @@ urlpatterns = [
     path('metrics/', include('metrics.urls')),
     path('bolton/', include('boltons.urls')),
     path('birth_notification/', include('birth_notifications.urls')),
+    path('memberships/', include('memberships.urls')),
     path('reports/', include('reports.urls')),
     path('primary_account/<str:service>', views.activate_primary_account, name='primary_account'),
     path('build/<int:build_id>', views.build, name='build'),
