@@ -616,7 +616,6 @@ def settings(request):
         boltons = requests.get(django_settings.BOLTON_API_URL).json()
         count = 0
         for bolton in boltons['results']:
-            #print(attached_service.boltons.filter(bolton=bolton['id'], active=True).exists())
             if attached_service.boltons.filter(bolton=bolton['id'], active=True).exists():
                 boltons['results'][count]['active'] = True
             count += 1
