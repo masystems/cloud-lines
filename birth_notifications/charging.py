@@ -46,7 +46,7 @@ def bn_charging_session(request, pedigree, child, price):
         ],
         mode='payment',
         customer=customer.id,
-        success_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/register_pedigree_success/{child.id}/{pedigree.id}",
+        return_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/register_pedigree_success/{child.id}/{pedigree.id}",
         stripe_account=stripe_account.stripe_acct_id,
     )
     pedigree.stripe_payment_token = session['id']
