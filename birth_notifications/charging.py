@@ -13,15 +13,18 @@ from account.views import is_editor,\
     has_permission,\
     redirect_2_login,\
     get_stripe_secret_key
-
+from pedigree.models import Pedigree
 import stripe
 
 
-def bn_charging_session(request, pedigree, child, price):
+@csrf_exempt
+@login_required(login_url="/account/login")
+def rp_checkout_session(request, id, price, child_id):
     stripe.api_key = get_stripe_secret_key(request)
     attached_service = get_main_account(request.user)
     stripe_account = StripeAccount.objects.get(account=attached_service)
     user_detail = UserDetail.objects.get(user=request.user)
+    pedigree = Pedigree.objects.get(id=id)
 
     # get or create customer
     if not user_detail.bn_stripe_id:
@@ -46,12 +49,12 @@ def bn_charging_session(request, pedigree, child, price):
         ],
         mode='payment',
         customer=customer.id,
-        return_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/register_pedigree_success/{child.id}/{pedigree.id}",
+        return_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/register_pedigree_success/{pedigree.id}/{child_id}" + "?session_id={CHECKOUT_SESSION_ID}",
         stripe_account=stripe_account.stripe_acct_id,
     )
     pedigree.stripe_payment_token = session['id']
     pedigree.save()
-    return session.url
+    return JsonResponse({'clientSecret': session.client_secret})
 
 
 @csrf_exempt

@@ -452,8 +452,7 @@ def register_pedigree(request, id, price):
 
     # redirect for charging
     if attached_service.pedigree_charging:
-        session_url = bn_charging_session(request, new_pedigree, child, price)
-        return redirect(session_url, code=303)
+        return redirect('rp_checkout', new_pedigree.id, price, child.id)
     else:
         new_pedigree.paid = True
         new_pedigree.save()
@@ -467,7 +466,18 @@ def register_pedigree(request, id, price):
 
 
 @login_required(login_url="/account/login")
-def register_pedigree_success(request, child_id, pedigree_id):
+def rp_checkout(request, id, price, child_id):
+    attached_service = get_main_account(request.user)
+    stripe_account = StripeAccount.objects.get(account=attached_service)
+    return render(request, 'rp_checkout.html', {'rp_id': id,
+                                                'price': price,
+                                                'child_id': child_id,
+                                                'stripe_pk': get_stripe_public_key(request),
+                                                'connect_account_id': stripe_account.stripe_acct_id})
+
+
+@login_required(login_url="/account/login")
+def register_pedigree_success(request, pedigree_id, child_id):
     # check if user has permission
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': True, 'admin': True, 'breed_admin': True}):
