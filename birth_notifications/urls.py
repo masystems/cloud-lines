@@ -23,6 +23,9 @@ urlpatterns = [
     path('get_births_td', tabledata.get_birth_notifications_td, name='get_births_td'),
     path('validate_bn/<int:id>', views.validate_bn, name='validate_bn'),
     path('bn_charging_switch', views.bn_charging_switch, name='bn_charging_switch'),
+
     path('register_pedigree/<int:id>/<str:price>', views.register_pedigree, name='register_pedigree'),
-    path('register_pedigree_success/<int:child_id>/<str:pedigree_id>', views.register_pedigree_success, name='register_pedigree_success'),
+    path('rp_checkout/<int:id>/<str:price>/<str:child_id>', views.rp_checkout, name='rp_checkout'),
+    path('rp_checkout_session/<int:id>/<str:price>/<str:child_id>', charging.rp_checkout_session, name="rp_checkout_session"),
+    path('register_pedigree_success/<str:pedigree_id>/<str:child_id>', views.register_pedigree_success, name='register_pedigree_success'),
 ]
