@@ -5,6 +5,7 @@
 
     <!-- This page plugin CSS -->
     <link href="{% static 'assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.css' %}" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token }}">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -71,6 +72,43 @@
                                     <dt class="col-sm-3">Status</dt>
                                     <dd class="col-sm-9"><span class="label {% if breeder.active %}label-light-success{% else %}label-light-danger{% endif %}">{% if breeder.active %}Active{% else %}Inactive{% endif %}</span></dd>
                                 </dl>
+                                {% if request.user == breeder.user or editor %}
+                                    <div class="container">
+                                        <div class="container">
+                                            <div class="custom-control custom-switch">
+                                                <input type="checkbox" class="custom-control-input" id="shareToggle" {% if breeder.data_visible %}checked{% endif %}>
+                                                <label class="custom-control-label" for="shareToggle">Share my data</label>
+                                            </div>
+                                            {% if service.organisation_or_society_name %}
+                                                <small>Do you want to share your personal information with other breeders within {{ service.organisation_or_society_name }}?</small>
+                                            {% else %}
+                                                <small>Do you want to share your personal information with other breeders in this Cloud-Lines package?</small>
+                                            {% endif %}
+                                        </div>
+                                        <script>
+                                            $(document).ready(function(){
+                                                $('#shareToggle').on('change', function() {
+                                                    var csrftoken = $('meta[name="csrf-token"]').attr('content');
+                                                    var isSharing = $(this).is(':checked');
+                                    
+                                                    // Make the request when the toggle state changes
+                                                    $.ajax({
+                                                        url: '{% url 'update_sharing' breeder.id %}', // Set your request URL here
+                                                        type: 'POST',
+                                                        headers: {'X-CSRFToken': csrftoken},
+                                                        data: { shareData: isSharing },
+                                                        success: function(response) {
+                                                            console.log('Sharing status updated:', response);
+                                                        },
+                                                        error: function(xhr, status, error) {
+                                                            console.error('Error:', error);
+                                                        }
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-6">
                                 <dl class="row">

@@ -1,9 +1,12 @@
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.views.decorators.cache import never_cache
 from django.utils.datastructures import MultiValueDictKeyError
+from django.db.models import Q
 from django.core import serializers
 from .models import Breeder
 from pedigree.models import Pedigree
@@ -46,6 +49,15 @@ def breeder(request, breeder_id):
                                             'column_data': column_data
                                             })
 
+@require_POST
+@login_required(login_url="/account/login")
+def update_sharing(request, id):
+    # Get the 'shareData' value from the POST request
+    share_data = request.POST.get('shareData') == 'true'
+    print(share_data)
+    attached_service = get_main_account(request.user)
+    Breeder.objects.filter(account=attached_service, id=id).update(data_visible=share_data)
+    return JsonResponse({'status': 'success', 'shareData': share_data})
 
 @login_required(login_url="/account/login")
 def breeders(request):
@@ -63,7 +75,14 @@ def breeders(request):
     if request.user in attached_service.contributors.all() or request.user in attached_service.read_only_users.all():
         return get_breeder_and_redirect()
 
-    return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
+    ## breeder data
+    if request.user == attached_service.user.user or request.user in attached_service.admin_users.all():
+        # editors see all
+        return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
+    else:
+        # contrib users see themselfs and shared profiles
+        # read only users see themselfs and shared profiles
+        return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(Q(data_visible=True) | Q(user=request.user), account=attached_service)})
 
 
 @login_required(login_url="/account/login")
