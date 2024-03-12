@@ -15,5 +15,6 @@ urlpatterns = [
     path('get-ta-breeders/<str:type>', tabledata.get_ta_breeders, name="get_ta_breeders"),
     path('get_pedigrees_owned', breeder_tabledata.get_pedigrees_owned, name='get_pedigrees_owned'),
     path('get_pedigrees_bred', breeder_tabledata.get_pedigrees_bred, name='get_pedigrees_bred'),
-    path('get_groups_bred', breeder_tabledata.get_groups_bred, name='get_groups_bred')
+    path('get_groups_bred', breeder_tabledata.get_groups_bred, name='get_groups_bred'),
+    path('update-sharing/<str:id>', views.update_sharing, name='update_sharing'),
 ]

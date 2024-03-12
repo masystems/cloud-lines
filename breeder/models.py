@@ -18,7 +18,7 @@ class Breeder(models.Model):
     phone_number2 = models.CharField(max_length=100, blank=True)
     email = models.CharField(max_length=100, blank=True)
     custom_fields = models.TextField(blank=True)
-
+    data_visible = models.BooleanField(default=False, help_text="Is the breeder data visible to others?", verbose_name='Data Visible')
     active = models.BooleanField(default=False, help_text="Is the breeder currently active?", verbose_name='Status')
 
     def __str__(self):
