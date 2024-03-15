@@ -488,9 +488,16 @@ def register_pedigree_success(request, pedigree_id, child_id):
     else:
         raise PermissionDenied()
 
+    stripe.api_key = get_stripe_secret_key(request)
     attached_service = get_main_account(request.user)
+    stripe_account = StripeAccount.objects.get(account=attached_service)
+    session = stripe.checkout.Session.retrieve(request.GET.get('session_id', ''),
+                                               stripe_account=stripe_account.stripe_acct_id)
+
     child = BnChild.objects.get(id=child_id)
     pedigree = Pedigree.objects.get(id=pedigree_id)
+    pedigree.stripe_payment_token = session.payment_intent
+    pedigree.save()
     child.pedigree = pedigree
     child.save()
 

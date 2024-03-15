@@ -38,7 +38,10 @@ def approvals(request):
                 data.append(obj.object)
             # get charging info for failed payments
             if approval.pedigree.stripe_payment_token:
-                charging_data[approval.id] = get_pedigree_payment_session(request, approval.pedigree).amount_total
+                try:
+                    charging_data[approval.id] = get_pedigree_payment_session(request, approval.pedigree).amount
+                except AttributeError:
+                    charging_data[approval.id] = get_pedigree_payment_session(request, approval.pedigree).amount_total
         elif approval.breed_group:
             # convert the data to a dict
             data_dict = safe_load(approval.data)[0]
