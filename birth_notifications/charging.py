@@ -107,5 +107,5 @@ def birth_notification_paid(request):
                                                stripe_account=stripe_account.stripe_acct_id)
     if session.payment_status == 'paid':
         BirthNotification.objects.filter(id=request.GET.get('id', '')).update(paid=True, 
-                                                                     stripe_payment_token=request.GET.get('session_id', ''))
+                                                                     stripe_payment_token=session.payment_intent)
     return redirect('birth_notification', request.GET.get('id', ''))

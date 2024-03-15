@@ -157,9 +157,13 @@ def pedigree_paid(request):
     stripe_account = StripeAccount.objects.get(account=attached_service)
     session = stripe.checkout.Session.retrieve(request.GET.get('session_id', ''),
                                                stripe_account=stripe_account.stripe_acct_id)
+    
+    # Access the payment intent ID from the session object
+    payment_intent_id = session.payment_intent
+
     if session.payment_status == 'paid':
         Pedigree.objects.filter(id=request.GET.get('id', '')).update(paid=True, 
-                                                                     stripe_payment_token=request.GET.get('session_id', ''))
+                                                                     stripe_payment_token=payment_intent_id)
     return redirect('pedigree', request.GET.get('id', ''))
 
 
@@ -196,8 +200,15 @@ def get_pedigree_payment_session(request, pedigree):
     if not attached_service.pedigree_charging:
         return
     stripe_account = StripeAccount.objects.get(account=attached_service)
-    session = stripe.checkout.Session.retrieve(
-        pedigree.stripe_payment_token,
-        stripe_account=stripe_account.stripe_acct_id
-    )
-    return session
+    try:
+        payment_intent = stripe.PaymentIntent.retrieve(
+            pedigree.stripe_payment_token,
+            stripe_account=stripe_account.stripe_acct_id  # Include this if you are using Stripe Connect
+        )
+        return payment_intent
+    except stripe.error.InvalidRequestError:
+        session = stripe.checkout.Session.retrieve(
+            pedigree.stripe_payment_token,
+            stripe_account=stripe_account.stripe_acct_id
+        )
+        return session
