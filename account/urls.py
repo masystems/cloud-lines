@@ -21,6 +21,7 @@ urlpatterns = [
     path('logo_upload', views.logo_upload, name='logo_upload'),
     path('metrics_switch', views.metrics_switch, name='metrics_switch'),
     path('pedigree_charging_switch', views.pedigree_charging_switch, name='pedigree_charging_switch'),
+    path('pedigrees_visible_switch', views.pedigrees_visible_switch, name='pedigrees_visible_switch'),
     path('update_card', views.update_card, name='update_card'),
     path('update_user', views.update_user, name='update_user'),
     path('subdomain_check', views.subdomain_check, name='subdomain_check'),

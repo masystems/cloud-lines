@@ -3,6 +3,7 @@
 
 {% block header %}
 
+
 {% endblock %}
 
 {% block content %}
@@ -897,18 +898,71 @@
                     <!-- metrics tab -->
                     <div class="tab-pane" id="features" role="tabpanel">
                         <div class="card-body">
-
                             {% if editor %}
-                                <p class="text-left">You can enable/disable features using the switchs below.</p>
-                                <div class="btn-list">
-
-                                        <button class="btn {% if service.metrics %}btn-danger{% else%}btn-success{% endif %}"
-                                                id="metricsSwitch">{% if service.metrics %}Disable Metrics{% else%}Enable Metrics{% endif %}</button>
-
-                                        <button class="btn {% if service.pedigree_charging %}btn-danger{% else%}btn-success{% endif %}"
-                                                id="pedigreeChargingSwitch">{% if service.pedigree_charging %}Disable Pedigree Charging{% else%}Enable Pedigree Charging{% endif %}</button>
-
+                                <h2>Site Features</h2>
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="metrics-toggle" {% if service.metrics %}Checked{% endif %}>
+                                    <label class="custom-control-label" for="metrics-toggle"><h4>Enable Metrics</h4></label>
                                 </div>
+                                <script>
+                                    $('#metrics-toggle').on('change', function() {
+                                        var isEnabled = $(this).is(':checked');
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "{% url 'metrics_switch' %}",
+                                            dataType: "text",
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            data: { isEnabled: isEnabled },
+                                            success: function (data) {
+                                                infoMsg('Metrics updated')
+                                            },
+                                            error: function (xhr, textStatus, error) {
+                                            },
+                                        });
+                                    });
+                                </script>
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="pedigree-charging-toggle" {% if service.pedigree_charging %}Checked{% endif %}>
+                                    <label class="custom-control-label" for="pedigree-charging-toggle"><h4>Enable Pedigree Charging</h4></label>
+                                </div>
+                                <script>
+                                    $('#pedigree-charging-toggle').click(function() {
+                                        var isEnabled = $(this).is(':checked');
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "{% url 'pedigree_charging_switch' %}",
+                                            dataType: "text",
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            data: { isEnabled: isEnabled },
+                                            success: function (data) {
+                                                infoMsg('Pedigree charging updated')
+                                            },
+                                            error: function (xhr, textStatus, error) {
+                                            },
+                                        });
+                                    });
+                                </script>
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="pedigree-visibility-toggle"{% if service.pedigrees_visible %}Checked{% endif %}>
+                                    <label class="custom-control-label" for="pedigree-visibility-toggle"><h4>Pedigree Visible to Everyone</h4></label>
+                                </div>
+                                <script>
+                                    $('#pedigree-visibility-toggle').click(function() {
+                                        var isEnabled = $(this).is(':checked');
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "{% url 'pedigrees_visible_switch' %}",
+                                            dataType: "text",
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            data: { isEnabled: isEnabled },
+                                            success: function (data) {
+                                                infoMsg('Pedigree visibility updated')
+                                            },
+                                            error: function (xhr, textStatus, error) {
+                                            },
+                                        });
+                                    });
+                                </script>
                             {% else %}
                                 <p>You must be an editor to enable/disable metrics.</p>
                             {% endif %}
@@ -991,56 +1045,6 @@
 {% endblock %}
 
 {% block footer %}
-    <script>
-        $('#metricsSwitch').click(function() {
-            $.ajax({
-                type: "POST",
-                url: "{% url 'metrics_switch' %}",
-                dataType: "text",
-                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                data: '',
-                beforeSend: function() {
-                    if ($('#metricsSwitch').hasClass('btn-danger')) {
-                        $('#metricsSwitch').removeClass('btn-danger');
-                        $('#metricsSwitch').addClass('btn-success');
-                        $('#metricsSwitch').text('Enable Metrics');
-                        } else {
-                        $('#metricsSwitch').removeClass('btn-success');
-                        $('#metricsSwitch').addClass('btn-danger');
-                        $('#metricsSwitch').text('Disable Metrics');
-                        }
-                },
-                success: function (data) {
-                },
-                error: function (xhr, textStatus, error) {
-                },
-            });
-        });
-        $('#pedigreeChargingSwitch').click(function() {
-            $.ajax({
-                type: "POST",
-                url: "{% url 'pedigree_charging_switch' %}",
-                dataType: "text",
-                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                data: '',
-                beforeSend: function() {
-                    if ($('#pedigreeChargingSwitch').hasClass('btn-danger')) {
-                        $('#pedigreeChargingSwitch').removeClass('btn-danger');
-                        $('#pedigreeChargingSwitch').addClass('btn-success');
-                        $('#pedigreeChargingSwitch').text('Enable Pedigree Charging');
-                        } else {
-                        $('#pedigreeChargingSwitch').removeClass('btn-success');
-                        $('#pedigreeChargingSwitch').addClass('btn-danger');
-                        $('#pedigreeChargingSwitch').text('Disable Pedigree Charging');
-                        }
-                },
-                success: function (data) {
-                },
-                error: function (xhr, textStatus, error) {
-                },
-            });
-        });
-    </script>
     <script>
         $(document).ready(function(){
             // get the tab from url
