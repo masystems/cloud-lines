@@ -819,13 +819,8 @@ def metrics_switch(request):
     
     user_detail = UserDetail.objects.get(user=request.user)
     attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-    if attached_service.metrics:
-        attached_service.metrics = False
-    else:
-        attached_service.metrics = True
-
+    attached_service.metrics = request.POST.get('isEnabled') == 'true'
     attached_service.save()
-
     return HttpResponse('')
 
 
@@ -842,15 +837,27 @@ def pedigree_charging_switch(request):
 
     user_detail = UserDetail.objects.get(user=request.user)
     attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
-    if attached_service.pedigree_charging:
-        attached_service.pedigree_charging = False
-    else:
-        attached_service.pedigree_charging = True
-
+    attached_service.pedigree_charging = request.POST.get('isEnabled') == 'true'
     attached_service.save()
-
     return HttpResponse('')
 
+
+@login_required(login_url="/account/login")
+def pedigrees_visible_switch(request):
+    # permission check
+    if request.method == 'GET':
+        return redirect_2_login(request)
+    elif request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': False}):
+            raise PermissionDenied()
+    else:
+        raise PermissionDenied()
+
+    user_detail = UserDetail.objects.get(user=request.user)
+    attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
+    attached_service.pedigrees_visible = request.POST.get('isEnabled') == 'true'
+    attached_service.save()
+    return HttpResponse('')
 
 @login_required(login_url="/account/login")
 def welcome(request):

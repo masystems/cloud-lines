@@ -54,7 +54,6 @@ def breeder(request, breeder_id):
 def update_sharing(request, id):
     # Get the 'shareData' value from the POST request
     share_data = request.POST.get('shareData') == 'true'
-    print(share_data)
     attached_service = get_main_account(request.user)
     Breeder.objects.filter(account=attached_service, id=id).update(data_visible=share_data)
     return JsonResponse({'status': 'success', 'shareData': share_data})

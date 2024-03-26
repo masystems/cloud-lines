@@ -70,6 +70,7 @@ class AttachedService(models.Model):
     mean_kinship_timeout = models.IntegerField(default=60)
     metrics = models.BooleanField(default=False)
     pedigree_charging = models.BooleanField(default=False)
+    pedigrees_visible = models.BooleanField(default=False) # can users see each others pedigrees
 
     SITE_MODES = (
         ('mammal', 'Mammal'),

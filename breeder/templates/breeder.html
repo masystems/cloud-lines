@@ -98,10 +98,8 @@
                                                         headers: {'X-CSRFToken': csrftoken},
                                                         data: { shareData: isSharing },
                                                         success: function(response) {
-                                                            console.log('Sharing status updated:', response);
                                                         },
                                                         error: function(xhr, status, error) {
-                                                            console.error('Error:', error);
                                                         }
                                                     });
                                                 });
