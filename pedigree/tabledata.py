@@ -274,11 +274,12 @@ def get_filtered_pedigrees(request, attached_service, sort_by_col, start, end, c
         father_search="", father_notes_search="", mother_search="", mother_notes_search="",
         breed_search="", sale_hire_search="", search_int="", search_date=""):
 
-    if not attached_service.pedigrees_visible:
-        try:
-            owner_search=Breeder.objects.get(user=request.user)
-        except Breeder.DoesNotExist:
-            pass
+    if request.user in attached_service.contributors.all() or request.user in attached_service.read_only_users.all():
+        if not attached_service.pedigrees_visible:
+            try:
+                owner_search=Breeder.objects.get(user=request.user)
+            except Breeder.DoesNotExist:
+                pass
 
     # reg_no, name, litter_size, sale_or_hire - none of these can be None - the rest of the filterable fields can
 
