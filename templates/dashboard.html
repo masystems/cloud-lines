@@ -576,6 +576,30 @@
                     </div>
                 </div>
             {% endif %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex no-block align-items-center">
+                        <h4 class="card-title">Latest Updates</h4>
+                    </div>
+                    <div class="table-responsive mt-2">
+                        <table class="table stylish-table">
+                            <thead>
+                                <tr>
+                                    <th colspan="1">Date</th>
+                                    <th colspan="2">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for update in updates %}
+                                    <tr>
+                                        <td><h6>{{ update.date }}</h6></td>
+                                        <td>{{ update.body|safe }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
         </div>
 
 

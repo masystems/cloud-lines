@@ -19,6 +19,7 @@ router.register('stud_advisor', views.StudAdvisorViews, basename='stud_advisor')
 router.register('attached-service', views.AttachedServiceViews, basename='AttachedService')
 router.register('birth_notification', views.BirthNotificationViews, basename='BirthNotification')
 router.register('bn_child', views.BnChildViews, basename='BnChild')
+router.register('updates', views.UpdateViews, basename='updates')
 #router.register('authenticate', views.Authenticate)
 
 urlpatterns = [
