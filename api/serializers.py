@@ -6,7 +6,7 @@ from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
 from birth_notifications.models import BirthNotification, BnChild
-from cloud_lines.models import Service, Faq, Bolton
+from cloud_lines.models import Service, Faq, Bolton, Update
 from account.models import AttachedService
 from metrics.models import KinshipQueue, DataValidatorQueue, StudAdvisorQueue
 from django.contrib.auth.models import User
@@ -137,6 +137,12 @@ class ApiFaqSerializer(serializers.ModelSerializer):
 class ApiBoltonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bolton
+        fields = '__all__'
+
+
+class ApiUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Update
         fields = '__all__'
 
 

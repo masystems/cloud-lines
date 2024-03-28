@@ -114,14 +114,12 @@ def dashboard(request):
         return redirect('welcome')
 
     # updates
-    # try:
-    #     get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
-    #     updates = get_updates_json.json()
-    #     updates = updates['results']
-    #     update_card_size = 44 * len(updates)
-    # except (ConnectionError, KeyError):
-    #     updates = {}
-    #     update_card_size = 44
+    try:
+        get_updates_json = requests.get('https://cloud-lines.com/api/updates/?format=json')
+        updates = get_updates_json.json()
+        updates = updates['results']
+    except (ConnectionError, KeyError):
+        updates = {}
 
     return render(request, 'dashboard.html', {'total_pedigrees': total_pedigrees,
                                               'top_pedigrees': top_pedigrees,
@@ -132,9 +130,8 @@ def dashboard(request):
                                               'current_alive_chart': current_alive_chart,
                                               'born_chart': born_chart,
                                               'user_graphs': json.loads(request.user.user.first().graphs),
-                                              'site_graphs': json.loads(get_graphs())})
-                                              # 'updates': updates,
-                                              # 'update_card_size': update_card_size})
+                                              'site_graphs': json.loads(get_graphs()),
+                                              'updates': updates})
 
 
 @login_required(login_url="/account/login")

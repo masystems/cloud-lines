@@ -22,6 +22,7 @@ from .serializers import ApiLargeTierQueueSerializer, \
     ApiStudAdvisorSerializer, \
     ApiBirthNotificationSerializer, \
     ApiBnChildSerializer, \
+    ApiUpdateSerializer, \
     ApiAuthentication
 from cloud_lines.models import LargeTierQueue
 from reports.models import ReportQueue
@@ -30,7 +31,7 @@ from breeder.models import Breeder
 from breed.models import Breed
 from breed_group.models import BreedGroup
 from birth_notifications.models import BirthNotification, BnChild
-from cloud_lines.models import Service, Faq, Bolton
+from cloud_lines.models import Service, Faq, Bolton, Update
 from account.models import UserDetail, AttachedService
 from metrics.models import KinshipQueue, DataValidatorQueue, StudAdvisorQueue
 from memberships.models import Membership
@@ -230,6 +231,12 @@ class FaqViews(viewsets.ModelViewSet):
 class BoltonViews(viewsets.ModelViewSet):
     serializer_class = ApiBoltonSerializer
     queryset = Bolton.objects.all()
+    filter_backends = [SearchFilter]
+
+@permission_classes((AllowAny, ))
+class UpdateViews(viewsets.ModelViewSet):
+    serializer_class = ApiUpdateSerializer
+    queryset = Update.objects.all().order_by('-date')[:3]
     filter_backends = [SearchFilter]
 
 # class Authenticate(viewsets.ModelViewSet):
