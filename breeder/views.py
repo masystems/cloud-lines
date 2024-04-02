@@ -24,10 +24,15 @@ def breeder(request, breeder_id):
     
     # check if user has permission
     if request.method == 'GET':
-        if not has_permission(request, {'read_only': 'breeder', 'contrib': 'breeder', 'admin': True, 'breed_admin': True}, breeder_users=[breeder.user]):
+        if not has_permission(request, {'read_only': True, 'contrib': True, 'admin': True, 'breed_admin': True}, breeder_users=[breeder.user]):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
+
+    # validate user allowed to view breeder
+    if not breeder.data_visible:
+        if request.user != breeder.user or request.user not in attached_service.admin_users.all() or request.user != attached_service.user.user:
+            raise PermissionDenied()
     
     columns, column_data = get_site_pedigree_column_headings(attached_service)
     breeder_pedigrees = Pedigree.objects.filter(account=attached_service, breeder__breeding_prefix__exact=breeder).exclude(
