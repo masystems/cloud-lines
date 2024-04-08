@@ -31,7 +31,14 @@ def breeder(request, breeder_id):
 
     # validate user allowed to view breeder
     if not breeder.data_visible:
-        if request.user != breeder.user or request.user not in attached_service.admin_users.all() or request.user != attached_service.user.user:
+        # Allow if the user is the breeder's user, an admin of the attached service, or the user of the attached service
+        user_allowed = (
+            request.user == breeder.user or 
+            request.user in attached_service.admin_users.all() or 
+            request.user == attached_service.user.user
+        )
+
+        if not user_allowed:
             raise PermissionDenied()
     
     columns, column_data = get_site_pedigree_column_headings(attached_service)
