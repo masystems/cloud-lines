@@ -36,6 +36,7 @@ def census(request, type):
     if type != "form":
         queue_item = ReportQueue.objects.create(account=attached_service,
                                                 user=request.user,
+                                                report_name="Census",
                                                 file_name="",
                                                 file_type=type,
                                                 complete=False)
@@ -52,6 +53,7 @@ def census(request, type):
 
         queue_item = ReportQueue.objects.create(account=attached_service,
                                                 user=request.user,
+                                                report_name="Census with start/end date",
                                                 from_date=start_date,
                                                 to_date=end_date,
                                                 file_name="",
@@ -122,6 +124,7 @@ def all(request, type):
 
     queue_item = ReportQueue.objects.create(account=attached_service,
                                             user=request.user,
+                                            report_name="All living",
                                             file_name="",
                                             file_type="xls",
                                             complete=False)
@@ -145,6 +148,53 @@ def all(request, type):
     return redirect('reports')
 
 
+def all_animals_by_boo(request):
+    """
+    All animals by breeder or owner
+    """
+
+    # check if user has permission
+    if request.method == 'POST':
+        if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
+            return redirect_2_login(request)
+    else:
+        raise PermissionDenied()
+    
+    attached_service = get_main_account(request.user)
+
+    prefix_type = request.POST.get('prefixType')
+    breeder_prefix = request.POST.get('id_prefix')
+
+    queue_item = ReportQueue.objects.create(account=attached_service,
+                                            user=request.user,
+                                            report_name=f"All animals by {prefix_type}: {breeder_prefix}",
+                                            file_name="",
+                                            file_type="xls",
+                                            complete=False)
+
+    token_res = requests.post(url=f'{settings.ORCH_URL}/api-token-auth/',
+                              data={'username': settings.ORCH_USER, 'password': settings.ORCH_PASS})
+    ## create header
+    headers = {'Content-Type': 'application/json', 'Authorization': f"token {token_res.json()['token']}"}
+    ## get pedigrees
+    if attached_service.domain:
+        domain = attached_service.domain
+    else:
+        domain = "https://cloud-lines.com"
+
+    token, created = Token.objects.get_or_create(user=request.user)
+
+    data = '{"queue_id": %d, "domain": "%s", "token": "%s", "boo": "%s", "prefix": "%s"}' % (queue_item.id,
+                                                                                         domain,
+                                                                                         token, 
+                                                                                         prefix_type,
+                                                                                         breeder_prefix)
+
+    post_res = requests.post(url=f'{settings.ORCH_URL}/api/reports/all_boo/', headers=headers, data=data)
+    print(post_res.text)
+    return redirect('reports')
+
+
 def fangr(request):
      # check if user has permission
     if request.method == 'POST':
@@ -157,6 +207,7 @@ def fangr(request):
 
     queue_item = ReportQueue.objects.create(account=attached_service,
                                             user=request.user,
+                                            report_name="Fangr/UKGLE",
                                             file_name="",
                                             file_type="xls",
                                             complete=False)
