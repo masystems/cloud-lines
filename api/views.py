@@ -141,6 +141,8 @@ class PedigreeViews(viewsets.ModelViewSet):
         from_date = self.request.GET.get('from_date')
         to_date = self.request.GET.get('to_date')
         account_id = self.request.GET.get('account')
+        breeder_breeding_prefix = self.request.GET.get('breeder_breeding_prefix')
+        current_owner_breeding_prefix = self.request.GET.get('current_owner_breeding_prefix')
 
         if account_id:
             try:
@@ -163,6 +165,12 @@ class PedigreeViews(viewsets.ModelViewSet):
 
         if current_owner is not None:
             queryset = queryset.filter(current_owner=current_owner)
+        
+        if breeder_breeding_prefix is not None:
+            queryset = queryset.filter(breeder_breeding_prefix=breeder_breeding_prefix)
+
+        if current_owner_breeding_prefix is not None:
+            queryset = queryset.filter(current_owner_breeding_prefix=current_owner_breeding_prefix)
 
         queryset = queryset.filter(status='alive')
 
