@@ -168,14 +168,14 @@
                                                         <div class="form-group required">
                                                             <label for="register-form-username" class="control-label">Username</label>
                                                             <div class="col-sm-9">
-                                                                <input type="text" class="form-control" id="register-form-username" name="register-form-username" placeholder="Username" required>
+                                                                <input type="text" class="form-control" data-lpignore="true" id="register-form-username" name="register-form-username" placeholder="Username" required>
                                                                 <span id='username_message'></span>
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="register-form-email" class="control-label">Email</label>
                                                             <div class="col-sm-9">
-                                                                <input type="text" class="form-control" id="register-form-email" name="register-form-email" placeholder="Email" required>
+                                                                <input type="text" class="form-control" data-lpignore="true" id="register-form-email" name="register-form-email" placeholder="Email" required>
                                                                 <span id='email_message'></span>
                                                             </div>
                                                         </div>
@@ -254,10 +254,8 @@
                                     $('#lastName').val('');
                                     $('#register-form-username').val('');
                                     $("#register-form-username").prop("readonly", false);
-                                    $("#register-form-username").prop("disabled", false);
                                     $('#register-form-email').val('');
                                     $("#register-form-email").prop("readonly", false);
-                                    $("#register-form-email").prop("disbaled", false);
                                     $('#status').val('Read Only')
                                     // iterate through checkboxes
                                     $('.breed-input').each(function(index, checkbox) {
@@ -282,10 +280,8 @@
                                     $('#lastName').val(currentRow.find("td:eq(1)").text());
                                     $('#register-form-username').val(currentRow.find("td:eq(2)").text());
                                     $("#register-form-username").prop("readonly", true);
-                                    $("#register-form-username").prop("disabled", true);
                                     $('#register-form-email').val(currentRow.find("td:eq(3)").text());
                                     $("#register-form-email").prop("readonly", true);
-                                    $("#register-form-email").prop("disbaled", true);
                                     $('#breeding_prefix').val(currentRow.find("td:eq(5)").text())
                                     // check if editor
                                     var status = currentRow.find("td:eq(4)").text();
