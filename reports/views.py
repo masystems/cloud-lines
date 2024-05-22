@@ -167,7 +167,7 @@ def all_animals_by_boo(request):
 
     queue_item = ReportQueue.objects.create(account=attached_service,
                                             user=request.user,
-                                            report_name=f"All animals by {prefix_type}: {breeder_prefix}",
+                                            report_name=f"Living animals by {prefix_type}: {breeder_prefix}",
                                             file_name="",
                                             file_type="xls",
                                             complete=False)
