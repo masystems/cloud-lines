@@ -38,14 +38,14 @@ def change_bolton_state(request, bolton_id, req_state):
     # ensure user is superadmin or owner
     attached_service = get_main_account(request.user)
     if request.user.id is not attached_service.user.user.id:
-        return redirect('settings')
+        return redirect('settings', "You don't have permission to activate boltons")
     # ensure account is != small tier
 
     # get bolton from API
     try:
         bolton = requests.get(urljoin(settings.BOLTON_API_URL, str(bolton_id))).json()
     except:
-        return redirect('settings')
+        return redirect('settings', "Unable to enable boltons at this time")
 
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -53,7 +53,7 @@ def change_bolton_state(request, bolton_id, req_state):
     if req_state == "enable":
         # ensure bolton is not already active
         if attached_service.boltons.filter(bolton=bolton['id'], active=True).exists():
-            return redirect('settings')
+            return redirect('settings', "Bolton already exists!")
         else:
             #  redirect to bolton charding
             if request.META['HTTP_HOST'] in settings.TEST_STRIPE_DOMAINS:
@@ -71,7 +71,7 @@ def change_bolton_state(request, bolton_id, req_state):
 
         # cancel subscription in strip
         stripe.Subscription.delete(attached_bolton.stripe_sub_id)
-    return redirect('settings')
+    return redirect('settings', "Unknown error, please contact support")
 
 
 @login_required(login_url="/account/login")

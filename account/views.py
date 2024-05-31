@@ -583,13 +583,14 @@ def profile(request):
 
 
 @login_required(login_url="/account/login")
-def settings(request):
+def settings(request, msg=''):
     # check if user has permission
     if request.method == 'GET':
         if not has_permission(request, {'read_only': False, 'contrib': False, 'admin': True, 'breed_admin': True}):
             return redirect_2_login(request)
     else:
         raise PermissionDenied()
+    
     
     user_detail = UserDetail.objects.get(user=request.user)
     attached_service = AttachedService.objects.get(id=user_detail.current_service_id)
@@ -641,7 +642,8 @@ def settings(request):
                                              'breeds': breeds,
                                              'breed_admins': breed_admins,
                                              'boltons': boltons,
-                                             'membership': membership})
+                                             'membership': membership,
+                                             'msg': msg})
 
 
 @user_passes_test(is_editor, "/account/login")

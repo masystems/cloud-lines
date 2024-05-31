@@ -9,6 +9,7 @@ urlpatterns = [
     path('logout', views.logout, name='cl_logout'),
     path('profile', views.profile, name='profile'),
     path('settings', views.settings, name='settings'),
+    path('settings/<str:msg>/', views.settings, name='settings'),
     path('welcome', views.welcome, name='welcome'),
     path('register', views.register, name='register'),
     path('username_check', views.username_check, name='username_check'),

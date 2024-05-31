@@ -35,4 +35,10 @@
             $('a[href="' + hash + '"]').tab('show');
         }
     });
+
+    // Check if the msg variable is not empty and display the toaster popup
+    var msg = "{{ msg }}";
+        if (msg !== '') {
+            warningMsg(msg);
+        }
 </script>
