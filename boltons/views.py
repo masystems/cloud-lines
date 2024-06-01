@@ -37,7 +37,7 @@ def change_bolton_state(request, bolton_id, req_state):
     # security checks
     # ensure user is superadmin or owner
     attached_service = get_main_account(request.user)
-    if request.user.id is not attached_service.user.user.id:
+    if str(request.user.id) is not str(attached_service.user.user.id):
         return redirect('settings', f"You don't have permission to activate boltons. Error:{request.user.id}-{attached_service.user.user.id}")
     # ensure account is != small tier
 
