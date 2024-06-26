@@ -72,19 +72,19 @@ def update_sharing(request, id):
 
 @login_required(login_url="/account/login")
 def breeders(request):
-    def get_breeder_and_redirect():
-        try:
-            breeder = Breeder.objects.get(account=attached_service, user=request.user)
-            return redirect('breeder', breeder.id)
-        except Breeder.DoesNotExist:
-            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
-        except:
-            return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
+    # def get_breeder_and_redirect():
+    #     try:
+    #         breeder = Breeder.objects.get(account=attached_service, user=request.user)
+    #         return redirect('breeder', breeder.id)
+    #     except Breeder.DoesNotExist:
+    #         return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
+    #     except:
+    #         return render(request, 'breeders.html', {'breeders': Breeder.objects.filter(account=attached_service)})
 
     attached_service = get_main_account(request.user)
 
-    if request.user in attached_service.contributors.all() or request.user in attached_service.read_only_users.all():
-        return get_breeder_and_redirect()
+    # if request.user in attached_service.contributors.all() or request.user in attached_service.read_only_users.all():
+    #     return get_breeder_and_redirect()
 
     ## breeder data
     if request.user == attached_service.user.user or request.user in attached_service.admin_users.all():
