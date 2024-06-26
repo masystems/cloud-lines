@@ -53,7 +53,7 @@
                         </thead>
                         <tbody id="bredTable">
                         {% for breeder in breeders.all %}
-                            <tr {% if editor or breeds_editable|length > 0 or breeder.user == request.user %}onclick="window.location='{% url 'breeder' breeder.id %}';" style="cursor: pointer;"{% endif %}>
+                            <tr {% if editor or breeds_editable|length > 0 or breeder.user == request.user or breeder.data_visible %}onclick="window.location='{% url 'breeder' breeder.id %}';" style="cursor: pointer;"{% endif %}>
                                 <th scope="row">{{ breeder.contact_name }}</th>
                                 <td>{{ breeder.breeding_prefix }}</td>
                                 <td class="d-none d-sm-table-cell">{{ breeder.address_line_1 }}</td>
