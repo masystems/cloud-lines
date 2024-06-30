@@ -59,7 +59,10 @@ def epochtodate(value):
 
 @register.filter
 def percent(value):
-    return f"{float(value)*100}%"
+    try:
+        return f"{float(value) * 100:.2f}%"
+    except (ValueError, TypeError):
+        return "Error generating percentace"
 
 
 @register.filter
