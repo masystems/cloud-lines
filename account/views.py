@@ -1,4 +1,4 @@
-from django.shortcuts import HttpResponse, HttpResponseRedirect
+from django.shortcuts import HttpResponse
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -15,9 +15,9 @@ from django.contrib import auth
 from django.db.models import Q
 from django.conf import settings as django_settings
 from rest_framework.authtoken.models import Token
-from .models import UserDetail, AttachedService, StripeAccount
+from .models import UserDetail, AttachedService
 from memberships.models import Membership
-from cloud_lines.models import Service, Page, Bolton
+from cloud_lines.models import Service, Page
 from pedigree.models import Pedigree
 from pedigree.functions import get_pedigree_column_headings
 from breed.models import Breed
@@ -510,7 +510,8 @@ def site_login(request):
                 return render(request, 'cl_login.html', {'error': 'Username or Password does not exist.'})
     else:
         if match('(.*).cloud-lines.com', request.META['HTTP_HOST']):
-            return render(request, 'lt_login.html')
+            attachedservice = AttachedService.objects.filter(domain__icontains=request.META['HTTP_HOST']).first()
+            return render(request, 'lt_login.html', {"attachedservice": attachedservice})
         else:
             if request.GET.get('service'):
                 service_id = request.GET.get('service')
