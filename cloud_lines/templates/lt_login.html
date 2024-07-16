@@ -40,6 +40,10 @@
         <div class="login-register" style="background-image:url({% static 'assets/images/background/login-register.jpg' %});">
             <div class="login-box card">
             <div class="card-body">
+                {% if attachedservice.image.url %}
+                    <img src="{{ attachedservice.image.url }}" alt="Logo" style="max-width: 100%; height: auto;">
+                {% endif %}
+                <h3>{{ attachedservice.organisation_or_society_name }}</h3>
                 {% include 'login_form.html' %}
             </div>
           </div>
