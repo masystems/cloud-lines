@@ -539,9 +539,29 @@ def profile(request):
     else:
         stripe_pk = settings.STRIPE_PUBLIC_KEY
         stripe.api_key = settings.STRIPE_SECRET_KEY
-    context = {'public_api_key': stripe_pk, 'user_detail': UserDetail.objects.get(user=request.user)}
 
     main_account = get_main_account(request.user)
+
+    # Check if this request is the return from Stripe's Checkout success URL
+    if request.GET.get('session_id'):
+        session_id = request.GET['session_id']
+
+        # Retrieve the Checkout session
+        session = stripe.checkout.Session.retrieve(session_id)
+        
+        # Ensure session contains a setup_intent
+        if session.setup_intent:
+            setup_intent = stripe.SetupIntent.retrieve(session.setup_intent)
+            
+            # Set the payment method as the default for the customer
+            stripe.Customer.modify(
+                main_account.user.stripe_id,
+                invoice_settings={
+                    'default_payment_method': setup_intent.payment_method,
+                },
+            )
+
+    context = {'public_api_key': stripe_pk, 'user_detail': UserDetail.objects.get(user=request.user)}
 
     if request.user == main_account.user.user and context['user_detail'].current_service.service.service_name != 'Free':
         context['services'] = Service.objects.exclude(service_name='Free')
@@ -574,9 +594,14 @@ def profile(request):
 
         # payment methods
         try:
-            #print(main_account.user.stripe_id)
-            context['cards'] = stripe.Customer.list_sources(main_account.user.stripe_id, object='card', limit=1)
-            #print(context['cards'])
+            customer = stripe.Customer.retrieve(main_account.user.stripe_id)
+
+            # The `invoice_settings.default_payment_method` might contain the default card
+            default_payment_method_id = customer.get("invoice_settings", {}).get("default_payment_method")
+
+            if default_payment_method_id:
+                context['card'] = stripe.PaymentMethod.retrieve(default_payment_method_id)
+
         except stripe.error.AuthenticationError:
             pass
 
@@ -978,7 +1003,7 @@ def update_card(request):
         payment_method_types=['card'],
         mode='setup',
         customer=user_detail.stripe_id,
-        success_url=f"http://{request.META['HTTP_HOST']}/account/profile#billing",
+        success_url=f"http://{request.META['HTTP_HOST']}/account/profile#billing?session_id={{CHECKOUT_SESSION_ID}}",
         cancel_url=f"http://{request.META['HTTP_HOST']}/account/profile#billing",
     )
     return redirect(session.url, code=303)
