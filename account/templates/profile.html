@@ -299,7 +299,7 @@
                                     </tbody>
                                 </table>
                                 <hr>
-                                <h4>Payment Method</h4>
+                                <h4>Default Payment Method</h4>
                                 <div class="table-responsive">
                                     <table class="table no-wrap">
                                         <thead>
@@ -311,14 +311,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for card in cards %}
-                                                <tr>
-                                                    <td scope="row" id="card_id"><p data-toggle="tooltip" data-placement="top" title="{{ card.id }}">{{ card.id|slice:"-6:" }}</p></td>
-                                                    <td id="card_type">{{ card.brand }}</td>
-                                                    <td id="card_last4">...**** {{ card.last4 }}</td>
-                                                    <td id="card_exp">{{ card.exp_month }}/{{ card.exp_year }}</td>
-                                                </tr>
-                                            {% endfor %}
+                                            <tr>
+                                                <td scope="row" id="card_id"><p data-toggle="tooltip" data-placement="top" title="{{ card.id }}">{{ card.id|slice:"-6:" }}</p></td>
+                                                <td id="card_type">{{ card.card.brand }}</td>
+                                                <td id="card_last4">...**** {{ card.card.last4 }}</td>
+                                                <td id="card_exp">{{ card.card.exp_month }}/{{ card.card.exp_year }}</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
