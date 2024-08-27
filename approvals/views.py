@@ -43,7 +43,10 @@ def approvals(request):
                     charging_data[approval.id] = stripe_charging_data.amount
                 except AttributeError:
                     charging_data[approval.id] = stripe_charging_data.amount_total
-                approval.pedigree.paid = stripe_charging_data.charges.data[0].paid
+                try:
+                    approval.pedigree.paid = stripe_charging_data.charges.data[0].paid
+                except AttributeError:
+                    pass
                 approval.pedigree.save()
         elif approval.breed_group:
             # convert the data to a dict
