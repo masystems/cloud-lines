@@ -72,7 +72,7 @@
                             {% endif %}
                             {% if 'setup' not in request.get_full_path %}
                                 {% if editor or breeds_editable|length > 0 %}
-                                    <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breeder</button>
+                                    <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="my-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breeder</button>
                                 {% endif %}
                             {% endif %}
                         {% elif field.label == 'Current owner' %}
@@ -86,7 +86,7 @@
                             {% endif %}
                             {% if 'setup' not in request.get_full_path %}
                                 {% if editor %}
-                                    <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Owner</button>
+                                    <button type="button" id="showNewBreederModal" data-toggle="modal" data-target=".bs-example-modal-lg" class="my-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Owner</button>
                                 {% endif %}
                             {% endif %}
                         {% elif field.label == 'Registration Number' %}
@@ -144,7 +144,7 @@
                                     <input id="id_breed" class="typeahead form-control" type="text" value="{{ breeds.all.first }}" disabled>
                             {% endif %}
                             {% if 'setup' not in request.get_full_path and editor %}
-                                <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="{% if add_breed %}#newBreedModal{% else %}#upgrade{% endif %}" class="mt-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breed</button>
+                                <button type="button" id="showNewBreedModal" data-toggle="modal" data-target="{% if add_breed %}#newBreedModal{% else %}#upgrade{% endif %}" class="my-1 btn btn-sm btn-outline-success btn-rounded"><i class="fad fa-plus-square"></i> Add New Breed</button>
                             {% endif %}
                         {% elif field.label == 'Sale or hire' %}
                             <div>

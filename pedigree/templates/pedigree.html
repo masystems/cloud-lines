@@ -3,15 +3,17 @@
 {% load widget_tweaks %}
 {% load custom_tags %}
 {% block content %}
+
+<!-- Popup CSS -->
+<link href="{% static 'assets/plugins/Magnific-Popup-master/dist/magnific-popup.css' %}" rel="stylesheet">
+<link href="{% static 'assets/plugins/dropzone-master/dist/dropzone.css' %}" rel="stylesheet" type="text/css" />
+
 <style>
 td:nth-child(1) {
 vertical-align: middle;
 }
 td:nth-child(2) {
 vertical-align: middle;
-}
-.left-sidebar {
-    z-index: 10 !important;
 }
 
 .feeds li span {
@@ -21,7 +23,7 @@ vertical-align: middle;
 
     <!-- ============================================================== -->
     <div class="row page-titles">
-        <div class="col-md-6 col-8 align-self-center">
+        <div class="col-md-6 col-8 justify-content-center">
             <h3 class="text-themecolor m-b-0 m-t-0">{% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Details</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
@@ -29,24 +31,24 @@ vertical-align: middle;
                 <li class="breadcrumb-item active">{{ lvl1.reg_no }}</li>
             </ol>
         </div>
-        <div class="col-md-6 col-4 align-self-center">
+        <div class="col-md-6 col-4 justify-content-center">
             {% if editor or contributor and breeder or breeds_editable|length > 0 %}
                 {% if lvl1.state == 'approved' and contributor and lvl1.current_owner.user == request.user or editor or lvl1.breed.breed_name in breeds_editable %}
-                    <a href="{% url 'edit_pedigree_form' lvl1.id %}" id="editPedigree" class="btn float-right hidden-sm-down btn-info ml-1"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                    <a href="{% url 'edit_pedigree_form' lvl1.id %}" id="editPedigree" class="btn float-end hidden-sm-down btn-info mx-1"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
                 {% endif %}
                 {% if add_pedigree %}
-                    <a href="{% url 'new_pedigree_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
+                    <a href="{% url 'new_pedigree_form' %}" class="btn float-end hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}
                     </a>
                 {% else %}
                     {% include 'upgrade_modal.html' with type='pedigrees' %}
-                    <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                    <button class="btn float-end hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
                 {% endif %}
             {% else %}
                 {% include 'login_modal.html' %}
                 <!-- /.modal -->
-                <button class="btn float-right hidden-sm-down btn-info ml-1" data-toggle="modal" data-target="#login"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
-                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                <button class="btn float-end hidden-sm-down btn-info mx-1" data-toggle="modal" data-target="#login"><i class="fad fa-pencil-alt"></i> Edit {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
+                <button class="btn float-end hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Add {% if service.site_mode == 'mammal' %}Pedigree{% else %}Bird{% endif %}</button>
             {% endif %}
 
         </div>
@@ -648,8 +650,8 @@ vertical-align: middle;
                         {% if editor or lvl1.breed.breed_name in breeds_editable or lvl1.current_owner.user == request.user or lvl1.breeder.user == request.user %}
                             <div class="row">
                                 <div class="col-12">
-                                    <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>
-                                    <a href="{% url 'cert' lvl1.id 'cert' %}"><button class="btn float-right hidden-sm-down btn-outline-info ml-2">Certificate PDF</button></a>
+                                    <a href="{% url 'cert' lvl1.id 'zootech' %}"><button class="btn float-end hidden-sm-down btn-outline-info ml-2">ZooTechnical PDF</button></a>
+                                    <a href="{% url 'cert' lvl1.id 'cert' %}"><button class="btn float-end hidden-sm-down btn-outline-info ml-2">Certificate PDF</button></a>
                                 </div>
                             </div>
                         {% endif %}
@@ -743,6 +745,8 @@ vertical-align: middle;
 {% endblock %}
 
 {% block footer %}
+    <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
+
     <!-- code for the reg number field typeaheads -->
     {% include 'ta_add_edit_view.html' %}
 {% endblock %}

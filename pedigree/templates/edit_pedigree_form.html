@@ -2,6 +2,7 @@
 {% load static %}
 {% load widget_tweaks %}
 {% block content %}
+<link href="{% static 'assets/plugins/dropzone-master/dist/dropzone.css' %}" rel="stylesheet" type="text/css" />
 
 <style>
     ul {
@@ -65,7 +66,7 @@
 <!-- Bread crumb and right sidebar toggle -->
 <!-- ============================================================== -->
 <div class="row page-titles">
-    <div class="col-md-6 col-8 align-self-center">
+    <div class="col-md-6 col-8 justify-content-center">
         <h3 class="text-themecolor m-b-0 m-t-0">Edit {% if service.site_mode == 'mammal' %}Pedigree {% else %}Bird {% endif %} Form</h3>
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
@@ -390,7 +391,7 @@
                                     {% endif %}
                                     <a href="{% url 'pedigree' pedigree.id %}"><button type="button" class="btn btn-inverse">Cancel</button></a>
                                     {% if editor %}
-                                        <button type="button" id="deletePedigree" data-toggle="modal" data-target="#delete" class="model_img img-fluid btn btn-danger float-right">Delete Pedigree</button>
+                                        <button type="button" id="deletePedigree" data-toggle="modal" data-target="#delete" class="model_img img-fluid btn btn-danger float-end">Delete Pedigree</button>
                                     {% endif %}
                                 </div>
                             </div>
@@ -439,6 +440,7 @@
 {% endblock %}
 
 {% block footer %}
+    <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
 
     <script>
         $('.confirmSaveBtn').click(function (e) {

@@ -5,7 +5,7 @@
     <!-- Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
     <div class="row page-titles">
-        <div class="col-md-6 col-8 align-self-center">
+        <div class="col-md-6 col-8 justify-content-center">
             <h3 class="text-themecolor m-b-0 m-t-0">{{ breed.breed_name }}</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
@@ -13,23 +13,23 @@
                 <li class="breadcrumb-item active">{{ breed.breed_name }}</li>
             </ol>
         </div>
-        <div class="col-md-6 col-4 align-self-center">
+        <div class="col-md-6 col-4 justify-content-center">
             {% if add_breed %}
                 {% if editor %}
-                    <a href="{% url 'new_breed_form' %}" class="btn float-right hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Create
+                    <a href="{% url 'new_breed_form' %}" class="btn float-end hidden-sm-down btn-success"><i class="fad fa-plus-square"></i> Create
                     </a>
-                    <a href="{% url 'edit_breed_form' breed.id %}" id="editBreed" class="btn btn-outline-info float-right mr-1"><i class="fad fa-pencil-alt"></i> Edit
+                    <a href="{% url 'edit_breed_form' breed.id %}" id="editBreed" class="btn btn-outline-info float-end mr-1"><i class="fad fa-pencil-alt"></i> Edit
                     </a>
                 {% else %}
                     {% include 'login_modal.html' %}
                     <!-- /.modal -->
-                    <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Create</button>
+                    <button class="btn float-end hidden-sm-down btn-success" data-toggle="modal" data-target="#login"><i class="fad fa-plus-square"></i> Create</button>
                 {% endif %}
             {% else %}
                 {% include 'upgrade_modal.html' with type='breeds' %}
-                <button class="btn float-right hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Create</button>
+                <button class="btn float-end hidden-sm-down btn-success" data-toggle="modal" data-target="#upgrade"><i class="fad fa-plus-square"></i> Create</button>
                 {% if editor %}
-                    <a href="{% url 'edit_breed_form' breed.id %}" class="btn btn-outline-info float-right mr-2"><i class="fad fa-pencil-alt"></i> Edit
+                    <a href="{% url 'edit_breed_form' breed.id %}" class="btn btn-outline-info float-end mr-2"><i class="fad fa-pencil-alt"></i> Edit
                     </a>
                 {% endif %}
             {% endif %}

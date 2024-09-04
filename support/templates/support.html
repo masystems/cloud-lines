@@ -5,16 +5,16 @@
     <!-- Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
     <div class="row page-titles">
-        <div class="col-md-6 col-8 align-self-center">
+        <div class="col-md-6 col-8 justify-content-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Support</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
                 <li class="breadcrumb-item active">Support</li>
             </ol>
         </div>
-        <div class="col-md-6 col-4 align-self-center">
-            <button type="button" class="btn float-right hidden-sm-down btn-success ml-1" data-toggle="modal" data-target="#add-contact">New Support Ticket</button>
-            <a href="{% url 'faq' %}"><button type="button" class="btn float-right hidden-sm-down btn-info">FAQs</button></a>
+        <div class="col-md-6 col-4 justify-content-center">
+            <button type="button" class="btn float-end hidden-sm-down btn-success mx-1" data-toggle="modal" data-target="#add-contact">New Support Ticket</button>
+            <a href="{% url 'faq' %}"><button type="button" class="btn float-end hidden-sm-down btn-info">FAQs</button></a>
             <!-- Add Contact Popup Model -->
             <div id="add-contact" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                 <div class="modal-dialog">

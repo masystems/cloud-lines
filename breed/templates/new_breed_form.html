@@ -1,3 +1,4 @@
+{% load static %}
 {% load widget_tweaks %}
 <h3 class="box-title">Breed Info</h3>
 <hr class="mt-0 mb-5">
@@ -98,15 +99,18 @@
     {% endfor %}
 </div>
 
-<script>
-    $('#id_breed_description').keyup( function() {
-        var max = 2000;
-            var len = $(this).val().length;
-            if (len >= max) {
-                $('#charNum').text(' you have reached the limit').fadeIn();
-            } else {
-                var char = max - len;
-                $('#charNum').text(char + ' characters left').fadeIn();
-          }
-    });
-</script>
+{% block footer %}
+    <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
+    <script>
+        $('#id_breed_description').keyup( function() {
+            var max = 2000;
+                var len = $(this).val().length;
+                if (len >= max) {
+                    $('#charNum').text(' you have reached the limit').fadeIn();
+                } else {
+                    var char = max - len;
+                    $('#charNum').text(char + ' characters left').fadeIn();
+            }
+        });
+    </script>
+{% endblock %}

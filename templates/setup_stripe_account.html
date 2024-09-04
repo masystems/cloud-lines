@@ -2,7 +2,7 @@
 
 {% if editor and not local_stripe_account.stripe_acct_id %}
     <!-- Trigger Modal Button -->
-    <button type="button" class="btn btn-success float-right mr-2" data-toggle="modal" data-target="#accountSetupModal">
+    <button type="button" class="btn btn-success float-end mr-2" data-toggle="modal" data-target="#accountSetupModal">
         Setup Stripe Account
     </button>
 
@@ -44,42 +44,44 @@
         </div>
     </div>
 {% endif %}
-<!-- Typehead Plugin JavaScript -->
-<script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
-<script>
-    // Typeahead Initialization Script
-    var substringMatcher = function(strs) {
-        return function findMatches(q, cb) {
-            var matches, substringRegex;
 
-            // an array that will be populated with substring matches
-            matches = [];
+{% block footer %}
+    <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
+    <script>
+        // Typeahead Initialization Script
+        var substringMatcher = function(strs) {
+            return function findMatches(q, cb) {
+                var matches, substringRegex;
 
-            // regex used to determine if a string contains the substring `q`
-            substrRegex = new RegExp(q, 'i');
+                // an array that will be populated with substring matches
+                matches = [];
 
-            // iterate through the pool of strings and for any string that
-            // contains the substring `q`, add it to the `matches` array
-            $.each(strs, function(i, str) {
-            if (substrRegex.test(str)) {
-                matches.push(str);
-            }
-            });
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
 
-            cb(matches);
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(strs, function(i, str) {
+                if (substrRegex.test(str)) {
+                    matches.push(str);
+                }
+                });
+
+                cb(matches);
+            };
         };
-    };
 
-    var countries = {{ countries | safe }};
-    console.log(countries)
-    $('.typeahead').typeahead({
-        hint: true,
-        highlight: true,
-        minLength: 0
-    },
-    {
-        name: 'country',
-        source: substringMatcher(countries),
-    }).val('United Kingdom').trigger('change');
+        var countries = {{ countries | safe }};
+        console.log(countries)
+        $('.typeahead').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 0
+        },
+        {
+            name: 'country',
+            source: substringMatcher(countries),
+        }).val('United Kingdom').trigger('change');
 
-</script>
+    </script>
+{% endblock %}
