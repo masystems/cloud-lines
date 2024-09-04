@@ -71,9 +71,26 @@
      --font-family-monospace:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace
     }
 
+    a {
+        text-decoration: none;
+    }
+    
 /* TOP BAR */
     #main-wrapper[data-layout="horizontal"] .topbar .navbar-collapse[data-navbarbg="skin6"], #main-wrapper[data-layout="horizontal"] .topbar[data-navbarbg="skin6"], #main-wrapper[data-layout="vertical"] .topbar .navbar-collapse[data-navbarbg="skin6"], #main-wrapper[data-layout="vertical"] .topbar[data-navbarbg="skin6"] {
     background: #44AAAC;
+    }
+
+    .fix-sidebar .left-sidebar {
+        position: absolute;
+    }
+
+    .left-sidebar {
+        z-index: 25 !important;
+    }
+
+/* TOOL TIPS */
+    .mytooltip {
+        z-index: 10;
     }
 
 /* INFO */

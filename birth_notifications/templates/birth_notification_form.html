@@ -4,7 +4,6 @@
 {% load custom_tags %}
 
 {% block header %}
-
     <script src="{% static 'assets/plugins/jsPDF-1.3.2/dist/jspdf.min.js' %}"></script>
     <script src="https://unpkg.com/jspdf-autotable"></script>
 {% endblock %}
@@ -25,7 +24,7 @@
     <!-- Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
     <div class="row page-titles">
-        <div class="col-md-6 col-8 align-self-center">
+        <div class="col-md-6 col-8 justify-content-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Birth Notification Form</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
@@ -33,7 +32,7 @@
                 <li class="breadcrumb-item active">Form</li>
             </ol>
         </div>
-        <div class="col-md-6 col-3 align-self-center">
+        <div class="col-md-6 col-3 justify-content-center">
 
         </div>
     </div>
@@ -101,198 +100,149 @@
                                         <div class="card-body">
                                             <!-- Table -->
                                             <table id="birthTable" class="table table-responsive">
-                                                <tr>
-                                                    <th>Tag No.</th>
-                                                    <th>Status</th>
-                                                    <th>Sex</th>
-                                                    <th>For Sale</th>
-                                                    <th></th>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <input type="text" class="form-control" name="tag_no" required>
-                                                    </td>
-                                                    <td>
-                                                        <select class="form-control" name="status">
-                                                            <option value="alive">Alive</option>
-                                                            <option value="deceased">Deceased</option>
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <select class="form-control" name="sex">
-                                                            <option value="male">Male</option>
-                                                            <option value="female">Female</option>
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <select class="form-control" name="for_sale">
-                                                            <option value="False">No</option>
-                                                            <option value="True">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                    <td><button type="button" class="btn" onclick="DeleteRow(this)"><i class="fad fa-trash-alt fa-lg text-danger"></i></button></td>
-                                                </tr>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Tag No.</th>
+                                                        <th>Status</th>
+                                                        <th>Sex</th>
+                                                        <th>For Sale</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><input type="text" class="form-control" name="tag_no" required></td>
+                                                        <td>
+                                                            <select class="form-control" name="status">
+                                                                <option value="alive">Alive</option>
+                                                                <option value="deceased">Deceased</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-control" name="sex">
+                                                                <option value="male">Male</option>
+                                                                <option value="female">Female</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select class="form-control" name="for_sale">
+                                                                <option value="False">No</option>
+                                                                <option value="True">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn" onclick="DeleteRow(this)">
+                                                                <i class="fad fa-trash-alt fa-lg text-danger"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
                                             </table>
                                             <button id="addRow" type="button" class="btn btn-outline-success">Add new row</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                    <div class="col-12">
-                        <hr/>
-                        <p>
-                        BN Price: {{ bn_cost.unit_amount|price }} {{ bn_cost.currency|upper }} | Child Price: {{ bn_child_cost.unit_amount|price }} {{ bn_child_cost.currency|upper }}
-                        </p>
-                        <p id="totalCost">
-                        <strong>Total:</strong> {{ bn_stripe_account.currency }}
-                        </p>
-                    </div>
-                    <button id="formSubmit" class="btn btn-success float-right" type="submit">Submit</button>
-                    <p id="errorText" class="text-danger float-right pr-4"></p>
-                    <script>
-                        // Validate bn number
-                        $('#id_bn_number').on('input',function(e){
-                            $.ajax({
-                                url: '{% url 'validate_bn_number' %}',
-                                type: 'post',
-                                dataType: 'text',
-                                headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                                data: {'bn_number': $('#id_bn_number').val()},
-                                beforeSend: function() {
-                                    $('#errorText').html('')
-                                },
-                                success: function(data) {
-                                    var result = JSON.parse(data);
-                                    console.log(result.result)
-                                    if (result.result == true) {
-                                        $('#errorText').html('BN Number already in use!');
-                                        $('#formSubmit').attr('disabled','disabled')
-                                    } else {
-                                        $('#errorText').html('')
-                                        $('#formSubmit').removeAttr('disabled')
-                                    }
-                                 },
-                                error: function(jqXHR, textStatus, errorThrown){
-                                    console.log('jqXHR:');
-                                    console.log(jqXHR);
-                                    console.log('textStatus:');
-                                    console.log(textStatus);
-                                    console.log('errorThrown:');
-                                    console.log(errorThrown);
+                            
+                            <div class="col-12">
+                                <hr/>
+                                <p>BN Price: {{ bn_cost.unit_amount|price }} {{ bn_cost.currency|upper }} | Child Price: {{ bn_child_cost.unit_amount|price }} {{ bn_child_cost.currency|upper }}</p>
+                                <p id="totalCost"><strong>Total:</strong> {{ bn_stripe_account.currency }}</p>
+                            </div>
+                            <button id="formSubmit" class="btn btn-success float-end" type="submit">Submit</button>
+                            <p id="errorText" class="text-danger float-end pr-4"></p>
+                            
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    updateTotal();
+                            
+                                    document.getElementById('addRow').addEventListener('click', addRow);
+                            
+                                    $('#id_bn_number').on('input', function(e){
+                                        $.ajax({
+                                            url: '{% url 'validate_bn_number' %}',
+                                            type: 'post',
+                                            dataType: 'text',
+                                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                            data: {'bn_number': $('#id_bn_number').val()},
+                                            beforeSend: function() {
+                                                $('#errorText').html('')
+                                            },
+                                            success: function(data) {
+                                                var result = JSON.parse(data);
+                                                if (result.result) {
+                                                    $('#errorText').html('BN Number already in use!');
+                                                    $('#formSubmit').attr('disabled', 'disabled');
+                                                } else {
+                                                    $('#errorText').html('');
+                                                    $('#formSubmit').removeAttr('disabled');
+                                                }
+                                            },
+                                            error: function(jqXHR, textStatus, errorThrown){
+                                                console.error('AJAX Error:', textStatus, errorThrown);
+                                            }
+                                        });
+                                    });
+                                });
+                            
+                                function updateTotal() {
+                                    const bnCost = parseFloat({{ bn_cost.unit_amount|price }});
+                                    const childCost = parseFloat({{ bn_child_cost.unit_amount|price }});
+                                    const table = document.getElementById("birthTable");
+                                    const rows = table.querySelectorAll('tbody tr').length;
+                                    const childTotal = childCost * rows;
+                                    const total = (bnCost + childTotal);
+                                    document.getElementById('totalCost').innerHTML = `<strong>Total:</strong> ${total.toFixed(2)} {{ bn_stripe_account.currency }}`;
                                 }
-                            });
-                        });
-
-                        window.onload = function() {
-                          updateTotal();
-                        };
-                        function updateTotal() {
-                            var bnCost = {{ bn_cost.unit_amount|price }}
-                            var childCost = {{ bn_child_cost.unit_amount|price }}
-                            var table = document.getElementById("birthTable");
-                            var rows = table.rows.length - 1;
-                            var childTotal = childCost * rows
-                            var total = bnCost + childTotal
-                            var totalDec = total / 100
-                            $('#totalCost').html("<strong>Total:</strong> " + totalDec.toFixed(2) + " {{ bn_stripe_account.currency }}")
-                        }
-                        function DeleteRow(o) {
-                         //no clue what to put here?
-                         var p=o.parentNode.parentNode;
-                             p.parentNode.removeChild(p);
-                             updateTotal()
-                        }
-
-                        function addRow(){
-                            var birthTable = document.getElementById('birthTable');
-                            var birthTd, birthInput;
-                            var birthTr = document.createElement('tr');
-
-                            // tag no
-                            tagnoTd = document.createElement('td');
-                            tagnoInput = document.createElement('input');
-                            tagnoInput.setAttribute('type','text');
-                            tagnoInput.setAttribute('class','form-control');
-                            tagnoInput.setAttribute('name','tag_no');
-                            tagnoTd.appendChild(tagnoInput);
-                            birthTr.appendChild(tagnoTd);
-
-                            // status
-                            statusTd = document.createElement('td');
-                            statusSelect = document.createElement('select');
-                                var aliveOpt = document.createElement('option');
-                                    aliveOpt.value = "alive";
-                                    aliveOpt.innerHTML = "Alive";
-                                var deceasedOpt = document.createElement('option');
-                                    deceasedOpt.value = "deceased";
-                                    deceasedOpt.innerHTML = "Deceased";
-                            statusSelect.appendChild(aliveOpt);
-                            statusSelect.appendChild(deceasedOpt);
-                            statusSelect.setAttribute('class','form-control');
-                            statusSelect.setAttribute('name','status');
-                            statusTd.appendChild(statusSelect);
-                            birthTr.appendChild(statusTd);
-
-                            // sex
-                            sexTd = document.createElement('td');
-                            sexSelect = document.createElement('select');
-                                var maleOpt = document.createElement('option');
-                                    maleOpt.value = "male";
-                                    maleOpt.innerHTML = "Male";
-                                var femaleOpt = document.createElement('option');
-                                    femaleOpt.value = "female";
-                                    femaleOpt.innerHTML = "Female";
-                            sexSelect.appendChild(maleOpt);
-                            sexSelect.appendChild(femaleOpt);
-                            sexSelect.setAttribute('class','form-control');
-                            sexSelect.setAttribute('name','sex');
-                            sexTd.appendChild(sexSelect);
-                            birthTr.appendChild(sexTd);
-
-                            // for sale
-                            for_saleTd = document.createElement('td');
-                            for_saleSelect = document.createElement('select');
-                                var noOpt = document.createElement('option');
-                                    noOpt.value = "False";
-                                    noOpt.innerHTML = "No";
-                                var yesOpt = document.createElement('option');
-                                    yesOpt.value = "True";
-                                    yesOpt.innerHTML = "Yes";
-                            for_saleSelect.appendChild(noOpt);
-                            for_saleSelect.appendChild(yesOpt);
-                            for_saleSelect.setAttribute('class','form-control');
-                            for_saleSelect.setAttribute('name','for_sale');
-                            for_saleTd.appendChild(for_saleSelect);
-                            birthTr.appendChild(for_saleTd);
-
-                            // delete row
-                            deleteTd = document.createElement('td');
-                            deleteBtn = document.createElement('button');
-                            deleteBtn.setAttribute('class','btn');
-                            deleteBtn.innerHTML = '<i class="fad fa-trash-alt fa-lg text-danger"></i>'
-                            deleteBtn.onclick = function() { DeleteRow(this); }
-                            deleteBtn.setAttribute('type','button');
-                            deleteTd.appendChild(deleteBtn);
-                            birthTr.appendChild(deleteTd);
-
-                          birthTable.appendChild(birthTr);
-                          updateTotal()
-                        }
-                        document.getElementById('addRow').onclick=addRow;
-                    </script>
+                            
+                                function DeleteRow(button) {
+                                    const row = button.closest('tr');
+                                    row.remove();
+                                    updateTotal();
+                                }
+                            
+                                function addRow() {
+                                    const birthTable = document.getElementById('birthTable').querySelector('tbody');
+                                    const newRow = document.createElement('tr');
+                            
+                                    newRow.innerHTML = `
+                                        <td><input type="text" class="form-control" name="tag_no" required></td>
+                                        <td>
+                                            <select class="form-control" name="status">
+                                                <option value="alive">Alive</option>
+                                                <option value="deceased">Deceased</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="sex">
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" name="for_sale">
+                                                <option value="False">No</option>
+                                                <option value="True">Yes</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn" onclick="DeleteRow(this)">
+                                                <i class="fad fa-trash-alt fa-lg text-danger"></i>
+                                            </button>
+                                        </td>
+                                    `;
+                            
+                                    birthTable.appendChild(newRow);
+                                    updateTotal();
+                                }
+                            </script>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-lg-3">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Information</h4>
-                    <p>Can have some information here?</p>
 
-                    <hr>
-                    <p>and some information here?</p>
                 </div>
             </div>
         </div>
@@ -301,6 +251,7 @@
 {% endblock %}
 
 {% block footer %}
+    <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
     <!-- code for the reg number field typeaheads -->
     {% include 'ta_pedigrees_by_sex.html' %}
 

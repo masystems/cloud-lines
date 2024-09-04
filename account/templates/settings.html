@@ -11,7 +11,7 @@
     <!-- Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
     <div class="row page-titles">
-        <div class="col-md-6 col-8 align-self-center">
+        <div class="col-md-6 col-8 justify-content-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Site Settings</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
@@ -238,7 +238,7 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
-                                                <button type="submit" id="userDelete" name="delete" value="delete" class="btn btn-danger float-right">Yes, delete it!</button>
+                                                <button type="submit" id="userDelete" name="delete" value="delete" class="btn btn-danger float-end">Yes, delete it!</button>
                                             </div>
                                         </div>
                                     </div>
@@ -518,7 +518,7 @@
                                         </div>
                                     </div>
                                     <div class="col-2">
-                                        <button id="selectNameSettings" class="btn btn-success float-right">Update Name</button>
+                                        <button id="selectNameSettings" class="btn btn-success float-end">Update Name</button>
                                     </div>
                                 </div>
                                 <script>
@@ -582,7 +582,7 @@
                             <div class="pb-4">
                                 {% if editor %}
                                     <a type="hidden" id="openCfModal" data-toggle="modal" data-target="#cfverticalcenter"></a>
-                                    <button class="btn btn-success float-right" id="createNewCf">Create New Custom Field</button>
+                                    <button class="btn btn-success float-end" id="createNewCf">Create New Custom Field</button>
 
                                     <div id="cfverticalcenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="cfvcenter" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
@@ -654,7 +654,7 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-info waves-effect" data-dismiss="modal">Close</button>
-                                                    <button type="submit" id="cfDelete" name="delete" value="delete" class="btn btn-danger float-right">Yes, delete it!</button>
+                                                    <button type="submit" id="cfDelete" name="delete" value="delete" class="btn btn-danger float-end">Yes, delete it!</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -763,7 +763,7 @@
                                         </div>
                                     </div>
                                     <div class="col-2">
-                                        <button id="selectTitleSettings" class="btn btn-success float-right">Update Titles</button>
+                                        <button id="selectTitleSettings" class="btn btn-success float-end">Update Titles</button>
                                     </div>
                                 </div>
                                 <script>
@@ -819,7 +819,7 @@
                                         </div>
                                     </div>
                                     <div class="col-2">
-                                        <button id="selectPedigreeColumnsBtn" class="btn btn-success float-right">Update Columns</button>
+                                        <button id="selectPedigreeColumnsBtn" class="btn btn-success float-end">Update Columns</button>
                                     </div>
                                 </div>
                                 <script>
@@ -1045,6 +1045,7 @@
 {% endblock %}
 
 {% block footer %}
+    <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
     <script>
         $(document).ready(function(){
             // get the tab from url

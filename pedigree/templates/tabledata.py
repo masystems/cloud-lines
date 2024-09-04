@@ -447,7 +447,7 @@ def get_groups_bred(request):
                             </span>
                             <span class="tooltip-content clearfix">
                                 <span class="tooltip-text2">
-                                    <a href='{reverse("pedigree", args=[member.id])}' class="btn btn-outline-primary waves-effect waves-light my-1 mx-1" role="button"><span class="btn-label"><i class="fad fa-venus"></i></span> <strong>Profile</strong></a>
+                                    <a href='{reverse("pedigree", args=[member.id])}' class="btn btn-outline-primary waves-effect waves-light my-1 float-end" role="button"><span class="btn-label"><i class="fad fa-venus"></i></span> <strong>Profile</strong></a>
                                     <ul class="list-icons">
                                         <li class="text-muted"><i class="ti-angle-right"></i> <strong>Reg #:</strong> {member.reg_no }</li>
                                         <li class="text-muted"><i class="ti-angle-right"></i> <strong>Name:</strong> {member.name}</li>

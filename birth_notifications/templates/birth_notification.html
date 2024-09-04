@@ -12,7 +12,7 @@
     <!-- Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
     <div class="row page-titles">
-        <div class="col-md-6 col-8 align-self-center">
+        <div class="col-md-6 col-8 justify-content-center">
             <h3 class="text-themecolor m-b-0 m-t-0">Birth Notification ({{ bn.bn_number }})</h3>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
@@ -37,11 +37,11 @@
                             <div class="card-body">
                                 <h4 class="card-title">{{ bn.bn_number }} Details</h4>
                                 {% if editor %}
-                                <button class="btn btn-danger float-right" data-toggle="modal" data-target="#deleteBn">Delete</button>
+                                <button class="btn btn-danger float-end" data-toggle="modal" data-target="#deleteBn">Delete</button>
                                 {% endif %}
-                                <button class="btn btn-outline-info float-right mr-2" data-toggle="modal" data-target="#editBn">Edit</button>
+                                <button class="btn btn-outline-info float-end mr-2" data-toggle="modal" data-target="#editBn">Edit</button>
                                 {% if not bn.complete and editor %}
-                                    <a href="{% url 'approve_birth_notification' bn.id %}"><button class="btn btn-success float-right mr-2">Approve</button></a>
+                                    <a href="{% url 'approve_birth_notification' bn.id %}"><button class="btn btn-success float-end mr-2">Approve</button></a>
                                 {% endif %}
                                 <!-- Warning Filled Modal -->
                                 <div id="editBn" class="modal fade" tabindex="-1" role="dialog"
@@ -58,7 +58,7 @@
                                                 <div class="modal-body">
                                                     <div id="mothers-alive">
                                                         <label class="text-white">{{ service.mother_title }}</label>
-                                                        <input id="id_mother" class="typeahead form-control mt-1" name='motherx' type="text" value="{{ bn.mother.reg_no }}" required>
+                                                        <input id="id_mother" class="typeahead form-control my-1" name='motherx' type="text" value="{{ bn.mother.reg_no }}" required>
                                                     </div>
                                                     <div class="col-md-5">
                                                         <!-- hidden note which will show name and tag number of female if reg number has a match -->
@@ -66,11 +66,11 @@
                                                     </div>
                                                     <div id="fathers-alive">
                                                         <label class="text-white pt-2">{{ service.father_title }}</label>
-                                                        <input id="id_father" class="typeahead form-control mt-1" name='fatherx' type="text" value="{{ bn.father.reg_no }}" required>
+                                                        <input id="id_father" class="typeahead form-control my-1" name='fatherx' type="text" value="{{ bn.father.reg_no }}" required>
                                                     </div>
                                                     <div>
                                                         <label class="text-white pt-2">BN No.</label>
-                                                        <input id="bn_number_validate" class="form-control mt-1" name='bn_number' type="text" value="{{ bn.bn_number }}" required>
+                                                        <input id="bn_number_validate" class="form-control my-1" name='bn_number' type="text" value="{{ bn.bn_number }}" required>
                                                         <small id="bn_number_message"></small>
                                                     </div>
                                                     <div class="col-md-5">
@@ -79,7 +79,7 @@
                                                     </div>
                                                     <div>
                                                         <label class="text-white pt-2">DoB(s)</label>
-                                                        <input class="form-control mt-1" name='bn_dob' type="date" value="{{ bn.dob|datefield }}" required>
+                                                        <input class="form-control my-1" name='bn_dob' type="date" value="{{ bn.dob|datefield }}" required>
                                                     </div>
                                                     <div id="breeders">
                                                         <label class="text-white pt-2">Breeder</label>
@@ -313,6 +313,7 @@
 {% endblock %}
 
 {% block footer %}
+    <script src="{% static 'assets/plugins/typeahead.js-master/dist/typeahead.bundle.min.js' %}"></script>
     <!-- code for the reg number field typeaheads -->
     {% include 'ta_pedigrees_by_sex.html' %}
     {% include 'ta_breeder.html' with search_type='all' %}
