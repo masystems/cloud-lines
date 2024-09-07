@@ -142,83 +142,100 @@
                 
                 <!-- START -->
                 <div class="card-body">
-                    {% if not read_only %}
-                        <!-- Flex container for the first button -->
-                        <div class="d-flex justify-content-center">
-                            <button id="validateDataBtn" type="button" class="btn btn-warning mx-2 my-1" 
-                                {% if dv_queue and not dv_queue.complete %}disabled{% endif %}>
-                                Check My Data
-                            </button>
-                        </div>
-                
-                        <!-- Non-flex content for messages -->
-                        {% if dv_queue.complete %}
-                            <p id="dvLastRun">Last validated: {{ dv_queue.created }}</p>
-                            <p>{{ dv_queue.result|safe }}</p>
-                        {% else %}
-                            {% if dv_queue %}
-                                <p id="dvPlsWait">Results still calculating, please check back later.</p>
+                    <div class="d-flex justify-content-center">
+                        {% if not read_only %}
+                            <button id="validateDataBtn" type="button" class="btn btn-block btn-warning mx-1 my-1" {% if dv_queue and not dv_queue.complete %}disabled{% endif %}>Check My Data</button>
+                            {% if dv_queue.complete %}
+                                <p id="dvLastRun">Last validated: {{ dv_queue.created }}</p>
+                                <p>{{ dv_queue.result|safe }}</p>
+                            {% else %}
+                                {% if dv_queue %}
+                                    <p id="dvPlsWait">Results still calculating, please check back later.</p>
+                                {% endif %}
+                            {% endif %}
+                            <p id="dvResult"></p>
+                            
+                            <script>
+                                $('#validateDataBtn').click( function() {
+                                    $.ajax({
+                                        url: '{% url 'data_validation' %}',
+                                        type: 'post',
+                                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                                        dataType: 'text',
+                                        async: true,
+                                        data: [],
+                                        beforeSend: function() {
+                                            //$('#coiTimer').html('<i class="fad fa-spinner fa-spin" style="font-size:24px;color:#009efb"></i>');
+                                        },
+                                        success: function(data) {
+                                            var result = JSON.parse(data);
+                                            $('#dvResult').html("Calculating, please check back later")
+                                            $('#validateDataBtn').prop('disabled', true);
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown){
+                                        }
+                                    });
+                                });
+                            </script>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-center">
+                        <h4 class="card-title">Calculations</h4>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <p id="coiTimer" class="text-center"></p>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        {% if editor %}
+                            {% if breeds.all.count == 1 %}
+                                <button id="coiBtn" onclick="runCoi(this)" type="button" class="btn btn-block btn-success mx-1" value="{{ breeds.first.id }}">Run COI</button>
+                            {% elif breeds.all.count > 1 %}
+                                <div class="btn-group btn-block">
+                                    <button id="coiBtn" type="button" class="btn btn-success dropdown-toggle mx-1"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {% if breeds_editable|length > 0 %}data-toggle="tooltip" data-placement="top" title="Can only run for your editable breeds"{% endif %}>
+                                        Run COI
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        {% for breed in breeds.all %}
+                                            {% if breeds_editable|length == 0 or breed.breed_name in breeds_editable %}
+                                                <button onclick="runCoi(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             {% endif %}
                         {% endif %}
-                        <p id="dvResult"></p>
-                
-                        <hr>
-                
-                        <h4 class="card-title text-center">Calculations</h4>
-                
-                        <!-- Non-flex element for COI timer -->
-                        <p id="coiTimer" class="text-center"></p>
-                
-                        <!-- Flex container for the COI button -->
-                        <div class="d-flex justify-content-center">
-                            {% if not read_only and not contributor %}
-                                {% if breeds.all.count == 1 %}
-                                    <button id="coiBtn" onclick="runCoi(this)" type="button" class="btn btn-success mx-2">Run COI</button>
-                                {% elif breeds.all.count > 1 %}
-                                    <div class="btn-group mx-2">
-                                        <button id="coiBtn" type="button" class="btn btn-success dropdown-toggle mx-1"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            Run COI
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            {% for breed in breeds.all %}
-                                                {% if breeds_editable|length == 0 or breed.breed_name in breeds_editable %}
-                                                    <button onclick="runCoi(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            {% endif %}
-                        </div>
-                
-                        <!-- Non-flex element for Mean Kinship timer -->
-                        <hr>
+                    </div>
+                    
+                    <hr>
+
+                    <div class="d-flex justify-content-center">
                         <p id="meanKinshipTimer" class="text-center"></p>
-                
-                        <!-- Flex container for the Mean Kinship button -->
-                        <div class="d-flex justify-content-center">
-                            {% if not read_only and not contributor %}
-                                {% if breeds.all.count == 1 %}
-                                    <button id="meanKinshipBtn" onclick="runMK(this)" type="button" class="btn btn-success mx-2">Run Mean Kinship</button>
-                                {% elif breeds.all.count > 1 %}
-                                    <div class="btn-group mx-2">
-                                        <button id="meanKinshipBtn" type="button" class="btn btn-success dropdown-toggle mx-1"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            Run Mean Kinship
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            {% for breed in breeds.all %}
-                                                {% if breeds_editable|length == 0 or breed.breed_name in breeds.editable %}
-                                                    <button onclick="runMK(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            {% endif %}
-                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                    {% if not read_only and not contributor %}
+                        {% if breeds.all.count == 1 %}
+                            <button id="meanKinshipBtn" onclick="runMK(this)" type="button" class="btn btn-block btn-success mx-1" value="{{ breeds.first.id }}">Run Mean Kinship</button>
+                        {% elif breeds.all.count > 1 %}
+                            <div class="btn-group btn-block">
+                                <button id="meanKinshipBtn" type="button" class="btn btn-success dropdown-toggle mx-1"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {% if breeds_editable|length > 0 %}data-toggle="tooltip" data-placement="top" title="Can only run for your editable breeds"{% endif %}>
+                                    Run Mean Kinship
+                                </button>
+                                <div class="dropdown-menu">
+                                    {% for breed in breeds.all %}
+                                        {% if breeds_editable|length == 0 or breed.breed_name in breeds_editable %}
+                                            <button onclick="runMK(this)" class="dropdown-item" name="breed" value='{{ breed.id }}'>{{ breed.breed_name }}</button>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
                     {% endif %}
+                    </div>
                 </div>
                 
                  <!-- END -->
