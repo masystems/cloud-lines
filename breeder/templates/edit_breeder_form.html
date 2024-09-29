@@ -76,9 +76,15 @@
                                             {% render_field field class="form-control" value=breeder.email %}
                                         {% elif field.label == 'Status' %}
                                             {% if breeder.active %}
-                                                {{ field|attr:"class:form-control"|attr:"checked: " }}
+                                                {{ field|attr:"class:form-check"|attr:"checked: " }}
                                             {% else %}
-                                                {% render_field field class="form-control" %}
+                                                {% render_field field class="form-check" %}
+                                            {% endif %}
+                                        {% elif field.label == 'Data Visible' %}
+                                            {% if breeder.data_visible %}
+                                                {{ field|attr:"class:form-check"|attr:"checked: " }}
+                                            {% else %}
+                                                {% render_field field class="form-check" %}
                                             {% endif %}
                                         {% elif field.label == 'Custom fields' %}
                                             {% if custom_fields %}

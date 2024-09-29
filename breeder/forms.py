@@ -24,4 +24,6 @@ class BreederForm(forms.ModelForm):
             'phone_number1': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_phone_number1'}),
             'phone_number2': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_phone_number2'}),
             'email': forms.TextInput(attrs={'class': 'form-control', 'id': 'id_email'}),
+            'data_visible': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
