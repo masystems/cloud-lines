@@ -171,19 +171,19 @@
                                 {% endif %}
                             {% endif %}
                         {% elif field.label == 'Registration charge' %}
-                            {% if prices and contributor %}
-                                <select name="registration_charge" class="custom-select" id="prices" required>
-                                    {% for price in prices %}
-                                        <option value="{{ price.id }}">{{ price.nickname }} {{ price.unit_amount|price }} {{ price.currency|upper }}</option>
-                                    {% endfor %}
-                                </select>
-                                <small>Select the correct charge type for this pedigree</small>
-                            {% else %}
-                                <select name="registration_charge" class="custom-select" id="prices" disabled>
-                                    <option value="price_0000">No Charge</option>
-                                </select>
-                                <small>Field only used if charging is enabled, prices are created and user is a Contributor </small>
-                            {% endif %}
+                        {% if prices and contributor %}
+                            <select name="registration_charge" class="form-select" id="prices" required>
+                                {% for price in prices %}
+                                    <option value="{{ price.id }}">{{ price.nickname }} {{ price.unit_amount|price }} {{ price.currency|upper }}</option>
+                                {% endfor %}
+                            </select>
+                            <small>Select the correct charge type for this pedigree</small>
+                        {% else %}
+                            <select name="registration_charge" class="form-select" id="prices" disabled>
+                                <option value="price_0000">No Charge</option>
+                            </select>
+                            <small>Field only used if charging is enabled, prices are created and user is a Contributor</small>
+                        {% endif %}
 
                         {% else %}
                             {{ field }}

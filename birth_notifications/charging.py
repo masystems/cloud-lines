@@ -52,9 +52,9 @@ def rp_checkout_session(request, id, price, child_id):
         return_url=f"{settings.HTTP_PROTOCOL}://{request.META['HTTP_HOST']}/birth_notification/register_pedigree_success/{pedigree.id}/{child_id}" + "?session_id={CHECKOUT_SESSION_ID}",
         stripe_account=stripe_account.stripe_acct_id,
     )
-    pedigree.stripe_payment_token = session['id']
+    # Store PaymentIntent ID for future reference
+    pedigree.stripe_payment_token = session.payment_intent
     pedigree.save()
-    return JsonResponse({'clientSecret': session.client_secret})
 
 
 @csrf_exempt

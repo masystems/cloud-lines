@@ -63,32 +63,57 @@
                     <div class="tab-content">
                         <div class="tab-pane  active" id="breeders" role="tabpanel">
                             <div class="card-body">
-                                <form action="{% url 'import_breeder_data' %}" method="POST" enctype="multipart/form-data" id="breeders-form">
+                                <form action="{% url 'import_pedigree_data' %}" method="POST" enctype="multipart/form-data" id="pedigrees-form">
                                     {% csrf_token %}
-                                        {% for breeder_heading in breeder_headings %}
-                                            {% if breeder_heading.verbose_name != None %}
-                                                <div class="row mx-lg-n5">
-                                                    <div class="col bg-light border">
-                                                        <p class="mt-2"><strong>{{ breeder_heading.verbose_name|title }}</strong></p>
-                                                        <p><small>{{ breeder_heading.help_text }}</small></p>
-                                                    </div>
-                                                    <div class="col bg-light border">
-                                                        <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                            <select id="select-{{ breeder_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ breeder_heading.name }}" data-style="btn-info" tabindex="-99">
-                                                                    <option data-tokens="" selected>---</option>
-                                                                    {% for imported_heading in imported_headings %}
-                                                                        <option data-tokens="{{ breeder_heading.name }}"
-                                                                        {% if breeder_heading.verbose_name|lower == imported_heading|lower %}selected{% endif %}
-                                                                        >{{ imported_heading }}</option>
-                                                                    {% endfor %}
-                                                            </select>
-                                                        </div>
-                                                    </div>
+                                    
+                                    {% for pedigree_heading in pedigree_headings %}
+                                        {% if pedigree_heading.verbose_name != None and pedigree_heading.verbose_name != 'COI' and pedigree_heading.verbose_name != 'Mean Kinship' %}
+                                            <div class="row gx-5">
+                                                <!-- Label Column -->
+                                                <div class="col bg-light border p-3">
+                                                    <p class="mt-2"><strong>{{ pedigree_heading.verbose_name|title }}</strong></p>
+                                                    <p><small>{{ pedigree_heading.help_text }}</small></p>
                                                 </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                    <button id="import-breeders" class="btn btn-block btn-outline-info">Import Data</button>
+                                
+                                                <!-- Select Dropdown Column -->
+                                                <div class="col bg-light border p-3">
+                                                    <select id="select-{{ pedigree_heading.name }}" class="form-select mt-2 mb-2" name="{{ pedigree_heading.name }}">
+                                                        <option value="" selected>---</option>
+                                                        {% for imported_heading in imported_headings %}
+                                                            <option value="{{ imported_heading }}"
+                                                            {% if pedigree_heading.verbose_name|lower == imported_heading|lower %}selected{% endif %}
+                                                            >{{ imported_heading }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                
+                                    <!-- Custom Fields Section -->
+                                    {% for field in custom_fields %}
+                                        <div class="row gx-5">
+                                            <!-- Label Column -->
+                                            <div class="col bg-light border p-3">
+                                                <p class="mt-2"><strong>{{ field }}</strong></p>
+                                            </div>
+                                
+                                            <!-- Select Dropdown Column -->
+                                            <div class="col bg-light border p-3">
+                                                <select class="form-select mt-2 mb-2" name="{{ field }}">
+                                                    <option value="" selected>---</option>
+                                                    {% for imported_heading in imported_headings %}
+                                                        <option value="{{ imported_heading }}">{{ imported_heading }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                
+                                    <!-- Hidden Input -->
+                                    <input type="hidden" name="update" value="no" id="update">
                                 </form>
+                                
                             </div>
                         </div>
                         <div class="tab-pane" id="pedigrees" role="tabpanel">
@@ -100,48 +125,55 @@
                                 {% endif %}
                                 <form action="{% url 'import_pedigree_data' %}" method="POST" enctype="multipart/form-data" id="pedigrees-form">
                                     {% csrf_token %}
+                                    
                                     {% for pedigree_heading in pedigree_headings %}
                                         {% if pedigree_heading.verbose_name != None and pedigree_heading.verbose_name != 'COI' and pedigree_heading.verbose_name != 'Mean Kinship' %}
-                                            <div class="row mx-lg-n5">
-                                                <div class="col bg-light border">
+                                            <div class="row gx-5">
+                                                <!-- Label Column -->
+                                                <div class="col bg-light border p-3">
                                                     <p class="mt-2"><strong>{{ pedigree_heading.verbose_name|title }}</strong></p>
                                                     <p><small>{{ pedigree_heading.help_text }}</small></p>
                                                 </div>
-                                                <div class="col bg-light border">
-                                                    <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                        <select id="select-{{ pedigree_heading.name }}" class="selectpicker mt-2 mb-2 mr-2" name="{{ pedigree_heading.name }}" data-style="btn-info" tabindex="-98">
-                                                                <option data-tokens="" selected>---</option>
-                                                                {% for imported_heading in imported_headings %}
-                                                                    <option data-tokens="{{ pedigree_heading.name }}"
-                                                                    {% if pedigree_heading.verbose_name|lower == imported_heading|lower %}selected{% endif %}
-                                                                    >{{ imported_heading }}</option>
-                                                                {% endfor %}
-                                                        </select>
-                                                    </div>
+                                
+                                                <!-- Select Dropdown Column -->
+                                                <div class="col bg-light border p-3">
+                                                    <select id="select-{{ pedigree_heading.name }}" class="form-select mt-2 mb-2" name="{{ pedigree_heading.name }}">
+                                                        <option value="" selected>---</option>
+                                                        {% for imported_heading in imported_headings %}
+                                                            <option value="{{ imported_heading }}"
+                                                            {% if pedigree_heading.verbose_name|lower == imported_heading|lower %}selected{% endif %}
+                                                            >{{ imported_heading }}</option>
+                                                        {% endfor %}
+                                                    </select>
                                                 </div>
                                             </div>
                                         {% endif %}
                                     {% endfor %}
-                                    <!-- custom fields -->
+                                
+                                    <!-- Custom Fields Section -->
                                     {% for field in custom_fields %}
-                                        <div class="row mx-lg-n5">
-                                            <div class="col bg-light border">
+                                        <div class="row gx-5">
+                                            <!-- Label Column -->
+                                            <div class="col bg-light border p-3">
                                                 <p class="mt-2"><strong>{{ field }}</strong></p>
                                             </div>
-                                            <div class="col bg-light border">
-                                                <div class="dropdown bootstrap-select mb-3 mr-2">
-                                                    <select class="selectpicker mt-2 mb-2 mr-2" name="{{ field }}" data-style="btn-info" tabindex="-98">
-                                                            <option data-tokens="" selected>---</option>
-                                                            {% for imported_heading in imported_headings %}
-                                                                <option data-tokens="{{ field }}">{{ imported_heading }}</option>
-                                                            {% endfor %}
-                                                    </select>
-                                                </div>
+                                
+                                            <!-- Select Dropdown Column -->
+                                            <div class="col bg-light border p-3">
+                                                <select class="form-select mt-2 mb-2" name="{{ field }}">
+                                                    <option value="" selected>---</option>
+                                                    {% for imported_heading in imported_headings %}
+                                                        <option value="{{ imported_heading }}">{{ imported_heading }}</option>
+                                                    {% endfor %}
+                                                </select>
                                             </div>
                                         </div>
                                     {% endfor %}
+                                    
+                                    <!-- Hidden Input -->
                                     <input type="hidden" name="update" value="no" id="update">
                                 </form>
+                                
                                 <!-- don't show import button if there are no breeds -->
                                 {% if has_breeds %}
                                     <button id="import-pedigrees" class="btn btn-block btn-outline-info">Import Data</button>
