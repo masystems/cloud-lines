@@ -206,8 +206,7 @@
                                                                 {% if can_register or contributor or editor %}
                                                                     {% if birth.status == 'alive' and bn.complete and prices %}
                                                                         <div class="btn-group">
-                                                                            <button type="button" class="btn btn-info dropdown-toggle"
-                                                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                            <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                                 Register Pedigree
                                                                             </button>
                                                                             <div class="dropdown-menu">
@@ -217,11 +216,15 @@
                                                                             </div>
                                                                         </div>
                                                                     {% elif birth.status == 'alive' and bn.complete and not prices %}
-                                                                        <a href="{% url 'register_pedigree' birth.id 0 %}"><button class="btn btn-info">Register Pedigree</button></a>
+                                                                        <a href="{% url 'register_pedigree' birth.id 0 %}">
+                                                                            <button class="btn btn-info">Register Pedigree</button>
+                                                                        </a>
                                                                     {% endif %}
                                                                 {% endif %}
                                                             {% else %}
-                                                                <a href="{% url 'pedigree' birth.pedigree.id %}"><button class="btn btn-success">View Pedigree</button></a>
+                                                                <a href="{% url 'pedigree' birth.pedigree.id %}">
+                                                                    <button class="btn btn-success">View Pedigree</button>
+                                                                </a>
                                                             {% endif %}
                                                         </div>
                                                     </td>
