@@ -55,6 +55,7 @@ def rp_checkout_session(request, id, price, child_id):
     # Store PaymentIntent ID for future reference
     pedigree.stripe_payment_token = session.payment_intent
     pedigree.save()
+    return JsonResponse({'clientSecret': session.client_secret})
 
 
 @csrf_exempt

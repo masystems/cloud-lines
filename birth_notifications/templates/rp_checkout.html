@@ -33,22 +33,24 @@
       stripeAccount: '{{ connect_account_id }}',
     });
 
-    initialize();
+    document.addEventListener("DOMContentLoaded", function () {
+      initialize();
+    });
 
     // Create a Checkout Session as soon as the page loads
     async function initialize() {
-    const response = await fetch("{% url 'rp_checkout_session' rp_id price child_id %}", {
-        method: "POST",
-    });
+      const response = await fetch("{% url 'rp_checkout_session' rp_id price child_id %}", {
+          method: "POST",
+      });
 
-    const { clientSecret } = await response.json();
+      const { clientSecret } = await response.json();
 
-    const checkout = await stripe.initEmbeddedCheckout({
-        clientSecret,
-    });
+      const checkout = await stripe.initEmbeddedCheckout({
+          clientSecret,
+      });
 
-    // Mount Checkout
-    checkout.mount('#checkout');
+      // Mount Checkout
+      checkout.mount('#checkout');
     }
   </script>
 {% endblock %}
