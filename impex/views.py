@@ -127,7 +127,6 @@ def importx(request):
             
             # if we need to save the body
             elif request.POST['job'] == 'slices':
-                
                 # create the file slice
                 file_slice = []
                 for key in request.POST:
@@ -240,20 +239,24 @@ def import_pedigree_data(request):
         # dictionary that stores name of given custom fields, and their column's index in the file header
         custom_fields_in = {}
 
-        # iterate through columns
+        # Iterate through columns
         for key, val in request.POST.items():
-            # add custom field columns
-            if key in field_names and val != '---':
-                # find what index of the header corresponds with this column
-                col_index = loads(database_upload.header)['header'].index(val)
-                # add name:index to list
-                custom_fields_in[key] = col_index
+            # Add custom field columns if `val` is valid and in field_names
+            if key in field_names and val not in ('', '---'):
+                try:
+                    # Find what index of the header corresponds with this column
+                    col_index = loads(database_upload.header)['header'].index(val)
+                    # Add name:index to list
+                    custom_fields_in[key] = col_index
+                except ValueError:
+                    continue
             
-            # remove blank ('---') entries ###################
+            # Remove blank ('---') entries
             elif val == '---':
                 if key in date_fields:
                     post_data[key] = None
-                post_data[key] = ''
+                else:
+                    post_data[key] = ''
             else:
                 post_data[key] = val
 
@@ -1061,22 +1064,25 @@ def import_pedigree_data(request):
             ############################ save, or don't
             if not has_error:
                 try:
-                    if father_obj:
-                        father_obj.save()
-                except NameError:
-                    pass
-                try:
-                    if mother_obj:
-                        mother_obj.save()
-                except NameError:
-                    pass
-                try:
-                    breeder_obj.save()
-                except NameError:
-                    pass
-                try:
-                    current_owner_obj.save()
-                except NameError:
+                    try:
+                        if father_obj:
+                            father_obj.save()
+                    except NameError:
+                        pass
+                    try:
+                        if mother_obj:
+                            mother_obj.save()
+                    except NameError:
+                        pass
+                    try:
+                        breeder_obj.save()
+                    except NameError:
+                        pass
+                    try:
+                        current_owner_obj.save()
+                    except NameError:
+                        pass
+                except AttributeError:
                     pass
                 try:
                     # set foreign keys again so they aren't forgotten when pedigree saved
@@ -1207,7 +1213,6 @@ def import_breeder_data(request):
     phone_number2 = post_data['phone_number2'] or ''
     email = post_data['email'] or ''
     active = post_data['active'] or ''
-    print(loads(database_upload.header)['header'])
     # get index of each heading
     thousand = 1000
     if breeding_prefix:

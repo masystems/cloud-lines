@@ -16,6 +16,7 @@
                     <div id="spinner">
                         <div class="spinner-border" role="status"></div>
                         <h3 class="text-white mt-2">Importing Data...</h3>
+                        <h5 id="rowNumbers" class="text-white mt-2"></h5>
                     </div>
 
                 </div>
@@ -237,56 +238,74 @@
                 })
 
                 function slicesJob(allRows) {
-                    // maximum size of slice
-                    var sliceMax = 100
-                    // the start of the first slice
-                    var sliceStart = 0
-                    // the line which is the end of the first slice
-                    var sliceEnd = sliceMax
+                    var sliceMax = 100;
+                    var sliceStart = 0;
+                    var sliceEnd = sliceMax;
+
                     if (totalLines < sliceMax) {
-                        sliceEnd = totalLines
+                        sliceEnd = totalLines;
                     }
 
-                    // the first row is on row 2, as it's after the header
-                    var rowCounter = 2
+                    var rowCounter = 2;
 
-                    // go through slices of the file
-                    while (sliceEnd <= totalLines) {
-                        // get slice of file
-                        fileSliceArray = allRows.slice(sliceStart, sliceEnd)
-
-                        // add row number column
-                        fileSliceArray.forEach(updateSlice)
-                        function updateSlice(row, index) {
-                            fileSliceArray[index] = row.concat([rowCounter])
-                            rowCounter += 1
+                    function processNextSlice() {
+                        if (sliceStart >= totalLines) {
+                            // All slices are processed, hide the modal and redirect
+                            $('#overlay-spinner').modal('hide');
+                            window.location.href = 'import_data';
+                            return;
                         }
 
-                        // send slice to backend
+                        // Update the row numbers in the UI
+                        $('#rowNumbers').text('Importing rows ' + sliceStart + ' to ' + sliceEnd);
+
+                        // Get slice of file
+                        var fileSliceArray = allRows.slice(sliceStart, sliceEnd);
+
+                        // Add row number column
+                        fileSliceArray.forEach(function(row, index) {
+                            fileSliceArray[index] = row.concat([rowCounter]);
+                            rowCounter += 1;
+                        });
+
+                        // Send slice to backend
                         $.ajax({
                             type: "POST",
                             url: "{% url 'import' %}",
                             dataType: "json",
                             headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                            async: false,
-                            data: ({
+                            async: true, // Allow async to keep the UI responsive
+                            data: {
                                 'job': 'slices',
                                 'uploadDatabase': fileSliceArray
-                            }),
-                            success: function(result){
-                            }
-                        })
+                            },
+                            success: function(result) {
+                                // Increment start and end of slice for the next iteration
+                                sliceStart = sliceEnd;
+                                sliceEnd += sliceMax;
+                                if (sliceEnd > totalLines) {
+                                    sliceEnd = totalLines;
+                                }
 
-                        // increment end and start of slice
-                        sliceStart = sliceEnd
-                        sliceEnd += sliceMax
-                        if (sliceEnd > totalLines && sliceStart < totalLines) {
-                            sliceEnd = totalLines
-                        }
+                                // Process the next slice
+                                setTimeout(processNextSlice, 0);
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                if (jqXHR.status == 403) {
+                                    location.reload();
+                                } else {
+                                    // Handle any other errors (e.g., show an error message)
+                                    console.error("Error processing slice:", textStatus, errorThrown);
+                                    $('#overlay-spinner').modal('hide');
+                                }
+                            }
+                        });
                     }
-                    $('#overlay-spinner').modal('hide')
-                    window.location.href = 'import_data'
+
+                    // Start processing slices asynchronously
+                    processNextSlice();
                 }
+
             };
         }
     }
