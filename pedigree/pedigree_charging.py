@@ -17,6 +17,7 @@ from account.views import is_editor,\
 
 import json
 import stripe
+from stripe.error import InvalidRequestError
 
 class PedigreePaymentSettings(LoginRequiredMixin, TemplateView):
     template_name = 'pedigree_payment_settings.html'
@@ -176,22 +177,26 @@ def decline_pedigree(request, reg_no):
     pedigree = Pedigree.objects.get(reg_no=reg_no)
 
     # submit refund
-    session = stripe.checkout.Session.retrieve(
-        pedigree.stripe_payment_token,
-        stripe_account=stripe_account.stripe_acct_id
-    )
-
-    if session['payment_status'] == 'paid':
-        payment_intent = stripe.PaymentIntent.retrieve(
-            session.payment_intent,
+    try:
+        session = stripe.checkout.Session.retrieve(
+            pedigree.stripe_payment_token,
             stripe_account=stripe_account.stripe_acct_id
         )
+    
 
-        # create refund
-        stripe.Refund.create(
-            charge=payment_intent['charges']['data'][0]['id'],
-            stripe_account=stripe_account.stripe_acct_id
-        )
+        if session['payment_status'] == 'paid':
+            payment_intent = stripe.PaymentIntent.retrieve(
+                session.payment_intent,
+                stripe_account=stripe_account.stripe_acct_id
+            )
+
+            # create refund
+            stripe.Refund.create(
+                charge=payment_intent['charges']['data'][0]['id'],
+                stripe_account=stripe_account.stripe_acct_id
+            )
+    except InvalidRequestError:
+        return False
 
 
 def get_pedigree_payment_session(request, pedigree):
