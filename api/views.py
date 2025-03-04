@@ -172,7 +172,7 @@ class PedigreeViews(viewsets.ModelViewSet):
         if current_owner_breeding_prefix is not None:
             queryset = queryset.filter(current_owner__breeding_prefix=current_owner_breeding_prefix)
 
-        queryset = queryset.filter(status='alive')
+        #queryset = queryset.filter(status='alive')
 
         return queryset
 
